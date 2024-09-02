@@ -2,7 +2,7 @@
   <tr class="group">
     <td
       v-if="row.icon"
-      class="pl-6 w-8 pr-2 w-max"
+      class="pl-6 w-14 pr-2"
       :class="{
         [row.iconClass]: true,
         [rowClasses]: true,
@@ -28,7 +28,7 @@
 
     <td
       v-if="row.actions.length > 0"
-      class="text-right pr-4 w-max"
+      class="text-right pr-4 w-12"
       :class="rowClasses"
     >
       <div class="flex justify-end items-center text-gray-400">
