@@ -246,7 +246,7 @@ class Nova
 
             $version = $manifest['version'] ?? '4.x';
 
-            return $version.' (Silver Surfer)';
+            return $version;
         });
     }
 
