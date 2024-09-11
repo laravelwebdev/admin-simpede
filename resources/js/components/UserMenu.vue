@@ -141,7 +141,7 @@ export default {
 
     userName() {
       return (
-        this.currentUser.nama || this.currentUser.email || this.__('Nova User')
+        this.currentUser.name || this.currentUser.email || this.__('Nova User')
       )
     },
 
