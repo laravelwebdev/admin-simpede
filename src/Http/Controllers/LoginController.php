@@ -62,7 +62,7 @@ class LoginController extends Controller
     {
         $redirect = redirect()->intended($this->redirectPath($request));    
         session(['year' => $request->input('year')]);  
-        session(['role' => 'pegawai']);  
+        session(['role' => 'anggota']);  
         return $request->wantsJson()
             ? new JsonResponse([
                 'redirect' => $redirect->getTargetUrl(),
