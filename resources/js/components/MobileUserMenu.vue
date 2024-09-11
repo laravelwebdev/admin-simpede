@@ -55,7 +55,7 @@ const formattedItems = computed(() => {
 
 const userName = computed(() => {
   return (
-    store.getters.currentUser?.nama ||
+    store.getters.currentUser?.name ||
     store.getters.currentUser?.email ||
     __('Nova User')
   )
