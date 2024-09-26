@@ -28,7 +28,11 @@ class PendingRouteRegistration
     {
         Nova::withAuthentication();
 
-        if ($default === true && ! Route::has('login')) {
+        if (
+            $default === true
+            && ! Route::has('login')
+            && Nova::url('/login') !== '/login'
+        ) {
             Route::redirect('/login', Nova::url('/login'))->name('login');
         }
 

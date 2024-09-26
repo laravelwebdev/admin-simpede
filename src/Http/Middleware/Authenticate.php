@@ -14,7 +14,7 @@ class Authenticate extends BaseAuthenticationMiddleware
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request):mixed  $next
-     * @param  string[]  ...$guards
+     * @param  string  ...$guards
      * @return mixed
      *
      * @throws \Illuminate\Auth\AuthenticationException

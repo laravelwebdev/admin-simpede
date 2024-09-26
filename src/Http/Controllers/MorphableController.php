@@ -3,7 +3,7 @@
 namespace Laravel\Nova\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Laravel\Nova\Contracts\RelatableField;
+use Laravel\Nova\Fields\MorphTo;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 
@@ -23,10 +23,13 @@ class MorphableController extends Controller
 
         $field = $request->newResource()
                         ->availableFieldsOnIndexOrDetail($request)
-                        ->whereInstanceOf(RelatableField::class)
+                        ->filter(function ($field) {
+                            return $field instanceof MorphTo;
+                        })
                         ->findFieldByAttribute($request->field, function () {
                             abort(404);
-                        })->applyDependsOn($request);
+                        })
+                        ->applyDependsOn($request);
 
         $withTrashed = $this->shouldIncludeTrashed(
             $request, $relatedResource
@@ -39,7 +42,7 @@ class MorphableController extends Controller
         $shouldReorderAssociatableValues = $field->shouldReorderAssociatableValues($request) && ! $relatedResource::usesScout();
 
         return [
-            'resources' => $field->buildMorphableQuery($request, $relatedResource, $withTrashed)
+            'resources' => $field->searchMorphableQuery($request, $relatedResource, $withTrashed)
                                 ->take($limit)
                                 ->get()
                                 ->mapInto($relatedResource)

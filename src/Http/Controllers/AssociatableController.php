@@ -3,7 +3,7 @@
 namespace Laravel\Nova\Http\Controllers;
 
 use Illuminate\Routing\Controller;
-use Laravel\Nova\Contracts\RelatableField;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class AssociatableController extends Controller
@@ -18,7 +18,9 @@ class AssociatableController extends Controller
     {
         $field = $request->newResource()
                     ->availableFields($request)
-                    ->whereInstanceOf(RelatableField::class)
+                    ->filter(function ($field) {
+                        return $field instanceof BelongsTo;
+                    })
                     ->findFieldByAttribute($request->field, function () {
                         abort(404);
                     })->applyDependsOn($request);
@@ -34,7 +36,7 @@ class AssociatableController extends Controller
         $shouldReorderAssociatableValues = $field->shouldReorderAssociatableValues($request) && ! $associatedResource::usesScout();
 
         return [
-            'resources' => $field->buildAssociatableQuery($request, $withTrashed)
+            'resources' => $field->searchAssociatableQuery($request, $withTrashed)
                         ->take($limit)
                         ->get()
                         ->mapInto($field->resourceClass)

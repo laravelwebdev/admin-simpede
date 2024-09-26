@@ -3,9 +3,9 @@
 namespace Laravel\Nova\Fields;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Contracts\RelatableField;
@@ -389,60 +389,43 @@ class MorphTo extends Field implements FilterableField, RelatableField
      * @param  bool  $withTrashed
      * @return \Laravel\Nova\Contracts\QueryBuilder
      */
-    public function buildMorphableQuery(NovaRequest $request, $relatedResource, $withTrashed = false)
+    public function searchMorphableQuery(NovaRequest $request, $relatedResource, $withTrashed)
     {
         $model = $relatedResource::newModel();
 
         $query = app()->make(QueryBuilder::class, [$relatedResource]);
 
         $request->first === 'true'
-                        ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
-                        : $query->search(
-                            $request, $model->newQuery(), $request->search,
-                            [], [], TrashedStatus::fromBoolean($withTrashed)
-                        );
-
-        return $query->tap(function ($query) use ($request, $relatedResource, $model) {
-            if (is_callable($this->relatableQueryCallback)) {
-                call_user_func($this->relatableQueryCallback, $request, $query);
-
-                return;
-            }
-
-            forward_static_call(
-                $this->morphableQueryCallable($request, $relatedResource, $model),
-                $request, $query, $this
+            ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
+            : $query->search(
+                $request, $model->newQuery(), $request->search,
+                [], [], TrashedStatus::fromBoolean($withTrashed)
             );
+
+        return $query->tap(function (Builder $query) use ($request, $relatedResource, $model) {
+            $this->applyAssociatableCallbacks($query, $request, $relatedResource, $model);
         });
     }
 
     /**
-     * Get the morphable query method name.
+     * Build the morphable query for the field.
      *
      * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  string  $relatedResource
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return array
+     * @param  bool  $withTrashed
+     * @return \Laravel\Nova\Contracts\QueryBuilder
      */
-    protected function morphableQueryCallable(NovaRequest $request, $relatedResource, $model)
+    public function buildMorphableQuery(NovaRequest $request, $relatedResource, $withTrashed)
     {
-        return ($method = $this->morphableQueryMethod($request, $model))
-                    ? [$request->resource(), $method]
-                    : [$relatedResource, 'relatableQuery'];
-    }
+        $model = $relatedResource::newModel();
 
-    /**
-     * Get the morphable query method name.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string
-     */
-    protected function morphableQueryMethod(NovaRequest $request, $model)
-    {
-        $method = 'relatable'.Str::plural(class_basename($model));
+        /** @var QueryBuilder $query */
+        $query = app()->make(QueryBuilder::class, [$relatedResource]);
 
-        return method_exists($request->resource(), $method) ? $method : null;
+        return $query->search($request, $model->newQuery(), null, [], [], TrashedStatus::fromBoolean($withTrashed))
+            ->tap(function (Builder $query) use ($request, $relatedResource, $model) {
+                $this->applyAssociatableCallbacks($query, $request, $relatedResource, $model);
+            });
     }
 
     /**

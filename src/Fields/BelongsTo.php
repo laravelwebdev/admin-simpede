@@ -2,10 +2,10 @@
 
 namespace Laravel\Nova\Fields;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Contracts\RelatableField;
@@ -315,8 +315,9 @@ class BelongsTo extends Field implements FilterableField, RelatableField
      * @param  bool  $withTrashed
      * @return \Laravel\Nova\Contracts\QueryBuilder
      */
-    public function buildAssociatableQuery(NovaRequest $request, $withTrashed = false)
+    public function searchAssociatableQuery(NovaRequest $request, $withTrashed = false)
     {
+        /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = forward_static_call(
             [$resourceClass = $this->resourceClass, 'newModel']
         );
@@ -324,51 +325,38 @@ class BelongsTo extends Field implements FilterableField, RelatableField
         $query = app()->make(QueryBuilder::class, [$resourceClass]);
 
         $request->first === 'true'
-                        ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
-                        : $query->search(
-                            $request, $model->newQuery(), $request->search,
-                            [], [], TrashedStatus::fromBoolean($withTrashed)
-                        );
+            ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
+            : $query->search(
+                $request, $model->newQuery(), $request->search,
+                [], [], TrashedStatus::fromBoolean($withTrashed)
+            );
 
-        return $query->tap(function ($query) use ($request, $model) {
-            if (is_callable($this->relatableQueryCallback)) {
-                call_user_func($this->relatableQueryCallback, $request, $query);
-
-                return;
-            }
-
-            forward_static_call($this->associatableQueryCallable($request, $model), $request, $query, $this);
+        return $query->tap(function (Builder $query) use ($request, $resourceClass, $model) {
+            $this->applyAssociatableCallbacks($query, $request, $resourceClass, $model);
         });
     }
 
     /**
-     * Get the associatable query method name.
+     * Build an associatable query for the field.
      *
      * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return array
+     * @param  bool  $withTrashed
+     * @return \Laravel\Nova\Contracts\QueryBuilder
      */
-    protected function associatableQueryCallable(NovaRequest $request, $model)
+    public function buildAssociatableQuery(NovaRequest $request, $withTrashed = false)
     {
-        return ($method = $this->associatableQueryMethod($request, $model))
-                    ? [$request->resource(), $method]
-                    : [$this->resourceClass, 'relatableQuery'];
-    }
+        /** @var \Illuminate\Database\Eloquent\Model $model */
+        $model = forward_static_call(
+            [$resourceClass = $this->resourceClass, 'newModel']
+        );
 
-    /**
-     * Get the associatable query method name.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string|null
-     */
-    protected function associatableQueryMethod(NovaRequest $request, $model)
-    {
-        $method = 'relatable'.Str::plural(class_basename($model));
+        /** @var QueryBuilder $query */
+        $query = app()->make(QueryBuilder::class, [$resourceClass]);
 
-        if (method_exists($request->resource(), $method)) {
-            return $method;
-        }
+        return $query->search($request, $model->newQuery(), null, [], [], TrashedStatus::fromBoolean($withTrashed))
+                    ->tap(function (Builder $query) use ($request, $resourceClass, $model) {
+                        $this->applyAssociatableCallbacks($query, $request, $resourceClass, $model);
+                    });
     }
 
     /**

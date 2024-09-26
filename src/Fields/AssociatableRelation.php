@@ -2,10 +2,14 @@
 
 namespace Laravel\Nova\Fields;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 trait AssociatableRelation
 {
+    use SupportsRelatableQuery;
+
     /**
      * The callback that should be run to associate relations.
      *
@@ -71,5 +75,28 @@ trait AssociatableRelation
         $this->relatableQueryCallback = $callback;
 
         return $this;
+    }
+
+    /**
+     * Applies the relatableQueryCallback if applicable or fallbacks to calling relateQuery method on related resource.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  class-string<\Laravel\Nova\Resource>  $resourceClass  $resourceClass
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return void
+     */
+    protected function applyAssociatableCallbacks(Builder $query, NovaRequest $request, string $resourceClass, Model $model)
+    {
+        if (is_callable($this->relatableQueryCallback)) {
+            call_user_func($this->relatableQueryCallback, $request, $query);
+
+            return;
+        }
+
+        forward_static_call(
+            $this->relatableQueryCallable($request, $resourceClass, $model),
+            $request, $query, $this
+        );
     }
 }

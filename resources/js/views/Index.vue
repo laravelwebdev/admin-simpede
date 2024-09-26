@@ -122,7 +122,7 @@
           :restore-all-matching-resources="restoreAllMatchingResources"
           :restore-selected-resources="restoreSelectedResources"
           :select-all-matching-checked="selectAllMatchingResources"
-          @deselect="clearResourceSelections"
+          @deselect="deselectAllResources"
           :selected-resources="selectedResources"
           :selected-resources-for-action-selector="
             selectedResourcesForActionSelector
@@ -214,7 +214,6 @@
 </template>
 
 <script>
-// this.$refs.selectControl.selectedIndex = 0
 import { CancelToken, isCancel } from 'axios'
 import {
   HasCards,
