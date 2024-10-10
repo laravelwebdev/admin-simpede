@@ -196,7 +196,7 @@ class MenuItem implements JsonSerializable
         }
 
         $this->filters->push([
-            'class' => $filter instanceof FilterContract ? get_class($filter) : $filter,
+            'class' => $filter instanceof FilterContract ? $filter->key() : $filter,
             'value' => $value,
         ]);
 

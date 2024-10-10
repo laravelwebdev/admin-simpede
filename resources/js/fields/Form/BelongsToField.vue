@@ -386,6 +386,10 @@ export default {
       }
     },
 
+    revertSyncedFieldToPreviousValue(field) {
+      this.syncedField.belongsToId = field.belongsToId
+    },
+
     onSyncedField() {
       if (this.viaRelatedResource) {
         return

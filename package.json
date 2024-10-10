@@ -48,7 +48,7 @@
     "@vueuse/core": "^10.4.1",
     "@vueuse/integrations": "^10.4.1",
     "autosize": "^4.0.2",
-    "browser-sync": "^3.0.1",
+    "browser-sync": "^3.0.3",
     "browser-sync-v3-webpack-plugin": "^0.1.0",
     "chartist": "^0.11.0",
     "chartist-plugin-tooltips-updated": "^0.1.4",
