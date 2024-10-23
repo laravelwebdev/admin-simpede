@@ -13,13 +13,13 @@
       <DividerLine />
 
       <div class="mb-6">
-        <label class="block mb-2" for="email">{{ __('Email Address') }}</label>
+        <label class="block mb-2" for="email">{{ __('Username') }}</label>
         <input
           v-model="form.email"
           class="form-control form-input form-control-bordered w-full"
           :class="{ 'form-control-bordered-error': form.errors.has('email') }"
           id="email"
-          type="email"
+          type="text"
           name="email"
           autofocus=""
           required
