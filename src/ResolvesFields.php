@@ -367,7 +367,7 @@ trait ResolvesFields
      * @param  \Laravel\Nova\Resource|null  $resource
      * @return \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field>
      */
-    public function updateFieldsWithinPanels(NovaRequest $request, Resource $resource = null)
+    public function updateFieldsWithinPanels(NovaRequest $request, ?Resource $resource = null)
     {
         return $this->updateFields($request)
             ->assignDefaultPanel(Panel::defaultNameForUpdate($resource ?? $request->newResource()));
@@ -406,7 +406,7 @@ trait ResolvesFields
      * @param  (\Closure(\Laravel\Nova\Fields\FieldCollection):(\Laravel\Nova\Fields\FieldCollection))|null  $filter
      * @return \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field>
      */
-    protected function resolveFields(NovaRequest $request, Closure $filter = null)
+    protected function resolveFields(NovaRequest $request, ?Closure $filter = null)
     {
         $fields = $this->availableFields($request)->authorized($request);
 
@@ -538,7 +538,7 @@ trait ResolvesFields
      * @param  \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field>|null  $fields
      * @return array<int, \Laravel\Nova\Panel>
      */
-    public function availablePanelsForCreate($request, FieldCollection $fields = null)
+    public function availablePanelsForCreate($request, ?FieldCollection $fields = null)
     {
         $method = $this->fieldsMethod($request);
 
@@ -560,7 +560,7 @@ trait ResolvesFields
      * @param  \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field>|null  $fields
      * @return array<int, \Laravel\Nova\Panel>
      */
-    public function availablePanelsForUpdate(NovaRequest $request, Resource $resource = null, FieldCollection $fields = null)
+    public function availablePanelsForUpdate(NovaRequest $request, ?Resource $resource = null, ?FieldCollection $fields = null)
     {
         $method = $this->fieldsMethod($request);
 

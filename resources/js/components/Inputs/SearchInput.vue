@@ -200,10 +200,10 @@ export default {
           })
         })
       } else {
-        this.$refs.search.blur()
         if (this.popper) this.popper.destroy()
 
         Nova.$emit('enable-focus-trap')
+        this.$refs.input.focus()
       }
     },
   },

@@ -20,7 +20,7 @@ trait Filterable
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed, string):(void))|null  $filterableCallback
      * @return $this
      */
-    public function filterable(callable $filterableCallback = null)
+    public function filterable(?callable $filterableCallback = null)
     {
         if (property_exists($this, 'requiresExplicitFilterableCallback')
             && $this->requiresExplicitFilterableCallback === true

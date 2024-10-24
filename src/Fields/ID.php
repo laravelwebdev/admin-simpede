@@ -46,7 +46,7 @@ class ID extends Field
      * @param  callable|null  $resolveCallback
      * @return \Laravel\Nova\Fields\Hidden
      */
-    public static function hidden($name = 'ID', $attribute = 'id', callable $resolveCallback = null)
+    public static function hidden($name = 'ID', $attribute = 'id', ?callable $resolveCallback = null)
     {
         return Hidden::make($name, $attribute, $resolveCallback);
     }

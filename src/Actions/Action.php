@@ -593,7 +593,7 @@ class Action implements JsonSerializable
      * @param  string|null  $message
      * @return static|\Laravel\Nova\Actions\ActionResponse
      */
-    public static function danger($name, string $message = null)
+    public static function danger($name, ?string $message = null)
     {
         if (\func_num_args() === 2) {
             return (new static)
