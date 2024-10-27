@@ -63,13 +63,6 @@
       </div>     
 
       <div class="flex mb-6">
-        <Checkbox
-          @change="() => (form.remember = !form.remember)"
-          :model-value="form.remember"
-          dusk="remember-button"
-          :label="__('Remember me')"
-        />
-
         <div
           v-if="supportsPasswordReset || forgotPasswordPath !== false"
           class="ml-auto"
