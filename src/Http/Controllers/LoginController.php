@@ -60,9 +60,10 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
+        $roles = Pengelola::cache()->get('all')->where('user_id', Auth::user()->id)->whereNull('inactive')->pluck('role')->toArray();
         $redirect = redirect()->intended($this->redirectPath($request));    
         session(['year' => $request->input('year')]);  
-        session(['role' => 'anggota']);  
+        session(['role' => $roles]);  
         return $request->wantsJson()
             ? new JsonResponse([
                 'redirect' => $redirect->getTargetUrl(),
