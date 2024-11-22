@@ -9,7 +9,7 @@
   <div v-else-if="hasContent" class="break-normal">
     <div
       v-if="expanded"
-      class="max-w-none prose prose-sm dark:prose-invert max-w-none text-gray-500 dark:text-gray-400"
+      class="prose prose-sm dark:prose-invert max-w-none text-gray-500 dark:text-gray-400"
       :class="{ 'whitespace-pre-wrap': plainText }"
       v-html="content"
     />
