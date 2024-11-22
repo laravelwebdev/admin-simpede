@@ -14,7 +14,7 @@
   ],
   "require": {
     "php": "^7.3|^8.0",
-    "brick/money": "^0.5|^0.6|^0.7|^0.8|^0.9",
+    "brick/money": "^0.5|^0.6|^0.7|^0.8|^0.9|^0.10",
     "doctrine/dbal": "^2.13.3|^3.1.2|^4.0",
     "illuminate/support": "^8.83.4|^9.3.1|^10.0|^11.0",
     "inertiajs/inertia-laravel": "^0.4.5|^0.5.2|^0.6.0|^1.0",
@@ -123,5 +123,5 @@
   ],
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "version": "4.35.4"
+  "version": "4.35.5"
 }

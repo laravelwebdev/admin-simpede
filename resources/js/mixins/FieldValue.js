@@ -35,8 +35,12 @@ export default {
       return this.field.usesCustomizedDisplay && filled(this.field.displayedAs)
     },
 
+    fieldHasValueOrCustomizedDisplay() {
+      return this.usesCustomizedDisplay || this.fieldHasValue
+    },
+
     fieldValue() {
-      if (!this.usesCustomizedDisplay && !this.fieldHasValue) {
+      if (!this.fieldHasValueOrCustomizedDisplay) {
         return null
       }
 

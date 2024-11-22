@@ -69,8 +69,8 @@ Route::get('/styles/{style}', StyleController::class)->middleware(CheckResponseF
 Route::get('/search', SearchController::class);
 
 // Impersonation...
-Route::post('impersonate', [ImpersonateController::class, 'startImpersonating']);
-Route::delete('impersonate', [ImpersonateController::class, 'stopImpersonating']);
+Route::post('impersonate', [ImpersonateController::class, 'startImpersonating'])->name('start-nova-impersonation');
+Route::delete('impersonate', [ImpersonateController::class, 'stopImpersonating'])->name('stop-nova-impersonation');
 
 // Fields...
 Route::get('/{resource}/field/{field}', FieldController::class);

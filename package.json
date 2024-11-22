@@ -24,7 +24,7 @@
     "babel-jest": "^27.4.6",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-syntax-jsx": "^6.18.0",
-    "cross-env": "^5.0.0",
+    "cross-env": "^7.0.3",
     "jest": "^27.4.7",
     "laravel-mix": "^6.0.41",
     "lodash": "^4.17.21",

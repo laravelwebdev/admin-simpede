@@ -28,6 +28,7 @@ class JSON implements Preset
         // Reset the field attribute in case it's filled already
         $model->setAttribute($attribute, null);
 
+        /** @var \Illuminate\Support\Collection<int, \Closure> $fieldCallbacks */
         $fieldCallbacks = collect($request->input($requestAttribute))
             ->map(function ($item, $blockKey) use ($request, $requestAttribute, $model, $attribute, $repeatables) {
                 $data = new Fluent();

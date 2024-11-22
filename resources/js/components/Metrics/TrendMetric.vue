@@ -77,12 +77,14 @@ export default {
   mounted() {
     if (this.card && this.card.refreshWhenFiltersChange === true) {
       Nova.$on('filter-changed', this.fetch)
+      Nova.$on('filter-reset', this.fetch)
     }
   },
 
   beforeUnmount() {
     if (this.card && this.card.refreshWhenFiltersChange === true) {
       Nova.$off('filter-changed', this.fetch)
+      Nova.$off('filter-reset', this.fetch)
     }
   },
 
