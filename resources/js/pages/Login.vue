@@ -49,6 +49,7 @@
         </HelpText>
       </div>
 
+    <div class="flex mb-6">
       <div class="mb-6">
         <label class="block mb-2" for="year">{{ __('Year') }}</label>
         <select
@@ -169,8 +170,8 @@ export default {
     },
 
     years () {
-        const year = new Date().getFullYear()
-        return Array.from({length: year - 2023}, (value, index) => year - index)
+      const year = new Date().getFullYear()
+      return Array.from({length: year - 2023}, (value, index) => year - index)
     },
   },
 }
