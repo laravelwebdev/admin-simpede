@@ -3,7 +3,7 @@
 namespace Laravel\Nova\Http\Requests;
 
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use LogicException;
 
 /**
@@ -17,12 +17,10 @@ class LensResourceDeletionRequest extends NovaRequest
     /**
      * Get the selected models for the action in chunks.
      *
-     * @param  int  $count
      * @param  \Closure(\Illuminate\Support\Collection):void  $callback
      * @param  \Closure(\Illuminate\Support\Collection):\Illuminate\Support\Collection  $authCallback
-     * @return mixed
      */
-    protected function chunkWithAuthorization($count, Closure $callback, Closure $authCallback)
+    protected function chunkWithAuthorization(int $count, Closure $callback, Closure $authCallback): void
     {
         $this->toSelectedResourceQuery()->when(! $this->allResourcesSelected(), function ($query) {
             $query->whereKey($this->resources);
@@ -39,22 +37,20 @@ class LensResourceDeletionRequest extends NovaRequest
 
     /**
      * Get the query for the models that were selected by the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function toSelectedResourceQuery()
+    protected function toSelectedResourceQuery(): Builder
     {
         return $this->allResourcesSelected()
-                    ? $this->toQuery()
-                    : $this->newQueryWithoutScopes();
+            ? $this->toQuery()
+            : $this->newQueryWithoutScopes();
     }
 
     /**
      * Transform the request into a query.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @throws \LogicException
      */
-    public function toQuery()
+    public function toQuery(): Builder
     {
         return tap($this->lens()->query(LensRequest::createFrom($this), $this->newSearchQuery()), function ($query) {
             if (! $query instanceof Builder) {

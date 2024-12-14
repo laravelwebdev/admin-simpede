@@ -2,6 +2,8 @@
 
 namespace Laravel\Nova\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Nova\Actions\ActionEvent;
 use Laravel\Nova\Actions\ActionResource;
 
 trait InteractsWithActionEvent
@@ -11,17 +13,15 @@ trait InteractsWithActionEvent
      *
      * @return class-string<\Laravel\Nova\Actions\ActionResource>
      */
-    public static function actionResource()
+    public static function actionResource(): string
     {
         return config('nova.actions.resource') ?? ActionResource::class;
     }
 
     /**
      * Get a new instance of the configured ActionEvent.
-     *
-     * @return \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Actions\ActionEvent
      */
-    public static function actionEvent()
+    public static function actionEvent(): Model|ActionEvent
     {
         return static::actionResource()::newModel();
     }
@@ -30,12 +30,23 @@ trait InteractsWithActionEvent
      * Invoke the callback with an instance of the configured ActionEvent if it is available.
      *
      * @param  callable(\Laravel\Nova\Actions\ActionEvent):mixed  $callback
-     * @return mixed
      */
-    public static function usingActionEvent(callable $callback)
+    public static function usingActionEvent(callable $callback): mixed
     {
         if (! is_null(config('nova.actions.resource'))) {
             return call_user_func($callback, static::actionEvent());
         }
+
+        return null;
+    }
+
+    /**
+     * Disable action log entries.
+     */
+    public static function withoutActionEvents(): static
+    {
+        config(['nova.actions.resource' => null]);
+
+        return new static;
     }
 }

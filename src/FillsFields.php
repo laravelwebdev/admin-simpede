@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova;
 
+use Illuminate\Support\Collection;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 trait FillsFields
@@ -9,11 +10,10 @@ trait FillsFields
     /**
      * Fill a new model instance using the given request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return array{\Illuminate\Database\Eloquent\Model, array<int, callable>}
      */
-    public static function fill(NovaRequest $request, $model)
+    public static function fill(NovaRequest $request, $model): array
     {
         return static::fillFields(
             $request, $model,
@@ -28,11 +28,10 @@ trait FillsFields
     /**
      * Fill a new model instance using the given request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return array{\Illuminate\Database\Eloquent\Model, array<int, callable>}
      */
-    public static function fillForUpdate(NovaRequest $request, $model)
+    public static function fillForUpdate(NovaRequest $request, $model): array
     {
         return static::fillFields(
             $request, $model,
@@ -47,12 +46,11 @@ trait FillsFields
     /**
      * Fill a new pivot model instance using the given request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Relations\Pivot  $pivot
-     * @return array{\Illuminate\Database\Eloquent\Model, array<int, callable>}
+     * @return array{\Illuminate\Database\Eloquent\Relations\Pivot, array<int, callable>}
      */
-    public static function fillPivot(NovaRequest $request, $model, $pivot)
+    public static function fillPivot(NovaRequest $request, $model, $pivot): array
     {
         $instance = new static($model);
 
@@ -69,12 +67,11 @@ trait FillsFields
     /**
      * Fill a new pivot model instance using the given request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  \Illuminate\Database\Eloquent\Relations\Pivot  $pivot
-     * @return array{\Illuminate\Database\Eloquent\Model, array<int, callable>}
+     * @return array{\Illuminate\Database\Eloquent\Relations\Pivot, array<int, callable>}
      */
-    public static function fillPivotForUpdate(NovaRequest $request, $model, $pivot)
+    public static function fillPivotForUpdate(NovaRequest $request, $model, $pivot): array
     {
         $instance = new static($model);
 
@@ -90,12 +87,13 @@ trait FillsFields
     /**
      * Fill the given fields for the model.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @template TModelOrPivot of \Illuminate\Database\Eloquent\Relations\Pivot|\Illuminate\Database\Eloquent\Model
+     *
+     * @param  TModelOrPivot  $model
      * @param  \Illuminate\Support\Collection<int, \Laravel\Nova\Fields\Field>  $fields
-     * @return array{\Illuminate\Database\Eloquent\Model, array<int, callable>}
+     * @return array{TModelOrPivot, array<int, callable>}
      */
-    protected static function fillFields(NovaRequest $request, $model, $fields)
+    protected static function fillFields(NovaRequest $request, $model, Collection $fields): array
     {
         return [$model, $fields->map->fill($request, $model)->filter(function ($callback) {
             return is_callable($callback);

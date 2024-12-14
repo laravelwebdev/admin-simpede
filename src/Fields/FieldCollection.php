@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Contracts\ListableField;
+use Laravel\Nova\Contracts\PivotableField;
 use Laravel\Nova\Contracts\RelatableField;
 use Laravel\Nova\Contracts\Resolvable;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -16,6 +17,7 @@ use Laravel\Nova\Panel;
 use Laravel\Nova\ResourceTool;
 use Laravel\Nova\ResourceToolElement;
 use Laravel\Nova\Util;
+use Stringable;
 
 /**
  * @template TKey of int
@@ -28,14 +30,11 @@ class FieldCollection extends Collection
     /**
      * Assign the fields with the given panels to their parent panel.
      *
-     * @param  string  $label
      * @return static<TKey, TValue>
      */
-    public function assignDefaultPanel($label)
+    public function assignDefaultPanel(Stringable|string $label)
     {
-        new Panel($label, $this->reject(function ($field) {
-            return isset($field->panel);
-        }));
+        new Panel($label, $this->reject(fn ($field) => isset($field->panel)));
 
         return $this;
     }
@@ -61,11 +60,10 @@ class FieldCollection extends Collection
      *
      * @template TGetDefault
      *
-     * @param  string  $attribute
-     * @param  TGetDefault|\Closure():TGetDefault  $default
+     * @param  TGetDefault|(\Closure():(TGetDefault))  $default
      * @return TValue|TGetDefault
      */
-    public function findFieldByAttribute($attribute, $default = null)
+    public function findFieldByAttribute(string $attribute, mixed $default = null)
     {
         return $this->first(function ($field) use ($attribute) {
             return isset($field->attribute) &&
@@ -74,22 +72,32 @@ class FieldCollection extends Collection
     }
 
     /**
-     * Filter elements should be displayed for the given request.
+     * Find a given field by its attribute.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return static<int, TValue>
+     * @return TValue
      */
-    public function authorized(Request $request)
+    public function findFieldByAttributeOrFail(string $attribute)
     {
-        return $this->filter(function ($field) use ($request) {
-            return $field->authorize($request);
-        })->values();
+        return $this->first(function ($field) use ($attribute) {
+            return isset($field->attribute) &&
+                $field->attribute == $attribute;
+        }, fn () => abort(404));
     }
 
     /**
      * Filter elements should be displayed for the given request.
      *
-     * @param  mixed  $resource
+     * @return static<int, TValue>
+     */
+    public function authorized(Request $request)
+    {
+        return $this->filter->authorize($request)->values();
+    }
+
+    /**
+     * Filter elements should be displayed for the given request.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object|array  $resource
      * @return static<int, TValue>
      */
     public function resolve($resource)
@@ -104,7 +112,7 @@ class FieldCollection extends Collection
     /**
      * Resolve value of fields for display.
      *
-     * @param  mixed  $resource
+     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object|array  $resource
      * @return static<int, TValue>
      */
     public function resolveForDisplay($resource)
@@ -125,12 +133,12 @@ class FieldCollection extends Collection
     /**
      * Remove non-creation fields from the collection.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  mixed  $resource
+     * @param  \Illuminate\Database\Eloquent\Model|object  $resource
      * @return static<int, \Laravel\Nova\Fields\Field>
      */
     public function onlyCreateFields(NovaRequest $request, $resource)
     {
+        /** @phpstan-ignore return.type */
         return $this->reject(function ($field) use ($resource, $request) {
             return $field instanceof ListableField ||
                 ($field instanceof ResourceTool || $field instanceof ResourceToolElement) ||
@@ -143,12 +151,12 @@ class FieldCollection extends Collection
     /**
      * Remove non-update fields from the collection.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  mixed  $resource
+     * @param  \Illuminate\Database\Eloquent\Model|object  $resource
      * @return static<int, \Laravel\Nova\Fields\Field>
      */
     public function onlyUpdateFields(NovaRequest $request, $resource)
     {
+        /** @phpstan-ignore return.type */
         return $this->reject(function ($field) use ($resource, $request) {
             return $field instanceof ListableField ||
                 ($field instanceof ResourceTool || $field instanceof ResourceToolElement) ||
@@ -161,70 +169,58 @@ class FieldCollection extends Collection
     /**
      * Filter fields for showing on detail.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  mixed  $resource
+     * @param  \Illuminate\Database\Eloquent\Model|object  $resource
      * @return static<int, \Laravel\Nova\Fields\Field>
      */
     public function filterForDetail(NovaRequest $request, $resource)
     {
-        return $this->filter(function ($field) use ($resource, $request) {
-            return $field->isShownOnDetail($request, $resource);
-        })->values();
+        /** @phpstan-ignore return.type */
+        return $this->filter->isShownOnDetail($request, $resource)->values();
     }
 
     /**
      * Filter fields for showing on preview.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  mixed  $resource
+     * @param  \Illuminate\Database\Eloquent\Model|object  $resource
      * @return static<int, \Laravel\Nova\Fields\Field>
      */
     public function filterForPreview(NovaRequest $request, $resource)
     {
-        return $this->filter(function (Field $field) use ($resource, $request) {
-            return $field->isShownOnPreview($request, $resource);
-        })->values();
+        /** @phpstan-ignore return.type */
+        return $this->filter->isShownOnPreview($request, $resource)->values();
     }
 
     /**
      * Filter fields for showing when peeking.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return static<int, \Laravel\Nova\Fields\Field>
      */
     public function filterForPeeking(NovaRequest $request)
     {
-        return $this
-            ->filter(function (Field $field) use ($request) {
-                return $field->isShownWhenPeeking($request);
-            })->values();
+        /** @phpstan-ignore return.type */
+        return $this->filter->isShownWhenPeeking($request)->values();
     }
 
     /**
      * Filter fields for showing on index.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  mixed  $resource
+     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object|array  $resource
      * @return static<int, \Laravel\Nova\Fields\Field>
      */
     public function filterForIndex(NovaRequest $request, $resource)
     {
-        return $this->filter(function ($field) use ($resource, $request) {
-            return $field->isShownOnIndex($request, $resource);
-        })->values();
+        /** @phpstan-ignore return.type */
+        return $this->filter->isShownOnIndex($request, $resource)->values();
     }
 
     /**
      * Reject if the field is readonly.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return static<int, TValue>
      */
     public function withoutReadonly(NovaRequest $request)
     {
-        return $this->reject(function ($field) use ($request) {
-            return $field->isReadonly($request);
-        });
+        return $this->reject->isReadonly($request);
     }
 
     /**
@@ -234,9 +230,8 @@ class FieldCollection extends Collection
      */
     public function withoutMissingValues()
     {
-        return $this->reject(function ($field) {
-            return $field instanceof MissingValue;
-        });
+        /** @phpstan-ignore return.type */
+        return $this->reject(fn ($field) => $field instanceof MissingValue);
     }
 
     /**
@@ -246,9 +241,8 @@ class FieldCollection extends Collection
      */
     public function withoutListableFields()
     {
-        return $this->reject(function ($field) {
-            return $field instanceof ListableField;
-        });
+        /** @phpstan-ignore return.type */
+        return $this->reject(fn ($field) => $field instanceof ListableField);
     }
 
     /**
@@ -258,9 +252,8 @@ class FieldCollection extends Collection
      */
     public function withoutUnfillable()
     {
-        return $this->reject(function ($field) {
-            return $field instanceof Unfillable;
-        });
+        /** @phpstan-ignore return.type */
+        return $this->reject(fn ($field) => $field instanceof Unfillable);
     }
 
     /**
@@ -270,21 +263,19 @@ class FieldCollection extends Collection
      */
     public function withoutResourceTools()
     {
-        return $this->reject(function ($field) {
-            return $field instanceof ResourceToolElement;
-        });
+        /** @phpstan-ignore return.type */
+        return $this->reject(fn ($field) => $field instanceof ResourceToolElement);
     }
 
     /**
      * Filter the fields to only many-to-many relationships.
      *
-     * @return static<TKey, \Laravel\Nova\Fields\MorphToMany|\Laravel\Nova\Fields\BelongsToMany>
+     * @return static<TKey, \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\PivotableField>
      */
     public function filterForManyToManyRelations()
     {
-        return $this->filter(function ($field) {
-            return $field instanceof BelongsToMany || $field instanceof MorphToMany;
-        });
+        /** @phpstan-ignore return.type */
+        return $this->filter(fn ($field) => $field instanceof PivotableField);
     }
 
     /**
@@ -296,16 +287,15 @@ class FieldCollection extends Collection
     {
         return $this->whereInstanceOf(Field::class)
             ->whereInstanceOf(FilterableField::class)
-            ->filter(function ($field) {
+            ->reject(function ($field) {
                 /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\FilterableField $field */
-                return $field->attribute !== 'ComputedField' && ! is_null($field->filterableCallback);
+                return $field->isComputed() || is_null($field->filterableCallback);
             });
     }
 
     /**
      * Apply depends on for the request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return $this
      */
     public function applyDependsOn(NovaRequest $request)
@@ -318,7 +308,6 @@ class FieldCollection extends Collection
     /**
      * Apply depends on for the request with default values.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return $this
      */
     public function applyDependsOnWithDefaultValues(NovaRequest $request)

@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\LensMetricRequest;
 
@@ -9,11 +10,8 @@ class LensMetricController extends Controller
 {
     /**
      * List the metrics for the given resource.
-     *
-     * @param  \Laravel\Nova\Http\Requests\LensMetricRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(LensMetricRequest $request)
+    public function index(LensMetricRequest $request): JsonResponse
     {
         return response()->json(
             $request->availableMetrics()
@@ -22,11 +20,8 @@ class LensMetricController extends Controller
 
     /**
      * Get the specified metric's value.
-     *
-     * @param  \Laravel\Nova\Http\Requests\LensMetricRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(LensMetricRequest $request)
+    public function show(LensMetricRequest $request): JsonResponse
     {
         return response()->json([
             'value' => $request->metric()->resolve($request),

@@ -10,10 +10,9 @@ class {{ class }} extends Repeatable
     /**
      * Get the fields displayed by the repeatable.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return array
+     * @return array<int, \Laravel\Nova\Fields\Field>
      */
-    public function fields(NovaRequest $request)
+    public function fields(NovaRequest $request): array
     {
         return [
             //

@@ -21,6 +21,7 @@ class EloquentFilter extends Filter
      */
     public function key()
     {
+        /** @phpstan-ignore property.notFound */
         return 'resource:'.$this->field->resourceClass::uriKey().':'.$this->field->attribute;
     }
 

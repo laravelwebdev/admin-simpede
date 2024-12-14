@@ -2,16 +2,17 @@
 
 namespace Laravel\Nova\Http\Requests;
 
+use Illuminate\Support\Collection;
+
 class LensCardRequest extends CardRequest
 {
     use InteractsWithLenses;
 
     /**
      * Get all of the possible metrics for the request.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    public function availableCards()
+    #[\Override]
+    public function availableCards(): Collection
     {
         return $this->lens()->availableCards($this);
     }

@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Fields\Filters;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class NumberFilter extends Filter
@@ -16,12 +17,9 @@ class NumberFilter extends Filter
     /**
      * Apply the filter to the given query.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Contracts\Database\Eloquent\Builder
      */
-    public function apply(NovaRequest $request, $query, $value)
+    public function apply(NovaRequest $request, Builder $query, mixed $value)
     {
         $value = collect($value)->transform(function ($value) {
             return ! $this->field->isValidNullValue($value) ? $value : null;

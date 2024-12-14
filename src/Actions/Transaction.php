@@ -13,11 +13,10 @@ class Transaction
      *
      * @param  callable(string):mixed  $callback
      * @param  (callable(string):(void))|null  $finished
-     * @return mixed
      *
      * @throws \Throwable
      */
-    public static function run($callback, $finished = null)
+    public static function run(callable $callback, ?callable $finished = null): mixed
     {
         try {
             DB::beginTransaction();

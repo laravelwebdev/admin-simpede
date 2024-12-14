@@ -3,13 +3,14 @@
 namespace Laravel\Nova\Fields;
 
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Util;
 
 trait Searchable
 {
     /**
      * Indicates if this relationship is searchable.
      *
-     * @var bool|\Closure(\Laravel\Nova\Http\Requests\NovaRequest):bool
+     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest):(bool))|bool
      */
     public $searchable = false;
 
@@ -30,10 +31,10 @@ trait Searchable
     /**
      * Specify if the relationship should be searchable.
      *
-     * @param  bool|\Closure(\Laravel\Nova\Http\Requests\NovaRequest):bool  $searchable
+     * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(bool))|bool  $searchable
      * @return $this
      */
-    public function searchable($searchable = true)
+    public function searchable(callable|bool $searchable = true)
     {
         $this->searchable = $searchable;
 
@@ -55,10 +56,9 @@ trait Searchable
     /**
      * Set the debounce period for use in searchable select inputs.
      *
-     * @param  int  $amount
      * @return $this
      */
-    public function debounce($amount)
+    public function debounce(int $amount)
     {
         $this->debounce = $amount;
 
@@ -67,14 +67,13 @@ trait Searchable
 
     /**
      * Determine if current field are searchable.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return bool
      */
-    public function isSearchable(NovaRequest $request)
+    public function isSearchable(NovaRequest $request): bool
     {
-        return is_bool($this->searchable)
-                    ? $this->searchable
-                    : call_user_func($this->searchable, $request);
+        if (Util::isSafeCallable($this->searchable)) {
+            $this->searchable = call_user_func($this->searchable, $request);
+        }
+
+        return $this->searchable;
     }
 }

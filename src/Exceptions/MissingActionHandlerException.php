@@ -9,11 +9,10 @@ class MissingActionHandlerException extends Exception
     /**
      * Create a new exception instance.
      *
-     * @param  mixed  $action
-     * @param  string  $method
+     * @param  object  $action
      * @return static
      */
-    public static function make($action, $method)
+    public static function make($action, string $method)
     {
         return new static('Action handler ['.get_class($action).'@'.$method.'] not defined.');
     }

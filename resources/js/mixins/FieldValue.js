@@ -5,6 +5,10 @@ export default {
   props: ['field'],
 
   methods: {
+    /**
+     * @param {any} value
+     * @returns {boolean}
+     */
     isEqualsToValue(value) {
       if (isArray(this.field.value) && filled(value)) {
         return Boolean(
@@ -23,22 +27,37 @@ export default {
   },
 
   computed: {
+    /**
+     * @returns {string}
+     */
     fieldAttribute() {
       return this.field.attribute
     },
 
+    /**
+     * @returns {boolean}
+     */
     fieldHasValue() {
       return filled(this.field.value)
     },
 
+    /**
+     * @returns {boolean}
+     */
     usesCustomizedDisplay() {
       return this.field.usesCustomizedDisplay && filled(this.field.displayedAs)
     },
 
+    /**
+     * @returns {boolean}
+     */
     fieldHasValueOrCustomizedDisplay() {
       return this.usesCustomizedDisplay || this.fieldHasValue
     },
 
+    /**
+     * @returns {string|null}
+     */
     fieldValue() {
       if (!this.fieldHasValueOrCustomizedDisplay) {
         return null
@@ -47,6 +66,9 @@ export default {
       return String(this.field.displayedAs ?? this.field.value)
     },
 
+    /**
+     * @returns {string|null}
+     */
     shouldDisplayAsHtml() {
       return this.field.asHtml
     },

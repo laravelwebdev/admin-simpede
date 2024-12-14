@@ -8,20 +8,16 @@ class RestoreResourceModalComponent extends ModalComponent
 {
     /**
      * Modal confirmation button.
-     *
-     * @return void
      */
-    public function confirm(Browser $browser)
+    public function confirm(Browser $browser): void
     {
         $browser->click('@confirm-restore-button');
     }
 
     /**
      * Modal cancelation button.
-     *
-     * @return void
      */
-    public function cancel(Browser $browser)
+    public function cancel(Browser $browser): void
     {
         $browser->click('@cancel-restore-button');
     }

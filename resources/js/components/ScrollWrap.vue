@@ -1,24 +1,19 @@
 <template>
-  <div class="scroll-wrap overflow-x-hidden overflow-y-auto" :style="style">
+  <div class="scroll-wrap overflow-x-hidden overflow-y-auto" :style="styles">
     <slot />
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    height: {
-      type: Number,
-      default: 288,
-    },
-  },
+<script setup>
+import { computed } from 'vue'
 
-  computed: {
-    style() {
-      return {
-        maxHeight: `${this.height}px`,
-      }
-    },
-  },
-}
+const props = defineProps({
+  height: { type: Number, default: 288 },
+})
+
+const styles = computed(() => {
+  return {
+    maxHeight: `${props.height}px`,
+  }
+})
 </script>

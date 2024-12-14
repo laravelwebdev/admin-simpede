@@ -10,13 +10,6 @@ class PartitionResult implements JsonSerializable
     use RoundingPrecision;
 
     /**
-     * The value of the result.
-     *
-     * @var array<string, int|float>
-     */
-    public $value;
-
-    /**
      * The custom label name.
      *
      * @var array<string, string>
@@ -36,10 +29,9 @@ class PartitionResult implements JsonSerializable
      * @param  array<string, int|float>  $value
      * @return void
      */
-    public function __construct(array $value)
+    public function __construct(public array $value)
     {
-        $this->value = $value;
-        $this->colors = new PartitionColors();
+        $this->colors = new PartitionColors;
     }
 
     /**
@@ -89,9 +81,7 @@ class PartitionResult implements JsonSerializable
                     'label' => $resolvedLabel,
                     'value' => $value,
                     'percentage' => $total > 0 ? round(($value / $total) * 100, $this->roundingPrecision, $this->roundingMode) : 0,
-                ], function ($value) {
-                    return ! is_null($value);
-                });
+                ], fn ($value) => ! is_null($value));
             })->values()->all(),
         ];
     }

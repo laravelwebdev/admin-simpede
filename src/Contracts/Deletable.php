@@ -20,10 +20,9 @@ interface Deletable
     /**
      * Specify if the field is able to be deleted.
      *
-     * @param  bool  $deletable
      * @return $this
      */
-    public function deletable($deletable = true);
+    public function deletable(bool $deletable = true);
 
     /**
      * Determine if the field should be pruned when the resource is deleted.

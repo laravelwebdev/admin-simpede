@@ -4,15 +4,15 @@
 
     <template #filter>
       <SelectControl
-        :dusk="`${filter.name}-select-filter`"
+        :selected="value"
+        @update:selected="value = $event"
+        :options="filter.options"
+        size="sm"
         label="label"
         class="w-full block"
-        size="sm"
-        @change="handleChange"
-        :value="value"
-        :options="filter.options"
+        :dusk="filter.uniqueKey"
       >
-        <option value="" :selected="value === ''">&mdash;</option>
+        <option value="" :selected="value === ''">{{ __('&mdash;') }}</option>
       </SelectControl>
     </template>
   </FilterContainer>
@@ -32,11 +32,11 @@ export default {
 
   data: () => ({
     value: null,
-    debouncedEmit: null,
+    debouncedEventEmitter: null,
   }),
 
   created() {
-    this.debouncedEmit = debounce(() => this.emitChange(), 500)
+    this.debouncedEventEmitter = debounce(() => this.emitFilterChange(), 500)
     this.setCurrentFilterValue()
   },
 
@@ -50,6 +50,12 @@ export default {
 
   watch: {
     value() {
+      this.debouncedEventEmitter()
+    },
+  },
+
+  watch: {
+    value() {
       this.debouncedHandleChange()
     },
   },
@@ -59,12 +65,7 @@ export default {
       this.value = this.filter.currentValue
     },
 
-    handleChange(e) {
-      this.value = e
-      this.debouncedEmit()
-    },
-
-    emitChange() {
+    emitFilterChange() {
       this.$emit('change', {
         filterClass: this.filterKey,
         value: this.value,

@@ -2,7 +2,7 @@
   <CreateForm
     @resource-created="handleResourceCreated"
     @resource-created-and-adding-another="handleResourceCreatedAndAddingAnother"
-    @create-cancelled="handleCreateCancelled"
+    @create-cancelled="cancelCreatingResource"
     :mode="mode"
     :resource-name="resourceName"
     :via-resource="viaResource"
@@ -55,7 +55,7 @@ export default {
 
   methods: {
     handleResourceCreated({ redirect, id }) {
-      this.mode === 'form' ? this.allowLeavingForm() : this.allowLeavingModal()
+      if (this.mode !== 'form') this.allowLeavingModal()
 
       Nova.$emit('resource-created', {
         resourceName: this.resourceName,
@@ -73,10 +73,9 @@ export default {
       this.disableNavigateBackUsingHistory()
     },
 
-    handleCreateCancelled() {
+    cancelCreatingResource() {
       if (this.mode === 'form') {
         this.handleProceedingToPreviousPage()
-        this.allowLeavingForm()
 
         this.proceedToPreviousPage(
           this.isRelation
@@ -95,7 +94,7 @@ export default {
      * Prevent accidental abandonment only if form was changed.
      */
     onUpdateFormStatus() {
-      this.mode === 'form' ? this.updateFormStatus() : this.updateModalStatus()
+      if (this.mode !== 'form') this.updateModalStatus()
     },
 
     removeFile(attribute) {

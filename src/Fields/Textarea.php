@@ -38,10 +38,9 @@ class Textarea extends Field implements FilterableField
     /**
      * Set the number of rows used for the textarea.
      *
-     * @param  int  $rows
      * @return $this
      */
-    public function rows($rows)
+    public function rows(int $rows)
     {
         $this->rows = $rows;
 
@@ -51,11 +50,10 @@ class Textarea extends Field implements FilterableField
     /**
      * Resolve the field's value for display.
      *
-     * @param  mixed  $resource
-     * @param  string|null  $attribute
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object  $resource
      */
-    public function resolveForDisplay($resource, $attribute = null)
+    #[\Override]
+    public function resolveForDisplay($resource, ?string $attribute = null): void
     {
         parent::resolveForDisplay($resource, $attribute);
 
@@ -65,7 +63,6 @@ class Textarea extends Field implements FilterableField
     /**
      * Make the field filter.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -77,7 +74,7 @@ class Textarea extends Field implements FilterableField
      * Specify that the element should be visible on the index view.
      *
      * @param  (callable():(bool))|bool  $callback
-     * @return $this
+     * @return never
      *
      * @throws \Laravel\Nova\Exceptions\NovaException
      */
@@ -91,6 +88,7 @@ class Textarea extends Field implements FilterableField
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

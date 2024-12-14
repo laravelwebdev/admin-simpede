@@ -12,7 +12,6 @@
 
 <script>
 import { FieldValue } from '@/mixins'
-import forEach from 'lodash/forEach'
 
 export default {
   mixins: [FieldValue],
@@ -23,7 +22,7 @@ export default {
     fieldValues() {
       let selected = []
 
-      forEach(this.field.options, option => {
+      this.field.options.forEach(option => {
         if (this.isEqualsToValue(option.value)) {
           selected.push(option.label)
         }

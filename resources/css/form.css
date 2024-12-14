@@ -24,7 +24,7 @@
 /* Form Inputs
 ---------------------------------------------------------------------------- */
 .form-input {
-  @apply appearance-none text-sm w-full bg-white dark:bg-gray-900 shadow rounded appearance-none placeholder:text-gray-400 dark:placeholder:text-gray-500 px-3 text-gray-600 dark:text-gray-400;
+  @apply appearance-none text-sm bg-white dark:bg-gray-900 shadow rounded appearance-none placeholder:text-gray-400 dark:placeholder:text-gray-500 px-3 text-gray-600 dark:text-gray-400;
 }
 
 /* Form Selects

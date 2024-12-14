@@ -7,11 +7,11 @@
 
       <SelectControl
         v-if="ranges.length > 0"
-        class="ml-auto w-[6rem] shrink-0"
-        size="xxs"
+        :value="selectedRangeKey"
+        @update:modelValue="$emit('selected', $event)"
         :options="ranges"
-        :selected="selectedRangeKey"
-        @change="handleChange"
+        size="xxs"
+        class="ml-auto w-[6rem] shrink-0"
         :aria-label="__('Select Ranges')"
       />
     </div>
@@ -33,9 +33,10 @@
 
 <script>
 import debounce from 'lodash/debounce'
-import Chartist from 'chartist'
-import 'chartist/dist/chartist.min.css'
 import { singularOrPlural } from '@/util'
+
+import { LineChart, Interpolation } from 'chartist'
+import 'chartist/dist/index.css'
 import ChartistTooltip from 'chartist-plugin-tooltips-updated'
 import 'chartist-plugin-tooltips-updated/dist/chartist-plugin-tooltip.css'
 
@@ -96,54 +97,58 @@ export default {
     // This avoids the awkward situation where the chart doesn't appear filled in.
     const areaBase = low >= 0 ? 0 : low
 
-    this.chartist = new Chartist.Line(this.$refs.chart, this.chartData, {
-      lineSmooth: Chartist.Interpolation.none(),
-      fullWidth: true,
-      showPoint: true,
-      showLine: true,
-      showArea: true,
-      chartPadding: {
-        top: 10,
-        right: 0,
-        bottom: 0,
-        left: 0,
-      },
-      low,
-      high,
-      areaBase,
-      axisX: {
-        showGrid: false,
-        showLabel: true,
-        offset: 0,
-      },
-      axisY: {
-        showGrid: false,
-        showLabel: true,
-        offset: 0,
-      },
-      plugins: [
-        ChartistTooltip({
-          pointClass: 'ct-point',
-          anchorToPoint: false,
-        }),
-        ChartistTooltip({
-          pointClass: 'ct-point__left',
-          anchorToPoint: false,
-          tooltipOffset: {
-            x: 50,
-            y: -20,
-          },
-        }),
-        ChartistTooltip({
-          pointClass: 'ct-point__right',
-          anchorToPoint: false,
-          tooltipOffset: {
-            x: -50,
-            y: -20,
-          },
-        }),
-      ],
-    })
+    this.chartist = new LineChart(
+      this.$refs.chart,
+      { series: this.chartData },
+      {
+        lineSmooth: Interpolation.none(),
+        fullWidth: true,
+        showPoint: true,
+        showLine: true,
+        showArea: true,
+        chartPadding: {
+          top: 10,
+          right: 0,
+          bottom: 0,
+          left: 0,
+        },
+        low,
+        high,
+        areaBase,
+        axisX: {
+          showGrid: false,
+          showLabel: true,
+          offset: 0,
+        },
+        axisY: {
+          showGrid: false,
+          showLabel: true,
+          offset: 0,
+        },
+        plugins: [
+          ChartistTooltip({
+            pointClass: 'ct-point',
+            anchorToPoint: false,
+          }),
+          ChartistTooltip({
+            pointClass: 'ct-point__left',
+            anchorToPoint: false,
+            tooltipOffset: {
+              x: 50,
+              y: -20,
+            },
+          }),
+          ChartistTooltip({
+            pointClass: 'ct-point__right',
+            anchorToPoint: false,
+            tooltipOffset: {
+              x: -50,
+              y: -20,
+            },
+          }),
+        ],
+      }
+    )
 
     this.chartist.on('draw', data => {
       if (data.type === 'point') {
@@ -167,12 +172,6 @@ export default {
   methods: {
     renderChart() {
       this.chartist.update(this.chartData)
-    },
-
-    handleChange(event) {
-      const value = event?.target?.value || event
-
-      this.$emit('selected', value)
     },
 
     transformTooltipText(value) {

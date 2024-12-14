@@ -82,9 +82,7 @@
               dusk="view-resource-button"
               tabindex="1"
             >
-              <BasicButton component="span">
-                <Icon type="eye" />
-              </BasicButton>
+              <Button as="span" variant="ghost" icon="eye" />
             </Link>
 
             <Link
@@ -100,9 +98,7 @@
               dusk="edit-resource-button"
               tabindex="1"
             >
-              <BasicButton component="span">
-                <Icon type="pencil-alt" />
-              </BasicButton>
+              <Button as="span" variant="ghost" icon="pencil-square" />
             </Link>
           </div>
         </div>
@@ -112,21 +108,28 @@
 </template>
 
 <script>
-import isNil from 'lodash/isNil'
+import { Button } from 'laravel-nova-ui'
 import {
   Errors,
   HasCards,
   InteractsWithResourceInformation,
   mapProps,
 } from '@/mixins'
-import { minimum } from '@/util'
 import { mapGetters, mapActions } from 'vuex'
+import { minimum } from '@/util'
 
 export default {
+  components: {
+    Button,
+  },
+
+  mixins: [HasCards, InteractsWithResourceInformation],
+
   props: {
     shouldOverrideMeta: { type: Boolean, default: false },
     showViewLink: { type: Boolean, default: false },
     shouldEnableShortcut: { type: Boolean, default: false },
+    showActionDropdown: { type: Boolean, default: true },
 
     ...mapProps([
       'resourceName',
@@ -137,8 +140,6 @@ export default {
       'relationshipType',
     ]),
   },
-
-  mixins: [HasCards, InteractsWithResourceInformation],
 
   data: () => ({
     initialLoading: true,
@@ -291,7 +292,6 @@ export default {
 
         this.actions = response.data?.actions
       } catch (error) {
-        console.log(error)
         Nova.error(this.__('Unable to load actions for this resource'))
       }
     },
@@ -308,7 +308,7 @@ export default {
      * Resolve the component name.
      */
     resolveComponentName(panel) {
-      return isNil(panel.prefixComponent) || panel.prefixComponent
+      return panel.prefixComponent == null || panel.prefixComponent
         ? 'detail-' + panel.component
         : panel.component
     },
@@ -325,7 +325,9 @@ export default {
 
     shouldShowActionDropdown() {
       return (
-        this.resource && (this.actions.length > 0 || this.canModifyResource)
+        this.resource &&
+        (this.actions.length > 0 || this.canModifyResource) &&
+        this.showActionDropdown
       )
     },
 

@@ -3,11 +3,14 @@
 namespace Laravel\Nova\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Str;
 use Laravel\Nova\Console\Concerns\AcceptsNameAndVendor;
 use Symfony\Component\Process\Process;
 
-abstract class ComponentGeneratorCommand extends Command
+use function Laravel\Prompts\confirm;
+
+abstract class ComponentGeneratorCommand extends Command implements PromptsForMissingInput
 {
     use AcceptsNameAndVendor, ResolvesStubPath;
 
@@ -38,27 +41,27 @@ abstract class ComponentGeneratorCommand extends Command
             $this->addRepositoryToRootComposer();
             $this->addRequireToRootComposer();
 
-            if ($this->confirm('Would you like to update your Composer packages?', true)) {
+            if (confirm('Would you like to update your Composer packages?', true)) {
                 $this->composerUpdate();
 
                 $this->output->newLine();
             }
         }
 
-        if ($interactsWithNpm === true) {
+        if ($interactsWithComposer === true && $interactsWithNpm === true) {
             if (file_exists(base_path('package.json'))) {
                 $this->addScriptsToRootNpmPackage();
             } else {
-                $this->warn('Please create a package.json to the root of your project.');
+                $this->components->warn('Please create a package.json to the root of your project.');
             }
 
-            if ($this->confirm("Would you like to install the {$componentType}'s NPM dependencies?", true)) {
+            if (confirm("Would you like to install the {$componentType}'s NPM dependencies?", true)) {
                 $this->installNpmDependencies();
 
                 $this->output->newLine();
             }
 
-            if ($this->confirm("Would you like to compile the {$componentType}'s assets?", true)) {
+            if (confirm("Would you like to compile the {$componentType}'s assets?", true)) {
                 $this->compileAssets();
 
                 $this->output->newLine();
@@ -272,5 +275,17 @@ abstract class ComponentGeneratorCommand extends Command
     protected function component()
     {
         return $this->argument('name');
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array<string, string>
+     */
+    protected function promptForMissingArgumentsUsing(): array
+    {
+        return [
+            'name' => "What's the component name?",
+        ];
     }
 }

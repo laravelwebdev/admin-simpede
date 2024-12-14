@@ -2,7 +2,8 @@
 
 namespace Laravel\Nova\Http\Requests;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use LogicException;
 
 class LensActionRequest extends ActionRequest
@@ -11,10 +12,9 @@ class LensActionRequest extends ActionRequest
 
     /**
      * Transform the request into a query.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function toQuery()
+    #[\Override]
+    public function toQuery(): Builder
     {
         return tap($this->lens()->query(LensRequest::createFrom($this), $this->newSearchQuery()), function ($query) {
             if (! $query instanceof Builder) {
@@ -25,23 +25,21 @@ class LensActionRequest extends ActionRequest
 
     /**
      * Transform the request into a query without scope.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function toQueryWithoutScopes()
+    #[\Override]
+    public function toQueryWithoutScopes(): Builder
     {
         return $this->toQuery();
     }
 
     /**
      * Get the all actions for the request.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    protected function resolveActions()
+    #[\Override]
+    protected function resolveActions(): Collection
     {
         return $this->isPivotAction()
-                    ? $this->lens()->resolvePivotActions($this)
-                    : $this->lens()->resolveActions($this);
+            ? $this->lens()->resolvePivotActions($this)
+            : $this->lens()->resolveActions($this);
     }
 }

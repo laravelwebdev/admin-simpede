@@ -7,9 +7,9 @@ trait HasHelpText
     /**
      * The help text for the metric.
      *
-     * @var string
+     * @var \Stringable|string|null
      */
-    public $helpText;
+    public $helpText = null;
 
     /**
      * The width of the help text tooltip.
@@ -21,7 +21,7 @@ trait HasHelpText
     /**
      * Add help text to the metric.
      *
-     * @param  string  $text
+     * @param  \Stringable|string|null  $text
      * @return $this
      */
     public function help($text)
@@ -34,7 +34,7 @@ trait HasHelpText
     /**
      * Return the help text for the metric.
      *
-     * @return string
+     * @return \Stringable|string
      */
     public function getHelpText()
     {
@@ -44,10 +44,9 @@ trait HasHelpText
     /**
      * Set the width for the help text tooltip.
      *
-     * @param  string  $helpWidth
      * @return $this
      */
-    public function helpWidth($helpWidth)
+    public function helpWidth(string|int $helpWidth)
     {
         $this->helpWidth = $helpWidth;
 
@@ -57,7 +56,7 @@ trait HasHelpText
     /**
      * Return the width of the help text tooltip.
      *
-     * @return string
+     * @return string|int
      */
     public function getHelpWidth()
     {

@@ -1,12 +1,3 @@
-<script setup>
-import { Button } from 'laravel-nova-ui'
-import { useStore } from 'vuex'
-
-const store = useStore()
-
-defineProps({ notifications: {} })
-</script>
-
 <template>
   <div
     class="divide-y divide-gray-200 dark:divide-gray-600"
@@ -29,31 +20,15 @@ defineProps({ notifications: {} })
         <component
           :is="notification.component || `MessageNotification`"
           :notification="notification"
-          @delete-notification="
-            store.dispatch('nova/deleteNotification', notification.id)
-          "
+          @delete-notification="deleteNotification(notification)"
           @toggle-notifications="store.commit('nova/toggleNotifications')"
-          @toggle-mark-as-read="
-            notification.read_at
-              ? store.dispatch('nova/markNotificationAsUnread', notification.id)
-              : store.dispatch('nova/markNotificationAsRead', notification.id)
-          "
+          @toggle-mark-as-read="toggleMarkNotificationAsRead(notification)"
         />
 
         <div class="ml-12">
           <div class="flex items-start">
             <Button
-              @click="
-                notification.read_at
-                  ? store.dispatch(
-                      'nova/markNotificationAsUnread',
-                      notification.id
-                    )
-                  : store.dispatch(
-                      'nova/markNotificationAsRead',
-                      notification.id
-                    )
-              "
+              @click="toggleMarkNotificationAsRead(notification)"
               dusk="mark-as-read-button"
               variant="link"
               state="mellow"
@@ -64,9 +39,7 @@ defineProps({ notifications: {} })
             />
 
             <Button
-              @click="
-                store.dispatch('nova/deleteNotification', notification.id)
-              "
+              @click="deleteNotification(notification)"
               dusk="delete-button"
               variant="link"
               state="mellow"
@@ -79,3 +52,24 @@ defineProps({ notifications: {} })
     </div>
   </div>
 </template>
+
+<script setup>
+import { Button } from 'laravel-nova-ui'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+defineProps({
+  notifications: { type: Array },
+})
+
+function toggleMarkNotificationAsRead(notification) {
+  notification.read_at
+    ? store.dispatch('nova/markNotificationAsUnread', notification.id)
+    : store.dispatch('nova/markNotificationAsRead', notification.id)
+}
+
+function deleteNotification(notification) {
+  store.dispatch('nova/deleteNotification', notification.id)
+}
+</script>

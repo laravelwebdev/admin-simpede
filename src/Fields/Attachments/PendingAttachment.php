@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Fields\Attachments;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Support\Facades\Storage;
@@ -49,14 +50,11 @@ class PendingAttachment extends Model
     /**
      * Persist the given draft's pending attachments.
      *
-     * @param  string  $draftId
-     * @param  \Laravel\Nova\Contracts\Storable  $field
-     * @param  mixed  $model
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      *
      * @phpstan-param \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Storable  $field
      */
-    public static function persistDraft($draftId, Storable $field, $model)
+    public static function persistDraft(string $draftId, Storable $field, $model): void
     {
         static::where('draft_id', $draftId)->get()->each->persist($field, $model);
     }
@@ -64,13 +62,11 @@ class PendingAttachment extends Model
     /**
      * Persist the pending attachment.
      *
-     * @param  \Laravel\Nova\Contracts\Storable  $field
-     * @param  mixed  $model
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      *
      * @phpstan-param \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Storable  $field
      */
-    public function persist(Storable $field, $model)
+    public function persist(Storable $field, $model): void
     {
         $disk = $field->getStorageDisk() ?? $field->getDefaultStorageDisk();
 
@@ -87,30 +83,24 @@ class PendingAttachment extends Model
 
     /**
      * Get the prunable model query.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function prunable()
+    public function prunable(): Builder
     {
         return static::where('created_at', '<=', now()->subDays(1));
     }
 
     /**
      * Prepare the model for pruning.
-     *
-     * @return void
      */
-    protected function pruning()
+    protected function pruning(): void
     {
         Storage::disk($this->disk)->delete($this->attachment);
     }
 
     /**
      * Purge the attachment.
-     *
-     * @return void
      */
-    public function purge()
+    public function purge(): void
     {
         $this->prune();
     }

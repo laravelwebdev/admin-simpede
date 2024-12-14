@@ -26,7 +26,7 @@ trait DeterminesIfCreateRelationCanBeShown
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(bool))|bool  $callback
      * @return $this
      */
-    public function showCreateRelationButton($callback = true)
+    public function showCreateRelationButton(callable|bool $callback = true)
     {
         $this->showCreateRelationButtonCallback = $callback;
 
@@ -48,21 +48,17 @@ trait DeterminesIfCreateRelationCanBeShown
     /**
      * Set the size used for the create relation modal.
      *
-     * @param  string  $size
      * @return $this
      */
-    public function modalSize($size)
+    public function modalSize(string $size)
     {
         return $this->withMeta(['modalSize' => $size]);
     }
 
     /**
      * Determine if Nova should show the edit pivot relation button.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return bool
      */
-    public function createRelationShouldBeShown(NovaRequest $request)
+    public function createRelationShouldBeShown(NovaRequest $request): bool
     {
         return with($this->showCreateRelationButtonCallback, function ($callback) use ($request) {
             if ($callback === true || (is_callable($callback) && call_user_func($callback, $request))) {

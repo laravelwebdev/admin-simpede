@@ -3,7 +3,7 @@
     <template #value>
       <div
         v-if="fieldValue"
-        class="form-input form-control-bordered px-0 overflow-hidden"
+        class="px-0 overflow-hidden form-input form-control-bordered"
       >
         <textarea ref="theTextarea" />
       </div>
@@ -15,7 +15,6 @@
 <script>
 import CodeMirror from 'codemirror'
 import { FieldValue } from '@/mixins'
-import isNull from 'lodash/isNull'
 
 export default {
   mixins: [FieldValue],
@@ -30,7 +29,7 @@ export default {
   mounted() {
     const fieldValue = this.fieldValue
 
-    if (!isNull(fieldValue)) {
+    if (fieldValue !== null) {
       const config = {
         tabSize: 4,
         indentWithTabs: true,

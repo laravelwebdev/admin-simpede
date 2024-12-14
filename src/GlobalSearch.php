@@ -2,36 +2,23 @@
 
 namespace Laravel\Nova;
 
+use Generator;
 use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class GlobalSearch
 {
     /**
-     * The request instance.
-     *
-     * @var \Laravel\Nova\Http\Requests\NovaRequest
-     */
-    public $request;
-
-    /**
-     * The resource class names that should be searched.
-     *
-     * @var array<int, class-string<\Laravel\Nova\Resource>>
-     */
-    public $resources;
-
-    /**
      * Create a new global search instance.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  array<int, class-string<\Laravel\Nova\Resource>>  $resources
      * @return void
      */
-    public function __construct(NovaRequest $request, $resources)
-    {
-        $this->request = $request;
-        $this->resources = $resources;
+    public function __construct(
+        public NovaRequest $request,
+        public array $resources
+    ) {
+        //
     }
 
     /**
@@ -39,17 +26,15 @@ class GlobalSearch
      *
      * @return array<int, array<string, mixed>>
      */
-    public function get()
+    public function get(): array
     {
         return iterator_to_array($this->getSearchResults(), false);
     }
 
     /**
      * Get the search results for the resources.
-     *
-     * @return \Generator
      */
-    protected function getSearchResults()
+    protected function getSearchResults(): Generator
     {
         foreach ($this->resources as $resourceClass) {
             $query = app()->make(QueryBuilder::class, [$resourceClass])->search(
@@ -76,7 +61,7 @@ class GlobalSearch
      * @param  TResourceValue  $resource
      * @return array<string, mixed>
      */
-    protected function transformResult($resourceClass, Resource $resource)
+    protected function transformResult(string $resourceClass, Resource $resource): array
     {
         $model = $resource->model();
 
@@ -84,9 +69,7 @@ class GlobalSearch
             'resourceName' => $resourceClass::uriKey(),
             'resourceTitle' => $resourceClass::label(),
             'title' => (string) $resource->title(),
-            'subTitle' => transform($resource->subtitle(), function ($subtitle) {
-                return (string) $subtitle;
-            }),
+            'subTitle' => transform($resource->subtitle(), fn ($subtitle) => (string) $subtitle),
             'resourceId' => Util::safeInt($model->getKey()),
             'url' => url(Nova::url('/resources/'.$resourceClass::uriKey().'/'.$model->getKey())),
             'avatar' => $resource->resolveAvatarUrl($this->request),

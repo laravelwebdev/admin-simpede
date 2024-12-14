@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   resource: { type: Object },
   resourceName: { type: String },
   field: { type: Object },

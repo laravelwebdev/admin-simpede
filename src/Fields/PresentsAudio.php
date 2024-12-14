@@ -19,7 +19,7 @@ trait PresentsAudio
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):string)|string  $preloadAudioCallback
      * @return $this
      */
-    public function preload($preloadAudioCallback)
+    public function preload(callable|string $preloadAudioCallback)
     {
         $this->preloadAudioCallback = $preloadAudioCallback;
 

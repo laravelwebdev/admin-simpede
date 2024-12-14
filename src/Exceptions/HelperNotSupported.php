@@ -6,4 +6,5 @@ use Exception;
 
 class HelperNotSupported extends Exception
 {
+    //
 }

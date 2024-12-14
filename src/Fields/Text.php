@@ -35,10 +35,8 @@ class Text extends Field implements FilterableField
 
     /**
      * Prepare the field for JSON serialization.
-     *
-     * @return array
      */
-    public function serializeForFilter()
+    public function serializeForFilter(): array
     {
         return transform($this->jsonSerialize(), function ($field) {
             $field['suggestions'] = $field['suggestions'] ?? $this->resolveSuggestions(app(NovaRequest::class));
@@ -64,6 +62,7 @@ class Text extends Field implements FilterableField
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         $request = app(NovaRequest::class);

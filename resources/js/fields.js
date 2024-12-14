@@ -1,6 +1,15 @@
 import camelCase from 'lodash/camelCase'
 import upperFirst from 'lodash/upperFirst'
 
+/**
+ * @typedef {import('./nova').default} NovaApp
+ */
+
+/**
+ * @param {NovaApp} app
+ * @param {string} type
+ * @param {{[key: string]: any}} requireComponent
+ */
 function registerComponents(app, type, requireComponent) {
   requireComponent.keys().forEach(fileName => {
     const componentConfig = requireComponent(fileName)
@@ -20,6 +29,9 @@ function registerComponents(app, type, requireComponent) {
   })
 }
 
+/**
+ * @param {NovaApp} app
+ */
 export function registerFields(app) {
   registerComponents(
     app,
@@ -40,5 +52,10 @@ export function registerFields(app) {
     app,
     'Filter',
     require.context(`./fields/Filter`, true, /[A-Z]\w+\.(vue)$/)
+  )
+  registerComponents(
+    app,
+    'Preview',
+    require.context(`./fields/Preview`, true, /[A-Z]\w+\.(vue)$/)
   )
 }

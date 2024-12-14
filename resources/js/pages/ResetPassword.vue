@@ -16,7 +16,7 @@
         <label class="block mb-2" for="email">{{ __('Email Address') }}</label>
         <input
           v-model="form.email"
-          class="form-control form-input form-control-bordered w-full"
+          class="w-full form-control form-input form-control-bordered"
           :class="{ 'form-control-bordered-error': form.errors.has('email') }"
           id="email"
           type="email"
@@ -34,7 +34,7 @@
         <label class="block mb-2" for="password">{{ __('Password') }}</label>
         <input
           v-model="form.password"
-          class="form-control form-input form-control-bordered w-full"
+          class="w-full form-control form-input form-control-bordered"
           :class="{
             'form-control-bordered-error': form.errors.has('password'),
           }"
@@ -55,7 +55,7 @@
         }}</label>
         <input
           v-model="form.password_confirmation"
-          class="form-control form-input form-control-bordered w-full"
+          class="w-full form-control form-input form-control-bordered"
           :class="{
             'form-control-bordered-error': form.errors.has(
               'password_confirmation'
@@ -86,49 +86,48 @@
   </div>
 </template>
 
-<script>
-import Cookies from 'js-cookie'
+<script setup>
 import Auth from '@/layouts/Auth'
 import { Button } from 'laravel-nova-ui'
+import { reactive } from 'vue'
+import Cookies from 'js-cookie'
+import { useLocalization } from '@/composables/useLocalization'
 
-export default {
+defineOptions({
   layout: Auth,
+})
 
-  components: {
-    Button,
-  },
+const props = defineProps({
+  email: { type: String, required: false },
+  token: { type: String, required: true },
+})
 
-  props: ['email', 'token'],
+const form = reactive(
+  Nova.form({
+    email: props.email,
+    password: '',
+    password_confirmation: '',
+    token: props.token,
+  })
+)
 
-  data() {
-    return {
-      form: Nova.form({
-        email: this.email,
-        password: '',
-        password_confirmation: '',
-        token: this.token,
-      }),
-    }
-  },
+const { __ } = useLocalization()
 
-  methods: {
-    async attempt() {
-      const { message } = await this.form.post(Nova.url('/password/reset'))
-      const redirect = { url: Nova.url('/'), remote: true }
+async function attempt() {
+  const { message } = await form.post(Nova.url('/password/reset'))
+  const redirect = { url: Nova.url('/'), remote: true }
 
-      Cookies.set('token', Math.random().toString(36), { expires: 365 })
+  Cookies.set('token', Math.random().toString(36), { expires: 365 })
 
-      Nova.$toasted.show(message, {
-        action: {
-          onClick: () => Nova.visit(redirect),
-          text: this.__('Reload'),
-        },
-        duration: null,
-        type: 'success',
-      })
-
-      setTimeout(() => Nova.visit(redirect), 5000)
+  Nova.$toasted.show(message, {
+    action: {
+      onClick: () => Nova.visit(redirect),
+      text: __('Reload'),
     },
-  },
+    duration: null,
+    type: 'success',
+  })
+
+  setTimeout(() => Nova.visit(redirect), 5000)
 }
 </script>

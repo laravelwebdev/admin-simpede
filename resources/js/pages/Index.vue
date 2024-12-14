@@ -6,12 +6,12 @@
   />
 </template>
 
-<script>
+<script setup>
 import { mapProps } from '@/mixins'
 
-export default {
+defineOptions({
   name: 'Index',
+})
 
-  props: mapProps(['resourceName']),
-}
+defineProps(mapProps(['resourceName']))
 </script>

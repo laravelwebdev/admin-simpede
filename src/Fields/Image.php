@@ -9,6 +9,10 @@ class Image extends File implements Cover
 {
     use PresentsImages;
 
+    public const ASPECT_AUTO = 'aspect-auto';
+
+    public const ASPECT_SQUARE = 'aspect-square';
+
     /**
      * Indicates if the element should be shown on the index view.
      *
@@ -16,20 +20,15 @@ class Image extends File implements Cover
      */
     public $showOnIndex = true;
 
-    const ASPECT_AUTO = 'aspect-auto';
-
-    const ASPECT_SQUARE = 'aspect-square';
-
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|null  $attribute
-     * @param  string|null  $disk
+     * @param  \Stringable|string  $name
+     * @param  string|callable|null  $attribute
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, object, string, string, ?string, ?string):(mixed))|null  $storageCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, $disk = null, $storageCallback = null)
+    public function __construct($name, mixed $attribute = null, ?string $disk = null, ?callable $storageCallback = null)
     {
         parent::__construct($name, $attribute, $disk, $storageCallback);
 
@@ -47,6 +46,7 @@ class Image extends File implements Cover
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), $this->imageAttributes());

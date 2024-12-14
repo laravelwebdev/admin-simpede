@@ -11,13 +11,8 @@
   </Card>
 </template>
 
-<script>
-export default {
-  props: {
-    loading: {
-      type: Boolean,
-      default: true,
-    },
-  },
-}
+<script setup>
+defineProps({
+  loading: { type: Boolean, default: true },
+})
 </script>

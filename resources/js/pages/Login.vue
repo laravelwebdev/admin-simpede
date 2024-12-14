@@ -13,20 +13,20 @@
       <DividerLine />
 
       <div class="mb-6">
-        <label class="block mb-2" for="email">{{ __('Username') }}</label>
+        <label class="block mb-2" for="username">{{ __(usernameLabel) }}</label>
         <input
-          v-model="form.email"
-          class="form-control form-input form-control-bordered w-full"
-          :class="{ 'form-control-bordered-error': form.errors.has('email') }"
-          id="email"
-          type="text"
-          name="email"
+          v-model="form[username]"
+          class="w-full form-control form-input form-control-bordered"
+          :class="{ 'form-control-bordered-error': form.errors.has(username) }"
+          id="username"
+          :type="usernameInputType"
+          :name="username"
           autofocus=""
           required
         />
 
-        <HelpText class="mt-2 text-red-500" v-if="form.errors.has('email')">
-          {{ form.errors.first('email') }}
+        <HelpText class="mt-2 text-red-500" v-if="form.errors.has(username)">
+          {{ form.errors.first(username) }}
         </HelpText>
       </div>
 
@@ -34,7 +34,7 @@
         <label class="block mb-2" for="password">{{ __('Password') }}</label>
         <input
           v-model="form.password"
-          class="form-control form-input form-control-bordered w-full"
+          class="w-full form-control form-input form-control-bordered"
           :class="{
             'form-control-bordered-error': form.errors.has('password'),
           }"
@@ -62,7 +62,6 @@
         </select>
       </div>     
 
-      <div class="flex mb-6">
         <div
           v-if="supportsPasswordReset || forgotPasswordPath !== false"
           class="ml-auto"
@@ -109,23 +108,37 @@ export default {
     Button,
   },
 
-  data: () => ({
-    form: Nova.form({
-      email: '',
-      password: '',
-      year: new Date().getFullYear(),
-      remember: false,
-    }),
-  }),
+  props: {
+    username: { type: String, default: 'email' },
+    email: { type: String, default: 'email' },
+  },
+
+  data() {
+    return {
+      form: Nova.form({
+        [this.username]: '',
+        password: '',
+        year: new Date().getFullYear(),
+        remember: false,
+      }),
+    }
+  },
 
   methods: {
     async attempt() {
       try {
-        const { redirect } = await this.form.post(Nova.url('/login'))
+        const { redirect, two_factor } = await this.form.post(
+          Nova.url('/login')
+        )
 
         let path = { url: Nova.url('/'), remote: true }
 
-        if (redirect !== undefined && redirect !== null) {
+        if (two_factor === true) {
+          path = {
+            url: Nova.url('/user-security/two-factor-challenge'),
+            remote: false,
+          }
+        } else if (redirect != null) {
           path = { url: redirect, remote: true }
         }
 
@@ -139,6 +152,14 @@ export default {
   },
 
   computed: {
+    usernameLabel() {
+      return this.username === this.email ? 'Email Address' : 'Username'
+    },
+
+    usernameInputType() {
+      return this.username === this.email ? 'email' : 'text'
+    },
+
     supportsPasswordReset() {
       return Nova.config('withPasswordReset')
     },
@@ -146,10 +167,11 @@ export default {
     forgotPasswordPath() {
       return Nova.config('forgotPasswordPath')
     },
+
     years () {
         const year = new Date().getFullYear()
         return Array.from({length: year - 2023}, (value, index) => year - index)
-      },
+    },
   },
 }
 </script>

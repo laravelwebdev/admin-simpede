@@ -1,4 +1,5 @@
 @import 'form.css';
+@import 'tabs.css';
 
 :root {
   accent-color: theme('colors.primary.500');

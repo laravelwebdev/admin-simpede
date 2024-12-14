@@ -34,14 +34,12 @@
   </svg>
 </template>
 
-<script>
-export default {
-  inheritAttrs: false,
+<script setup>
+import { computed } from 'vue'
 
-  computed: {
-    logo() {
-      return window.Nova.config('logo')
-    },
-  },
-}
+defineOptions({
+  inheritAttrs: false,
+})
+
+const logo = computed(() => Nova.config('logo'))
 </script>

@@ -5,6 +5,7 @@ namespace Laravel\Nova\Menu;
 use Laravel\Nova\AuthorizedToSee;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Makeable;
+use Laravel\Nova\WithComponent;
 
 /**
  * @method static static make(array $items)
@@ -13,6 +14,7 @@ class MenuList implements \JsonSerializable
 {
     use AuthorizedToSee;
     use Makeable;
+    use WithComponent;
 
     /**
      * The menu's component.
@@ -23,17 +25,13 @@ class MenuList implements \JsonSerializable
 
     /**
      * The menu's items.
-     *
-     * @var \Laravel\Nova\Menu\MenuCollection
      */
-    public $items;
+    public MenuCollection $items;
 
     /**
      * Construct a new Menu List instance.
-     *
-     * @param  array  $items
      */
-    public function __construct($items)
+    public function __construct(iterable $items)
     {
         $this->items($items);
     }
@@ -41,10 +39,9 @@ class MenuList implements \JsonSerializable
     /**
      * Set menu's items.
      *
-     * @param  array  $items
      * @return $this
      */
-    public function items($items = [])
+    public function items(iterable $items = [])
     {
         $this->items = new MenuCollection($items);
 

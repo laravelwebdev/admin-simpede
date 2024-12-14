@@ -2,22 +2,14 @@
   <DashboardView :name="name" />
 </template>
 
-<script>
+<script setup>
 import DashboardView from '@/views/Dashboard'
 
-export default {
+defineOptions({
   name: 'Dashboard',
+})
 
-  components: {
-    DashboardView,
-  },
-
-  props: {
-    name: {
-      type: String,
-      required: false,
-      default: 'main',
-    },
-  },
-}
+defineProps({
+  name: { type: String, required: false, default: 'main' },
+})
 </script>

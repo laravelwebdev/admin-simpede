@@ -2,7 +2,7 @@
 
 namespace Laravel\Nova\Fields;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -13,7 +13,7 @@ trait AssociatableRelation
     /**
      * The callback that should be run to associate relations.
      *
-     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder):(\Illuminate\Database\Eloquent\Builder))|null
+     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder):(\Illuminate\Contracts\Database\Eloquent\Builder))|null
      */
     public $relatableQueryCallback;
 
@@ -26,11 +26,8 @@ trait AssociatableRelation
 
     /**
      * Determine if the display values should be automatically sorted when rendering associatable relation.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return bool
      */
-    public function shouldReorderAssociatableValues(NovaRequest $request)
+    public function shouldReorderAssociatableValues(NovaRequest $request): bool
     {
         if (is_callable($this->reordersOnAssociatableCallback)) {
             return call_user_func($this->reordersOnAssociatableCallback, $request);
@@ -57,7 +54,7 @@ trait AssociatableRelation
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):bool)|bool  $value
      * @return $this
      */
-    public function reorderAssociatables($value = true)
+    public function reorderAssociatables(callable|bool $value = true)
     {
         $this->reordersOnAssociatableCallback = $value;
 
@@ -67,10 +64,10 @@ trait AssociatableRelation
     /**
      * Determine the associate relations query.
      *
-     * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder):(\Illuminate\Database\Eloquent\Builder))|null  $callback
+     * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder):(\Illuminate\Contracts\Database\Eloquent\Builder))|null  $callback
      * @return $this
      */
-    public function relatableQueryUsing($callback)
+    public function relatableQueryUsing(?callable $callback)
     {
         $this->relatableQueryCallback = $callback;
 
@@ -80,10 +77,7 @@ trait AssociatableRelation
     /**
      * Applies the relatableQueryCallback if applicable or fallbacks to calling relateQuery method on related resource.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  class-string<\Laravel\Nova\Resource>  $resourceClass  $resourceClass
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
      * @return void
      */
     protected function applyAssociatableCallbacks(Builder $query, NovaRequest $request, string $resourceClass, Model $model)

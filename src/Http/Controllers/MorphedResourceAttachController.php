@@ -3,6 +3,7 @@
 namespace Laravel\Nova\Http\Controllers;
 
 use DateTime;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class MorphedResourceAttachController extends ResourceAttachController
@@ -10,11 +11,10 @@ class MorphedResourceAttachController extends ResourceAttachController
     /**
      * Initialize a fresh pivot model for the relationship.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Relations\MorphToMany  $relationship
-     * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    protected function initializePivot(NovaRequest $request, $relationship)
+    #[\Override]
+    protected function initializePivot(NovaRequest $request, $relationship): Pivot
     {
         $model = tap($request->findResourceOrFail(), function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
@@ -34,6 +34,7 @@ class MorphedResourceAttachController extends ResourceAttachController
             $relatedKey = $request->findRelatedModelOrFail()->{$relatedKeyName};
         }
 
+        /** @phpstan-ignore method.notFound */
         ($pivot = $relationship->newPivot($relationship->getDefaultPivotAttributes(), false))->forceFill([
             $relationship->getForeignPivotKeyName() => $parentKey,
             $relationship->getRelatedPivotKeyName() => $relatedKey,

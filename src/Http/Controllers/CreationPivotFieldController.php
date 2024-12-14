@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\ResourceCreateOrAttachRequest;
 use Laravel\Nova\Http\Resources\CreationPivotFieldResource;
@@ -10,22 +11,16 @@ class CreationPivotFieldController extends Controller
 {
     /**
      * List the pivot fields for the given resource and relation.
-     *
-     * @param  \Laravel\Nova\Http\Requests\ResourceCreateOrAttachRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(ResourceCreateOrAttachRequest $request)
+    public function __invoke(ResourceCreateOrAttachRequest $request): JsonResponse
     {
         return CreationPivotFieldResource::make()->toResponse($request);
     }
 
     /**
      * Synchronize the pivot field for creation.
-     *
-     * @param  \Laravel\Nova\Http\Requests\ResourceCreateOrAttachRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function sync(ResourceCreateOrAttachRequest $request)
+    public function sync(ResourceCreateOrAttachRequest $request): JsonResponse
     {
         $resource = CreationPivotFieldResource::make()->newResourceWith($request);
 

@@ -33,13 +33,9 @@ class Trix extends Field implements DeletableContract, FilterableField, Storable
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
-     * @param  string  $attribute
-     * @return void|\Closure
      */
-    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute)
+    protected function fillAttribute(NovaRequest $request, string $requestAttribute, object $model, string $attribute): ?callable
     {
         return $this->fillAttributeWithAttachment($request, $requestAttribute, $model, $attribute);
     }
@@ -57,7 +53,6 @@ class Trix extends Field implements DeletableContract, FilterableField, Storable
     /**
      * Make the field filter.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -67,10 +62,8 @@ class Trix extends Field implements DeletableContract, FilterableField, Storable
 
     /**
      * Prepare the field for JSON serialization.
-     *
-     * @return array
      */
-    public function serializeForFilter()
+    public function serializeForFilter(): array
     {
         return transform($this->jsonSerialize(), function ($field) {
             return Arr::only($field, [

@@ -18,9 +18,9 @@ class Slug extends Field implements Previewable
     /**
      * The field the slug should be generated from.
      *
-     * @var string|\Laravel\Nova\Fields\Field
+     * @var \Laravel\Nova\Fields\Field|string|null
      */
-    public $from;
+    public $from = null;
 
     /**
      * The separator to use for the slug.
@@ -39,12 +39,12 @@ class Slug extends Field implements Previewable
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|\Closure|callable|object|null  $attribute
+     * @param  \Stringable|string  $name
+     * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
     }
@@ -52,10 +52,9 @@ class Slug extends Field implements Previewable
     /**
      * The field the slug should be generated from.
      *
-     * @param  string|\Laravel\Nova\Fields\Field  $from
      * @return $this
      */
-    public function from($from)
+    public function from(Field|string $from)
     {
         $this->from = $from;
 
@@ -65,10 +64,9 @@ class Slug extends Field implements Previewable
     /**
      * Set the separator used for slugifying the field.
      *
-     * @param  string  $separator
      * @return $this
      */
-    public function separator($separator)
+    public function separator(string $separator)
     {
         $this->separator = $separator;
 
@@ -79,7 +77,7 @@ class Slug extends Field implements Previewable
      * Return a preview for the given field value.
      *
      * @param  string  $value
-     * @return mixed
+     * @return string
      */
     public function previewFor($value)
     {
@@ -91,6 +89,7 @@ class Slug extends Field implements Previewable
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         $request = app(NovaRequest::class);

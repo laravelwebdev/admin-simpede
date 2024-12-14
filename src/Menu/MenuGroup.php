@@ -7,6 +7,8 @@ use Laravel\Nova\AuthorizedToSee;
 use Laravel\Nova\Fields\Collapsable;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Makeable;
+use Laravel\Nova\WithComponent;
+use Stringable;
 
 /**
  * @method static static make(string $name, array $items = [])
@@ -17,6 +19,7 @@ class MenuGroup implements \JsonSerializable
     use Collapsable;
     use Macroable;
     use Makeable;
+    use WithComponent;
 
     /**
      * The menu's component.
@@ -26,37 +29,24 @@ class MenuGroup implements \JsonSerializable
     public $component = 'menu-group';
 
     /**
-     * The menu's name.
-     *
-     * @var string
-     */
-    public $name;
-
-    /**
      * The menu's items.
-     *
-     * @var \Laravel\Nova\Menu\MenuCollection
      */
-    public $items;
+    public MenuCollection $items;
 
     /**
      * Construct a new Menu Group instance.
-     *
-     * @param  string  $name
-     * @param  array  $items
      */
-    public function __construct($name, $items = [])
-    {
-        $this->name = $name;
+    public function __construct(
+        public Stringable|string $name,
+        iterable $items = []
+    ) {
         $this->items = new MenuCollection($items);
     }
 
     /**
      * Get the menu's unique key.
-     *
-     * @return string
      */
-    public function key()
+    public function key(): string
     {
         return md5($this->name.$this->items->reduce(function ($carry, $item) {
             return $carry.'-'.$item->name;

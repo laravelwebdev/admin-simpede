@@ -11,20 +11,16 @@ trait InteractsWithElements
 {
     /**
      * Dismiss toasted messages.
-     *
-     * @return void
      */
-    public function dismissToasted(Browser $browser)
+    public function dismissToasted(Browser $browser): void
     {
         $browser->script('Nova.$toasted.clear()');
     }
 
     /**
      * Close current dropdown.
-     *
-     * @return void
      */
-    public function closeCurrentDropdown(Browser $browser, bool $throwIfMissing = false)
+    public function closeCurrentDropdown(Browser $browser, bool $throwIfMissing = false): void
     {
         try {
             $browser->elseWhereWhenAvailable('@dropdown-teleported', function (Browser $browser) {
@@ -45,9 +41,8 @@ trait InteractsWithElements
      * Type on "date" input.
      *
      * @param  \Carbon\CarbonInterface|empty-string|null  $carbon
-     * @return void
      */
-    public function typeOnDate(Browser $browser, string $selector, $carbon)
+    public function typeOnDate(Browser $browser, string $selector, $carbon): void
     {
         if ($carbon instanceof CarbonInterface) {
             $date = $carbon->format(Env::get('DUSK_DATE_FORMAT', 'mdY'));
@@ -82,9 +77,8 @@ trait InteractsWithElements
      * Type on "datetime-local" input.
      *
      * @param  \Carbon\CarbonInterface|empty-string|null  $carbon
-     * @return void
      */
-    public function typeOnDateTimeLocal(Browser $browser, string $selector, $carbon)
+    public function typeOnDateTimeLocal(Browser $browser, string $selector, $carbon): void
     {
         if ($carbon instanceof CarbonInterface) {
             $date = $carbon->format(Env::get('DUSK_DATE_FORMAT', 'mdY'));
@@ -100,10 +94,8 @@ trait InteractsWithElements
 
     /**
      * Type input separated using "tab".
-     *
-     * @return void
      */
-    protected function typeWithTabs(Browser $browser, string $selector, string $date, string $separator = '-')
+    protected function typeWithTabs(Browser $browser, string $selector, string $date, string $separator = '-'): void
     {
         $date = explode($separator, $date);
 
@@ -125,20 +117,16 @@ trait InteractsWithElements
 
     /**
      * Assert active modal is present.
-     *
-     * @return void
      */
-    public function assertPresentModal(Browser $browser)
+    public function assertPresentModal(Browser $browser): void
     {
         $browser->assertPresent('.modal[data-modal-open=true]');
     }
 
     /**
      * Assert active modal is missing.
-     *
-     * @return void
      */
-    public function assertMissingModal(Browser $browser)
+    public function assertMissingModal(Browser $browser): void
     {
         $browser->assertMissing('.modal[data-modal-open=true]');
     }

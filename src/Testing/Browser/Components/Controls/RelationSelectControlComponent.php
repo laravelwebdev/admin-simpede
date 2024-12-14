@@ -6,10 +6,9 @@ class RelationSelectControlComponent extends SelectControlComponent
 {
     /**
      * Get the root selector associated with this component.
-     *
-     * @return string
      */
-    public function selector()
+    #[\Override]
+    public function selector(): string
     {
         return "@{$this->attribute}-select";
     }

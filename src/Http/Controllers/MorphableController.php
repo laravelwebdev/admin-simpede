@@ -11,11 +11,8 @@ class MorphableController extends Controller
 {
     /**
      * List the available morphable resources for a given resource.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return array
      */
-    public function __invoke(NovaRequest $request)
+    public function __invoke(NovaRequest $request): array
     {
         $relatedResource = Nova::resourceForKey($request->type);
 
@@ -24,9 +21,8 @@ class MorphableController extends Controller
         $field = $request->newResource()
                         ->availableFieldsOnIndexOrDetail($request)
                         ->whereInstanceOf(RelatableField::class)
-                        ->findFieldByAttribute($request->field, function () {
-                            abort(404);
-                        })->applyDependsOn($request);
+                        ->findFieldByAttributeOrFail($request->field)
+                        ->applyDependsOn($request);
 
         $withTrashed = $this->shouldIncludeTrashed(
             $request, $relatedResource
@@ -60,11 +56,9 @@ class MorphableController extends Controller
     /**
      * Determine if the query should include trashed models.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  string  $associatedResource
-     * @return bool
+     * @param  class-string<\Laravel\Nova\Resource>  $associatedResource
      */
-    protected function shouldIncludeTrashed(NovaRequest $request, $associatedResource)
+    protected function shouldIncludeTrashed(NovaRequest $request, string $associatedResource): bool
     {
         if ($request->withTrashed === 'true') {
             return true;
@@ -75,6 +69,7 @@ class MorphableController extends Controller
         if ($request->current && empty($request->search) && $associatedResource::softDeletes()) {
             $associatedModel = $associatedModel->newQueryWithoutScopes()->find($request->current);
 
+            /** @phpstan-ignore method.notFound */
             return $associatedModel ? $associatedModel->trashed() : false;
         }
 

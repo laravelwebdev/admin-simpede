@@ -22,6 +22,7 @@ export default {
     index: { type: Number },
     resourceName: { type: String, require: true },
     field: { type: Object, require: true },
+    errors: { type: Object, required: true },
   },
 
   methods: {

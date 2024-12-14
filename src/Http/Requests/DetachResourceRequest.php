@@ -4,17 +4,16 @@ namespace Laravel\Nova\Http\Requests;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Laravel\Nova\Resource;
 
 class DetachResourceRequest extends DeletionRequest
 {
     /**
      * Get the selected models for the action in chunks.
      *
-     * @param  int  $count
      * @param  \Closure(\Illuminate\Support\Collection):void  $callback
-     * @return mixed
      */
-    public function chunks($count, Closure $callback)
+    public function chunks(int $count, Closure $callback): void
     {
         $parentResource = $this->findParentResourceOrFail();
         $model = $this->model();
@@ -32,12 +31,8 @@ class DetachResourceRequest extends DeletionRequest
 
     /**
      * Get the models that may be detached.
-     *
-     * @param  \Illuminate\Support\Collection  $models
-     * @param  \Laravel\Nova\Resource  $parentResource
-     * @return \Illuminate\Support\Collection
      */
-    protected function detachableModels(Collection $models, $parentResource)
+    protected function detachableModels(Collection $models, Resource $parentResource): Collection
     {
         return $models->filter(function ($model) use ($parentResource) {
             return $parentResource->authorizedToDetach($this, $model, $this->viaRelationship);

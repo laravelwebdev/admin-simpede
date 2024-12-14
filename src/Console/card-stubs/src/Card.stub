@@ -15,10 +15,8 @@ class {{ class }} extends Card
 
     /**
      * Get the component name for the element.
-     *
-     * @return string
      */
-    public function component()
+    public function component(): string
     {
         return '{{ component }}';
     }

@@ -8,10 +8,8 @@ class BelongsToMany
 {
     /**
      * Get default pivot attributes using mixin.
-     *
-     * @return \Closure
      */
-    public function getDefaultPivotAttributes()
+    public function getDefaultPivotAttributes(): callable
     {
         return function () {
             return collect($this->pivotValues)->mapWithKeys(function ($pivot) {
@@ -22,10 +20,8 @@ class BelongsToMany
 
     /**
      * Apply default pivot query using mixin.
-     *
-     * @return \Closure
      */
-    public function applyDefaultPivotQuery()
+    public function applyDefaultPivotQuery(): callable
     {
         return function ($query) {
             $query->from($this->table);

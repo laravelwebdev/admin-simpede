@@ -27,10 +27,11 @@
     </div>
 
     <!-- Create / Attach Button -->
-    <OutlineButtonInertiaLink
+    <InertiaButton
       v-if="shouldShowButton"
-      class="shrink-0"
+      variant="outline"
       :href="buttonURL"
+      class="shrink-0"
       dusk="create-button"
     >
       <span class="hidden md:inline-block">
@@ -39,7 +40,7 @@
       <span class="inline-block md:hidden">
         {{ shouldShowAttachButton ? __('Attach') : __('Create') }}
       </span>
-    </OutlineButtonInertiaLink>
+    </InertiaButton>
   </div>
 </template>
 

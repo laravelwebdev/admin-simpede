@@ -4,27 +4,22 @@ namespace Laravel\Nova\Testing\Browser\Components;
 
 class LensComponent extends IndexComponent
 {
-    public $lens;
-
     /**
      * Create a new component instance.
      *
-     * @param  string  $resourceName
-     * @param  string  $lens
      * @return void
      */
-    public function __construct($resourceName, $lens)
-    {
-        $this->lens = $lens;
-        $this->resourceName = $resourceName;
+    public function __construct(
+        public string $resourceName,
+        public string $lens
+    ) {
+        //
     }
 
     /**
      * Get the root selector for the component.
-     *
-     * @return string
      */
-    public function selector()
+    public function selector(): string
     {
         return '@'.$this->lens.'-lens-component';
     }

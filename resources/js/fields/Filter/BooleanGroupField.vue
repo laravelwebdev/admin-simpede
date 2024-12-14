@@ -4,18 +4,16 @@
 
     <template #filter>
       <div class="space-y-2">
-        <button type="button">
-          <IconBooleanOption
-            :dusk="`${field.uniqueKey}-filter-${option.value}-option`"
-            :resource-name="resourceName"
-            :key="option.value"
-            v-for="option in field.options"
-            :filter="filter"
-            :option="option"
-            @change="handleChange"
-            label="label"
-          />
-        </button>
+        <IconBooleanOption
+          :dusk="`${filter.uniqueKey}-${option.value}-option`"
+          :resource-name="resourceName"
+          :key="option.value"
+          v-for="option in field.options"
+          :filter="filter"
+          :option="option"
+          @change="$emit('change')"
+          label="label"
+        />
       </div>
     </template>
   </FilterContainer>
@@ -35,12 +33,6 @@ export default {
       required: true,
     },
     lens: String,
-  },
-
-  methods: {
-    handleChange() {
-      this.$emit('change')
-    },
   },
 
   computed: {

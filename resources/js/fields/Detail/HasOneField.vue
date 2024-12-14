@@ -31,6 +31,7 @@
         :via-resource-id="viaResourceId"
         :via-relationship="viaRelationship"
         :relationship-type="field.relationshipType"
+        :show-action-dropdown="showActionDropdown"
         :show-view-link="true"
       />
     </div>
@@ -40,6 +41,10 @@
 <script>
 export default {
   props: ['resourceName', 'resourceId', 'resource', 'field'],
+
+  data: () => ({
+    showActionDropdown: true,
+  }),
 
   computed: {
     authorizedToCreate() {

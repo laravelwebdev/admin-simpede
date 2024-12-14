@@ -30,13 +30,13 @@ class CardCommand extends ComponentGeneratorCommand
      *
      * @return void
      */
-    public function handle()
+    public function handle(Filesystem $files)
     {
         if (! $this->hasValidNameArgument()) {
             return;
         }
 
-        (new Filesystem)->copyDirectory(
+        $files->copyDirectory(
             __DIR__.'/card-stubs',
             $this->componentPath()
         );
@@ -50,7 +50,7 @@ class CardCommand extends ComponentGeneratorCommand
         $this->replace('{{ class }}', $this->componentClass(), $this->componentPath().'/src/Card.stub');
         $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/Card.stub');
 
-        (new Filesystem)->move(
+        $files->move(
             $this->componentPath().'/src/Card.stub',
             $this->componentPath().'/src/'.$this->componentClass().'.php'
         );
