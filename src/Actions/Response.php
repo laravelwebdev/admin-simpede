@@ -8,13 +8,17 @@ class Response
 {
     /**
      * Determine if action was executed.
+     *
+     * @var bool
      */
-    public bool $wasExecuted = false;
+    public $wasExecuted = false;
 
     /**
      * List of action results.
+     *
+     * @var array
      */
-    public array $results = [];
+    public $results = [];
 
     /**
      * Mark response as successful.
