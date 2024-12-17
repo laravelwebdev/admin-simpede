@@ -13,13 +13,13 @@
       <DividerLine />
 
       <div class="mb-6">
-        <label class="block mb-2" for="email">{{ __('Username') }}</label>
+        <label class="block mb-2" for="email">{{ __('Email Address') }}</label>
         <input
           v-model="form.email"
           class="form-control form-input form-control-bordered w-full"
           :class="{ 'form-control-bordered-error': form.errors.has('email') }"
           id="email"
-          type="text"
+          type="email"
           name="email"
           autofocus=""
           required
@@ -49,20 +49,14 @@
         </HelpText>
       </div>
 
-      <div class="mb-6">
-        <label class="block mb-2" for="year">{{ __('Year') }}</label>
-        <select
-          v-model="form.year"
-          class="form-control form-input form-control-bordered w-full"
-          id="year"
-          name="year"
-          required
-        >
-        <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-        </select>
-      </div>     
-
       <div class="flex mb-6">
+        <Checkbox
+          @change="() => (form.remember = !form.remember)"
+          :model-value="form.remember"
+          dusk="remember-button"
+          :label="__('Remember me')"
+        />
+
         <div
           v-if="supportsPasswordReset || forgotPasswordPath !== false"
           class="ml-auto"
@@ -113,7 +107,6 @@ export default {
     form: Nova.form({
       email: '',
       password: '',
-      year: new Date().getFullYear(),
       remember: false,
     }),
   }),
@@ -146,10 +139,6 @@ export default {
     forgotPasswordPath() {
       return Nova.config('forgotPasswordPath')
     },
-    years () {
-        const year = new Date().getFullYear()
-        return Array.from({length: year - 2023}, (value, index) => year - index)
-      },
   },
 }
 </script>

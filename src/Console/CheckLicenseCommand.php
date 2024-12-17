@@ -34,7 +34,7 @@ class CheckLicenseCommand extends Command
 
         $response = Nova::checkLicense();
 
-        if ($response) {
+        if ($response->status() == 204) {
             $this->info('Your license key is valid and correctly configured! Thank you for being a Nova customer. 🚀');
 
             return 0;

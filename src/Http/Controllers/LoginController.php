@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
-use App\Models\Pengelola;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
@@ -55,15 +54,13 @@ class LoginController extends Controller
     /**
      * The user has been authenticated.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
      * @return mixed
      */
     protected function authenticated(Request $request, $user)
     {
-        $roles = Pengelola::cache()->get('all')->where('user_id', Auth::user()->id)->whereNull('inactive')->pluck('role')->toArray();
         $redirect = redirect()->intended($this->redirectPath($request));
-        session(['year' => $request->input('year')]);
-        session(['role' => $roles]);
 
         return $request->wantsJson()
             ? new JsonResponse([
@@ -75,6 +72,7 @@ class LoginController extends Controller
     /**
      * Log the user out of the application.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(Request $request)
@@ -89,6 +87,7 @@ class LoginController extends Controller
     /**
      * Get the post register / login redirect path.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     public function redirectPath(Request $request)
