@@ -18,14 +18,13 @@ class UserResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    #[\Override]
     public function toArray($request)
     {
         if (app()->bound(NovaRequest::class)) {
             $resourceClass = Nova::resourceForModel($this->resource);
 
             if (! is_null($resourceClass)) {
-                $resource = $resourceClass::make($this->resource);
+                $resource = new $resourceClass($this->resource);
                 $avatar = $resource->resolveAvatarField(app(NovaRequest::class));
 
                 if (! is_null($avatar)) {

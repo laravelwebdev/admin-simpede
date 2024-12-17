@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Lenses;
 
 use ArrayAccess;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
@@ -60,13 +59,16 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
     /**
      * Execute the query for the lens.
      *
-     * @return \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Contracts\Pagination\Paginator
+     * @param  \Laravel\Nova\Http\Requests\LensRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return mixed
      */
-    abstract public static function query(LensRequest $request, Builder $query);
+    abstract public static function query(LensRequest $request, $query);
 
     /**
      * Get the fields displayed by the lens.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array<int, \Laravel\Nova\Fields\Field>
      */
     abstract public function fields(NovaRequest $request);
@@ -118,6 +120,7 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
     /**
      * Get the actions available on the lens.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array<int, \Laravel\Nova\Actions\Action>
      */
     public function actions(NovaRequest $request)
@@ -130,6 +133,7 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
     /**
      * Resolve the given fields to their values.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field>
      */
     public function resolveFields(NovaRequest $request)
@@ -144,6 +148,7 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
     /**
      * Resolve the filterable fields.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\FilterableField>
      */
     public function filterableFields(NovaRequest $request)
@@ -157,6 +162,7 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
     /**
      * Get the fields that are available for the given request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\FieldCollection
      */
     public function availableFields(NovaRequest $request)

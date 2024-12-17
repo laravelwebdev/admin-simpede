@@ -6,9 +6,10 @@ class MorphMany extends HasMany
 {
     /**
      * Get the relationship type.
+     *
+     * @return string
      */
-    #[\Override]
-    public function relationshipType(): string
+    public function relationshipType()
     {
         return 'morphMany';
     }

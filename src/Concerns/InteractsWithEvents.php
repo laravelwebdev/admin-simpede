@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Concerns;
 
-use Closure;
 use Illuminate\Support\Facades\Event;
 use Laravel\Nova\Events\NovaServiceProviderRegistered;
 use Laravel\Nova\Events\ServingNova;
@@ -12,10 +11,10 @@ trait InteractsWithEvents
     /**
      * Register an event listener for the Nova "booted" event.
      *
-     * @param  (\Closure(\Laravel\Nova\Events\NovaServiceProviderRegistered):(void))|string|array  $callback
+     * @param  (\Closure(\Laravel\Nova\Events\NovaServiceProviderRegistered):(void))|string  $callback
      * @return void
      */
-    public static function booted(Closure|string|array $callback)
+    public static function booted($callback)
     {
         Event::listen(NovaServiceProviderRegistered::class, $callback);
     }
@@ -23,10 +22,10 @@ trait InteractsWithEvents
     /**
      * Register an event listener for the Nova "serving" event.
      *
-     * @param  (\Closure(\Laravel\Nova\Events\ServingNova):(void))|string|array  $callback
+     * @param  (\Closure(\Laravel\Nova\Events\ServingNova):(void))|string  $callback
      * @return void
      */
-    public static function serving(Closure|string|array $callback)
+    public static function serving($callback)
     {
         Event::listen(ServingNova::class, $callback);
     }
@@ -38,8 +37,6 @@ trait InteractsWithEvents
      */
     public static function flushState()
     {
-        static::fortify()->flush();
-
         static::$rtlCallback = null;
         static::$createUserCallback = null;
         static::$createUserCommandCallback = null;

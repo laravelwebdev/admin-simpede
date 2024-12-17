@@ -3,19 +3,18 @@
 namespace Laravel\Nova;
 
 use JsonSerializable;
-use Stringable;
 
 /**
- * @method static static make(self|string|null $url, bool $remote = false)
+ * @method static static make(string|self $url, bool $remote = false)
  */
-class URL implements JsonSerializable, Stringable
+class URL implements JsonSerializable
 {
     use Makeable;
 
     /**
      * The URL.
      *
-     * @var string|null
+     * @var string
      */
     public $url;
 
@@ -28,8 +27,11 @@ class URL implements JsonSerializable, Stringable
 
     /**
      * Construct a new URL instance.
+     *
+     * @param  string|self  $url
+     * @param  bool  $remote
      */
-    public function __construct(self|string|null $url, bool $remote = false)
+    public function __construct($url, $remote = false)
     {
         if ($url instanceof self) {
             $this->url = $url->url;
@@ -44,24 +46,31 @@ class URL implements JsonSerializable, Stringable
 
     /**
      * Make a remote URL.
+     *
+     * @param  string  $url
+     * @return static
      */
-    public static function remote(string $url): static
+    public static function remote($url)
     {
         return new static($url, true);
     }
 
     /**
      * Get the URL.
+     *
+     * @return string
      */
-    public function get(): ?string
+    public function get()
     {
         return $this->remote === true ? $this->url : Nova::url($this->url);
     }
 
     /**
      * Determine if currently an active URL.
+     *
+     * @return bool
      */
-    public function active(): bool
+    public function active()
     {
         return with(ltrim($this->get(), '/'), function ($url) {
             return request()->is($url, rtrim($url, '/').'/*');
@@ -70,8 +79,10 @@ class URL implements JsonSerializable, Stringable
 
     /**
      * Convert the URL instance to a string.
+     *
+     * @return string
      */
-    public function __toString(): string
+    public function __toString()
     {
         return $this->get();
     }

@@ -1,12 +1,6 @@
 import identity from 'lodash/identity'
 import pickBy from 'lodash/pickBy'
 
-/**
- * @param {string} base
- * @param {string} path
- * @param {any} parameters
- * @returns {string}
- */
 export default function url(base, path, parameters) {
   let searchParams = new URLSearchParams(pickBy(parameters || {}, identity))
 

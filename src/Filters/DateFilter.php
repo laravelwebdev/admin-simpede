@@ -14,9 +14,10 @@ abstract class DateFilter extends Filter
     /**
      * Set the first day of the week.
      *
+     * @param  int  $day
      * @return $this
      */
-    public function firstDayOfWeek(int $day)
+    public function firstDayOfWeek($day)
     {
         return $this->withMeta([__FUNCTION__ => $day]);
     }

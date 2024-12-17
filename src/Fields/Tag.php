@@ -2,28 +2,22 @@
 
 namespace Laravel\Nova\Fields;
 
-use Closure;
-use Laravel\Nova\Contracts\PivotableField;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
-use Laravel\Nova\Resource;
 use Laravel\Nova\Util;
 
 /**
  * @method static static make(mixed $name, string|null $attribute = null, string|null $resource = null)
  */
-class Tag extends Field implements PivotableField
+class Tag extends Field
 {
-    use AttachableRelation;
     use DeterminesIfCreateRelationCanBeShown;
-    use FormatsRelatableDisplayValues;
-    use ManyToManyCreationRules;
     use Searchable;
     use SupportsDependentFields;
 
-    public const LIST_STYLE = 'list';
+    const LIST_STYLE = 'list';
 
-    public const GROUP_STYLE = 'group';
+    const GROUP_STYLE = 'group';
 
     /**
      * The field's component.
@@ -84,46 +78,32 @@ class Tag extends Field implements PivotableField
     /**
      * Create a new field.
      *
-     * @param  \Stringable|string  $name
+     * @param  string  $name
+     * @param  string|null  $attribute
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
      * @return void
      */
-    public function __construct($name, ?string $attribute = null, ?string $resource = null)
+    public function __construct($name, $attribute = null, $resource = null)
     {
         parent::__construct($name, $attribute);
 
-        $resource ??= ResourceRelationshipGuesser::guessResource($name);
+        $resource = $resource ?? ResourceRelationshipGuesser::guessResource($name);
 
         $this->resourceClass = $resource;
         $this->resourceName = $resource::uriKey();
         $this->manyToManyRelationship = $this->attribute = $attribute ?? ResourceRelationshipGuesser::guessRelation($name);
-
-        $this->allowDuplicateRelations();
-    }
-
-    /**
-     * Get the relationship name.
-     */
-    public function relationshipName(): string
-    {
-        return $this->manyToManyRelationship;
-    }
-
-    /**
-     * Get the relationship type.
-     */
-    public function relationshipType(): string
-    {
-        return 'belongsToMany';
     }
 
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
+     * @param  string  $attribute
+     * @return \Closure
      */
-    #[\Override]
-    protected function fillAttributeFromRequest(NovaRequest $request, string $requestAttribute, object $model, string $attribute): Closure
+    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         return function () use ($model, $attribute, $request, $requestAttribute) {
             $model->{$attribute}()->sync(
@@ -135,9 +115,11 @@ class Tag extends Field implements PivotableField
     /**
      * Prepare relation values from request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
      * @return array<int, string>
      */
-    protected function prepareRelations(NovaRequest $request, string $requestAttribute): array
+    protected function prepareRelations(NovaRequest $request, string $requestAttribute)
     {
         if (! $request->filled($requestAttribute)) {
             return [];
@@ -152,9 +134,11 @@ class Tag extends Field implements PivotableField
     /**
      * Resolve the given attribute from the given resource.
      *
-     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
+     * @param  mixed  $resource
+     * @param  string  $attribute
+     * @return array
      */
-    protected function resolveAttribute($resource, string $attribute): array
+    protected function resolveAttribute($resource, $attribute)
     {
         return $resource->{$attribute}
             ->map(function ($model) {
@@ -203,14 +187,12 @@ class Tag extends Field implements PivotableField
     /**
      * Transform the result from resource.
      *
-     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model  $resource
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Laravel\Nova\Resource  $resource
+     * @return array
      */
-    protected function transformResult(NovaRequest $request, $resource): array
+    protected function transformResult(NovaRequest $request, $resource)
     {
-        if (! $resource instanceof Resource) {
-            $resource = Nova::newResourceFromModel($resource);
-        }
-
         return array_filter([
             'avatar' => $resource->resolveAvatarUrl($request),
             'display' => (string) $resource->title(),
@@ -226,6 +208,7 @@ class Tag extends Field implements PivotableField
      */
     public function jsonSerialize(): array
     {
+        /** @phpstan-ignore-next-line */
         return with(app(NovaRequest::class), function ($request) {
             return array_merge([
                 'preload' => $this->preload,

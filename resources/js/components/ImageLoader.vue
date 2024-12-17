@@ -10,7 +10,7 @@
   </span>
   <a v-else :href="src">
     <Icon
-      name="exclamation-circle"
+      type="exclamation-circle"
       class="text-red-500"
       v-tooltip="__('The image could not be loaded.')"
     />
@@ -19,12 +19,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { Icon } from 'laravel-nova-ui'
 import { useLocalization } from '@/composables/useLocalization'
-
-defineOptions({
-  inheritAttrs: false,
-})
 
 const { __ } = useLocalization()
 
@@ -55,4 +50,10 @@ const styles = computed(() => ({
   ...(props.aspect === 'aspect-square' && { width: `${props.maxWidth}px` }),
   ...(props.aspect === 'aspect-square' && { height: `${props.maxWidth}px` }),
 }))
+</script>
+
+<script>
+export default {
+  inheritAttrs: false,
+}
 </script>

@@ -66,23 +66,23 @@
 
       <ModalFooter>
         <div class="flex items-center ml-auto">
-          <Button
-            variant="link"
-            state="mellow"
-            @click="$emit('close')"
+          <CancelButton
+            component="button"
+            type="button"
             dusk="cancel-action-button"
             class="ml-auto mr-3"
+            @click="$emit('close')"
           >
             {{ action.cancelButtonText }}
-          </Button>
+          </CancelButton>
 
           <Button
-            ref="runButton"
             type="submit"
+            ref="runButton"
+            dusk="confirm-action-button"
             :loading="working"
             variant="solid"
             :state="action.destructive ? 'danger' : 'default'"
-            dusk="confirm-action-button"
           >
             {{ action.confirmButtonText }}
           </Button>

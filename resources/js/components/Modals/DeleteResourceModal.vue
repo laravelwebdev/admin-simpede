@@ -19,15 +19,14 @@
 
       <ModalFooter>
         <div class="ml-auto">
-          <Button
-            variant="link"
-            state="mellow"
+          <LinkButton
+            type="button"
+            dusk="cancel-delete-button"
             @click.prevent="handleClose"
             class="mr-3"
-            dusk="cancel-delete-button"
           >
             {{ __('Cancel') }}
-          </Button>
+          </LinkButton>
 
           <Button
             type="submit"
@@ -44,8 +43,8 @@
 </template>
 
 <script>
-import { Button } from 'laravel-nova-ui'
 import startCase from 'lodash/startCase'
+import { Button } from 'laravel-nova-ui'
 
 export default {
   components: {
@@ -60,7 +59,9 @@ export default {
     mode: {
       type: String,
       default: 'delete',
-      validator: v => ['force delete', 'delete', 'detach'].includes(v),
+      validator: function (value) {
+        return ['force delete', 'delete', 'detach'].indexOf(value) !== -1
+      },
     },
   },
 

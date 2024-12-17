@@ -2,9 +2,9 @@
 
 namespace Laravel\Nova\Fields;
 
+use Closure;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Metrics\Trend;
-use Laravel\Nova\Util;
 
 class Sparkline extends Field implements Unfillable
 {
@@ -18,7 +18,7 @@ class Sparkline extends Field implements Unfillable
     /**
      * The data used in the chart.
      *
-     * @var array|(callable(\Laravel\Nova\Http\Requests\NovaRequest):(mixed))|\Laravel\Nova\Metrics\Trend
+     * @var array|(\Closure(\Laravel\Nova\Http\Requests\NovaRequest):(mixed))|\Laravel\Nova\Metrics\Trend
      */
     public $data = [];
 
@@ -46,10 +46,10 @@ class Sparkline extends Field implements Unfillable
     /**
      * Set the data for the Spark Line.
      *
-     * @param  \Laravel\Nova\Metrics\Trend|(callable(\Laravel\Nova\Http\Requests\NovaRequest):(mixed))|iterable  $data
+     * @param  array|(\Closure(\Laravel\Nova\Http\Requests\NovaRequest):(mixed))|\Laravel\Nova\Metrics\Trend  $data
      * @return $this
      */
-    public function data(Trend|callable|iterable $data)
+    public function data($data)
     {
         $this->data = $data;
 
@@ -59,7 +59,8 @@ class Sparkline extends Field implements Unfillable
     /**
      * Get field data.
      *
-     * @return mixed
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array|mixed
      */
     public function getData(NovaRequest $request)
     {
@@ -75,7 +76,7 @@ class Sparkline extends Field implements Unfillable
                     ])
                 )->trend ?? []
             );
-        } elseif (Util::isSafeCallable($this->data)) {
+        } elseif ($this->data instanceof Closure) {
             return call_user_func($this->data, $request);
         }
 
@@ -97,9 +98,10 @@ class Sparkline extends Field implements Unfillable
     /**
      * Set the component height.
      *
+     * @param  int  $height
      * @return $this
      */
-    public function height(int $height)
+    public function height($height)
     {
         return $this->withMeta([
             __FUNCTION__ => $height,
@@ -109,9 +111,10 @@ class Sparkline extends Field implements Unfillable
     /**
      * Set the component width.
      *
+     * @param  int  $width
      * @return $this
      */
-    public function width(int $width)
+    public function width($width)
     {
         return $this->withMeta([
             __FUNCTION__ => $width,
@@ -123,7 +126,6 @@ class Sparkline extends Field implements Unfillable
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

@@ -1,8 +1,5 @@
 const mixin = {
   methods: {
-    /**
-     * @param {string} value
-     */
     copyValueToClipboard(value) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(value)

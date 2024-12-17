@@ -5,7 +5,6 @@
     class="h-full"
     :is="card.component"
     :card="card"
-    :dashboard="dashboard"
     :resource="resource"
     :resourceName="resourceName"
     :resourceId="resourceId"
@@ -23,11 +22,6 @@ export default {
 
     resource: {
       type: Object,
-      required: false,
-    },
-
-    dashboard: {
-      type: String,
       required: false,
     },
 

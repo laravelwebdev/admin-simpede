@@ -2,41 +2,41 @@
 
 namespace Laravel\Nova\Testing\Browser\Pages;
 
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Dusk\Browser;
 
 class UpdateAttached extends Page
 {
-    /**
-     * The Resource ID.
-     *
-     * @var \Illuminate\Database\Eloquent\Model|string|int
-     */
-    public mixed $resourceId;
+    public $resourceName;
 
-    /**
-     * The Related ID.
-     *
-     * @var \Illuminate\Database\Eloquent\Model|string|int
-     */
-    public mixed $relatedId;
+    public $resourceId;
+
+    public $relation;
+
+    public $relatedId;
+
+    public $viaRelationship;
+
+    public $viaPivotId;
 
     /**
      * Create a new page instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $resourceId
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $relatedId
+     * @param  string  $resourceName
+     * @param  string  $resourceId
+     * @param  string  $relation
+     * @param  string  $relatedId
+     * @param  string|null  $viaRelationship
+     * @param  string|null  $viaPivotId
+     * @return void
      */
-    public function __construct(
-        public string $resourceName,
-        mixed $resourceId,
-        public string $relation,
-        mixed $relatedId,
-        public ?string $viaRelationship = null,
-        public ?string $viaPivotId = null
-    ) {
-        $this->relatedId = $relatedId instanceof Model ? $relatedId->getKey() : $relatedId;
-        $this->resourceId = $resourceId instanceof Model ? $resourceId->getKey() : $resourceId;
+    public function __construct($resourceName, $resourceId, $relation, $relatedId, $viaRelationship = null, $viaPivotId = null)
+    {
+        $this->relation = $relation;
+        $this->relatedId = $relatedId;
+        $this->resourceId = $resourceId;
+        $this->resourceName = $resourceName;
+        $this->viaRelationship = $viaRelationship;
+        $this->viaPivotId = $viaPivotId;
 
         $this->setNovaPage("/resources/{$this->resourceName}/{$this->resourceId}/edit-attached/{$this->relation}/{$this->relatedId}");
     }
@@ -44,43 +44,41 @@ class UpdateAttached extends Page
     /**
      * Create a new page instance for Belongs-to-Many.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $resourceId
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $relatedId
+     * @param  string  $resourceName
+     * @param  string  $resourceId
+     * @param  string  $relation
+     * @param  string  $relatedId
+     * @param  string|null  $viaRelationship
+     * @param  string|null  $viaPivotId
      * @return static
      */
-    public static function belongsToMany(
-        string $resourceName,
-        mixed $resourceId,
-        string $relation,
-        mixed $relatedId,
-        ?string $viaRelationship = null,
-        ?string $viaPivotId = null
-    ) {
+    public static function belongsToMany($resourceName, $resourceId, $relation, $relatedId, $viaRelationship = null, $viaPivotId = null)
+    {
         return new static($resourceName, $resourceId, $relation, $relatedId, $viaRelationship, $viaPivotId);
     }
 
     /**
      * Create a new page instance for Morph-to-Many.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $resourceId
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $relatedId
+     * @param  string  $resourceName
+     * @param  string  $resourceId
+     * @param  string  $relation
+     * @param  string  $relatedId
+     * @param  string|null  $viaRelationship
+     * @param  string|null  $viaPivotId
      * @return static
      */
-    public static function morphToMany(
-        string $resourceName,
-        mixed $resourceId,
-        string $relation,
-        mixed $relatedId,
-        ?string $viaRelationship = null,
-        ?string $viaPivotId = null
-    ) {
+    public static function morphToMany($resourceName, $resourceId, $relation, $relatedId, $viaRelationship = null, $viaPivotId = null)
+    {
         return new static($resourceName, $resourceId, $relation, $relatedId, $viaRelationship, $viaPivotId);
     }
 
     /**
      * Get the URL for the page.
+     *
+     * @return string
      */
-    public function url(): string
+    public function url()
     {
         return $this->novaPageUrl.'?'.http_build_query(array_filter([
             'viaRelationship' => $this->viaRelationship ?? $this->relation,
@@ -90,8 +88,11 @@ class UpdateAttached extends Page
 
     /**
      * Click the update button.
+     *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
      */
-    public function update(Browser $browser): void
+    public function update(Browser $browser)
     {
         $browser->dismissToasted()
             ->click('@update-button')
@@ -100,8 +101,11 @@ class UpdateAttached extends Page
 
     /**
      * Click the update and continue editing button.
+     *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
      */
-    public function updateAndContinueEditing(Browser $browser): void
+    public function updateAndContinueEditing(Browser $browser)
     {
         $browser->dismissToasted()
             ->click('@update-and-continue-editing-button')
@@ -110,8 +114,11 @@ class UpdateAttached extends Page
 
     /**
      * Click the cancel button.
+     *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
      */
-    public function cancel(Browser $browser): void
+    public function cancel(Browser $browser)
     {
         $browser->dismissToasted()
             ->click('@cancel-update-attached-button');
@@ -120,9 +127,12 @@ class UpdateAttached extends Page
     /**
      * Assert that the browser is on the page.
      *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
+     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function assert(Browser $browser): void
+    public function assert(Browser $browser)
     {
         $browser->assertOk()->waitFor('@nova-form');
     }

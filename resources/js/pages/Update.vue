@@ -9,24 +9,28 @@
   />
 </template>
 
-<script setup>
-import ResourceUpdate from '@/views/Update'
+<script>
 import { mapProps } from '@/mixins'
+import ResourceUpdate from '@/views/Update'
 import { uid } from 'uid/single'
 
-defineOptions({
+export default {
   name: 'Update',
-})
 
-defineProps(
-  mapProps([
+  components: {
+    ResourceUpdate,
+  },
+
+  props: mapProps([
     'resourceName',
     'resourceId',
     'viaResource',
     'viaResourceId',
     'viaRelationship',
-  ])
-)
+  ]),
 
-const formUniqueId = uid()
+  data: () => ({
+    formUniqueId: uid(),
+  }),
+}
 </script>

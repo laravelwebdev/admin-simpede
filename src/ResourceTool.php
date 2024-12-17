@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova;
 
+use Closure;
 use Illuminate\Support\Str;
 
 /**
@@ -42,11 +43,11 @@ class ResourceTool extends Panel
     /**
      * Get the displayable name of the resource tool.
      *
-     * @return \Stringable|string
+     * @return string
      */
     public function name()
     {
-        return $this->name ?: Nova::humanize(get_class($this));
+        return $this->name ?: Str::title(Str::snake(class_basename(get_class($this)), ' '));
     }
 
     /**
@@ -62,10 +63,10 @@ class ResourceTool extends Panel
     /**
      * Set the callback to be run to authorize viewing the card.
      *
-     * @param  callable(\Illuminate\Http\Request):bool  $callback
+     * @param  \Closure(\Illuminate\Http\Request):bool  $callback
      * @return $this
      */
-    public function canSee(callable $callback)
+    public function canSee(Closure $callback)
     {
         $this->element->canSee($callback);
 
@@ -80,7 +81,6 @@ class ResourceTool extends Panel
      */
     public function withMeta(array $meta)
     {
-        parent::withMeta($meta);
         $this->element->withMeta($meta);
 
         return $this;

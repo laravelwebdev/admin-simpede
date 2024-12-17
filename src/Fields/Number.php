@@ -11,33 +11,33 @@ class Number extends Text
     /**
      * The minimum value that can be assigned to the field.
      *
-     * @var int|float|string|null
+     * @var mixed
      */
-    public $min = null;
+    public $min;
 
     /**
      * The maximum value that can be assigned to the field.
      *
-     * @var int|float|string|null
+     * @var mixed
      */
-    public $max = null;
+    public $max;
 
     /**
      * The step size the field will increment and decrement by.
      *
-     * @var int|float|string|null
+     * @var mixed
      */
-    public $step = null;
+    public $step;
 
     /**
      * Create a new field.
      *
-     * @param  \Stringable|string  $name
-     * @param  string|callable|object|null  $attribute
+     * @param  string  $name
+     * @param  string|\Closure|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
@@ -51,9 +51,10 @@ class Number extends Text
     /**
      * The minimum value that can be assigned to the field.
      *
+     * @param  mixed  $min
      * @return $this
      */
-    public function min(int|float|string|null $min)
+    public function min($min)
     {
         $this->min = $min;
 
@@ -63,9 +64,10 @@ class Number extends Text
     /**
      * The maximum value that can be assigned to the field.
      *
+     * @param  mixed  $max
      * @return $this
      */
-    public function max(int|float|string|null $max)
+    public function max($max)
     {
         $this->max = $max;
 
@@ -75,9 +77,10 @@ class Number extends Text
     /**
      * The step size the field will increment and decrement by.
      *
+     * @param  mixed  $step
      * @return $this
      */
-    public function step(int|float|string|null $step)
+    public function step($step)
     {
         $this->step = $step;
 
@@ -87,6 +90,7 @@ class Number extends Text
     /**
      * Make the field filter.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -97,7 +101,7 @@ class Number extends Text
     /**
      * Define the default filterable callback.
      *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):\Illuminate\Contracts\Database\Eloquent\Builder
+     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed, string):\Illuminate\Database\Eloquent\Builder
      */
     protected function defaultFilterableCallback()
     {
@@ -116,8 +120,10 @@ class Number extends Text
 
     /**
      * Prepare the field for JSON serialization.
+     *
+     * @return array
      */
-    public function serializeForFilter(): array
+    public function serializeForFilter()
     {
         return transform($this->jsonSerialize(), function ($field) {
             return Arr::only($field, [

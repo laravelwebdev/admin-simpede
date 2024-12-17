@@ -2,8 +2,6 @@
 
 namespace Laravel\Nova\Menu;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Traits\Conditionable;
 use JsonSerializable;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Makeable;
@@ -15,28 +13,32 @@ use Laravel\Nova\Makeable;
  */
 class Menu implements JsonSerializable
 {
-    use Conditionable;
     use Makeable;
 
     /**
      * The items for the menu.
+     *
+     * @var \Illuminate\Support\Collection|array
      */
-    public Collection $items;
+    public $items = [];
 
     /**
      * Create a new Menu instance.
+     *
+     * @param  array|iterable  $items
      */
-    public function __construct(iterable $items = [])
+    public function __construct($items = [])
     {
-        $this->items = Collection::make($items);
+        $this->items = collect($items);
     }
 
     /**
      * Wrap the given menu if not already wrapped.
      *
-     * @return self|static
+     * @param  \Laravel\Nova\Menu\Menu|array|iterable  $menu
+     * @return \Laravel\Nova\Menu\Menu
      */
-    public static function wrap(self|iterable $menu)
+    public static function wrap($menu)
     {
         return $menu instanceof self
             ? $menu
@@ -46,12 +48,12 @@ class Menu implements JsonSerializable
     /**
      * Push items into the menu.
      *
-     * @param  \JsonSerializable|iterable  $items
+     * @param  \JsonSerializable|array|iterable  $items
      * @return $this
      *
-     * @phpstan-param TMenu|iterable $items
+     * @phpstan-param TMenu|array|iterable $items
      */
-    public function push(MenuGroup|MenuItem|MenuList|MenuSection|iterable $items = [])
+    public function push($items = [])
     {
         return $this->append($items);
     }
@@ -59,12 +61,12 @@ class Menu implements JsonSerializable
     /**
      * Append items into the menu.
      *
-     * @param  \JsonSerializable|iterable  $items
+     * @param  \JsonSerializable|array|iterable  $items
      * @return $this
      *
-     * @phpstan-param TMenu|iterable $items
+     * @phpstan-param TMenu|array|iterable $items
      */
-    public function append(MenuGroup|MenuItem|MenuList|MenuSection|iterable $items = [])
+    public function append($items = [])
     {
         $this->items[] = $items;
 
@@ -74,12 +76,10 @@ class Menu implements JsonSerializable
     /**
      * Prepend items to the menu.
      *
-     * @param  \JsonSerializable|iterable  $items
+     * @param  TMenu|array|iterable  $items
      * @return $this
-     *
-     * @phpstan-param TMenu|iterable $items
      */
-    public function prepend(MenuGroup|MenuItem|MenuList|MenuSection|iterable $items = [])
+    public function prepend($items = [])
     {
         $this->items->prepend($items);
 

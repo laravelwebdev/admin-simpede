@@ -2,10 +2,9 @@
 
 namespace Laravel\Nova\Http\Resources;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Laravel\Nova\Http\Requests\LensRequest;
-use Laravel\Nova\Lenses\Lens;
-use Laravel\Nova\TrashedStatus;
+use Laravel\Nova\Query\ApplySoftDeleteConstraint;
 
 class LensViewResource extends Resource
 {
@@ -22,7 +21,7 @@ class LensViewResource extends Resource
         $query = $request->newSearchQuery();
 
         if ($request->resourceSoftDeletes()) {
-            (TrashedStatus::tryFrom($request->trashed) ?? TrashedStatus::DEFAULT)->applySoftDeleteConstraint($query);
+            (new ApplySoftDeleteConstraint)->__invoke($query, $request->trashed);
         }
 
         $paginator = $lens->query($request, $query);
@@ -52,10 +51,12 @@ class LensViewResource extends Resource
     /**
      * Get authorized resource for the request.
      *
+     * @param  \Laravel\Nova\Http\Requests\LensRequest  $request
+     * @return \Laravel\Nova\Lenses\Lens
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function authorizedLensForRequest(LensRequest $request): Lens
+    public function authorizedLensForRequest(LensRequest $request)
     {
         return $request->lens();
     }

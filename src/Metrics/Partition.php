@@ -2,11 +2,10 @@
 
 namespace Laravel\Nova\Metrics;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Contracts\Database\Query\Expression;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
-use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Util;
 
 abstract class Partition extends Metric
 {
@@ -22,9 +21,13 @@ abstract class Partition extends Metric
     /**
      * Return a partition result showing the segments of a count aggregate.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string  $groupBy
+     * @param  \Illuminate\Database\Query\Expression|string|null  $column
+     * @return \Laravel\Nova\Metrics\PartitionResult
      */
-    public function count(NovaRequest $request, Builder|Model|string $model, Expression|string $groupBy, Expression|string|null $column = null): PartitionResult
+    public function count($request, $model, $groupBy, $column = null)
     {
         return $this->aggregate($request, $model, 'count', $column, $groupBy);
     }
@@ -32,9 +35,13 @@ abstract class Partition extends Metric
     /**
      * Return a partition result showing the segments of an average aggregate.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string|null  $column
+     * @param  \Illuminate\Database\Query\Expression|string  $groupBy
+     * @return \Laravel\Nova\Metrics\PartitionResult
      */
-    public function average(NovaRequest $request, Builder|Model|string $model, Expression|string|null $column, Expression|string $groupBy): PartitionResult
+    public function average($request, $model, $column, $groupBy)
     {
         return $this->aggregate($request, $model, 'avg', $column, $groupBy);
     }
@@ -42,9 +49,13 @@ abstract class Partition extends Metric
     /**
      * Return a partition result showing the segments of a sum aggregate.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string|null  $column
+     * @param  \Illuminate\Database\Query\Expression|string  $groupBy
+     * @return \Laravel\Nova\Metrics\PartitionResult
      */
-    public function sum(NovaRequest $request, Builder|Model|string $model, Expression|string|null $column, Expression|string $groupBy): PartitionResult
+    public function sum($request, $model, $column, $groupBy)
     {
         return $this->aggregate($request, $model, 'sum', $column, $groupBy);
     }
@@ -52,9 +63,13 @@ abstract class Partition extends Metric
     /**
      * Return a partition result showing the segments of a max aggregate.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string|null  $column
+     * @param  \Illuminate\Database\Query\Expression|string  $groupBy
+     * @return \Laravel\Nova\Metrics\PartitionResult
      */
-    public function max(NovaRequest $request, Builder|Model|string $model, Expression|string|null $column, Expression|string $groupBy): PartitionResult
+    public function max($request, $model, $column, $groupBy)
     {
         return $this->aggregate($request, $model, 'max', $column, $groupBy);
     }
@@ -62,9 +77,13 @@ abstract class Partition extends Metric
     /**
      * Return a partition result showing the segments of a min aggregate.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string|null  $column
+     * @param  \Illuminate\Database\Query\Expression|string  $groupBy
+     * @return \Laravel\Nova\Metrics\PartitionResult
      */
-    public function min(NovaRequest $request, Builder|Model|string $model, Expression|string|null $column, Expression|string $groupBy): PartitionResult
+    public function min($request, $model, $column, $groupBy)
     {
         return $this->aggregate($request, $model, 'min', $column, $groupBy);
     }
@@ -72,31 +91,30 @@ abstract class Partition extends Metric
     /**
      * Return a partition result showing the segments of a aggregate.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  string  $function
+     * @param  \Illuminate\Database\Query\Expression|string|null  $column
+     * @param  \Illuminate\Database\Query\Expression|string  $groupBy
+     * @return \Laravel\Nova\Metrics\PartitionResult
      */
-    protected function aggregate(
-        NovaRequest $request,
-        Builder|Model|string $model,
-        string $function,
-        Expression|string|null $column,
-        Expression|string $groupBy
-    ): PartitionResult {
+    protected function aggregate($request, $model, $function, $column, $groupBy)
+    {
         $query = $model instanceof Builder ? $model : (new $model)->newQuery();
         $grammar = $query->getQuery()->getGrammar();
 
         $wrappedColumn = $grammar->wrap($column ?? $query->getModel()->getQualifiedKeyName());
-        $wrappedGroupByLabel = $grammar->wrap($groupBy);
 
         $results = $query->select(
-            DB::raw("{$wrappedGroupByLabel} as aggregate_group_by_label"),
-            DB::raw("{$function}({$wrappedColumn}) as aggregate")
+            $groupBy, DB::raw("{$function}({$wrappedColumn}) as aggregate")
         )->tap(function ($query) use ($request) {
             return $this->applyFilterQuery($request, $query);
         })->groupBy($groupBy)->get();
 
-        return $this->result($results->mapWithKeys(function ($result) {
+        return $this->result($results->mapWithKeys(function ($result) use ($grammar, $groupBy) {
             return $this->formatAggregateResult(
                 $result,
+                $groupBy instanceof Expression ? $grammar->getValue($groupBy) : $groupBy
             );
         })->all());
     }
@@ -105,13 +123,16 @@ abstract class Partition extends Metric
      * Format the aggregate result for the partition.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $result
+     * @param  string  $groupBy
      * @return array<string|int, int|float>
      */
-    protected function formatAggregateResult($result)
+    protected function formatAggregateResult($result, $groupBy)
     {
-        $key = $result->aggregate_group_by_label;
+        $key = with($result->{last(explode('.', $groupBy))}, function ($key) {
+            return Util::value($key);
+        });
 
-        if (! is_int($key) && ! is_bool($key)) {
+        if (! is_int($key)) {
             $key = (string) $key;
         }
 
@@ -122,8 +143,9 @@ abstract class Partition extends Metric
      * Create a new partition metric result.
      *
      * @param  array<string, int|float>  $value
+     * @return \Laravel\Nova\Metrics\PartitionResult
      */
-    public function result(array $value): PartitionResult
+    public function result(array $value)
     {
         return new PartitionResult(collect($value)->map(function ($number) {
             return round($number, $this->roundingPrecision, $this->roundingMode);

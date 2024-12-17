@@ -37,9 +37,10 @@ abstract class Card extends Element
     /**
      * Set the width of the card.
      *
+     * @param  string  $width
      * @return $this
      */
-    public function width(string $width)
+    public function width($width)
     {
         $this->width = $width;
 
@@ -53,9 +54,10 @@ abstract class Card extends Element
     /**
      * Set the height of a card to use a fixed value.
      *
+     * @param  string  $height
      * @return $this
      */
-    public function height(string $height)
+    public function height($height)
     {
         $this->height = $height;
 
@@ -91,7 +93,6 @@ abstract class Card extends Element
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge([

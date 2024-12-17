@@ -29,5 +29,4 @@ export { default as Paginatable } from './Paginatable'
 export { default as PerPageable } from './PerPageable'
 export { default as SupportsPolling } from './SupportsPolling'
 export { default as IndexConcerns } from './IndexConcerns'
-
-export { Errors } from '../util/FormValidation'
+export { Errors } from 'form-backend-validation'

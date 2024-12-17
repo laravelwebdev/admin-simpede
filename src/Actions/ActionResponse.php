@@ -4,48 +4,75 @@ namespace Laravel\Nova\Actions;
 
 use ArrayAccess;
 use JsonSerializable;
-use Laravel\Nova\URL;
-use Stringable;
 
 class ActionResponse implements ArrayAccess, JsonSerializable
 {
-    private ?string $danger = null;
+    /**
+     * @var string
+     */
+    private $danger;
 
-    private ?bool $deleted = null;
+    /**
+     * @var bool
+     */
+    private $deleted;
 
-    private ?string $download = null;
+    /**
+     * @var string
+     */
+    private $download;
 
-    private Stringable|string|null $message = null;
+    /**
+     * @var string
+     */
+    private $message;
 
-    private Stringable|string|null $name = null;
+    /**
+     * @var string
+     */
+    private $name;
 
-    private bool $openInNewTab = false;
+    /**
+     * @var string
+     */
+    private $openInNewTab;
 
-    private ?string $redirect = null;
+    /**
+     * @var string
+     */
+    private $redirect;
 
     /**
      * @var array{path: string, options: array<string, mixed>}|null
      */
-    private ?array $visit = null;
-
-    private ?string $modal = null;
-
-    private array $data = [];
+    private $visit;
 
     /**
-     * @return static
+     * @var string
      */
-    public static function message(Stringable|string $message)
+    private $modal;
+
+    /**
+     * @var array
+     */
+    private $data = [];
+
+    /**
+     * @param  string  $message
+     * @return \Laravel\Nova\Actions\ActionResponse
+     */
+    public static function message($message)
     {
-        return tap(new static, function ($response) use ($message) {
+        return tap(new static, function (self $response) use ($message) {
             $response->withMessage($message);
         });
     }
 
     /**
+     * @param  string  $message
      * @return $this
      */
-    public function withMessage(Stringable|string $message)
+    public function withMessage($message)
     {
         $this->message = $message;
 
@@ -53,23 +80,25 @@ class ActionResponse implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * @return static
-     */
-    public static function danger(Stringable|string $message)
-    {
-        return tap(new static, function ($response) use ($message) {
-            $response->withDangerMessage($message);
-        });
-    }
-
-    /**
+     * @param  string  $message
      * @return $this
      */
-    public function withDangerMessage(Stringable|string $message)
+    public function withDangerMessage($message)
     {
         $this->danger = $message;
 
         return $this;
+    }
+
+    /**
+     * @param  string  $message
+     * @return \Laravel\Nova\Actions\ActionResponse
+     */
+    public static function danger(string $message)
+    {
+        return tap(new static, function (self $response) use ($message) {
+            $response->withDangerMessage($message);
+        });
     }
 
     /**
@@ -83,29 +112,20 @@ class ActionResponse implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * @return static
+     * @return \Laravel\Nova\Actions\ActionResponse
      */
     public static function deleted()
     {
-        return tap(new static, function ($response) {
+        return tap(new static, function (self $response) {
             $response->withDeleted();
         });
     }
 
     /**
-     * @return static
-     */
-    public static function redirect(string $url)
-    {
-        return tap(new static, function ($response) use ($url) {
-            $response->withRedirect($url);
-        });
-    }
-
-    /**
+     * @param  string  $url
      * @return $this
      */
-    public function withRedirect(string $url)
+    public function withRedirect($url)
     {
         $this->redirect = $url;
 
@@ -113,39 +133,33 @@ class ActionResponse implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * @return static
+     * @param  string  $url
+     * @return \Laravel\Nova\Actions\ActionResponse
      */
-    public static function openInNewTab(string $url)
+    public static function redirect($url)
     {
-        return static::redirect($url)->usingNewTab();
-    }
-
-    /**
-     * @return $this
-     */
-    public function usingNewTab()
-    {
-        $this->openInNewTab = true;
-
-        return $this;
-    }
-
-    /**
-     * @param  array<string, mixed>  $options
-     * @return static
-     */
-    public static function visit(URL|string $path, array $options = [])
-    {
-        return tap(new static, function ($response) use ($path, $options) {
-            $response->withVisitOptions($path, $options);
+        return tap(new static, function (self $response) use ($url) {
+            $response->withRedirect($url);
         });
     }
 
     /**
+     * @param  string  $url
+     * @return \Laravel\Nova\Actions\ActionResponse
+     */
+    public static function openInNewTab($url)
+    {
+        return tap(new static, function (self $response) use ($url) {
+            $response->usingNewTab($url);
+        });
+    }
+
+    /**
+     * @param  string|\Laravel\Nova\URL  $path
      * @param  array<string, mixed>  $options
      * @return $this
      */
-    public function withVisitOptions(URL|string $path, array $options = [])
+    public function withVisitOptions($path, $options = [])
     {
         $this->visit = [
             'path' => '/'.ltrim($path, '/'),
@@ -156,19 +170,34 @@ class ActionResponse implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * @return static
+     * @param  string|\Laravel\Nova\URL  $path
+     * @param  array<string, mixed>  $options
+     * @return \Laravel\Nova\Actions\ActionResponse
      */
-    public static function download(Stringable|string $name, string $url)
+    public static function visit($path, $options = [])
     {
-        return tap(new static, function ($response) use ($name, $url) {
-            $response->withDownload($name, $url);
+        return tap(new static, function (self $response) use ($path, $options) {
+            $response->withVisitOptions($path, $options);
         });
     }
 
     /**
+     * @param  string  $url
      * @return $this
      */
-    public function withDownload(Stringable|string $name, string $url)
+    private function usingNewTab($url)
+    {
+        $this->openInNewTab = $url;
+
+        return $this;
+    }
+
+    /**
+     * @param  string  $name
+     * @param  string  $url
+     * @return $this
+     */
+    public function withDownload($name, $url)
     {
         $this->name = $name;
         $this->download = $url;
@@ -177,19 +206,23 @@ class ActionResponse implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * @return static
+     * @param  string  $name
+     * @param  string  $url
+     * @return \Laravel\Nova\Actions\ActionResponse
      */
-    public static function modal(string $modal, array $data)
+    public static function download(string $name, string $url)
     {
-        return tap(new static, function ($response) use ($data, $modal) {
-            $response->withModal($modal, $data);
+        return tap(new static, function (self $response) use ($name, $url) {
+            $response->withDownload($name, $url);
         });
     }
 
     /**
+     * @param  string  $modal
+     * @param  array  $data
      * @return $this
      */
-    public function withModal(string $modal, array $data = [])
+    public function withModal($modal, $data = [])
     {
         $this->modal = $modal;
         $this->data = $data;
@@ -198,9 +231,22 @@ class ActionResponse implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * @param  string  $modal
+     * @param  array  $data
+     * @return \Laravel\Nova\Actions\ActionResponse
+     */
+    public static function modal(string $modal, $data)
+    {
+        return tap(new static, function (self $response) use ($data, $modal) {
+            $response->withModal($modal, $data);
+        });
+    }
+
+    /**
      * Determine if the given offset exists.
      *
      * @param  string  $offset
+     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -222,6 +268,8 @@ class ActionResponse implements ArrayAccess, JsonSerializable
      * Set the value at the given offset.
      *
      * @param  string  $offset
+     * @param  mixed  $value
+     * @return void
      */
     public function offsetSet($offset, $value): void
     {
@@ -234,6 +282,7 @@ class ActionResponse implements ArrayAccess, JsonSerializable
      * Unset the value at the given offset.
      *
      * @param  string  $offset
+     * @return void
      */
     public function offsetUnset($offset): void
     {

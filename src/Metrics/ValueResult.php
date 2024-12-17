@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Metrics;
 
 use JsonSerializable;
-use Stringable;
 
 /**
  * @phpstan-type TNumbroFormat array{
@@ -39,21 +38,21 @@ class ValueResult implements JsonSerializable
     /**
      * The previous value label.
      *
-     * @var \Stringable|string
+     * @var string
      */
     public $previousLabel;
 
     /**
      * The metric value prefix.
      *
-     * @var \Stringable|string
+     * @var string
      */
     public $prefix;
 
     /**
      * The metric value suffix.
      *
-     * @var \Stringable|string
+     * @var string
      */
     public $suffix;
 
@@ -107,9 +106,10 @@ class ValueResult implements JsonSerializable
      * Set the previous value for the metric.
      *
      * @param  int|float|numeric-string|null  $previous
+     * @param  string  $label
      * @return $this
      */
-    public function previous($previous, Stringable|string|null $label = null)
+    public function previous($previous, $label = null)
     {
         $this->previous = $previous;
         $this->previousLabel = $label;
@@ -120,9 +120,10 @@ class ValueResult implements JsonSerializable
     /**
      * Indicate that the metric represents a dollar value.
      *
+     * @param  string  $symbol
      * @return $this
      */
-    public function dollars(Stringable|string $symbol = '$')
+    public function dollars($symbol = '$')
     {
         return $this->currency($symbol);
     }
@@ -130,9 +131,10 @@ class ValueResult implements JsonSerializable
     /**
      * Indicate that the metric represents a currency value.
      *
+     * @param  string  $symbol
      * @return $this
      */
-    public function currency(Stringable|string $symbol = '$')
+    public function currency($symbol = '$')
     {
         return $this->prefix($symbol);
     }
@@ -140,9 +142,10 @@ class ValueResult implements JsonSerializable
     /**
      * Set the metric value prefix.
      *
+     * @param  string  $prefix
      * @return $this
      */
-    public function prefix(Stringable|string $prefix)
+    public function prefix($prefix)
     {
         $this->prefix = $prefix;
 
@@ -152,9 +155,10 @@ class ValueResult implements JsonSerializable
     /**
      * Set the metric value suffix.
      *
+     * @param  string  $suffix
      * @return $this
      */
-    public function suffix(Stringable|string $suffix)
+    public function suffix($suffix)
     {
         $this->suffix = $suffix;
 
@@ -181,7 +185,7 @@ class ValueResult implements JsonSerializable
      *
      * @phpstan-param TNumbroFormat|string  $format
      */
-    public function format(array|string $format)
+    public function format($format)
     {
         $this->format = $format;
 
@@ -191,9 +195,10 @@ class ValueResult implements JsonSerializable
     /**
      * Set the metric value tooltip formatting.
      *
+     * @param  string  $format
      * @return $this
      */
-    public function tooltipFormat(string $format)
+    public function tooltipFormat($format)
     {
         $this->tooltipFormat = $format;
 
@@ -203,9 +208,10 @@ class ValueResult implements JsonSerializable
     /**
      * Sets the zeroResult value.
      *
+     * @param  bool  $zeroResult
      * @return $this
      */
-    public function allowZeroResult(bool $zeroResult = true)
+    public function allowZeroResult($zeroResult = true)
     {
         $this->zeroResult = $zeroResult;
 

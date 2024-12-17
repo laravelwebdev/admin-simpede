@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import isNil from 'lodash/isNil'
 import { FieldValue } from '@/mixins'
 
 export default {
@@ -25,7 +26,7 @@ export default {
 
   computed: {
     isPivot() {
-      return this.field.pivotValue != null
+      return !isNil(this.field.pivotValue)
     },
 
     authorizedToView() {

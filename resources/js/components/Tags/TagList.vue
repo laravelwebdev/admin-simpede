@@ -2,20 +2,19 @@
   <div>
     <TagListItem
       v-for="(tag, index) in tags"
-      :key="index"
+      @tag-removed="i => $emit('tag-removed', i)"
       :index="index"
       :tag="tag"
       :resource-name="resourceName"
       :editable="editable"
       :with-subtitles="withSubtitles"
       :with-preview="withPreview"
-      @tag-removed="index => $emit('tag-removed', index)"
     />
   </div>
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   resourceName: { type: String },
   tags: { type: Array, default: [] },
   editable: { type: Boolean, default: true },
@@ -23,5 +22,5 @@ defineProps({
   withPreview: { type: Boolean, default: false },
 })
 
-defineEmits(['tag-removed', 'click'])
+const emit = defineEmits(['tag-removed', 'click'])
 </script>

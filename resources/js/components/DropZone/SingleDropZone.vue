@@ -3,7 +3,6 @@
     <div v-if="files.length > 0" class="grid grid-cols-4 gap-x-6">
       <FilePreviewBlock
         v-for="(file, index) in files"
-        :key="index"
         :file="file"
         @removed="() => handleRemoveClick(index)"
       />
@@ -44,23 +43,23 @@
 </template>
 
 <script setup>
-import { Button } from 'laravel-nova-ui'
 import { useLocalization } from '@/composables/useLocalization'
 import { useDragAndDrop } from '@/composables/useDragAndDrop'
+import { Button } from 'laravel-nova-ui'
 
-const emitter = defineEmits(['fileChanged', 'fileRemoved'])
+const { __ } = useLocalization()
+
+const emit = defineEmits(['fileChanged', 'fileRemoved'])
+
+const { startedDrag, handleOnDragEnter, handleOnDragLeave, handleOnDrop } =
+  useDragAndDrop(emit)
 
 defineProps({
   files: Array,
   handleClick: Function,
 })
 
-const { __ } = useLocalization()
-
-const { startedDrag, handleOnDragEnter, handleOnDragLeave, handleOnDrop } =
-  useDragAndDrop(emitter)
-
 function handleRemoveClick(index) {
-  emitter('fileRemoved', index)
+  emit('fileRemoved', index)
 }
 </script>

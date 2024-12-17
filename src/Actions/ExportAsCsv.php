@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Actions;
 
 use Closure;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
@@ -15,7 +14,8 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Rules\Filename;
 use Rap2hpoutre\FastExcel\FastExcel;
-use Stringable;
+use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportAsCsv extends Action
 {
@@ -27,6 +27,34 @@ class ExportAsCsv extends Action
     public $responseType = 'blob';
 
     /**
+     * All of the defined action fields.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    public $actionFields;
+
+    /**
+     * The custom query callback.
+     *
+     * @var (\Closure(\Illuminate\Database\Eloquent\Builder, \Laravel\Nova\Fields\ActionFields):(\Illuminate\Database\Eloquent\Builder))|null
+     */
+    public $withQueryCallback;
+
+    /**
+     * The custom field callback.
+     *
+     * @var (\Closure(\Laravel\Nova\Http\Requests\NovaRequest):(array<int, \Laravel\Nova\Fields\Field>))|null
+     */
+    public $withFieldsCallback;
+
+    /**
+     * The custom format callback.
+     *
+     * @var (\Closure(\Illuminate\Database\Eloquent\Model):(array<string, mixed>))|null
+     */
+    public $withFormatCallback;
+
+    /**
      * Indicates action events should be logged for models.
      *
      * @var bool
@@ -34,48 +62,23 @@ class ExportAsCsv extends Action
     public $withoutActionEvents = true;
 
     /**
-     * All of the defined action fields.
-     */
-    public Collection $actionFields;
-
-    /**
-     * The custom query callback.
-     *
-     * @var (\Closure(\Illuminate\Contracts\Database\Eloquent\Builder, \Laravel\Nova\Fields\ActionFields):(\Illuminate\Contracts\Database\Eloquent\Builder))|null
-     */
-    public ?Closure $withQueryCallback = null;
-
-    /**
-     * The custom field callback.
-     *
-     * @var (\Closure(\Laravel\Nova\Http\Requests\NovaRequest):(array<int, \Laravel\Nova\Fields\Field>))|null
-     */
-    public ?Closure $withFieldsCallback = null;
-
-    /**
-     * The custom format callback.
-     *
-     * @var (\Closure(\Illuminate\Database\Eloquent\Model):(array<string, mixed>))|null
-     */
-    public ?Closure $withFormatCallback = null;
-
-    /**
      * Construct a new action instance.
      *
+     * @param  string|null  $name
      * @return void
      */
-    public function __construct(Stringable|string|null $name = null)
+    public function __construct($name = null)
     {
         $this->name = $name;
-        $this->actionFields = Collection::make();
+        $this->actionFields = collect();
     }
 
     /**
      * Get the fields available on the action.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
-    #[\Override]
     public function fields(NovaRequest $request)
     {
         if ($this->withFieldsCallback instanceof Closure) {
@@ -87,20 +90,26 @@ class ExportAsCsv extends Action
 
     /**
      * Perform the action request using custom dispatch handler.
+     *
+     * @param  \Laravel\Nova\Http\Requests\ActionRequest  $request
+     * @param  \Laravel\Nova\Actions\Response  $response
+     * @param  \Laravel\Nova\Fields\ActionFields  $fields
+     * @return \Laravel\Nova\Actions\Response
      */
-    protected function dispatchRequestUsing(ActionRequest $request, Response $response, ActionFields $fields): Response
+    protected function dispatchRequestUsing(ActionRequest $request, Response $response, ActionFields $fields)
     {
-        $this->then(fn ($results) => $results->first());
+        $this->then(function ($results) {
+            return $results->first();
+        });
 
         $query = $request->toSelectedResourceQuery();
 
-        $query->when(
-            $this->withQueryCallback instanceof Closure,
-            fn ($query) => call_user_func($this->withQueryCallback, $query, $fields)
-        );
+        $query->when($this->withQueryCallback instanceof Closure, function ($query) use ($fields) {
+            return call_user_func($this->withQueryCallback, $query, $fields);
+        });
 
         $eloquentGenerator = function () use ($query) {
-            foreach ($query->lazy() as $model) {
+            foreach ($query->cursor() as $model) {
                 yield $model;
             }
         };
@@ -120,17 +129,30 @@ class ExportAsCsv extends Action
         );
 
         return $response->successful([
-            (new FastExcel($eloquentGenerator()))->download($exportFilename, $this->withFormatCallback),
+            tap(
+                (new FastExcel($eloquentGenerator()))->download($exportFilename, $this->withFormatCallback),
+                function ($response) use ($exportFilename) {
+                    if ($response instanceof StreamedResponse && ! $response->headers->has('Content-Disposition')) {
+                        $response->headers->set(
+                            'Content-Disposition',
+                            HeaderUtils::makeDisposition(
+                                HeaderUtils::DISPOSITION_ATTACHMENT, $exportFilename, str_replace('%', '', Str::ascii($exportFilename))
+                            )
+                        );
+                    }
+                }
+            ),
+
         ]);
     }
 
     /**
      * Specify a callback that modifies the query used to retrieve the selected models.
      *
-     * @param  (\Closure(\Illuminate\Contracts\Database\Eloquent\Builder, \Laravel\Nova\Fields\ActionFields):(\Illuminate\Contracts\Database\Eloquent\Builder))|null  $withQueryCallback
+     * @param  (\Closure(\Illuminate\Database\Eloquent\Builder, \Laravel\Nova\Fields\ActionFields):(\Illuminate\Database\Eloquent\Builder))|null  $withQueryCallback
      * @return $this
      */
-    public function withQuery(?Closure $withQueryCallback)
+    public function withQuery($withQueryCallback)
     {
         $this->withQueryCallback = $withQueryCallback;
 
@@ -143,7 +165,7 @@ class ExportAsCsv extends Action
      * @param  (\Closure(\Laravel\Nova\Http\Requests\NovaRequest):(array<int, \Laravel\Nova\Fields\Field>))|null  $withFieldsCallback
      * @return $this
      */
-    public function withFields(?Closure $withFieldsCallback)
+    public function withFields($withFieldsCallback)
     {
         $this->withFieldsCallback = $withFieldsCallback;
 
@@ -156,7 +178,7 @@ class ExportAsCsv extends Action
      * @param  (\Closure(\Illuminate\Database\Eloquent\Model):(array<string, mixed>))|null  $withFormatCallback
      * @return $this
      */
-    public function withFormat(?Closure $withFormatCallback)
+    public function withFormat($withFormatCallback)
     {
         $this->withFormatCallback = $withFormatCallback;
 
@@ -169,13 +191,15 @@ class ExportAsCsv extends Action
      * @param  (\Closure(\Laravel\Nova\Http\Requests\NovaRequest):(?string))|string|null  $default
      * @return $this
      */
-    public function withTypeSelector(Closure|string|null $default = null)
+    public function withTypeSelector($default = null)
     {
         $this->actionFields->push(
-            Select::make(Nova::__('Type'), 'writerType')->options(fn () => [
-                'csv' => Nova::__('CSV (.csv)'),
-                'xlsx' => Nova::__('Excel (.xlsx)'),
-            ])->default($default)->rules(['required', Rule::in(['csv', 'xlsx'])])
+            Select::make(Nova::__('Type'), 'writerType')->options(function () {
+                return [
+                    'csv' => Nova::__('CSV (.csv)'),
+                    'xlsx' => Nova::__('Excel (.xlsx)'),
+                ];
+            })->default($default)->rules(['required', Rule::in(['csv', 'xlsx'])])
         );
 
         return $this;
@@ -187,10 +211,10 @@ class ExportAsCsv extends Action
      * @param  (\Closure(\Laravel\Nova\Http\Requests\NovaRequest):(?string))|string|null  $default
      * @return $this
      */
-    public function nameable(Closure|string|null $default = null)
+    public function nameable($default = null)
     {
         $this->actionFields->push(
-            Text::make(Nova::__('Filename'), 'filename')->default($default)->rules(['required', 'min:1', new Filename])
+            Text::make(Nova::__('Filename'), 'filename')->default($default)->rules(['required', 'min:1', new Filename()])
         );
 
         return $this;
@@ -199,22 +223,18 @@ class ExportAsCsv extends Action
     /**
      * Get the displayable name of the action.
      *
-     * @return \Stringable|string
+     * @return string
      */
-    #[\Override]
     public function name()
     {
-        return $this->name ?: Nova::__('Export As CSV');
+        return $this->name ?: 'Export As CSV';
     }
 
     /**
      * Mark the action as a standalone action.
      *
-     * @return never
-     *
-     * @throws \InvalidArgumentException
+     * @return $this
      */
-    #[\Override]
     public function standalone()
     {
         throw new InvalidArgumentException('The Export As CSV action may not be registered as a standalone action.');

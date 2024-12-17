@@ -1,3 +1,5 @@
+import isNil from 'lodash/isNil'
+
 export default {
   props: {
     formUniqueId: {
@@ -6,10 +8,6 @@ export default {
   },
 
   methods: {
-    /**
-     * @param {string} attribute
-     * @param {any} value
-     */
     emitFieldValue(attribute, value) {
       Nova.$emit(`${attribute}-value`, value)
 
@@ -18,10 +16,6 @@ export default {
       }
     },
 
-    /**
-     * @param {string} attribute
-     * @param {any} value
-     */
     emitFieldValueChange(attribute, value) {
       Nova.$emit(`${attribute}-change`, value)
 
@@ -32,9 +26,6 @@ export default {
 
     /**
      * Get field attribute value event name.
-     *
-     * @param {string} attribute
-     * @returns {string}
      */
     getFieldAttributeValueEventName(attribute) {
       return this.hasFormUniqueId === true
@@ -44,9 +35,6 @@ export default {
 
     /**
      * Get field attribue value event name.
-     *
-     * @param {string} attribute
-     * @returns {string}
      */
     getFieldAttributeChangeEventName(attribute) {
       return this.hasFormUniqueId === true
@@ -58,8 +46,6 @@ export default {
   computed: {
     /**
      * Return the field attribute.
-     *
-     * @returns {string}
      */
     fieldAttribute() {
       return this.field.attribute
@@ -67,17 +53,13 @@ export default {
 
     /**
      * Determine if the field has Form Unique ID.
-     *
-     * @returns {boolean}
      */
     hasFormUniqueId() {
-      return this.formUniqueId != null && this.formUniqueId !== ''
+      return !isNil(this.formUniqueId) && this.formUniqueId !== ''
     },
 
     /**
      * Get field attribue value event name.
-     *
-     * @returns {string}
      */
     fieldAttributeValueEventName() {
       return this.getFieldAttributeValueEventName(this.fieldAttribute)
@@ -85,8 +67,6 @@ export default {
 
     /**
      * Get field attribue value event name.
-     *
-     * @returns {string}
      */
     fieldAttributeChangeEventName() {
       return this.getFieldAttributeChangeEventName(this.fieldAttribute)

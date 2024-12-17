@@ -4,7 +4,6 @@ namespace Laravel\Nova\Http\Controllers\Pages;
 
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
-use Inertia\Response;
 use Laravel\Nova\Http\Requests\ResourceIndexRequest;
 use Laravel\Nova\Http\Resources\IndexViewResource;
 use Laravel\Nova\Menu\Breadcrumb;
@@ -15,8 +14,11 @@ class ResourceIndexController extends Controller
 {
     /**
      * Show Resource Index page using Inertia.
+     *
+     * @param  \Laravel\Nova\Http\Requests\ResourceIndexRequest  $request
+     * @return \Inertia\Response
      */
-    public function __invoke(ResourceIndexRequest $request): Response
+    public function __invoke(ResourceIndexRequest $request)
     {
         $resourceClass = IndexViewResource::make()->authorizedResourceForRequest($request);
 
@@ -28,8 +30,11 @@ class ResourceIndexController extends Controller
 
     /**
      * Get breadcrumb menu for the page.
+     *
+     * @param  \Laravel\Nova\Http\Requests\ResourceIndexRequest  $request
+     * @return \Laravel\Nova\Menu\Breadcrumbs
      */
-    protected function breadcrumbs(ResourceIndexRequest $request): Breadcrumbs
+    protected function breadcrumbs(ResourceIndexRequest $request)
     {
         return Breadcrumbs::make([
             Breadcrumb::make(Nova::__('Resources')),

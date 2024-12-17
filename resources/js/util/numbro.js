@@ -1,14 +1,6 @@
 import numbro from 'numbro'
 import numbroLanguages from 'numbro/dist/languages.min'
 
-/**
- * @typedef {import('numbro').default} numbro
- */
-
-/**
- * @param {string|null} locale
- * @returns {numbro}
- */
 export function setupNumbro(locale) {
   if (locale) {
     locale = locale.replace('_', '-')

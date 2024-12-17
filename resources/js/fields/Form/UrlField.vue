@@ -8,14 +8,14 @@
     <template #field>
       <input
         v-bind="extraAttributes"
-        :id="currentField.uniqueKey"
+        class="w-full form-control form-input form-control-bordered"
         type="url"
-        :value="value"
         @input="handleChange"
+        :value="value"
+        :id="currentField.uniqueKey"
+        :dusk="field.attribute"
         :disabled="currentlyIsReadonly"
         :list="`${field.attribute}-list`"
-        class="w-full form-control form-input form-control-bordered"
-        :dusk="field.attribute"
       />
 
       <datalist
@@ -46,18 +46,20 @@ export default {
         max: this.currentField.max,
         step: this.currentField.step,
         pattern: this.currentField.pattern,
-        placeholder: this.placeholder,
+        placeholder: this.currentField.placeholder || this.field.name,
         class: this.errorClasses,
       }
     },
 
     extraAttributes() {
+      const attrs = this.field.extraAttributes
+
       return {
         // Leave the default attributes even though we can now specify
         // whatever attributes we like because the old number field still
         // uses the old field attributes
         ...this.defaultAttributes,
-        ...this.currentField.extraAttributes,
+        ...attrs,
       }
     },
   },

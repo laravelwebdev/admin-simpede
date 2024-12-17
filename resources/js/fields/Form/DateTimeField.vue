@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import isNil from 'lodash/isNil'
 import { DateTime } from 'luxon'
 import { DependentFormField, HandlesValidationErrors } from '@/mixins'
 import filled from '@/util/filled'
@@ -48,7 +49,7 @@ export default {
      * Set the initial value for the field
      */
     setInitialValue() {
-      if (this.currentField.value != null) {
+      if (!isNil(this.currentField.value)) {
         let isoDate = DateTime.fromISO(this.currentField.value || this.value, {
           zone: Nova.config('timezone'),
         })

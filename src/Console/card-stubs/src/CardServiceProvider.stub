@@ -11,22 +11,27 @@ class CardServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
+     *
+     * @return void
      */
-    public function boot(): void
+    public function boot()
     {
         $this->app->booted(function () {
             $this->routes();
         });
 
         Nova::serving(function (ServingNova $event) {
-            Nova::mix('{{ component }}', __DIR__.'/../dist/mix-manifest.json');
+            Nova::script('{{ component }}', __DIR__.'/../dist/js/card.js');
+            Nova::style('{{ component }}', __DIR__.'/../dist/css/card.css');
         });
     }
 
     /**
      * Register the card's routes.
+     *
+     * @return void
      */
-    protected function routes(): void
+    protected function routes()
     {
         if ($this->app->routesAreCached()) {
             return;
@@ -39,8 +44,10 @@ class CardServiceProvider extends ServiceProvider
 
     /**
      * Register any application services.
+     *
+     * @return void
      */
-    public function register(): void
+    public function register()
     {
         //
     }

@@ -12,7 +12,7 @@
       <CreateResource
         :resource-name="resourceName"
         @create-cancelled="handleCreateCancelled"
-        @finished-loading="$nextTick(() => (loading = false))"
+        @finished-loading="() => (loading = false)"
         @refresh="handleRefresh"
         mode="modal"
         resource-id=""

@@ -5,7 +5,7 @@
  *
  * @category Event
  * @param {Event} evt The triggered event.
- * @returns {Array.<HTMLElement>} The DOM elements affected by the event.
+ * @return {Array.<HTMLElement>} The DOM elements affected by the event.
  *
  * @example
  * let domChild = document.createElement("div"),

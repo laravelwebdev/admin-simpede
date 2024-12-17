@@ -13,7 +13,11 @@
       }"
     >
       <span class="inline-block shrink-0 w-6 h-6">
-        <Icon :name="item.icon" class="inline-block" />
+        <component
+          :is="`heroicons-outline-${item.icon}`"
+          height="24"
+          width="24"
+        />
       </span>
 
       <span class="flex-1 flex items-center w-full px-3 text-base">
@@ -46,20 +50,13 @@
 </template>
 
 <script>
-import { Icon } from 'laravel-nova-ui'
 import { Collapsable } from '@/mixins'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
-  components: {
-    Icon,
-  },
-
   mixins: [Collapsable],
 
-  props: {
-    item: { type: Object, required: true },
-  },
+  props: ['item'],
 
   methods: {
     ...mapMutations(['toggleMainMenu']),

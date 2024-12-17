@@ -1,5 +1,5 @@
 <template>
-  <div :dusk="`${panel.attribute}-relationship-panel`">
+  <div>
     <component
       :key="`${field.attribute}:${resourceId}`"
       :is="`detail-${field.component}`"

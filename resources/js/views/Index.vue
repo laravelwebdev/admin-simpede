@@ -37,7 +37,8 @@
         <IndexSearchInput
           v-if="resourceInformation && resourceInformation.searchable"
           :searchable="resourceInformation && resourceInformation.searchable"
-          v-model="search"
+          v-model:keyword="search"
+          @update:keyword="search = $event"
         />
 
         <div
@@ -127,7 +128,7 @@
             selectedResourcesForActionSelector
           "
           :should-show-action-selector="shouldShowActionSelector"
-          :should-show-checkboxes="shouldShowSelectAllCheckboxes"
+          :should-show-checkboxes="shouldShowCheckboxes"
           :should-show-delete-menu="shouldShowDeleteMenu"
           :should-show-polling-toggle="shouldShowPollingToggle"
           :soft-deletes="softDeletes"
@@ -455,7 +456,6 @@ export default {
         .then(response => {
           this.actions = response.data.actions
           this.pivotActions = response.data.pivotActions
-          this.resourceHasSoleActions = response.data.counts.sole > 0
           this.resourceHasActions = response.data.counts.resource > 0
         })
         .catch(e => {

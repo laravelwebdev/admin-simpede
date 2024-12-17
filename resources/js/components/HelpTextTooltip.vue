@@ -3,8 +3,8 @@
     <span class="sr-only" v-html="text" />
     <Tooltip :triggers="['click']" placement="top-start">
       <Icon
-        name="question-mark-circle"
-        type="mini"
+        :solid="true"
+        type="question-mark-circle"
         class="cursor-pointer text-gray-400 dark:text-gray-500"
       />
 
@@ -15,11 +15,8 @@
   </div>
 </template>
 
-<script setup>
-import { Icon } from 'laravel-nova-ui'
-
-defineProps({
-  text: { type: String },
-  width: { type: [Number, String] },
-})
+<script>
+export default {
+  props: ['text', 'width'],
+}
 </script>

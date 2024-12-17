@@ -5,23 +5,60 @@ namespace Laravel\Nova\Metrics;
 use Carbon\CarbonImmutable;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Stringable;
+use Illuminate\Database\Eloquent\Builder;
 
-abstract class TrendDateExpression implements Stringable
+abstract class TrendDateExpression
 {
+    /**
+     * The value of the expression.
+     *
+     * @var string|int|float
+     */
+    protected $value;
+
+    /**
+     * The query builder being used to build the trend.
+     *
+     * @var \Illuminate\Database\Eloquent\Builder
+     */
+    public $query;
+
+    /**
+     * The column being measured.
+     *
+     * @var string
+     */
+    public $column;
+
+    /**
+     * The unit being measured.
+     *
+     * @var string
+     */
+    public $unit;
+
+    /**
+     * The user's local timezone.
+     *
+     * @var string
+     */
+    public $timezone;
+
     /**
      * Create a new raw query expression.
      *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $column
+     * @param  string  $unit
+     * @param  string  $timezone
      * @return void
      */
-    public function __construct(
-        public Builder $query,
-        public string $column,
-        public string $unit,
-        public string $timezone
-    ) {
-        //
+    public function __construct(Builder $query, $column, $unit, $timezone)
+    {
+        $this->unit = $unit;
+        $this->query = $query;
+        $this->column = $column;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -47,16 +84,21 @@ abstract class TrendDateExpression implements Stringable
 
     /**
      * Wrap the given value using the query's grammar.
+     *
+     * @param  string  $value
+     * @return string
      */
-    protected function wrap(string $value): string
+    protected function wrap($value)
     {
         return $this->query->getQuery()->getGrammar()->wrap($value);
     }
 
     /**
      * Get the value of the expression.
+     *
+     * @return mixed
      */
-    abstract public function getValue(): string;
+    abstract public function getValue();
 
     /**
      * Get the value of the expression.

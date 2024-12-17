@@ -14,26 +14,49 @@
   />
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script>
 import { uid } from 'uid/single'
 
-defineOptions({
+export default {
   name: 'UpdateAttached',
-})
 
-defineProps({
-  resourceName: { type: String, required: true },
-  resourceId: { required: true },
-  relatedResourceName: { type: String, required: true },
-  relatedResourceId: { required: true },
-  viaResource: { default: '' },
-  viaResourceId: { default: '' },
-  parentResource: { type: Object },
-  viaRelationship: { default: '' },
-  viaPivotId: { default: null },
-  polymorphic: { default: false },
-})
+  props: {
+    resourceName: {
+      type: String,
+      required: true,
+    },
+    resourceId: {
+      required: true,
+    },
+    relatedResourceName: {
+      type: String,
+      required: true,
+    },
+    relatedResourceId: {
+      required: true,
+    },
+    viaResource: {
+      default: '',
+    },
+    viaResourceId: {
+      default: '',
+    },
+    parentResource: {
+      type: Object,
+    },
+    viaRelationship: {
+      default: '',
+    },
+    viaPivotId: {
+      default: null,
+    },
+    polymorphic: {
+      default: false,
+    },
+  },
 
-const formUniqueId = uid()
+  data: () => ({
+    formUniqueId: uid(),
+  }),
+}
 </script>

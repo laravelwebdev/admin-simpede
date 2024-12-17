@@ -19,7 +19,7 @@ trait PeekableFields
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(bool))|bool  $callback
      * @return $this
      */
-    public function showWhenPeeking(callable|bool $callback = true)
+    public function showWhenPeeking($callback = true)
     {
         $this->showWhenPeeking = $callback;
 
@@ -28,6 +28,9 @@ trait PeekableFields
 
     /**
      * Determine if the field is to be shown in the preview modal.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return bool
      */
     public function isShownWhenPeeking(NovaRequest $request): bool
     {

@@ -11,8 +11,11 @@ class BootNova
 {
     /**
      * Handle the event.
+     *
+     * @param  mixed  $event
+     * @return void
      */
-    public function handle(object $event): void
+    public function handle($event)
     {
         if (! app()->providerIsLoaded(NovaServiceProvider::class)) {
             app()->register(NovaServiceProvider::class);
@@ -24,20 +27,22 @@ class BootNova
 
     /**
      * Boot the standard Nova resources.
+     *
+     * @return void
      */
-    protected function registerResources(): void
+    protected function registerResources()
     {
         Nova::resources([
             Nova::actionResource(),
         ]);
-
-        Nova::bootResources();
     }
 
     /**
      * Boot the standard Nova tools.
+     *
+     * @return void
      */
-    protected function registerTools(): void
+    protected function registerTools()
     {
         Nova::tools([
             new Dashboard,

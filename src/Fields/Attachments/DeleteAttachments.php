@@ -34,9 +34,11 @@ class DeleteAttachments
     /**
      * Delete the attachments associated with the field.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $model
+     * @return array
      */
-    public function __invoke(Request $request, $model): array
+    public function __invoke(Request $request, $model)
     {
         static::$model::query()
                 ->where('attachable_type', $model->getMorphClass())

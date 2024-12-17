@@ -2,7 +2,6 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Laravel\Nova\Filters\Filter;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -17,8 +16,13 @@ class {{ class }} extends Filter
 
     /**
      * Apply the filter to the given query.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function apply(NovaRequest $request, Builder $query, mixed $value): Builder
+    public function apply(NovaRequest $request, $query, $value)
     {
         return $query;
     }
@@ -26,9 +30,10 @@ class {{ class }} extends Filter
     /**
      * Get the filter's available options.
      *
-     * @return array<string, string>
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array
      */
-    public function options(NovaRequest $request): array
+    public function options(NovaRequest $request)
     {
         return [];
     }

@@ -3,10 +3,7 @@
 namespace Laravel\Nova;
 
 use BackedEnum;
-use Closure;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Stringable;
 
@@ -14,8 +11,11 @@ class Util
 {
     /**
      * Determine if the given request is intended for Nova.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
      */
-    public static function isNovaRequest(Request $request): bool
+    public static function isNovaRequest(Request $request)
     {
         $domain = config('nova.domain');
         $path = trim(Nova::path(), '/') ?: '/';
@@ -46,8 +46,11 @@ class Util
      * Convert large integer higher than Number.MAX_SAFE_INTEGER to string.
      *
      * https://stackoverflow.com/questions/47188449/json-max-int-number/47188576
+     *
+     * @param  mixed  $value
+     * @return mixed
      */
-    public static function safeInt(mixed $value): mixed
+    public static function safeInt($value)
     {
         $jsonMaxInt = 9007199254740991;
 
@@ -61,38 +64,21 @@ class Util
     }
 
     /**
-     * Determine if the value is a callable and not a string matching an available function name.
-     */
-    public static function isSafeCallable(mixed $value): bool
-    {
-        if ($value instanceof Closure) {
-            return true;
-        }
-
-        if (! is_callable($value)) {
-            return false;
-        }
-
-        if (is_array($value)) {
-            return count($value) === 2 && ! Arr::isAssoc($value) && method_exists(...$value);
-        }
-
-        return ! is_string($value);
-    }
-
-    /**
      * Hydrate the value to scalar (array, string, int etc...).
      *
+     * @param  mixed  $value
      * @return scalar
      */
-    public static function hydrate(mixed $value)
+    public static function hydrate($value)
     {
         if ($value instanceof BackedEnum) {
             return $value->value;
-        } elseif (is_object($value) && $value instanceof Stringable) {
+        } elseif (is_object($value) && ($value instanceof Stringable || method_exists($value, '__toString'))) {
             return (string) $value;
         } elseif (is_object($value) || is_array($value)) {
-            return rescue(fn () => json_encode($value), $value);
+            return rescue(function () use ($value) {
+                return json_encode($value);
+            }, $value);
         }
 
         return $value;
@@ -100,8 +86,11 @@ class Util
 
     /**
      * Resolve given value.
+     *
+     * @param  mixed  $value
+     * @return mixed
      */
-    public static function value(mixed $value): mixed
+    public static function value($value)
     {
         if ($value instanceof BackedEnum) {
             return $value->value;
@@ -111,30 +100,14 @@ class Util
     }
 
     /**
-     * Get the user guard for Laravel Nova.
-     */
-    public static function userGuard(): string
-    {
-        return config('nova.guard') ?? config('auth.defaults.guard');
-    }
-
-    /**
      * Get the user model for Laravel Nova.
      *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>|null
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
-    public static function userModel(): ?string
+    public static function userModel()
     {
-        return static::userModelFromGuard(static::userGuard());
-    }
+        $guard = config('nova.guard') ?: config('auth.defaults.guard');
 
-    /**
-     * Get the user model for Laravel Nova.
-     *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>|null
-     */
-    public static function userModelFromGuard(string $guard): ?string
-    {
         $provider = config("auth.guards.{$guard}.provider");
 
         return config("auth.providers.{$provider}.model");
@@ -144,8 +117,9 @@ class Util
      * Get the session auth guard for the model.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model  $model
+     * @return string|null
      */
-    public static function sessionAuthGuardForModel($model): ?string
+    public static function sessionAuthGuardForModel($model)
     {
         if (is_object($model)) {
             $model = get_class($model);
@@ -161,28 +135,14 @@ class Util
     }
 
     /**
-     * Resolve the model/resoruce for policy.
-     *
-     * @param  \Laravel\Nova\Resource  $resource
-     * @return \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model
-     */
-    public static function resolveResourceOrModelForAuthorization(Resource $resource): Model|Resource
-    {
-        if (property_exists($resource, 'policy') && ! is_null($resource::$policy)) {
-            return $resource;
-        }
-
-        return $resource->model() ?? $resource::newModel();
-    }
-
-    /**
      * Get the dependent validation rules.
      *
+     * @param  string  $attribute
      * @return array<string, string>
      *
      * @see \Illuminate\Validation\Validator::$dependentRules
      */
-    public static function dependentRules(string $attribute): array
+    public static function dependentRules($attribute)
     {
         return collect([
             'After',
@@ -217,19 +177,5 @@ class Util
 
             return ["{$rule}:" => "{$rule}:{$attribute}."];
         })->all();
-    }
-
-    /**
-     * Get EOL format from content.
-     */
-    public static function eol(string $content): string
-    {
-        $lineEndingCount = [
-            "\r\n" => substr_count($content, "\r\n"),
-            "\r" => substr_count($content, "\r"),
-            "\n" => substr_count($content, "\n"),
-        ];
-
-        return array_keys($lineEndingCount, max($lineEndingCount))[0];
     }
 }

@@ -2,20 +2,19 @@
 
 namespace Laravel\Nova\Http\Requests;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Laravel\Nova\Fields\File as FileField;
+use Laravel\Nova\Fields\File;
 use Laravel\Nova\Nova;
-use Laravel\Nova\Resource;
 
 class PivotFieldDestroyRequest extends NovaRequest
 {
     /**
      * Authorize that the user may attach resources of the given type.
      *
+     * @return void
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function authorizeForAttachment(): void
+    public function authorizeForAttachment()
     {
         if (! $this->newResourceWith($this->findModelOrFail())->authorizedToAttach(
             $this, $this->findRelatedModel()
@@ -26,8 +25,10 @@ class PivotFieldDestroyRequest extends NovaRequest
 
     /**
      * Get the pivot model for the relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function findPivotModel(): Pivot
+    public function findPivotModel()
     {
         $resource = $this->findResourceOrFail();
 
@@ -43,10 +44,10 @@ class PivotFieldDestroyRequest extends NovaRequest
     /**
      * Find the related resource for the operation.
      *
+     * @param  string|int|null  $resourceId
      * @return \Laravel\Nova\Resource<\Illuminate\Database\Eloquent\Model>
      */
-    #[\Override]
-    public function findRelatedResource(string|int|null $resourceId = null): Resource
+    public function findRelatedResource($resourceId = null)
     {
         return Nova::newResourceFromModel(
             $this->findRelatedModel($resourceId)
@@ -56,10 +57,12 @@ class PivotFieldDestroyRequest extends NovaRequest
     /**
      * Find the related model for the operation.
      *
+     * @param  string|int|null  $resourceId
+     * @return \Illuminate\Database\Eloquent\Model
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    #[\Override]
-    public function findRelatedModel(string|int|null $resourceId = null): Model
+    public function findRelatedModel($resourceId = null)
     {
         $resource = $this->findResourceOrFail();
 
@@ -81,10 +84,12 @@ class PivotFieldDestroyRequest extends NovaRequest
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function findFieldOrFail(): FileField
+    public function findFieldOrFail()
     {
         return $this->findRelatedResource()->resolvePivotFields($this, $this->resource)
-            ->whereInstanceOf(FileField::class)
-            ->findFieldByAttributeOrFail($this->field);
+            ->whereInstanceOf(File::class)
+            ->findFieldByAttribute($this->field, function () {
+                abort(404);
+            });
     }
 }

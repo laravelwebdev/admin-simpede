@@ -7,15 +7,12 @@ use Laravel\Nova\Http\Resources\NotificationResource;
 use Laravel\Nova\Notifications\Notification;
 use Laravel\Nova\Nova;
 
-/**
- * @param  string|int  $notification
- */
 class NotificationRequest extends NovaRequest
 {
     /**
-     * List latest notification for the user.
+     * @return AnonymousResourceCollection
      */
-    public function notifications(): AnonymousResourceCollection
+    public function notifications()
     {
         return NotificationResource::collection(
             Notification::whereNotifiableId(Nova::user($this)->getKey())
@@ -25,19 +22,6 @@ class NotificationRequest extends NovaRequest
         );
     }
 
-    /**
-     * Mark notification as read for the user.
-     */
-    public function markAsRead(): void
-    {
-        Notification::unread()->whereNotifiableId(
-            Nova::user($this)->getKey()
-        )->update(['read_at' => now()]);
-    }
-
-    /**
-     * Notification unread count for the user.
-     */
     public function unreadCount(): int
     {
         return Notification::unread()->whereNotifiableId(

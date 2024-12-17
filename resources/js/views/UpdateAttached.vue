@@ -55,18 +55,18 @@
         >
           <template #field>
             <SelectControl
-              v-model="selectedResourceId"
-              @selected="selectResource"
-              :options="availableResources"
-              disabled
-              label="display"
               class="w-full"
+              dusk="attachable-select"
               :class="{
                 'form-control-bordered-error': validationErrors.has(
                   field.attribute
                 ),
               }"
-              dusk="attachable-select"
+              v-model:selected="selectedResourceId"
+              @change="selectResourceFromSelectControl"
+              disabled
+              :options="availableResources"
+              :label="'display'"
             >
               <option value="" disabled selected>
                 {{ __('Choose :field', { field: field.name }) }}
@@ -77,7 +77,7 @@
 
         <LoadingView :loading="loading">
           <!-- Pivot Fields -->
-          <div v-for="field in fields" :key="field.uniqueKey">
+          <div v-for="field in fields">
             <component
               :is="'form-' + field.component"
               :resource-name="resourceName"
@@ -134,7 +134,10 @@
 </template>
 
 <script>
-import { Button } from 'laravel-nova-ui'
+import each from 'lodash/each'
+import find from 'lodash/find'
+import isNil from 'lodash/isNil'
+import tap from 'lodash/tap'
 import {
   PerformsSearches,
   TogglesTrashed,
@@ -143,8 +146,7 @@ import {
   HandlesFormRequest,
 } from '@/mixins'
 import { mapActions } from 'vuex'
-import storage from '@/storage/PivotableFieldStorage'
-import tap from 'lodash/tap'
+import { Button } from 'laravel-nova-ui'
 
 export default {
   components: {
@@ -209,6 +211,7 @@ export default {
     field: null,
     softDeletes: false,
     fields: [],
+    selectedResource: null,
     selectedResourceId: null,
     lastRetrievedAt: null,
     title: null,
@@ -242,7 +245,10 @@ export default {
 
       this.selectedResourceId = this.relatedResourceId
 
+      this.selectInitialResource()
+
       this.updateLastRetrievedAtTimestamp()
+      this.allowLeavingForm()
     },
 
     removeFile(attribute) {
@@ -265,7 +271,7 @@ export default {
     handlePivotFieldsLoaded() {
       this.loading = false
 
-      Object.values(this.fields).forEach(field => {
+      each(this.fields, field => {
         if (field) {
           field.fill = () => ''
         }
@@ -333,20 +339,15 @@ export default {
      * Get all of the available resources for the current search / trashed state.
      */
     async getAvailableResources(search = '') {
-      Nova.$progress.start()
-
       try {
-        const response = await storage.fetchAvailableResources(
-          this.resourceName,
-          this.resourceId,
-          this.relatedResourceName,
+        const response = await Nova.request().get(
+          `/nova-api/${this.resourceName}/${this.resourceId}/attachable/${this.relatedResourceName}`,
           {
             params: {
               search,
               current: this.relatedResourceId,
               first: true,
               withTrashed: this.withTrashed,
-              component: this.field.component,
               viaRelationship: this.viaRelationship,
             },
           }
@@ -356,8 +357,6 @@ export default {
         this.withTrashed = response.data.withTrashed
         this.softDeletes = response.data.softDeletes
       } catch (error) {}
-
-      Nova.$progress.done()
     },
 
     /**
@@ -381,6 +380,7 @@ export default {
         await this.updateRequest()
 
         this.submittedViaUpdateAttachedResource = false
+        this.allowLeavingForm()
 
         await this.fetchPolicies(),
           Nova.success(this.__('The resource was updated!'))
@@ -390,6 +390,8 @@ export default {
         window.scrollTo(0, 0)
 
         this.submittedViaUpdateAttachedResource = false
+
+        this.preventLeavingForm()
 
         this.handleOnUpdateResponseError(error)
       }
@@ -408,6 +410,8 @@ export default {
 
         this.disableNavigateBackUsingHistory()
 
+        this.allowLeavingForm()
+
         this.submittedViaUpdateAndContinueEditing = false
 
         Nova.success(this.__('The resource was updated!'))
@@ -423,6 +427,7 @@ export default {
 
     cancelUpdatingAttachedResource() {
       this.handleProceedingToPreviousPage()
+      this.allowLeavingForm()
 
       this.proceedToPreviousPage(
         `/resources/${this.resourceName}/${this.resourceId}`
@@ -451,24 +456,33 @@ export default {
      */
     updateAttachmentFormData() {
       return tap(new FormData(), formData => {
-        Object.values(this.fields).forEach(field => {
+        each(this.fields, field => {
           field.fill(formData)
         })
 
         formData.append('viaRelationship', this.viaRelationship)
 
-        if (!this.selectedResourceId) {
+        if (!this.selectedResource) {
           formData.append(this.relatedResourceName, '')
         } else {
-          formData.append(
-            this.relatedResourceName,
-            this.selectedResourceId ?? ''
-          )
+          formData.append(this.relatedResourceName, this.selectedResource.value)
         }
 
         formData.append(this.relatedResourceName + '_trashed', this.withTrashed)
         formData.append('_retrieved_at', this.lastRetrievedAt)
       })
+    },
+
+    /**
+     * Select a resource using the <select> control
+     */
+    selectResourceFromSelectControl(value) {
+      this.selectedResourceId = value
+      this.selectInitialResource()
+
+      if (this.field) {
+        this.emitFieldValueChange(this.fieldAttribute, this.selectedResourceId)
+      }
     },
 
     /**
@@ -484,21 +498,27 @@ export default {
     },
 
     /**
+     * Select the initial selected resource
+     */
+    selectInitialResource() {
+      this.selectedResource = find(
+        this.availableResources,
+        r => r.value == this.selectedResourceId
+      )
+    },
+
+    /**
      * Update the last retrieved at timestamp to the current UNIX timestamp.
      */
     updateLastRetrievedAtTimestamp() {
       this.lastRetrievedAt = Math.floor(new Date().getTime() / 1000)
     },
 
+    /**
+     * Prevent accidental abandonment only if form was changed.
+     */
     onUpdateFormStatus() {
-      //
-    },
-
-    isSelectedResourceId(value) {
-      return (
-        value != null &&
-        value?.toString() === this.selectedResourceId?.toString()
-      )
+      this.updateFormStatus()
     },
   },
 
@@ -545,12 +565,6 @@ export default {
       return (
         this.submittedViaUpdateAttachedResource ||
         this.submittedViaUpdateAndContinueEditing
-      )
-    },
-
-    selectedResource() {
-      return this.availableResources.find(r =>
-        this.isSelectedResourceId(r.value)
       )
     },
   },

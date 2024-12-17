@@ -7,7 +7,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Stringable;
 
 /**
  * @phpstan-import-type TValidationRules from \Laravel\Nova\Fields\Field
@@ -20,7 +19,7 @@ trait HandlesValidation
      *
      * @var string|null
      */
-    public $validationAttribute = null;
+    public $validationAttribute;
 
     /**
      * The validation rules for creation and updates.
@@ -75,11 +74,12 @@ trait HandlesValidation
     /**
      * Get the validation rules for this field.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array<array-key, array<int, mixed>>
      *
      * @phpstan-return array<string, array<int, TFieldValidationRules>>
      */
-    public function getRules(NovaRequest $request): array
+    public function getRules(NovaRequest $request)
     {
         return [
             $this->attribute => is_callable($this->rules) ? call_user_func($this->rules, $request) : $this->rules,
@@ -89,11 +89,12 @@ trait HandlesValidation
     /**
      * Get the creation rules for this field.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array<array-key, mixed>
      *
      * @phpstan-return array<string, array<int, TFieldValidationRules>>
      */
-    public function getCreationRules(NovaRequest $request): array
+    public function getCreationRules(NovaRequest $request)
     {
         $rules = [
             $this->attribute => is_callable($this->creationRules) ? call_user_func(
@@ -131,11 +132,12 @@ trait HandlesValidation
     /**
      * Get the update rules for this field.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array<array-key, array<int, mixed>>
      *
      * @phpstan-return array<string, array<int, TFieldValidationRules>>
      */
-    public function getUpdateRules(NovaRequest $request): array
+    public function getUpdateRules(NovaRequest $request)
     {
         $rules = [
             $this->attribute => is_callable($this->updateRules) ? call_user_func(
@@ -172,26 +174,32 @@ trait HandlesValidation
 
     /**
      * Get the validation attribute for the field.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return string
      */
-    public function getValidationAttribute(NovaRequest $request): Stringable|string
+    public function getValidationAttribute(NovaRequest $request)
     {
-        return $this->validationAttribute ?? Str::singular($this->name);
+        return $this->validationAttribute ?? Str::singular($this->attribute);
     }
 
     /**
      * Get the validation attribute names for the field.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array<string, string>
      */
-    public function getValidationAttributeNames(NovaRequest $request): array
+    public function getValidationAttributeNames(NovaRequest $request)
     {
         return [$this->validationKey() => $this->name];
     }
 
     /**
      * Return the validation key for the field.
+     *
+     * @return string
      */
-    public function validationKey(): string
+    public function validationKey()
     {
         return $this->attribute;
     }

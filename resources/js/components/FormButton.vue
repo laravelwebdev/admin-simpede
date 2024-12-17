@@ -20,30 +20,34 @@
   </form>
 </template>
 
-<script setup>
-defineOptions({
+<script>
+import isNil from 'lodash/isNil'
+
+export default {
   inheritAttrs: false,
-})
 
-const props = defineProps({
-  href: { type: String, required: true },
-  method: { type: String, required: true },
-  data: { type: Object, required: false, default: {} },
-  headers: { type: Object, required: false, default: null },
-  component: { type: String, default: 'button' },
-})
+  props: {
+    href: { type: String, required: true },
+    method: { type: String, required: true },
+    data: { type: Object, required: false, default: {} },
+    headers: { type: Object, required: false, default: null },
+    component: { type: String, default: 'button' },
+  },
 
-function handleSubmit(event) {
-  if (props.headers == null) {
-    return
-  }
+  methods: {
+    handleSubmit(e) {
+      if (isNil(this.headers)) {
+        return
+      }
 
-  event.preventDefault()
+      e.preventDefault()
 
-  Nova.$router.visit(props.href, {
-    method: props.method,
-    data: props.data,
-    headers: props.headers,
-  })
+      this.$inertia.visit(this.href, {
+        method: this.method,
+        data: this.data,
+        headers: this.headers,
+      })
+    },
+  },
 }
 </script>

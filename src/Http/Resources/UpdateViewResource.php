@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Http\Resources;
 
 use Laravel\Nova\Http\Requests\ResourceUpdateOrUpdateAttachedRequest;
-use Laravel\Nova\Resource as NovaResource;
 
 class UpdateViewResource extends Resource
 {
@@ -27,11 +26,13 @@ class UpdateViewResource extends Resource
     /**
      * Get current resource for the request.
      *
+     * @param  \Laravel\Nova\Http\Requests\ResourceUpdateOrUpdateAttachedRequest  $request
+     * @return \Laravel\Nova\Resource
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function newResourceWith(ResourceUpdateOrUpdateAttachedRequest $request): NovaResource
+    public function newResourceWith(ResourceUpdateOrUpdateAttachedRequest $request)
     {
         return tap($request->newResourceWith(
             tap($request->findModelQuery(), function ($query) use ($request) {

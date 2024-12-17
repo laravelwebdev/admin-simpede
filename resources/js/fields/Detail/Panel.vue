@@ -1,5 +1,5 @@
 <template>
-  <div :dusk="`${panel.attribute}-panel`">
+  <div>
     <slot>
       <div class="flex items-center">
         <Heading :level="1" v-text="panel.name" />

@@ -3,25 +3,42 @@
 namespace Laravel\Nova\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class NotAttached implements Rule
 {
     /**
+     * The request instance.
+     *
+     * @var \Laravel\Nova\Http\Requests\NovaRequest
+     */
+    public $request;
+
+    /**
+     * The model instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    public $model;
+
+    /**
      * Create a new rule instance.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
-    public function __construct(public NovaRequest $request, public Model $model)
+    public function __construct(NovaRequest $request, $model)
     {
-        //
+        $this->model = $model;
+        $this->request = $request;
     }
 
     /**
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)

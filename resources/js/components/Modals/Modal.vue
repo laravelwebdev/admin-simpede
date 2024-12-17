@@ -43,15 +43,14 @@ import {
   onMounted,
   ref,
   useAttrs,
-  useTemplateRef,
   watch,
 } from 'vue'
 
-const modalContentRef = useTemplateRef('modalContent')
+const modalContent = ref(null)
 
 const attrs = useAttrs()
 
-const emitter = defineEmits(['showing', 'closing', 'close-via-escape'])
+const emit = defineEmits(['showing', 'closing', 'close-via-escape'])
 
 defineOptions({ inheritAttrs: false })
 
@@ -85,7 +84,7 @@ const hasTrapFocus = computed(() => {
   return props.useFocusTrap && usesFocusTrap.value === true
 })
 
-const { activate, deactivate } = useFocusTrap(modalContentRef, {
+const { activate, deactivate } = useFocusTrap(modalContent, {
   immediate: false,
   allowOutsideClick: true,
   escapeDeactivates: false,
@@ -110,7 +109,7 @@ watch(hasTrapFocus, enable => {
 
 useEventListener(document, 'keydown', e => {
   if (e.key === 'Escape' && props.show === true) {
-    emitter('close-via-escape', e)
+    emit('close-via-escape', e)
   }
 })
 
@@ -143,7 +142,7 @@ const store = useStore()
 
 async function handleVisibilityChange(showing) {
   if (showing === true) {
-    emitter('showing')
+    emit('showing')
     document.body.classList.add('overflow-hidden')
     Nova.pauseShortcuts()
 
@@ -151,7 +150,7 @@ async function handleVisibilityChange(showing) {
   } else {
     usesFocusTrap.value = false
 
-    emitter('closing')
+    emit('closing')
     document.body.classList.remove('overflow-hidden')
     Nova.resumeShortcuts()
   }

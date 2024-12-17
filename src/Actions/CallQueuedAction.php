@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Actions;
 
 use Illuminate\Bus\Batchable;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Nova\Contracts\BatchableAction;
@@ -17,17 +16,24 @@ class CallQueuedAction
     use CallsQueuedActions;
 
     /**
+     * The Eloquent model/data collection.
+     *
+     * @var \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
+     */
+    public $models;
+
+    /**
      * Create a new job instance.
      *
+     * @param  \Laravel\Nova\Actions\Action  $action
+     * @param  string  $method
+     * @param  \Laravel\Nova\Fields\ActionFields  $fields
+     * @param  \Illuminate\Support\Collection  $models
+     * @param  string  $actionBatchId
      * @return void
      */
-    public function __construct(
-        Action $action,
-        string $method,
-        ActionFields $fields,
-        public EloquentCollection|Collection $models,
-        string $actionBatchId
-    ) {
+    public function __construct(Action $action, $method, ActionFields $fields, Collection $models, $actionBatchId)
+    {
         $this->action = $action;
         $this->method = $method;
         $this->fields = $fields;
@@ -35,12 +41,12 @@ class CallQueuedAction
         $this->actionBatchId = $actionBatchId;
 
         if (property_exists($action, 'timeout')) {
-            /** @phpstan-ignore property.notFound */
+            /** @phpstan-ignore-next-line */
             $this->timeout = $action->timeout;
         }
 
         if (property_exists($action, 'tries')) {
-            /** @phpstan-ignore property.notFound */
+            /** @phpstan-ignore-next-line */
             $this->tries = $action->tries;
         }
     }
@@ -83,8 +89,10 @@ class CallQueuedAction
 
     /**
      * Get the name of the "failed" method that should be called for the action.
+     *
+     * @return string|null
      */
-    protected function failedMethodName(): ?string
+    protected function failedMethodName()
     {
         if (($method = $this->failedMethodForModel()) &&
             method_exists($this->action, $method)) {
@@ -97,11 +105,13 @@ class CallQueuedAction
 
     /**
      * Get the appropriate "failed" method name for the action's model type.
+     *
+     * @return string|null
      */
-    protected function failedMethodForModel(): ?string
+    protected function failedMethodForModel()
     {
-        return $this->models->isNotEmpty()
-            ? 'failedFor'.Str::plural(class_basename($this->models->first()))
-            : null;
+        if ($this->models->isNotEmpty()) {
+            return 'failedFor'.Str::plural(class_basename($this->models->first()));
+        }
     }
 }

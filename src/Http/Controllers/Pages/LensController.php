@@ -4,7 +4,6 @@ namespace Laravel\Nova\Http\Controllers\Pages;
 
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
-use Inertia\Response;
 use Laravel\Nova\Http\Requests\LensRequest;
 use Laravel\Nova\Http\Resources\LensViewResource;
 use Laravel\Nova\Menu\Breadcrumb;
@@ -15,8 +14,11 @@ class LensController extends Controller
 {
     /**
      * Show Resource Lens page using Inertia.
+     *
+     * @param  \Laravel\Nova\Http\Requests\LensRequest  $request
+     * @return \Inertia\Response
      */
-    public function __invoke(LensRequest $request): Response
+    public function __invoke(LensRequest $request)
     {
         $lens = LensViewResource::make()->authorizedLensForRequest($request);
 
@@ -30,8 +32,11 @@ class LensController extends Controller
 
     /**
      * Get breadcrumb menu for the page.
+     *
+     * @param  \Laravel\Nova\Http\Requests\LensRequest  $request
+     * @return \Laravel\Nova\Menu\Breadcrumbs
      */
-    protected function breadcrumbs(LensRequest $request): Breadcrumbs
+    protected function breadcrumbs(LensRequest $request)
     {
         return Breadcrumbs::make([
             Breadcrumb::make(Nova::__('Resources')),

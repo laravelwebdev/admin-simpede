@@ -21,10 +21,11 @@ trait RoundingPrecision
     /**
      * Set the precision level used when rounding the value.
      *
+     * @param  int  $precision
      * @param  1|2|3|4  $mode
      * @return $this
      */
-    public function precision(int $precision = 0, int $mode = PHP_ROUND_HALF_UP)
+    public function precision($precision = 0, $mode = PHP_ROUND_HALF_UP)
     {
         $this->roundingPrecision = $precision;
 

@@ -2,8 +2,6 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Contracts\Pagination\Paginator;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\LensRequest;
@@ -22,8 +20,12 @@ class {{ class }} extends Lens
 
     /**
      * Get the query builder / paginator for the lens.
+     *
+     * @param  \Laravel\Nova\Http\Requests\LensRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return mixed
      */
-    public static function query(LensRequest $request, Builder $query): Builder|Paginator
+    public static function query(LensRequest $request, $query)
     {
         return $request->withOrdering($request->withFilters(
             $query
@@ -33,9 +35,10 @@ class {{ class }} extends Lens
     /**
      * Get the fields available to the lens.
      *
-     * @return array<int, \Laravel\Nova\Fields\Field>
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array
      */
-    public function fields(NovaRequest $request): array
+    public function fields(NovaRequest $request)
     {
         return [
             ID::make(Nova::__('ID'), 'id')->sortable(),
@@ -45,9 +48,10 @@ class {{ class }} extends Lens
     /**
      * Get the cards available on the lens.
      *
-     * @return array<int, \Laravel\Nova\Card>
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array
      */
-    public function cards(NovaRequest $request): array
+    public function cards(NovaRequest $request)
     {
         return [];
     }
@@ -55,9 +59,10 @@ class {{ class }} extends Lens
     /**
      * Get the filters available for the lens.
      *
-     * @return array<int, \Laravel\Nova\Filters\Filter>
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array
      */
-    public function filters(NovaRequest $request): array
+    public function filters(NovaRequest $request)
     {
         return [];
     }
@@ -65,17 +70,20 @@ class {{ class }} extends Lens
     /**
      * Get the actions available on the lens.
      *
-     * @return array<int, \Laravel\Nova\Actions\Action>
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array
      */
-    public function actions(NovaRequest $request): array
+    public function actions(NovaRequest $request)
     {
         return parent::actions($request);
     }
 
     /**
      * Get the URI key for the lens.
+     *
+     * @return string
      */
-    public function uriKey(): string
+    public function uriKey()
     {
         return 'uri-key';
     }

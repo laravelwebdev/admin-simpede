@@ -2,21 +2,36 @@
 
 namespace Laravel\Nova\Query;
 
-use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Laravel\Nova\Query\Search\Column;
 
 class Search
 {
     /**
+     * The Eloquent Query Builder instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Builder
+     */
+    public $queryBuilder;
+
+    /**
+     * The search keyword.
+     *
+     * @var string
+     */
+    public $searchKeyword;
+
+    /**
      * Create a new search builder instance.
      *
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $queryBuilder
+     * @param  string  $searchKeyword
      * @return void
      */
-    public function __construct(
-        public EloquentBuilder $queryBuilder,
-        public string $searchKeyword
-    ) {
-        //
+    public function __construct($queryBuilder, $searchKeyword)
+    {
+        $this->queryBuilder = $queryBuilder;
+        $this->searchKeyword = $searchKeyword;
     }
 
     /**
@@ -24,15 +39,15 @@ class Search
      *
      * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
      * @param  array<int, string|\Laravel\Nova\Query\Search\Column>  $searchColumns
+     * @return mixed
      */
-    public function handle(string $resourceClass, array $searchColumns): EloquentBuilder
+    public function handle($resourceClass, array $searchColumns)
     {
         return $this->queryBuilder->where(function ($query) use ($searchColumns) {
             $connectionType = $query->getModel()->getConnection()->getDriverName();
 
             collect($searchColumns)
                 ->each(function ($column) use ($query, $connectionType) {
-                    /** @phpstan-ignore booleanAnd.alwaysFalse */
                     if ($column instanceof Column || (! is_string($column) && is_callable($column))) {
                         $column($query, $this->searchKeyword, $connectionType);
                     } else {

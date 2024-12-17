@@ -24,7 +24,8 @@
       <IndexSearchInput
         v-if="searchable"
         :searchable="searchable"
-        v-model="search"
+        v-model:keyword="search"
+        @update:keyword="search = $event"
       />
 
       <!-- Action Dropdown -->
@@ -94,7 +95,7 @@
           selectedResourcesForActionSelector
         "
         :should-show-action-selector="shouldShowActionSelector"
-        :should-show-checkboxes="shouldShowSelectAllCheckboxes"
+        :should-show-checkboxes="shouldShowCheckboxes"
         :should-show-delete-menu="shouldShowDeleteMenu"
         :should-show-polling-toggle="shouldShowPollingToggle"
         :soft-deletes="softDeletes"
@@ -276,7 +277,7 @@ export default {
             this.resources = data.resources
             this.softDeletes = data.softDeletes
             this.perPage = data.per_page
-            this.resourceHasId = Boolean(data.hasId)
+            this.resourceHasId = data.hasId
 
             this.handleResourcesLoaded()
           })
@@ -321,7 +322,6 @@ export default {
         .then(response => {
           this.actions = response.data.actions
           this.pivotActions = response.data.pivotActions
-          this.resourceHasSoleActions = response.data.counts.sole > 0
           this.resourceHasActions = response.data.counts.resource > 0
         })
         .catch(e => {
@@ -398,7 +398,7 @@ export default {
     },
 
     actionsAreAvailable() {
-      return this.allActions.length > 0 && this.resourceHasId
+      return this.allActions.length > 0 && Boolean(this.resourceHasId)
     },
 
     /**
@@ -420,7 +420,7 @@ export default {
      */
     canShowDeleteMenu() {
       return (
-        this.resourceHasId &&
+        Boolean(this.resourceHasId) &&
         Boolean(
           this.authorizedToDeleteSelectedResources ||
             this.authorizedToForceDeleteSelectedResources ||

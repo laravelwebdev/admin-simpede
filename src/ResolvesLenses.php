@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova;
 
-use Illuminate\Support\Collection;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 trait ResolvesLenses
@@ -10,9 +9,10 @@ trait ResolvesLenses
     /**
      * Get the lenses that are available for the given request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Illuminate\Support\Collection<int, \Laravel\Nova\Lenses\Lens>
      */
-    public function availableLenses(NovaRequest $request): Collection
+    public function availableLenses(NovaRequest $request)
     {
         return $this->resolveLenses($request)->filter->authorizedToSee($request)->values();
     }
@@ -20,9 +20,10 @@ trait ResolvesLenses
     /**
      * Get the lenses for the given request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Illuminate\Support\Collection<int, \Laravel\Nova\Lenses\Lens>
      */
-    public function resolveLenses(NovaRequest $request): Collection
+    public function resolveLenses(NovaRequest $request)
     {
         return collect(array_values($this->filter($this->lenses($request))));
     }
@@ -30,6 +31,7 @@ trait ResolvesLenses
     /**
      * Get the lenses available on the resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function lenses(NovaRequest $request)

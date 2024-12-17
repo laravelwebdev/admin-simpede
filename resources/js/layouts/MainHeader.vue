@@ -26,8 +26,8 @@
 
       <div class="flex flex-1 px-4 sm:px-8 lg:px-12">
         <GlobalSearch
-          v-if="globalSearchEnabled"
           class="relative"
+          v-if="globalSearchEnabled"
           dusk="global-search-component"
         />
 
@@ -129,13 +129,13 @@ import { useStore } from 'vuex'
 import LicenseWarning from '@/components/LicenseWarning'
 import { Button } from 'laravel-nova-ui'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
-import { computed, onBeforeUnmount, useTemplateRef, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 const store = useStore()
 
-const modalContentRef = useTemplateRef('modalContent')
+const modalContent = ref(null)
 
-const { activate, deactivate } = useFocusTrap(modalContentRef, {
+const { activate, deactivate } = useFocusTrap(modalContent, {
   initialFocus: true,
   allowOutsideClick: false,
   escapeDeactivates: false,

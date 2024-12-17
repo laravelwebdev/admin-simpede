@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Http\Resources;
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Request;
 use Laravel\Nova\Makeable;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
@@ -14,8 +13,11 @@ abstract class Resource implements Responsable
 
     /**
      * Handle the resource for Inertia response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|null
      */
-    public function handle(Request $request): ?array
+    public function handle($request)
     {
         try {
             return $this->toArray($request);

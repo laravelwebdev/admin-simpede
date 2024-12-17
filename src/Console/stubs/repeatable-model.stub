@@ -15,12 +15,14 @@ class {{ class }} extends Repeatable
      */
     public static $model = \{{ namespacedModel }}::class;
 
+
     /**
      * Get the fields displayed by the repeatable.
      *
-     * @return array<int, \Laravel\Nova\Fields\Field>
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array
      */
-    public function fields(NovaRequest $request): array
+    public function fields(NovaRequest $request)
     {
         return [
             // ID::hidden(),

@@ -30,11 +30,12 @@ class HasManyThrough extends HasMany implements ListableField, RelatableField
     /**
      * Create a new field.
      *
-     * @param  \Stringable|string  $name
+     * @param  string  $name
+     * @param  string|null  $attribute
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
      * @return void
      */
-    public function __construct($name, ?string $attribute = null, ?string $resource = null)
+    public function __construct($name, $attribute = null, $resource = null)
     {
         parent::__construct($name, $attribute, $resource);
 
@@ -43,24 +44,30 @@ class HasManyThrough extends HasMany implements ListableField, RelatableField
 
     /**
      * Get the relationship name.
+     *
+     * @return string
      */
-    public function relationshipName(): string
+    public function relationshipName()
     {
         return $this->hasManyThroughRelationship;
     }
 
     /**
      * Get the relationship type.
+     *
+     * @return string
      */
-    public function relationshipType(): string
+    public function relationshipType()
     {
         return 'hasManyThrough';
     }
 
     /**
      * Make current field behaves as panel.
+     *
+     * @return \Laravel\Nova\Panel
      */
-    public function asPanel(): Panel
+    public function asPanel()
     {
         return Panel::make($this->name, [$this])
                     ->withMeta([
@@ -73,7 +80,6 @@ class HasManyThrough extends HasMany implements ListableField, RelatableField
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge([

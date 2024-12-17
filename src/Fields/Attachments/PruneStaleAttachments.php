@@ -15,8 +15,10 @@ class PruneStaleAttachments
 
     /**
      * Prune the stale attachments from the system.
+     *
+     * @return void
      */
-    public function __invoke(): void
+    public function __invoke()
     {
         Artisan::call('model:prune', [
             '--model' => static::$model,

@@ -1,6 +1,6 @@
 <template>
   <div :class="`text-${field.textAlign}`">
-    <IconBoolean :value="field.value" :nullable="field.nullable" />
+    <IconBoolean :value="field.value" />
   </div>
 </template>
 

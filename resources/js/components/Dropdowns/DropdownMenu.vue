@@ -8,16 +8,20 @@
   </div>
 </template>
 
-<script setup>
-import { computed } from 'vue'
+<script>
+export default {
+  props: {
+    width: {
+      default: 120,
+    },
+  },
 
-const props = defineProps({
-  width: { type: [Number, String], default: 120 },
-})
-
-const styles = computed(() => {
-  return {
-    width: props.width === 'auto' ? 'auto' : `${props.width}px`,
-  }
-})
+  computed: {
+    styles() {
+      return {
+        width: this.width === 'auto' ? 'auto' : `${this.width}px`,
+      }
+    },
+  },
+}
 </script>

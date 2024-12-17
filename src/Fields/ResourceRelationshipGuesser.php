@@ -9,8 +9,11 @@ class ResourceRelationshipGuesser
 {
     /**
      * Guess the relationship name from the displayable name or attribute.
+     *
+     * @param  string  $name
+     * @return string
      */
-    public static function guessRelation(string $name): string
+    public static function guessRelation($name)
     {
         return Str::camel(str_replace(' ', '_', $name));
     }
@@ -18,9 +21,10 @@ class ResourceRelationshipGuesser
     /**
      * Guess the resource class name from the displayable name.
      *
+     * @param  string  $name
      * @return class-string<\Laravel\Nova\Resource>
      */
-    public static function guessResource(string $name): string
+    public static function guessResource($name)
     {
         $singular = Str::studly(Str::singular($name));
 

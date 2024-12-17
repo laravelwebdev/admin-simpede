@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Metrics;
 
 use Laravel\Nova\Nova;
-use Stringable;
 
 class Table extends Metric
 {
@@ -17,16 +16,17 @@ class Table extends Metric
     /**
      * The text to be displayed when the table is empty.
      *
-     * @var \Stringable|string
+     * @var string
      */
     public $emptyText = 'No Results Found...';
 
     /**
      * Set the text to be displayed when the table is empty.
      *
+     * @param  string  $text
      * @return $this
      */
-    public function emptyText(Stringable|string $text)
+    public function emptyText($text)
     {
         $this->emptyText = $text;
 
@@ -38,7 +38,6 @@ class Table extends Metric
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

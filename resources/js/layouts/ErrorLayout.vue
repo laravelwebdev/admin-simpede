@@ -27,12 +27,13 @@
   </div>
 </template>
 
-<script setup>
-defineOptions({
-  name: 'ErrorLayout',
-})
-
-defineProps({
-  status: { type: String, default: '403' },
-})
+<script>
+export default {
+  props: {
+    status: {
+      type: String,
+      default: '403',
+    },
+  },
+}
 </script>

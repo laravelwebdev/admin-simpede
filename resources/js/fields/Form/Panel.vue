@@ -1,9 +1,5 @@
 <template>
-  <div
-    v-if="panel.fields.length > 0"
-    v-show="visibleFieldsCount > 0"
-    :dusk="`${panel.attribute}-panel`"
-  >
+  <div v-if="panel.fields.length > 0" v-show="visibleFieldsCount > 0">
     <Heading
       :level="1"
       :class="panel.helpText ? 'mb-2' : 'mb-3'"

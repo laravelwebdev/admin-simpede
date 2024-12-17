@@ -18,7 +18,7 @@
             v-for="(item, index) in theData"
             :index="index"
             :item="item"
-            :edit-mode="false"
+            :disabled="true"
             :key="item.key"
           />
         </div>
@@ -28,13 +28,16 @@
 </template>
 
 <script>
+import map from 'lodash/map'
+
 export default {
   props: ['index', 'resource', 'resourceName', 'resourceId', 'field'],
 
   data: () => ({ theData: [] }),
 
   created() {
-    this.theData = Object.entries(this.field.value || {}).map(
+    this.theData = map(
+      Object.entries(this.field.value || {}),
       ([key, value]) => ({
         key: `${key}`,
         value,

@@ -10,7 +10,7 @@
       <Card class="mt-8">
         <div class="md:grid md:grid-cols-2">
           <div class="border-r border-b border-gray-200 dark:border-gray-700">
-            <a :href="link('resources')" class="no-underline flex p-6">
+            <a :href="resources" class="no-underline flex p-6">
               <div class="flex justify-center w-11 shrink-0 mr-6">
                 <svg
                   class="text-primary-500 dark:text-primary-600"
@@ -38,10 +38,7 @@
           </div>
 
           <div class="border-b border-gray-200 dark:border-gray-700">
-            <a
-              :href="link('actions/defining-actions.html')"
-              class="no-underline flex p-6"
-            >
+            <a :href="actions" class="no-underline flex p-6">
               <div class="flex justify-center w-11 shrink-0 mr-6">
                 <svg
                   class="text-primary-500 dark:text-primary-600"
@@ -69,10 +66,7 @@
           </div>
 
           <div class="border-r border-b border-gray-200 dark:border-gray-700">
-            <a
-              :href="link('filters/defining-filters.html')"
-              class="no-underline flex p-6"
-            >
+            <a :href="filters" class="no-underline flex p-6">
               <div class="flex justify-center w-11 shrink-0 mr-6">
                 <svg
                   class="text-primary-500 dark:text-primary-600"
@@ -99,10 +93,7 @@
           </div>
 
           <div class="border-b border-gray-200 dark:border-gray-700">
-            <a
-              :href="link('lenses/defining-lenses.html')"
-              class="no-underline flex p-6"
-            >
+            <a :href="lenses" class="no-underline flex p-6">
               <div class="flex justify-center w-11 shrink-0 mr-6">
                 <svg
                   class="text-primary-500 dark:text-primary-600"
@@ -132,10 +123,7 @@
           <div
             class="border-r md:border-b-0 border-b border-gray-200 dark:border-gray-700"
           >
-            <a
-              :href="link('metrics/defining-metrics.html')"
-              class="no-underline flex p-6"
-            >
+            <a :href="metrics" class="no-underline flex p-6">
               <div class="flex justify-center w-11 shrink-0 mr-6">
                 <svg
                   class="text-primary-500 dark:text-primary-600"
@@ -165,10 +153,7 @@
           <div
             class="md:border-b-0 border-b border-gray-200 dark:border-gray-700"
           >
-            <a
-              :href="link('customization/cards.html')"
-              class="no-underline flex p-6"
-            >
+            <a :href="cards" class="no-underline flex p-6">
               <div class="flex justify-center w-11 shrink-0 mr-6">
                 <svg
                   class="text-primary-500 dark:text-primary-600"
@@ -200,25 +185,45 @@
   </div>
 </template>
 
-<script setup>
-import { computed } from 'vue'
-
-defineOptions({
+<script>
+export default {
   name: 'Help',
-})
 
-defineProps({
-  card: Object,
-})
+  props: {
+    card: Object,
+  },
 
-const version = computed(() => {
-  const parts = Nova.config('version').split('.')
-  parts.splice(-2)
+  methods: {
+    link(path) {
+      return `https://nova.laravel.com/docs/${this.version}/${path}`
+    },
+  },
 
-  return `${parts}.0`
-})
+  computed: {
+    resources() {
+      return this.link('resources')
+    },
+    actions() {
+      return this.link('actions/defining-actions.html')
+    },
+    filters() {
+      return this.link('filters/defining-filters.html')
+    },
+    lenses() {
+      return this.link('lenses/defining-lenses.html')
+    },
+    metrics() {
+      return this.link('metrics/defining-metrics.html')
+    },
+    cards() {
+      return this.link('customization/cards.html')
+    },
+    version() {
+      const parts = Nova.config('version').split('.')
+      parts.splice(-2)
 
-function link(path) {
-  return `https://nova.laravel.com/docs/${version.value}/${path}`
+      return `${parts}.0`
+    },
+  },
 }
 </script>

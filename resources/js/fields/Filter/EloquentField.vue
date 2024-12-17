@@ -6,17 +6,18 @@
       <SearchInput
         v-if="isSearchable"
         ref="searchable"
-        v-model="selectedResourceId"
+        :dusk="`${field.uniqueKey}-search-filter`"
         @input="performSearch"
         @clear="handleClearSelection"
         @shown="handleShowingActiveSearchInput"
-        :options="availableResources"
+        @selected="selectResource"
         :debounce="field.debounce"
+        :value="selectedResource"
+        :data="availableResources"
         :clearable="true"
         trackBy="value"
-        mode="modal"
         class="w-full"
-        :dusk="`${filter.uniqueKey}-search-input`"
+        mode="modal"
       >
         <div v-if="selectedResource" class="flex items-center">
           <div v-if="selectedResource.avatar" class="mr-3">
@@ -58,10 +59,11 @@
 
       <SelectControl
         v-else-if="availableResources.length > 0"
-        v-model="selectedResourceId"
+        :dusk="`${field.uniqueKey}-filter`"
+        v-model:selected="selectedResourceId"
+        @change="selectedResourceId = $event"
         :options="availableResources"
         label="display"
-        :dusk="filter.uniqueKey"
       >
         <option value="" selected>&mdash;</option>
       </SelectControl>
@@ -70,9 +72,12 @@
 </template>
 
 <script>
+import debounce from 'lodash/debounce'
+import find from 'lodash/find'
+import isNil from 'lodash/isNil'
 import { PerformsSearches } from '@/mixins'
 import storage from '@/storage/ResourceSearchStorage'
-import debounce from 'lodash/debounce'
+import filled from '@/util/filled'
 
 export default {
   emits: ['change'],
@@ -93,12 +98,13 @@ export default {
 
   data: () => ({
     availableResources: [],
+    selectedResource: null,
     selectedResourceId: '',
     softDeletes: false,
     withTrashed: false,
     search: '',
 
-    debouncedEventEmitter: null,
+    debouncedHandleChange: null,
   }),
 
   mounted() {
@@ -108,7 +114,7 @@ export default {
   },
 
   created() {
-    this.debouncedEventEmitter = debounce(() => this.emitFilterChange(), 500)
+    this.debouncedHandleChange = debounce(() => this.handleChange(), 500)
 
     Nova.$on('filter-active', this.handleClosingInactiveSearchInputs)
   },
@@ -119,8 +125,12 @@ export default {
   },
 
   watch: {
+    selectedResource(resource) {
+      this.selectedResourceId = filled(resource) ? resource.value : ''
+    },
+
     selectedResourceId() {
-      this.debouncedEventEmitter()
+      this.debouncedHandleChange()
     },
   },
 
@@ -129,6 +139,7 @@ export default {
      * Initialize the component.
      */
     initializeComponent() {
+      let filter = this.filter
       let shouldSelectInitialResource = false
 
       if (this.filter.currentValue) {
@@ -140,7 +151,11 @@ export default {
       }
 
       if (!this.isSearchable || shouldSelectInitialResource) {
-        this.getAvailableResources()
+        this.getAvailableResources().then(() => {
+          if (shouldSelectInitialResource === true) {
+            this.selectInitialResource()
+          }
+        })
       }
     },
 
@@ -150,14 +165,14 @@ export default {
     getAvailableResources(search) {
       let queryParams = this.queryParams
 
-      if (search != null) {
+      if (!isNil(search)) {
         queryParams.first = false
         queryParams.current = null
         queryParams.search = search
       }
 
       return storage
-        .fetchAvailableResources(this.field.resourceName, {
+        .fetchAvailableResources(this.filter.field.resourceName, {
           params: queryParams,
         })
         .then(({ data: { resources, softDeletes, withTrashed } }) => {
@@ -168,6 +183,16 @@ export default {
           this.availableResources = resources
           this.softDeletes = softDeletes
         })
+    },
+
+    /**
+     * Select the initial selected resource
+     */
+    selectInitialResource() {
+      this.selectedResource = find(
+        this.availableResources,
+        r => r.value === this.selectedResourceId
+      )
     },
 
     handleShowingActiveSearchInput() {
@@ -193,10 +218,10 @@ export default {
       this.clearSelection()
     },
 
-    emitFilterChange() {
+    handleChange() {
       this.$emit('change', {
         filterClass: this.filterKey,
-        value: this.selectedResourceId ?? '',
+        value: this.selectedResourceId,
       })
     },
 
@@ -206,6 +231,7 @@ export default {
       }
 
       this.selectedResourceId = ''
+      this.selectedResource = null
       this.availableResources = []
 
       this.closeSearchableRef()
@@ -249,12 +275,6 @@ export default {
         search: this.search,
         withTrashed: this.withTrashed,
       }
-    },
-
-    selectedResource() {
-      return this.availableResources.find(
-        r => r.value === this.selectedResourceId
-      )
     },
   },
 }

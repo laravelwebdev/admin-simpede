@@ -1,37 +1,29 @@
+import isNil from 'lodash/isNil'
 import omitBy from 'lodash/omitBy'
 
 export default {
   computed: {
-    /**
-     * @returns {string}
-     */
     suggestionsId() {
       return `${this.fieldAttribute}-list`
     },
 
-    /**
-     * @returns {string[]}
-     */
     suggestions() {
-      let field = this.syncedField != null ? this.syncedField : this.field
+      let field = !isNil(this.syncedField) ? this.syncedField : this.field
 
-      if (field.suggestions == null) {
+      if (isNil(field.suggestions)) {
         return []
       }
 
       return field.suggestions
     },
 
-    /**
-     * @returns {{[key: string]: any}}
-     */
     suggestionsAttributes() {
       return {
         ...omitBy(
           {
             list: this.suggestions.length > 0 ? this.suggestionsId : null,
           },
-          value => value == null
+          isNil
         ),
       }
     },

@@ -7,8 +7,6 @@ use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Fields\Filters\BooleanGroupFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
-use Laravel\Nova\Util;
-use Stringable;
 
 class BooleanGroup extends Field implements FilterableField
 {
@@ -32,41 +30,41 @@ class BooleanGroup extends Field implements FilterableField
     /**
      * The text to be used when there are no booleans to show.
      *
-     * @var \Stringable|string
+     * @var string
      */
     public $noValueText = 'No Data';
 
     /**
      * The options for the field.
      *
-     * @var array|null
+     * @var array
      */
-    public $options = null;
+    public $options;
 
     /**
      * Determine false values should be hidden.
      *
-     * @var bool|null
+     * @var bool
      */
-    public $hideFalseValues = null;
+    public $hideFalseValues;
 
     /**
      * Determine true values should be hidden.
      *
-     * @var bool|null
+     * @var bool
      */
-    public $hideTrueValues = null;
+    public $hideTrueValues;
 
     /**
      * Set the options for the field.
      *
-     * @param  callable():(iterable)|iterable  $options
+     * @param  \Closure():(array|\Illuminate\Support\Collection)|array|\Illuminate\Support\Collection  $options
      * @return $this
      */
-    public function options(callable|iterable $options)
+    public function options($options)
     {
-        if (Util::isSafeCallable($options)) {
-            $options = call_user_func($options);
+        if (is_callable($options)) {
+            $options = $options();
         }
 
         $this->options = with(collect($options), function ($options) {
@@ -109,9 +107,10 @@ class BooleanGroup extends Field implements FilterableField
     /**
      * Set the text to be used when there are no booleans to show.
      *
+     * @param  string  $text
      * @return $this
      */
-    public function noValueText(Stringable|string $text)
+    public function noValueText($text)
     {
         $this->noValueText = $text;
 
@@ -121,10 +120,13 @@ class BooleanGroup extends Field implements FilterableField
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
+     * @param  string  $attribute
+     * @return void
      */
-    #[\Override]
-    protected function fillAttributeFromRequest(NovaRequest $request, string $requestAttribute, object $model, string $attribute): void
+    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         if ($request->exists($requestAttribute)) {
             $model->{$attribute} = json_decode($request[$requestAttribute], true);
@@ -134,6 +136,7 @@ class BooleanGroup extends Field implements FilterableField
     /**
      * Make the field filter.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -144,7 +147,7 @@ class BooleanGroup extends Field implements FilterableField
     /**
      * Define the default filterable callback.
      *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):void
+     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed, string):void
      */
     protected function defaultFilterableCallback()
     {
@@ -161,8 +164,10 @@ class BooleanGroup extends Field implements FilterableField
 
     /**
      * Prepare the field for JSON serialization.
+     *
+     * @return array
      */
-    public function serializeForFilter(): array
+    public function serializeForFilter()
     {
         return transform($this->jsonSerialize(), function ($field) {
             $field['options'] = collect($field['options'])->transform(function ($option) {
@@ -181,7 +186,6 @@ class BooleanGroup extends Field implements FilterableField
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

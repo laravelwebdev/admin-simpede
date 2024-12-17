@@ -1,29 +1,42 @@
 <template>
   <div class="relative h-9 w-full md:w-1/3 md:shrink-0">
     <Icon
-      name="magnifying-glass"
-      type="mini"
-      class="absolute ml-2 text-gray-400 top-[4px]"
+      type="search"
+      width="20"
+      class="absolute ml-2 text-gray-400"
+      :style="{ top: '4px' }"
     />
 
     <RoundInput
       dusk="search-input"
-      class="bg-white dark:bg-gray-800 shadow dark:focus:bg-gray-800"
+      class="appearance-none bg-white dark:bg-gray-800 shadow rounded-full h-8 w-full dark:focus:bg-gray-800"
       :placeholder="__('Search')"
       type="search"
-      v-model="keyword"
+      :value="keyword"
+      @input="handleChange"
       spellcheck="false"
       :aria-label="__('Search')"
-      data-role="resource-search-input"
     />
   </div>
 </template>
 
-<script setup>
-import { Icon } from 'laravel-nova-ui'
-import { useLocalization } from '@/composables/useLocalization'
+<script>
+export default {
+  emits: ['update:keyword'],
 
-const { __ } = useLocalization()
+  props: {
+    keyword: {
+      type: String,
+    },
+  },
 
-const keyword = defineModel()
+  methods: {
+    /**
+     * Update the field's internal value
+     */
+    handleChange(event) {
+      this.$emit('update:keyword', event?.target?.value || '')
+    },
+  },
+}
 </script>

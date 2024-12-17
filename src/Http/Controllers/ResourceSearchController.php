@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Http\Requests\ResourceSearchRequest;
@@ -13,8 +12,11 @@ class ResourceSearchController extends Controller
 {
     /**
      * List the resources for administration.
+     *
+     * @param  \Laravel\Nova\Http\Requests\ResourceSearchRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(ResourceSearchRequest $request): JsonResponse
+    public function __invoke(ResourceSearchRequest $request)
     {
         $resource = $request->resource();
 
@@ -25,8 +27,9 @@ class ResourceSearchController extends Controller
         return response()->json([
             'resources' => $request->searchIndex()
                         ->mapInto($resource)
-                        ->map(fn ($resource) => $this->transformResult($request, $resource))
-                        ->values(),
+                        ->map(function ($resource) use ($request) {
+                            return $this->transformResult($request, $resource);
+                        })->values(),
             'softDeletes' => $resource::softDeletes(),
             'withTrashed' => $withTrashed,
         ]);
@@ -35,20 +38,21 @@ class ResourceSearchController extends Controller
     /**
      * Determine if the query should include trashed models.
      *
-     * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $resource
+     * @return bool
      */
-    protected function shouldIncludeTrashed(NovaRequest $request, string $resourceClass): bool
+    protected function shouldIncludeTrashed(NovaRequest $request, $resource)
     {
         if ($request->withTrashed === 'true') {
             return true;
         }
 
-        $model = $resourceClass::newModel();
+        $model = $resource::newModel();
 
-        if ($request->current && empty($request->search) && $resourceClass::softDeletes()) {
+        if ($request->current && empty($request->search) && $resource::softDeletes()) {
             $model = $model->newQueryWithoutScopes()->find($request->current);
 
-            /** @phpstan-ignore method.notFound */
             return $model ? $model->trashed() : false;
         }
 
@@ -57,8 +61,12 @@ class ResourceSearchController extends Controller
 
     /**
      * Transform the result from resource.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Laravel\Nova\Resource  $resource
+     * @return array
      */
-    protected function transformResult(NovaRequest $request, Resource $resource): array
+    protected function transformResult(NovaRequest $request, Resource $resource)
     {
         return array_filter([
             'avatar' => $resource->resolveAvatarUrl($request),

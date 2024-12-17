@@ -10,14 +10,18 @@ class AssociatableController extends Controller
 {
     /**
      * List the available related resources for a given resource.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array
      */
-    public function __invoke(NovaRequest $request): array
+    public function __invoke(NovaRequest $request)
     {
         $field = $request->newResource()
                     ->availableFields($request)
                     ->whereInstanceOf(RelatableField::class)
-                    ->findFieldByAttributeOrFail($request->field)
-                    ->applyDependsOn($request);
+                    ->findFieldByAttribute($request->field, function () {
+                        abort(404);
+                    })->applyDependsOn($request);
 
         $withTrashed = $this->shouldIncludeTrashed(
             $request, $associatedResource = $field->resourceClass
@@ -38,9 +42,11 @@ class AssociatableController extends Controller
                         ->get()
                         ->mapInto($field->resourceClass)
                         ->filter->authorizedToAdd($request, $request->model())
-                        ->map(fn ($resource) => $field->formatAssociatableResource($request, $resource))
-                        ->when($shouldReorderAssociatableValues, fn ($collection) => $collection->sortBy('display'))
-                        ->values(),
+                        ->map(function ($resource) use ($request, $field) {
+                            return $field->formatAssociatableResource($request, $resource);
+                        })->when($shouldReorderAssociatableValues, function ($collection) {
+                            return $collection->sortBy('display');
+                        })->values(),
             'softDeletes' => $associatedResource::softDeletes(),
             'withTrashed' => $withTrashed,
         ];
@@ -49,9 +55,11 @@ class AssociatableController extends Controller
     /**
      * Determine if the query should include trashed models.
      *
-     * @param  class-string<\Laravel\Nova\Resource>  $associatedResource
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $associatedResource
+     * @return bool
      */
-    protected function shouldIncludeTrashed(NovaRequest $request, string $associatedResource): bool
+    protected function shouldIncludeTrashed(NovaRequest $request, $associatedResource)
     {
         if ($request->withTrashed === 'true') {
             return true;
@@ -62,7 +70,6 @@ class AssociatableController extends Controller
         if ($request->current && empty($request->search) && $associatedResource::softDeletes()) {
             $associatedModel = $associatedModel->newQueryWithoutScopes()->find($request->current);
 
-            /** @phpstan-ignore method.notFound */
             return $associatedModel ? $associatedModel->trashed() : false;
         }
 

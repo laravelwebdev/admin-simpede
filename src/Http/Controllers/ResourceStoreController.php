@@ -4,7 +4,6 @@ namespace Laravel\Nova\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Laravel\Nova\Actions\ActionEvent;
@@ -18,15 +17,18 @@ class ResourceStoreController extends Controller
 {
     /**
      * The action event for the action.
+     *
+     * @var \Laravel\Nova\Actions\ActionEvent|null
      */
-    protected ?ActionEvent $actionEvent = null;
+    protected $actionEvent;
 
     /**
      * Create a new resource.
      *
-     * @throws \Throwable
+     * @param  \Laravel\Nova\Http\Requests\CreateResourceRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(CreateResourceRequest $request): JsonResponse
+    public function __invoke(CreateResourceRequest $request)
     {
         /** @var \Laravel\Nova\Resource $resource */
         $resource = $request->resource();
@@ -42,7 +44,7 @@ class ResourceStoreController extends Controller
                 );
 
                 if ($this->storeResource($request, $model) === false) {
-                    throw new ResourceSaveCancelledException;
+                    throw new ResourceSaveCancelledException();
                 }
 
                 DB::transaction(function () use ($request, $model) {
@@ -61,6 +63,7 @@ class ResourceStoreController extends Controller
 
             return response()->json([
                 'id' => $model->getKey(),
+                'resource' => $model->attributesToArray(),
                 'redirect' => URL::make($resource::redirectAfterCreate($request, $request->newResourceWith($model))),
             ], 201);
         } catch (Throwable $e) {
@@ -72,9 +75,11 @@ class ResourceStoreController extends Controller
     /**
      * Save the resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\CreateResourceRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
      */
-    protected function storeResource(CreateResourceRequest $request, $model): bool
+    protected function storeResource(CreateResourceRequest $request, Model $model)
     {
         if (! $request->viaRelationship()) {
             return $model->save();
@@ -88,6 +93,6 @@ class ResourceStoreController extends Controller
             return $model->save();
         }
 
-        return with($relation->save($model), fn ($model) => $model instanceof Model);
+        return $relation->save($model);
     }
 }

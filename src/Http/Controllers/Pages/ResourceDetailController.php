@@ -4,7 +4,6 @@ namespace Laravel\Nova\Http\Controllers\Pages;
 
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
-use Inertia\Response;
 use Laravel\Nova\Http\Requests\ResourceDetailRequest;
 use Laravel\Nova\Http\Resources\DetailViewResource;
 use Laravel\Nova\Menu\Breadcrumb;
@@ -15,8 +14,11 @@ class ResourceDetailController extends Controller
 {
     /**
      * Show Resource Detail page using Inertia.
+     *
+     * @param  \Laravel\Nova\Http\Requests\ResourceDetailRequest  $request
+     * @return \Inertia\Response
      */
-    public function __invoke(ResourceDetailRequest $request): Response
+    public function __invoke(ResourceDetailRequest $request)
     {
         $resourceClass = $request->resource();
 
@@ -30,10 +32,13 @@ class ResourceDetailController extends Controller
     /**
      * Get breadcrumb menu for the page.
      *
+     * @param  \Laravel\Nova\Http\Requests\ResourceDetailRequest  $request
+     * @return \Laravel\Nova\Menu\Breadcrumbs
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    protected function breadcrumbs(ResourceDetailRequest $request): Breadcrumbs
+    protected function breadcrumbs(ResourceDetailRequest $request)
     {
         $resource = DetailViewResource::make()->authorizedResourceForRequest($request);
 

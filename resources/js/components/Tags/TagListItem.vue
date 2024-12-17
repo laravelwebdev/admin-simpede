@@ -17,14 +17,17 @@
       </div>
     </div>
 
-    <button
+    <IconButton
+      iconType="minus-circle"
       v-if="editable"
       @click.stop="$emit('tag-removed', index)"
       type="button"
-      class="flex inline-flex items-center justify-center appearance-none cursor-pointer ml-auto text-red-500 hover:text-red-600 active:outline-none focus:ring focus:ring-primary-200 focus:outline-none rounded"
+      tabindex="0"
+      class="ml-auto flex appearance-none cursor-pointer text-red-500 hover:text-red-600 active:outline-none"
+      :title="__('Delete')"
     >
-      <Icon name="minus-circle" type="solid" class="hover:opacity-50" />
-    </button>
+      <Icon type="minus-circle" />
+    </IconButton>
 
     <PreviewResourceModal
       v-if="withPreview"
@@ -37,7 +40,6 @@
 </template>
 
 <script setup>
-import { Icon } from 'laravel-nova-ui'
 import { ref } from 'vue'
 
 const shown = ref(false)

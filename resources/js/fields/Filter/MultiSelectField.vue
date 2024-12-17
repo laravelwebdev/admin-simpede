@@ -4,10 +4,10 @@
 
     <template #filter>
       <MultiSelectControl
-        v-model="value"
-        @update:modelValue="debouncedHandleChange"
+        :dusk="`${field.uniqueKey}-filter`"
+        v-model:selected="value"
+        @change="value = $event"
         :options="field.options"
-        :dusk="filter.uniqueKey"
       >
         <option value="" :selected="value === ''">&mdash;</option>
       </MultiSelectControl>
@@ -39,7 +39,7 @@ export default {
   }),
 
   created() {
-    this.debouncedHandleChange = debounce(() => this.handleFilterChange(), 500)
+    this.debouncedHandleChange = debounce(() => this.handleChange(), 500)
     this.setCurrentFilterValue()
   },
 
@@ -51,12 +51,18 @@ export default {
     Nova.$off('filter-reset', this.setCurrentFilterValue)
   },
 
+  watch: {
+    value() {
+      this.debouncedHandleChange()
+    },
+  },
+
   methods: {
     setCurrentFilterValue() {
       this.value = this.filter.currentValue
     },
 
-    handleFilterChange() {
+    handleChange() {
       this.$emit('change', {
         filterClass: this.filterKey,
         value: this.value,

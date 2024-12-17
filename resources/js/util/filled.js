@@ -1,7 +1,5 @@
-/**
- * @param {any} value
- * @returns {boolean}
- */
+import isNil from 'lodash/isNil'
+
 export default function filled(value) {
-  return Boolean(value != null && value !== '')
+  return Boolean(!isNil(value) && value !== '')
 }

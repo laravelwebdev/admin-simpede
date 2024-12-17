@@ -3,17 +3,12 @@
 namespace Laravel\Nova\Console;
 
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-
-use function Laravel\Prompts\suggest;
 
 #[AsCommand(name: 'nova:resource')]
-class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
+class ResourceCommand extends GeneratorCommand
 {
     use ResolvesStubPath;
 
@@ -63,7 +58,6 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
      *
      * @return bool|null
      */
-    #[\Override]
     public function handle()
     {
         parent::handle();
@@ -79,7 +73,6 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
      * @param  string  $name
      * @return string
      */
-    #[\Override]
     protected function buildClass($name)
     {
         $resourceName = $this->argument('name');
@@ -96,7 +89,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
         }
 
         if (in_array(strtolower($resourceName), $this->protectedNames)) {
-            $this->components->warn("You *must* override the uriKey method for your {$resourceName} resource.");
+            $this->warn("You *must* override the uriKey method for your {$resourceName} resource.");
         }
 
         $replace = [
@@ -148,7 +141,6 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
      * @param  string  $rootNamespace
      * @return string
      */
-    #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Nova';
@@ -179,32 +171,10 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
     }
 
     /**
-     * Interact further with the user if they were prompted for missing arguments.
-     *
-     * @return void
-     */
-    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
-    {
-        if ($this->didReceiveOptions($input)) {
-            return;
-        }
-
-        $model = suggest(
-            'What model should this resource be for? (Optional)',
-            $this->possibleModels()
-        );
-
-        if ($model) {
-            $input->setOption('model', $model);
-        }
-    }
-
-    /**
      * Get the console command options.
      *
      * @return array
      */
-    #[\Override]
     protected function getOptions()
     {
         return [

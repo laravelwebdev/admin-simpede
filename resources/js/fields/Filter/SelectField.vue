@@ -7,15 +7,16 @@
       <SearchInput
         v-if="isSearchable"
         ref="searchable"
-        v-model="value"
+        :dusk="`${field.uniqueKey}-search-filter`"
         @input="performSearch"
         @clear="clearSelection"
-        :options="filteredOptions"
+        @selected="selectOption"
+        :value="selectedOption"
+        :data="filteredOptions"
         :clearable="true"
         trackBy="value"
-        mode="modal"
         class="w-full"
-        :dusk="`${filter.uniqueKey}-search-input`"
+        mode="modal"
       >
         <!-- The Selected Option Slot -->
         <div v-if="selectedOption" class="flex items-center">
@@ -36,9 +37,10 @@
       <!-- Select Input Field -->
       <SelectControl
         v-else
-        v-model="value"
-        :options="field?.options ?? []"
-        :dusk="filter.uniqueKey"
+        :dusk="`${field.uniqueKey}-filter`"
+        v-model:selected="value"
+        @change="value = $event"
+        :options="field.options"
       >
         <option value="" :selected="value === ''">&mdash;</option>
       </SelectControl>
@@ -48,6 +50,8 @@
 
 <script>
 import debounce from 'lodash/debounce'
+import find from 'lodash/find'
+import isNil from 'lodash/isNil'
 
 export default {
   emits: ['change'],
@@ -65,6 +69,7 @@ export default {
   },
 
   data: () => ({
+    selectedOption: null,
     search: '',
 
     value: null,
@@ -76,8 +81,14 @@ export default {
   },
 
   created() {
-    this.debouncedHandleChange = debounce(() => this.handleFilterChange(), 500)
-    this.value = this.filter.currentValue
+    this.debouncedHandleChange = debounce(() => this.handleChange(), 500)
+    let value = this.filter.currentValue
+
+    if (value) {
+      let selectedOption = find(this.field.options, v => v.value == value)
+
+      this.selectOption(selectedOption)
+    }
   },
 
   beforeUnmount() {
@@ -85,6 +96,14 @@ export default {
   },
 
   watch: {
+    selectedOption(option) {
+      if (!isNil(option) && option !== '') {
+        this.value = option.value
+      } else {
+        this.value = ''
+      }
+    },
+
     value() {
       this.debouncedHandleChange()
     },
@@ -102,6 +121,7 @@ export default {
      * Clear the current selection for the field.
      */
     clearSelection() {
+      this.selectedOption = null
       this.value = ''
 
       if (this.$refs.searchable) {
@@ -109,10 +129,18 @@ export default {
       }
     },
 
-    handleFilterChange() {
+    /**
+     * Select the given option.
+     */
+    selectOption(option) {
+      this.selectedOption = option
+      this.value = option.value
+    },
+
+    handleChange() {
       this.$emit('change', {
         filterClass: this.filterKey,
-        value: this.value ?? '',
+        value: this.value,
       })
     },
 
@@ -155,12 +183,6 @@ export default {
             .indexOf(this.search.toLowerCase()) > -1
         )
       })
-    },
-
-    selectedOption() {
-      return this.field.options.find(
-        o => this.value === o.value || this.value === o.value.toString()
-      )
     },
   },
 }

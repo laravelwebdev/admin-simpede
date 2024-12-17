@@ -26,6 +26,7 @@
 
 <script>
 import identity from 'lodash/identity'
+import isNull from 'lodash/isNull'
 import omitBy from 'lodash/omitBy'
 import pickBy from 'lodash/pickBy'
 import { mapGetters, mapMutations } from 'vuex'
@@ -78,7 +79,7 @@ export default {
             rel: this.component === 'a' ? 'noreferrer noopener' : null,
             target: this.item.target || null,
           },
-          value => value === null
+          isNull
         ),
         identity
       )

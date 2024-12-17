@@ -2,8 +2,6 @@
 
 namespace Laravel\Nova;
 
-use Laravel\Nova\Http\Requests\NovaRequest;
-
 trait Metable
 {
     /**
@@ -20,11 +18,7 @@ trait Metable
      */
     public function meta()
     {
-        $request = app(NovaRequest::class);
-
-        return collect($this->meta)
-            ->map(fn ($value) => value($value, $request))
-            ->all();
+        return $this->meta;
     }
 
     /**

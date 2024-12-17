@@ -30,13 +30,13 @@ class CustomFilterCommand extends ComponentGeneratorCommand
      *
      * @return void
      */
-    public function handle(Filesystem $files)
+    public function handle()
     {
         if (! $this->hasValidNameArgument()) {
             return;
         }
 
-        $files->copyDirectory(
+        (new Filesystem)->copyDirectory(
             __DIR__.'/filter-stubs',
             $this->componentPath()
         );
@@ -49,7 +49,7 @@ class CustomFilterCommand extends ComponentGeneratorCommand
         $this->replace('{{ class }}', $this->componentClass(), $this->componentPath().'/src/Filter.stub');
         $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/Filter.stub');
 
-        $files->move(
+        (new Filesystem)->move(
             $this->componentPath().'/src/Filter.stub',
             $this->componentPath().'/src/'.$this->componentClass().'.php'
         );
@@ -69,6 +69,27 @@ class CustomFilterCommand extends ComponentGeneratorCommand
 
         // Register the filter...
         $this->buildComponent('filter');
+    }
+
+    /**
+     * Get the stub file for the generator.
+     *
+     * @return string
+     */
+    protected function getStub()
+    {
+        return __DIR__.'/stubs/filter.stub';
+    }
+
+    /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        return $rootNamespace.'\Nova\Filters';
     }
 
     /**

@@ -71,7 +71,7 @@ async function fetch() {
 
     resourceFields.value = fields
   } catch (error) {
-    Nova.debug(error, 'error')
+    console.error(error)
   } finally {
     loading.value = false
   }

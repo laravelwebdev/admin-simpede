@@ -77,6 +77,9 @@
 </template>
 
 <script>
+import each from 'lodash/each'
+import isNil from 'lodash/isNil'
+import tap from 'lodash/tap'
 import {
   HandlesFormRequest,
   HandlesUploads,
@@ -85,7 +88,6 @@ import {
 } from '@/mixins'
 import { mapActions, mapMutations } from 'vuex'
 import { Button } from 'laravel-nova-ui'
-import tap from 'lodash/tap'
 
 export default {
   components: {
@@ -171,11 +173,16 @@ export default {
 
     this.getFields()
 
-    if (this.mode !== 'form') this.allowLeavingModal()
+    this.mode === 'form' ? this.allowLeavingForm() : this.allowLeavingModal()
   },
 
   methods: {
-    ...mapMutations(['allowLeavingModal', 'preventLeavingModal']),
+    ...mapMutations([
+      'allowLeavingForm',
+      'preventLeavingForm',
+      'allowLeavingModal',
+      'preventLeavingModal',
+    ]),
     ...mapActions(['fetchPolicies']),
 
     /**
@@ -248,7 +255,9 @@ export default {
             data: { redirect, id },
           } = await this.createRequest()
 
-          if (this.mode !== 'form') this.allowLeavingModal()
+          this.mode === 'form'
+            ? this.allowLeavingForm()
+            : this.allowLeavingModal()
 
           // Reload the policies for Nova in case the user has new permissions
           await this.fetchPolicies()
@@ -282,7 +291,9 @@ export default {
           this.submittedViaCreateResource = true
           this.isWorking = false
 
-          if (this.mode !== 'form') this.preventLeavingModal()
+          this.mode === 'form'
+            ? this.preventLeavingForm()
+            : this.preventLeavingModal()
 
           this.handleOnCreateResponseError(error)
         }
@@ -314,13 +325,13 @@ export default {
      */
     createResourceFormData() {
       return tap(new FormData(), formData => {
-        this.panels.forEach(panel => {
-          panel.fields.forEach(field => {
+        each(this.panels, panel => {
+          each(panel.fields, field => {
             field.fill(formData)
           })
         })
 
-        if (this.fromResourceId != null) {
+        if (!isNil(this.fromResourceId)) {
           formData.append('fromResourceId', this.fromResourceId)
         }
 

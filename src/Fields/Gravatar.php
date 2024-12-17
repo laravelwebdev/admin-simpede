@@ -2,40 +2,39 @@
 
 namespace Laravel\Nova\Fields;
 
-use Laravel\Nova\Nova;
-
 /**
- * @method static static make(\Stringable|string|null $name = null, string $attribute = 'email')
+ * @method static static make(mixed $name = 'Avatar', string|null $attribute = 'email')
  */
 class Gravatar extends Avatar implements Unfillable
 {
     /**
      * Create a new field.
      *
-     * @param  \Stringable|string|null  $name
+     * @param  string  $name
+     * @param  string|null  $attribute
      * @return void
      */
-    public function __construct($name = null, string $attribute = 'email')
+    public function __construct($name = 'Avatar', $attribute = 'email')
     {
-        parent::__construct($name ?? Nova::__('Avatar'), $attribute);
+        parent::__construct($name, $attribute ?? 'email');
 
-        $this->exceptOnForms()
-            ->disableDownload();
+        $this->exceptOnForms();
     }
 
     /**
      * Resolve the given attribute from the given resource.
      *
-     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
+     * @param  mixed  $resource
+     * @param  string  $attribute
+     * @return mixed
      */
-    #[\Override]
-    protected function resolveAttribute($resource, string $attribute): string
+    protected function resolveAttribute($resource, $attribute)
     {
-        $callback = fn () => 'https://www.gravatar.com/avatar/'.md5(strtolower(parent::resolveAttribute($resource, $attribute))).'?s=300';
+        $callback = function () use ($resource, $attribute) {
+            return 'https://www.gravatar.com/avatar/'.md5(strtolower(parent::resolveAttribute($resource, $attribute))).'?s=300';
+        };
 
         $this->preview($callback)->thumbnail($callback);
-
-        return call_user_func($callback);
     }
 
     /**
@@ -43,7 +42,6 @@ class Gravatar extends Avatar implements Unfillable
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge([

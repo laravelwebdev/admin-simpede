@@ -5,7 +5,6 @@ namespace Laravel\Nova\Fields;
 use Illuminate\Support\Str;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
-use Stringable;
 
 class KeyValue extends Field
 {
@@ -18,6 +17,15 @@ class KeyValue extends Field
      */
     public $component = 'key-value-field';
 
+    public function resolve($resource, $attribute = null)
+    {
+        parent::resolve($resource, $attribute);
+
+        if ($this->value === '{}') {
+            $this->value = null;
+        }
+    }
+
     /**
      * Indicates if the element should be shown on the index view.
      *
@@ -28,23 +36,23 @@ class KeyValue extends Field
     /**
      * The label that should be used for the key heading.
      *
-     * @var \Stringable|string|null
+     * @var string|null
      */
-    public $keyLabel = null;
+    public $keyLabel;
 
     /**
      * The label that should be used for the value heading.
      *
-     * @var \Stringable|string|null
+     * @var string|null
      */
-    public $valueLabel = null;
+    public $valueLabel;
 
     /**
      * The label that should be used for the "add row" button.
      *
-     * @var \Stringable|string|null
+     * @var string|null
      */
-    public $actionText = null;
+    public $actionText;
 
     /**
      * The callback used to determine if the keys are readonly.
@@ -68,27 +76,15 @@ class KeyValue extends Field
     public $canDeleteRow = true;
 
     /**
-     * Resolve the field's value.
-     *
-     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
-     */
-    #[\Override]
-    public function resolve($resource, ?string $attribute = null): void
-    {
-        parent::resolve($resource, $attribute);
-
-        if ($this->value === '{}') {
-            $this->value = null;
-        }
-    }
-
-    /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
+     * @param  string  $attribute
+     * @return void
      */
-    #[\Override]
-    protected function fillAttributeFromRequest(NovaRequest $request, string $requestAttribute, object $model, string $attribute): void
+    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         if ($request->exists($requestAttribute)) {
             // The value for KeyValue fields are serialized on the front-end using `JSON.stringify`,
@@ -101,9 +97,11 @@ class KeyValue extends Field
      * Fill the model's attribute with data.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
+     * @param  mixed  $value
+     * @param  string  $attribute
+     * @return void
      */
-    #[\Override]
-    public function fillModelWithData(object $model, mixed $value, string $attribute): void
+    public function fillModelWithData($model, $value, string $attribute)
     {
         $model->forceFill([Str::replace('.', '->', $attribute) => $value]);
     }
@@ -111,9 +109,10 @@ class KeyValue extends Field
     /**
      * The label that should be used for the key table heading.
      *
+     * @param  string  $label
      * @return $this
      */
-    public function keyLabel(Stringable|string $label)
+    public function keyLabel($label)
     {
         $this->keyLabel = $label;
 
@@ -123,9 +122,10 @@ class KeyValue extends Field
     /**
      * The label that should be used for the value table heading.
      *
+     * @param  string  $label
      * @return $this
      */
-    public function valueLabel(Stringable|string $label)
+    public function valueLabel($label)
     {
         $this->valueLabel = $label;
 
@@ -135,9 +135,10 @@ class KeyValue extends Field
     /**
      * The label that should be used for the add row button.
      *
+     * @param  string  $label
      * @return $this
      */
-    public function actionText(Stringable|string $label)
+    public function actionText($label)
     {
         $this->actionText = $label;
 
@@ -150,7 +151,7 @@ class KeyValue extends Field
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(bool))|bool  $callback
      * @return $this
      */
-    public function disableEditingKeys(callable|bool $callback = true)
+    public function disableEditingKeys($callback = true)
     {
         $this->readonlyKeysCallback = $callback;
 
@@ -159,8 +160,11 @@ class KeyValue extends Field
 
     /**
      * Determine if the keys are readonly.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return bool
      */
-    public function readonlyKeys(NovaRequest $request): bool
+    public function readonlyKeys(NovaRequest $request)
     {
         return with($this->readonlyKeysCallback, function ($callback) use ($request) {
             return is_callable($callback) ? call_user_func($callback, $request) : ($callback === true);
@@ -196,7 +200,6 @@ class KeyValue extends Field
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

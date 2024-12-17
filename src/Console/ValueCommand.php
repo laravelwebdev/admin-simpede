@@ -38,7 +38,6 @@ class ValueCommand extends GeneratorCommand
      * @param  string  $name
      * @return string
      */
-    #[\Override]
     protected function buildClass($name)
     {
         $stub = parent::buildClass($name);
@@ -64,7 +63,6 @@ class ValueCommand extends GeneratorCommand
      * @param  string  $rootNamespace
      * @return string
      */
-    #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Nova\Metrics';

@@ -5,12 +5,12 @@
   />
 </template>
 
-<script setup>
-import { computed } from 'vue'
-
-defineOptions({
-  name: 'Footer',
-})
-
-const footer = computed(() => Nova.config('footer'))
+<script>
+export default {
+  computed: {
+    footer() {
+      return window.Nova.config('footer')
+    },
+  },
+}
 </script>

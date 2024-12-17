@@ -2,11 +2,7 @@
 
 namespace Laravel\Nova\Rules;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Nova\Contracts\RelatableField;
-use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Fields\HasOne;
 use Laravel\Nova\Fields\MorphOne;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -15,22 +11,37 @@ use Laravel\Nova\Nova;
 class Relatable implements Rule
 {
     /**
+     * The request instance.
+     *
+     * @var \Laravel\Nova\Http\Requests\NovaRequest
+     */
+    public $request;
+
+    /**
+     * The query builder instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Builder
+     */
+    public $query;
+
+    /**
      * Create a new rule instance.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function __construct(
-        public NovaRequest $request,
-        public Builder $query,
-        public Field&RelatableField $field
-    ) {
-        //
+    public function __construct(NovaRequest $request, $query)
+    {
+        $this->query = $query;
+        $this->request = $request;
     }
 
     /**
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -54,8 +65,8 @@ class Relatable implements Rule
             return false;
         }
 
-        if ($resourceClass = ($this->field->resourceClass ?? Nova::resourceForModel($model))) {
-            return $this->authorize($resourceClass, $model);
+        if ($resource = Nova::resourceForModel($model)) {
+            return $this->authorize($resource, $model);
         }
 
         return true;
@@ -63,8 +74,13 @@ class Relatable implements Rule
 
     /**
      * Determine if the relationship is "full".
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
      */
-    protected function relationshipIsFull(Model $model, string $attribute, mixed $value): bool
+    protected function relationshipIsFull($model, $attribute, $value)
     {
         $inverseRelation = $this->request->newResource()
                     ->resolveInverseFieldsForAttribute($this->request, $attribute)->first(function ($field) {
@@ -91,11 +107,14 @@ class Relatable implements Rule
      * Authorize that the user is allowed to relate this resource.
      *
      * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
      */
-    protected function authorize(string $resourceClass, Model $model): bool
+    protected function authorize($resourceClass, $model)
     {
-        return $resourceClass::make($model)
-            ->authorizedToAdd($this->request, $this->request->model());
+        return (new $resourceClass($model))->authorizedToAdd(
+            $this->request, $this->request->model()
+        );
     }
 
     /**

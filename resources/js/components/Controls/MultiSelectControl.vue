@@ -2,10 +2,10 @@
   <div class="flex relative" :class="$attrs.class">
     <select
       v-bind="defaultAttributes"
-      ref="selectControl"
       @change="handleChange"
-      class="w-full min-h-[10rem] block form-control form-control-bordered form-input"
-      multiple
+      class="w-full block form-control form-control-bordered form-input min-h-[10rem]"
+      :multiple="true"
+      ref="selectControl"
       :class="{
         'h-8 text-xs': size === 'sm',
         'h-7 text-xs': size === 'xs',
@@ -42,67 +42,70 @@
   </div>
 </template>
 
-<script setup>
-import { computed, useAttrs, useTemplateRef } from 'vue'
+<script>
+import filter from 'lodash/filter'
 import groupBy from 'lodash/groupBy'
+import map from 'lodash/map'
 import omit from 'lodash/omit'
 
-defineOptions({
+export default {
+  emits: ['change'],
+
   inheritAttrs: false,
-})
 
-const emitter = defineEmits(['selected'])
-
-const props = defineProps({
-  hasError: { type: Boolean, default: false },
-  label: { default: 'label' },
-  options: { type: Array, default: [] },
-  disabled: { type: Boolean, default: false },
-  size: {
-    type: String,
-    default: 'md',
-    validator: val => ['xxs', 'xs', 'sm', 'md'].includes(val),
+  props: {
+    hasError: { type: Boolean, default: false },
+    label: { default: 'label' },
+    options: { type: Array, default: [] },
+    disabled: { type: Boolean, default: false },
+    selected: {},
+    size: {
+      type: String,
+      default: 'md',
+      validator: val => ['xxs', 'xs', 'sm', 'md'].includes(val),
+    },
   },
-})
 
-const modelValue = defineModel()
+  methods: {
+    labelFor(option) {
+      return this.label instanceof Function
+        ? this.label(option)
+        : option[this.label]
+    },
 
-const attrs = useAttrs()
+    attrsFor(option) {
+      return {
+        ...(option.attrs || {}),
+        ...{ value: option.value },
+      }
+    },
 
-const selectControlRef = useTemplateRef('selectControl')
+    isSelected(option) {
+      return this.selected.indexOf(option.value) > -1
+    },
 
-const labelFor = option => {
-  return props.label instanceof Function
-    ? props.label(option)
-    : option[props.label]
+    handleChange(event) {
+      let selected = map(
+        filter(event.target.options, option => option.selected),
+        option => option.value
+      )
+
+      this.$emit('change', selected)
+    },
+
+    resetSelection() {
+      this.$refs.selectControl.selectedIndex = 0
+    },
+  },
+
+  computed: {
+    defaultAttributes() {
+      return omit(this.$attrs, ['class'])
+    },
+
+    groupedOptions() {
+      return groupBy(this.options, option => option.group || '')
+    },
+  },
 }
-
-const attrsFor = option => {
-  return {
-    ...(option.attrs || {}),
-    ...{ value: option.value },
-  }
-}
-
-const isSelected = option => {
-  return modelValue.value.indexOf(option.value) > -1
-}
-
-const handleChange = event => {
-  let values = Object.values(event.target.options)
-    .filter(option => option.selected)
-    .map(option => option.value)
-
-  let selected = (props.options ?? []).filter(
-    o => values.includes(o.value) || values.includes(o.value.toString())
-  )
-
-  modelValue.value = selected.map(o => o.value)
-  emitter('selected', selected)
-}
-
-const defaultAttributes = computed(() => omit(attrs, ['class']))
-const groupedOptions = computed(() =>
-  groupBy(props.options, option => option.group || '')
-)
 </script>

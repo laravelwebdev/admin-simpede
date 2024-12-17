@@ -2,32 +2,23 @@
 
 namespace Laravel\Nova\Testing\Browser\Pages;
 
-use Illuminate\Database\Eloquent\Model;
-
 class Replicate extends Create
 {
-    /**
-     * The source Resource ID.
-     *
-     * @var \Illuminate\Database\Eloquent\Model|string|int
-     */
-    public mixed $fromResourceId;
+    public $fromResourceId;
 
     /**
      * Create a new page instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $fromResourceId
-     * @param  array<string, mixed>  $queryParams
+     * @param  string  $resourceName
+     * @param  int|string  $fromResourceId
+     * @param  array  $queryParams
      * @return void
      */
-    public function __construct(
-        string $resourceName,
-        mixed $fromResourceId,
-        array $queryParams = []
-    ) {
+    public function __construct($resourceName, $fromResourceId, $queryParams = [])
+    {
         parent::__construct($resourceName, $queryParams);
 
-        $this->fromResourceId = $fromResourceId instanceof Model ? $fromResourceId->getKey() : $fromResourceId;
+        $this->fromResourceId = $fromResourceId;
 
         $this->setNovaPage("/resources/{$this->resourceName}/{$this->fromResourceId}/replicate");
     }

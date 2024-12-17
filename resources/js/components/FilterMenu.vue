@@ -1,14 +1,12 @@
 <template>
   <Dropdown dusk="filter-selector" :should-close-on-blur="false">
     <Button
-      :variant="filtersWithTrashedAreApplied ? 'solid' : 'ghost'"
+      :variant="filtersAreApplied ? 'solid' : 'ghost'"
       dusk="filter-selector-button"
       icon="funnel"
       trailing-icon="chevron-down"
       padding="tight"
-      :label="
-        activeFilterWithTrashedCount > 0 ? activeFilterWithTrashedCount : ''
-      "
+      :label="activeFilterCount > 0 ? activeFilterCount : ''"
       :aria-label="__('Filter Dropdown')"
     />
 
@@ -18,7 +16,7 @@
           <div
             class="divide-y divide-gray-200 dark:divide-gray-800 divide-solid"
           >
-            <div v-if="filtersWithTrashedAreApplied" class="bg-gray-100">
+            <div v-if="filtersAreApplied" class="bg-gray-100">
               <button
                 class="py-2 w-full block text-xs uppercase tracking-wide text-center text-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700 font-bold focus:outline-none focus:text-primary-500"
                 @click="handleClearSelectedFiltersClick"
@@ -47,7 +45,7 @@
 
               <template #filter>
                 <SelectControl
-                  v-model="trashedValue"
+                  v-model:selected="trashedValue"
                   :options="[
                     { value: '', label: '—' },
                     { value: 'with', label: __('With Trashed') },
@@ -55,6 +53,7 @@
                   ]"
                   dusk="trashed-select"
                   size="sm"
+                  @change="trashedValue = $event"
                 />
               </template>
             </FilterContainer>
@@ -65,10 +64,11 @@
 
               <template #filter>
                 <SelectControl
-                  v-model="perPageValue"
+                  v-model:selected="perPageValue"
                   :options="perPageOptionsForFilter"
                   dusk="per-page-select"
                   size="sm"
+                  @change="perPageValue = $event"
                 />
               </template>
             </FilterContainer>
@@ -80,12 +80,11 @@
 </template>
 
 <script>
+import map from 'lodash/map'
 import { Button } from 'laravel-nova-ui'
 
 export default {
-  components: {
-    Button,
-  },
+  components: { Button },
 
   emits: [
     'filter-changed',
@@ -115,7 +114,7 @@ export default {
         const { filterClass, value } = v
 
         if (filterClass) {
-          Nova.debug(`Updating filter state ${filterClass}: ${value}`)
+          Nova.log(`Updating filter state ${filterClass}: ${value}`)
 
           this.$store.commit(`${this.resourceName}/updateFilterState`, {
             filterClass,
@@ -131,23 +130,12 @@ export default {
       Nova.$emit('clear-filter-values')
 
       setTimeout(() => {
-        this.$emit('trashed-changed', '')
         this.$emit('clear-selected-filters')
       }, 500)
     },
   },
 
   computed: {
-    filtersWithTrashedAreApplied() {
-      return this.filtersAreApplied || this.trashed !== ''
-    },
-
-    activeFilterWithTrashedCount() {
-      const trashed = this.trashed !== '' ? 1 : 0
-
-      return this.activeFilterCount + trashed
-    },
-
     trashedValue: {
       set(event) {
         let value = event?.target?.value || event
@@ -174,7 +162,7 @@ export default {
      * Return the values for the per page filter
      */
     perPageOptionsForFilter() {
-      return this.perPageOptions.map(option => {
+      return map(this.perPageOptions, option => {
         return { value: option, label: option }
       })
     },

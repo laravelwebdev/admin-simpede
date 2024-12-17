@@ -4,7 +4,7 @@
     :dusk="`notification-${notification.id}`"
   >
     <div class="shrink-0">
-      <Icon :name="icon" class="inline-block" :class="notification.iconClass" />
+      <Icon :type="icon" :class="notification.iconClass" />
     </div>
 
     <div class="flex-auto space-y-4">
@@ -34,34 +34,57 @@
   </div>
 </template>
 
-<script setup>
-import { Button, Icon } from 'laravel-nova-ui'
-import { computed } from 'vue'
+<script>
+import { Button } from 'laravel-nova-ui'
 
-defineOptions({
+export default {
+  components: {
+    Button,
+  },
+
+  emits: ['delete-notification', 'toggle-mark-as-read', 'toggle-notifications'],
+
   name: 'MessageNotification',
-})
 
-const emitter = defineEmits(['toggle-mark-as-read', 'toggle-notifications'])
+  props: {
+    notification: {
+      type: Object,
+      required: true,
+    },
+  },
 
-const props = defineProps({
-  notification: { type: Object, required: true },
-})
+  methods: {
+    handleClick() {
+      this.$emit('toggle-mark-as-read')
+      this.$emit('toggle-notifications')
+      this.visit()
+    },
 
-const icon = computed(() => props.notification.icon)
-const hasUrl = computed(() => props.notification.actionUrl)
+    handleDeleteClick() {
+      if (
+        confirm(this.__('Are you sure you want to delete this notification?'))
+      ) {
+        this.$emit('delete-notification')
+      }
+    },
 
-function visit() {
-  if (hasUrl.value) {
-    return Nova.visit(props.notification.actionUrl, {
-      openInNewTab: props.notification.openInNewTab || false,
-    })
-  }
-}
+    visit() {
+      if (this.hasUrl) {
+        return Nova.visit(this.notification.actionUrl, {
+          openInNewTab: this.notification.openInNewTab || false,
+        })
+      }
+    },
+  },
 
-function handleClick() {
-  emitter('toggle-mark-as-read')
-  emitter('toggle-notifications')
-  visit()
+  computed: {
+    icon() {
+      return this.notification.icon
+    },
+
+    hasUrl() {
+      return this.notification.actionUrl
+    },
+  },
 }
 </script>

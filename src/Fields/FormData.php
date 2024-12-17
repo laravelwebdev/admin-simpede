@@ -2,36 +2,45 @@
 
 namespace Laravel\Nova\Fields;
 
-use Carbon\CarbonInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
-use Illuminate\Support\Stringable;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Support\FluentDecorator;
 
 /**
  * @template TKey of array-key
  * @template TValue
  *
- * @extends \Laravel\Nova\Support\FluentDecorator<TKey, TValue>
+ * @extends \Illuminate\Support\Fluent<TKey, TValue>
  */
-class FormData extends FluentDecorator
+class FormData extends Fluent
 {
+    /**
+     * The Request instance.
+     *
+     * @var \Laravel\Nova\Http\Requests\NovaRequest
+     */
+    protected $request;
+
     /**
      * Create a new fluent instance.
      *
      * @param  iterable<TKey, TValue>  $attributes
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return void
      */
-    public function __construct($attributes, protected NovaRequest $request)
+    public function __construct($attributes, NovaRequest $request)
     {
         parent::__construct($attributes);
+
+        $this->request = $request;
     }
 
     /**
      * Make fluent payload from request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  array<string, mixed>  $fields
      * @return static
      */
@@ -55,6 +64,7 @@ class FormData extends FluentDecorator
     /**
      * Make fluent payload from request only on specific keys.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  array<int, string>  $onlyAttributes
      * @return static
      */
@@ -69,34 +79,46 @@ class FormData extends FluentDecorator
 
     /**
      * Get a resource attribute from the fluent instance.
+     *
+     * @param  string  $uriKey
+     * @param  mixed  $default
+     * @return mixed
      */
-    public function resource(string $uriKey, mixed $default = null): mixed
+    public function resource($uriKey, $default = null)
     {
         $key = "resource:{$uriKey}";
 
         if (! empty($this->request->viaRelationship)
             && ($uriKey === $this->request->relatedResource || $uriKey === $this->request->viaResource)
         ) {
-            return $this->fluent->get($key, $this->fluent->get($this->request->viaRelationship, $default));
+            return $this->get($key, $this->get($this->request->viaRelationship, $default));
         }
 
-        return $this->fluent->get($key, $default);
+        return $this->get($key, $default);
     }
 
     /**
      * Retrieve input from the request as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
      */
-    public function str(string $key, mixed $default = ''): Stringable
+    public function str($key, $default = null)
     {
         return $this->string($key, $default);
     }
 
     /**
      * Retrieve input from the request as a Stringable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Stringable
      */
-    public function string(string $key, mixed $default = ''): Stringable
+    public function string($key, $default = null)
     {
-        return Str::of($this->fluent->get($key, $default));
+        return Str::of($this->get($key, $default));
     }
 
     /**
@@ -108,7 +130,7 @@ class FormData extends FluentDecorator
      */
     public function json($key, $default = null)
     {
-        $value = $this->fluent->get($key, $default);
+        $value = $this->get($key, $default);
 
         return is_string($value) ? json_decode($value, true) : $value;
     }
@@ -117,36 +139,53 @@ class FormData extends FluentDecorator
      * Retrieve input as a boolean value.
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
+     *
+     * @param  string|null  $key
+     * @param  bool  $default
+     * @return bool
      */
-    public function boolean(string $key, bool $default = false): bool
+    public function boolean($key = null, $default = false)
     {
-        return filter_var($this->fluent->get($key, $default), FILTER_VALIDATE_BOOLEAN);
+        return filter_var($this->get($key, $default), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
      * Retrieve input as an integer value.
+     *
+     * @param  string  $key
+     * @param  int  $default
+     * @return int
      */
-    public function integer(string $key, int $default = 0): int
+    public function integer($key, $default = 0)
     {
-        return intval($this->fluent->get($key, $default));
+        return intval($this->get($key, $default));
     }
 
     /**
      * Retrieve input as a float value.
+     *
+     * @param  string  $key
+     * @param  float  $default
+     * @return float
      */
-    public function float(string $key, float $default = 0.0): float
+    public function float($key, $default = 0.0)
     {
-        return floatval($this->fluent->get($key, $default));
+        return floatval($this->get($key, $default));
     }
 
     /**
      * Retrieve input from the request as a Carbon instance.
      *
+     * @param  string  $key
+     * @param  string|null  $format
+     * @param  string|null  $tz
+     * @return \Illuminate\Support\Carbon|null
+     *
      * @throws \Carbon\Exceptions\InvalidFormatException
      */
-    public function date(string $key, ?string $format = null, ?string $tz = null): ?CarbonInterface
+    public function date($key, $format = null, $tz = null)
     {
-        $value = $this->fluent->get($key);
+        $value = $this->get($key);
 
         if (! filled($value)) {
             return null;
