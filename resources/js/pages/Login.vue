@@ -49,14 +49,20 @@
         </HelpText>
       </div>
 
-      <div class="flex mb-6">
-        <Checkbox
-          @change="() => (form.remember = !form.remember)"
-          :model-value="form.remember"
-          dusk="remember-button"
-          :label="__('Remember me')"
-        />
+      <div class="mb-6">
+        <label class="block mb-2" for="year">{{ __('Year') }}</label>
+        <select
+          v-model="form.year"
+          class="form-control form-input form-control-bordered w-full"
+          id="year"
+          name="year"
+          required
+        >
+        <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+        </select>
+      </div>     
 
+      <div class="flex mb-6">
         <div
           v-if="supportsPasswordReset || forgotPasswordPath !== false"
           class="ml-auto"
@@ -113,6 +119,7 @@ export default {
       form: Nova.form({
         [this.username]: '',
         password: '',
+        year: new Date().getFullYear(),
         remember: false,
       }),
     }
@@ -147,11 +154,11 @@ export default {
 
   computed: {
     usernameLabel() {
-      return this.username === this.email ? 'Email Address' : 'Username'
+      return this.username === 'Username'
     },
 
     usernameInputType() {
-      return this.username === this.email ? 'email' : 'text'
+      return this.username === 'text'
     },
 
     supportsPasswordReset() {
@@ -160,6 +167,10 @@ export default {
 
     forgotPasswordPath() {
       return Nova.config('forgotPasswordPath')
+    },
+    years () {
+      const year = new Date().getFullYear()
+      return Array.from({length: year - 2023}, (value, index) => year - index)
     },
   },
 }

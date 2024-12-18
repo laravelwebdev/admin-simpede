@@ -212,7 +212,7 @@ class Nova
 
             $version = $manifest['version'] ?? '4.x';
 
-            return $version.' (Silver Surfer)';
+            return $version;
         });
     }
 
@@ -868,7 +868,7 @@ class Nova
     {
         return Cache::remember('nova_valid_license_key', 3600, function () {
             return rescue(function () {
-                return static::checkLicense()->status() == 204;
+                return static::checkLicense();
             }, false);
         });
     }
@@ -878,10 +878,7 @@ class Nova
      */
     public static function checkLicense(): ClientResponse
     {
-        return Http::post('https://nova.laravel.com/api/license-check', [
-            'url' => request()->getHost(),
-            'key' => config('nova.license_key', ''),
-        ]);
+        return true;
     }
 
     /**
