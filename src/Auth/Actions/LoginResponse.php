@@ -4,6 +4,7 @@ namespace Laravel\Nova\Auth\Actions;
 
 use App\Models\Pengelola;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Contracts\LoginResponse as Responsable;
 use Laravel\Nova\Nova;
 
