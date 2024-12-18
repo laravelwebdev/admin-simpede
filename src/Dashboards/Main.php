@@ -12,8 +12,9 @@ class Main extends Dashboard
     /**
      * Get the displayable name of the dashboard.
      *
-     * @return string
+     * @return \Stringable|string
      */
+    #[\Override]
     public function name()
     {
         return class_basename($this);
@@ -24,6 +25,7 @@ class Main extends Dashboard
      *
      * @return string
      */
+    #[\Override]
     public function uriKey()
     {
         return Str::snake(class_basename($this));

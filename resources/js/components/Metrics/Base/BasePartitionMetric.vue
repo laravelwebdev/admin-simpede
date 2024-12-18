@@ -44,10 +44,9 @@
 
 <script>
 import debounce from 'lodash/debounce'
-import map from 'lodash/map'
 import sumBy from 'lodash/sumBy'
-import Chartist from 'chartist'
-import 'chartist/dist/chartist.min.css'
+import { PieChart } from 'chartist'
+import 'chartist/dist/index.css'
 
 const colorForIndex = index =>
   [
@@ -97,25 +96,20 @@ export default {
   },
 
   mounted() {
-    this.chartist = new Chartist.Pie(
-      this.$refs.chart,
-      this.formattedChartData,
-      {
-        donut: true,
-        donutWidth: 10,
-        donutSolid: true,
-        startAngle: 270,
-        showLabel: false,
-      }
-    )
-
-    this.chartist.on('draw', context => {
-      if (context.type === 'slice') {
-        context.element.attr({
-          style: `fill: ${context.meta.color} !important`,
-        })
-      }
+    this.chartist = new PieChart(this.$refs.chart, this.formattedChartData, {
+      donut: true,
+      donutWidth: 10,
+      startAngle: 270,
+      showLabel: false,
     })
+
+    // this.chartist.on('draw', context => {
+    //   if (context.type === 'slice') {
+    //     context.element.attr({
+    //       style: `fill: ${context.meta.color} !important`,
+    //     })
+    //   }
+    // })
 
     this.resizeObserver.observe(this.$refs.chart)
   },
@@ -144,7 +138,7 @@ export default {
     },
 
     formattedItems() {
-      return map(this.chartData, (item, index) => {
+      return this.chartData.map((item, index) => {
         return {
           label: item.label,
           value: Nova.formatNumber(item.value),
@@ -155,11 +149,11 @@ export default {
     },
 
     formattedLabels() {
-      return map(this.chartData, item => item.label)
+      return this.chartData.map(item => item.label)
     },
 
     formattedData() {
-      return map(this.chartData, (item, index) => {
+      return this.chartData.map((item, index) => {
         return {
           value: item.value,
           meta: { color: this.getItemColor(item, index) },

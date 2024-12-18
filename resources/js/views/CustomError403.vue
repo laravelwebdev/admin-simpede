@@ -15,6 +15,8 @@
 import ErrorLayout from '@/layouts/ErrorLayout'
 
 export default {
-  components: { ErrorLayout },
+  components: {
+    ErrorLayout,
+  },
 }
 </script>

@@ -3,11 +3,12 @@
 namespace Laravel\Nova\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'nova:translate')]
-class TranslateCommand extends Command
+class TranslateCommand extends Command implements PromptsForMissingInput
 {
     /**
      * The name and signature of the console command.
@@ -30,14 +31,26 @@ class TranslateCommand extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(Filesystem $files)
     {
         $language = $this->argument('language');
 
         $jsonLanguageFile = lang_path("vendor/nova/{$language}.json");
 
-        if (! File::exists($jsonLanguageFile) || $this->option('force')) {
-            File::copy(__DIR__.'/../../resources/lang/en.json', $jsonLanguageFile);
+        if (! $files->exists($jsonLanguageFile) || $this->option('force')) {
+            $files->copy(__DIR__.'/../../resources/lang/en.json', $jsonLanguageFile);
         }
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array<string, string>
+     */
+    protected function promptForMissingArgumentsUsing(): array
+    {
+        return [
+            'language' => "What's the language name?",
+        ];
     }
 }

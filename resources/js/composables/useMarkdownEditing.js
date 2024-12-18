@@ -1,7 +1,5 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import CodeMirror from 'codemirror'
-import each from 'lodash/each'
-import isNil from 'lodash/isNil'
 import debounce from 'lodash/debounce'
 
 import { useLocalization } from '@/composables/useLocalization'
@@ -84,7 +82,7 @@ const defineMarkdownCommands = (
     },
 
     uploadAttachment(file) {
-      if (!isNil(props.uploader)) {
+      if (props.uploader != null) {
         filesUploadingCount.value = filesUploadingCount.value + 1
 
         const placeholder = `![Uploading ${file.name}…]()`
@@ -166,7 +164,7 @@ const defineMarkdownKeyMaps = (editor, actions) => {
     Esc: 'exitFullScreen',
   }
 
-  each(keyMaps, (action, map) => {
+  Object.entries(keyMaps).forEach(([map, action]) => {
     const realMap = map.replace(
       'Cmd-',
       CodeMirror.keyMap['default'] == CodeMirror.keyMap.macDefault
@@ -349,7 +347,7 @@ export function useMarkdownEditing(emit, props) {
     files.value = []
   }
 
-  if (!isNil(props.uploader)) {
+  if (props.uploader != null) {
     watch(
       [filesUploadedCount, filesUploadingCount],
       ([currentFilesUploaded, currentFilesCount]) => {

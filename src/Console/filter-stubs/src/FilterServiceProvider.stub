@@ -10,23 +10,18 @@ class FilterServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         Nova::serving(function (ServingNova $event) {
-            Nova::script('{{ component }}', __DIR__.'/../dist/js/filter.js');
-            Nova::style('{{ component }}', __DIR__.'/../dist/css/filter.css');
+            Nova::mix('{{ component }}', __DIR__.'/../dist/mix-manifest.json');
         });
     }
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }

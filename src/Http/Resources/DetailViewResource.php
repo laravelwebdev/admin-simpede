@@ -10,6 +10,7 @@ use Laravel\Nova\Fields\HasOne;
 use Laravel\Nova\Fields\MorphOne;
 use Laravel\Nova\Fields\MorphTo;
 use Laravel\Nova\Http\Requests\ResourceDetailRequest;
+use Laravel\Nova\Resource as NovaResource;
 
 class DetailViewResource extends Resource
 {
@@ -56,13 +57,10 @@ class DetailViewResource extends Resource
     /**
      * Get authorized resource for the request.
      *
-     * @param  \Laravel\Nova\Http\Requests\ResourceDetailRequest  $request
-     * @return \Laravel\Nova\Resource
-     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function authorizedResourceForRequest(ResourceDetailRequest $request)
+    public function authorizedResourceForRequest(ResourceDetailRequest $request): NovaResource
     {
         return tap($request->newResourceWith(
             tap($request->findModelQuery(), function ($query) use ($request) {

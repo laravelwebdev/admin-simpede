@@ -8,22 +8,16 @@ class ConfirmUploadRemovalModalComponent extends ModalComponent
 {
     /**
      * Modal confirmation button.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
      */
-    public function confirm(Browser $browser)
+    public function confirm(Browser $browser): void
     {
         $browser->click('@confirm-upload-delete-button');
     }
 
     /**
      * Modal cancelation button.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
      */
-    public function cancel(Browser $browser)
+    public function cancel(Browser $browser): void
     {
         $browser->click('@cancel-upload-delete-button');
     }

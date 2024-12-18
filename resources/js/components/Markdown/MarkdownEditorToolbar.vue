@@ -15,7 +15,7 @@
 <script setup>
 import { computed } from 'vue'
 
-const emit = defineEmits(['action'])
+const emitter = defineEmits(['action'])
 
 const tools = computed(() => [
   {
@@ -45,5 +45,7 @@ const tools = computed(() => [
   },
 ])
 
-const handleAction = action => emit('action', action)
+function handleAction(action) {
+  emitter('action', action)
+}
 </script>

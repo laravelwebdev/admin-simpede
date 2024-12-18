@@ -12,15 +12,12 @@ trait ResolvesReverseRelation
      *
      * @var string|null
      */
-    public $reverseRelation;
+    public $reverseRelation = null;
 
     /**
      * Determine if the field is the reverse relation of a showed index view.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return bool
      */
-    public function isReverseRelation(NovaRequest $request)
+    public function isReverseRelation(NovaRequest $request): bool
     {
         if (! $request->viaResource || ($this->resourceName && $this->resourceName !== $request->viaResource)) {
             return false;
@@ -33,18 +30,15 @@ trait ResolvesReverseRelation
 
     /**
      * Get reverse relation field name.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return string
      */
-    public function getReverseRelation(NovaRequest $request)
+    public function getReverseRelation(NovaRequest $request): string
     {
         if (is_null($this->reverseRelation)) {
             $viaModel = forward_static_call(
                 [$resourceClass = $request->viaResource(), 'newModel']
             );
 
-            $viaResource = new $resourceClass($viaModel);
+            $viaResource = $resourceClass::make($viaModel);
 
             $resource = $request->newResource();
 
@@ -85,11 +79,8 @@ trait ResolvesReverseRelation
 
     /**
      * Get foreign key name for relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
-     * @return string
      */
-    protected function getRelationForeignKeyName(Relation $relation)
+    protected function getRelationForeignKeyName(Relation $relation): string
     {
         return method_exists($relation, 'getForeignKeyName')
             ? $relation->getForeignKeyName()

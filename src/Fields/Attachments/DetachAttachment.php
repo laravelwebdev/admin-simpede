@@ -15,11 +15,8 @@ class DetachAttachment
 
     /**
      * Delete an attachment from the field.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return void
      */
-    public function __invoke(NovaRequest $request)
+    public function __invoke(NovaRequest $request): void
     {
         static::$model::where('url', $request->attachmentUrl)
                     ->get()

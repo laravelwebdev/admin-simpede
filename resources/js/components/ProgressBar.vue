@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   title: { type: String, required: true },
   color: { type: String, required: true },
   value: { type: [String, Number], required: true },

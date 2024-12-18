@@ -4,21 +4,13 @@ namespace Laravel\Nova\Http\Middleware;
 
 use Closure;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Auth\Middleware\Authenticate as BaseAuthenticationMiddleware;
+use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Laravel\Nova\Exceptions\AuthenticationException as NovaAuthenticationException;
 
-class Authenticate extends BaseAuthenticationMiddleware
+class Authenticate extends Middleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request):mixed  $next
-     * @param  string  ...$guards
-     * @return mixed
-     *
-     * @throws \Illuminate\Auth\AuthenticationException
-     */
+    /** {@inheritDoc} */
+    #[\Override]
     public function handle($request, Closure $next, ...$guards)
     {
         try {

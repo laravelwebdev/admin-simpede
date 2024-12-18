@@ -16,14 +16,15 @@
 
       <ModalFooter>
         <div class="ml-auto">
-          <LinkButton
-            type="button"
-            dusk="cancel-restore-button"
+          <Button
+            variant="link"
+            state="mellow"
             @click.prevent="handleClose"
             class="mr-3"
+            dusk="cancel-restore-button"
           >
             {{ __('Cancel') }}
-          </LinkButton>
+          </Button>
 
           <Button
             type="submit"

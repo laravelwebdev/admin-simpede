@@ -2,38 +2,28 @@
 
 namespace Laravel\Nova\Query\Search;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Query\Expression;
+
 class PrimaryKey extends Column
 {
     /**
-     * Max primary key size.
-     *
-     * @var int
-     */
-    protected $maxPrimaryKeySize;
-
-    /**
      * Construct a new search.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $column
-     * @param  int  $maxPrimaryKeySize
      * @return void
      */
-    public function __construct($column, $maxPrimaryKeySize = PHP_INT_MAX)
-    {
-        $this->column = $column;
-        $this->maxPrimaryKeySize = $maxPrimaryKeySize;
+    public function __construct(
+        Expression|string $column,
+        public int $maxPrimaryKeySize = PHP_INT_MAX
+    ) {
+        parent::__construct($column);
     }
 
     /**
      * Apply the search.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $query
-     * @param  string|int  $search
-     * @param  string  $connectionType
-     * @param  string  $whereOperator
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function __invoke($query, $search, string $connectionType, string $whereOperator = 'orWhere')
+    #[\Override]
+    public function __invoke(Builder $query, string|int $search, string $connectionType, string $whereOperator = 'orWhere'): Builder
     {
         $model = $query->getModel();
 

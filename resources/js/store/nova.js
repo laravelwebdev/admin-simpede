@@ -1,21 +1,18 @@
-import { usePage } from '@inertiajs/inertia-vue3'
-import { Inertia } from '@inertiajs/inertia'
-import forEach from 'lodash/forEach'
+import { router, usePage } from '@inertiajs/vue3'
 import filled from '@/util/filled'
 
 export default {
   state: () => ({
     baseUri: '/nova',
     currentUser: null,
+    currentUserPasswordConfirmed: null,
     mainMenu: [],
     userMenu: [],
     breadcrumbs: [],
     resources: [],
-    version: '4.x',
+    version: '5.x',
     mainMenuShown: false,
-    canLeaveForm: true,
     canLeaveModal: true,
-    pushStateWasTriggered: false,
     validLicense: true,
     queryStringParams: {},
     compiledQueryStringParams: '',
@@ -23,43 +20,24 @@ export default {
 
   getters: {
     currentUser: s => s.currentUser,
+    currentUserPasswordConfirmed: s => s.currentUserPasswordConfirmed ?? false,
     currentVersion: s => s.version,
     mainMenu: s => s.mainMenu,
     userMenu: s => s.userMenu,
     breadcrumbs: s => s.breadcrumbs,
     mainMenuShown: s => s.mainMenuShown,
-    canLeaveForm: s => s.canLeaveForm,
-    canLeaveFormToPreviousPage: s => s.canLeaveForm && !s.pushStateWasTriggered,
     canLeaveModal: s => s.canLeaveModal,
     validLicense: s => s.validLicense,
     queryStringParams: s => s.queryStringParams,
   },
 
   mutations: {
-    allowLeavingForm(state) {
-      state.canLeaveForm = true
-    },
-
-    preventLeavingForm(state) {
-      state.canLeaveForm = false
-    },
-
     allowLeavingModal(state) {
       state.canLeaveModal = true
     },
 
     preventLeavingModal(state) {
       state.canLeaveModal = false
-    },
-
-    triggerPushState(state) {
-      Inertia.pushState(Inertia.page)
-      Inertia.ignoreHistoryState = true
-      state.pushStateWasTriggered = true
-    },
-
-    resetPushState(state) {
-      state.pushStateWasTriggered = false
     },
 
     toggleMainMenu(state) {
@@ -122,13 +100,35 @@ export default {
       Nova.visit('/')
     },
 
+    async confirmedPasswordStatus({ state, dispatch }) {
+      const {
+        data: { confirmed },
+      } = await Nova.request().get(
+        Nova.url('/user-security/confirmed-password-status')
+      )
+
+      dispatch(confirmed ? 'passwordConfirmed' : 'passwordUnconfirmed')
+    },
+
+    async passwordConfirmed({ state, dispatch }) {
+      state.currentUserPasswordConfirmed = true
+
+      setTimeout(() => dispatch('passwordUnconfirmed'), 500000)
+    },
+
+    async passwordUnconfirmed({ state }) {
+      state.currentUserPasswordConfirmed = false
+    },
+
     async assignPropsFromInertia({ state, dispatch }) {
-      let config = usePage().props.value.novaConfig || Nova.appConfig
+      const props = usePage().props
+
+      let config = props.novaConfig || Nova.appConfig
       let { resources, base, version, mainMenu, userMenu } = config
 
-      let user = usePage().props.value.currentUser
-      let validLicense = usePage().props.value.validLicense
-      let breadcrumbs = usePage().props.value.breadcrumbs
+      let user = props.currentUser
+      let validLicense = props.validLicense
+      let breadcrumbs = props.breadcrumbs
 
       Nova.appConfig = config
       state.breadcrumbs = breadcrumbs || []
@@ -156,9 +156,10 @@ export default {
 
     async updateQueryString({ state }, value) {
       let searchParams = new URLSearchParams(window.location.search)
-      let page = Inertia.page
+      let page = await router.decryptHistory()
+      let nextUrl = null
 
-      forEach(value, (v, i) => {
+      Object.entries(value).forEach(([i, v]) => {
         if (!filled(v)) {
           searchParams.delete(i)
         } else {
@@ -168,13 +169,7 @@ export default {
 
       if (state.compiledQueryStringParams !== searchParams.toString()) {
         if (page.url !== `${window.location.pathname}?${searchParams}`) {
-          page.url = `${window.location.pathname}?${searchParams}`
-
-          window.history.pushState(
-            page,
-            '',
-            `${window.location.pathname}?${searchParams}`
-          )
+          nextUrl = `${window.location.pathname}?${searchParams}`
         }
 
         state.compiledQueryStringParams = searchParams.toString()
@@ -184,7 +179,7 @@ export default {
       state.queryStringParams = Object.fromEntries(searchParams.entries())
 
       return new Promise((resolve, reject) => {
-        resolve(searchParams)
+        resolve({ searchParams, nextUrl, page })
       })
     },
   },

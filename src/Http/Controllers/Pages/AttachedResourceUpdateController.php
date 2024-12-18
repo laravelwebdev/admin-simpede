@@ -4,6 +4,7 @@ namespace Laravel\Nova\Http\Controllers\Pages;
 
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
+use Inertia\Response;
 use Laravel\Nova\Http\Requests\ResourceUpdateOrUpdateAttachedRequest;
 use Laravel\Nova\Menu\Breadcrumb;
 use Laravel\Nova\Menu\Breadcrumbs;
@@ -13,11 +14,8 @@ class AttachedResourceUpdateController extends Controller
 {
     /**
      * Show Resource Update Attached page using Inertia.
-     *
-     * @param  \Laravel\Nova\Http\Requests\ResourceUpdateOrUpdateAttachedRequest  $request
-     * @return \Inertia\Response
      */
-    public function __invoke(ResourceUpdateOrUpdateAttachedRequest $request)
+    public function __invoke(ResourceUpdateOrUpdateAttachedRequest $request): Response
     {
         $resourceClass = $request->resource();
 
@@ -47,11 +45,8 @@ class AttachedResourceUpdateController extends Controller
 
     /**
      * Get breadcrumb menu for the page.
-     *
-     * @param  \Laravel\Nova\Http\Requests\ResourceUpdateOrUpdateAttachedRequest  $request
-     * @return \Laravel\Nova\Menu\Breadcrumbs
      */
-    protected function breadcrumbs(ResourceUpdateOrUpdateAttachedRequest $request)
+    protected function breadcrumbs(ResourceUpdateOrUpdateAttachedRequest $request): Breadcrumbs
     {
         $resourceClass = $request->resource();
         $resource = $request->findResourceOrFail();

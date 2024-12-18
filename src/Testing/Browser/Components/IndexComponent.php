@@ -2,26 +2,28 @@
 
 namespace Laravel\Nova\Testing\Browser\Components;
 
+use Closure;
 use Illuminate\Support\Str;
 use Laravel\Dusk\Browser;
 
 class IndexComponent extends Component
 {
-    public $resourceName;
-
+    /**
+     * The via Relationship value.
+     *
+     * @var string
+     */
     public $viaRelationship;
 
     /**
      * Create a new component instance.
      *
-     * @param  string  $resourceName
-     * @param  string|null  $viaRelationship
      * @return void
      */
-    public function __construct($resourceName, $viaRelationship = null)
-    {
-        $this->resourceName = $resourceName;
-
+    public function __construct(
+        public string $resourceName,
+        ?string $viaRelationship = null
+    ) {
         if (! is_null($viaRelationship) && $resourceName !== $viaRelationship) {
             $this->viaRelationship = $viaRelationship;
         }
@@ -29,10 +31,8 @@ class IndexComponent extends Component
 
     /**
      * Get the root selector for the component.
-     *
-     * @return string
      */
-    public function selector()
+    public function selector(): string
     {
         $selector = '[dusk="'.$this->resourceName.'-index-component"]';
 
@@ -44,12 +44,9 @@ class IndexComponent extends Component
     /**
      * Wait for table to be ready.
      *
-     * @param  int|null  $seconds
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function waitForTable(Browser $browser, $seconds = null)
+    public function waitForTable(Browser $browser, ?int $seconds = null): void
     {
         $browser->waitUntilMissing('@loading-view')
             ->whenAvailable('@resource-table', function ($browser) use ($seconds) {
@@ -60,12 +57,9 @@ class IndexComponent extends Component
     /**
      * Wait for empty dialog to be ready.
      *
-     * @param  int|null  $seconds
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function waitForEmptyDialog(Browser $browser, $seconds = null)
+    public function waitForEmptyDialog(Browser $browser, ?int $seconds = null): void
     {
         $browser->waitUntilMissing('@loading-view')
             ->waitFor('div[dusk="'.$this->resourceName.'-empty-dialog"]', $seconds);
@@ -73,113 +67,90 @@ class IndexComponent extends Component
 
     /**
      * Search for the given string.
-     *
-     * @param  string  $search
-     * @return void
      */
-    public function searchFor(Browser $browser, $search)
+    public function searchFor(Browser $browser, string $search): void
     {
         $browser->type('@search-input', $search)->pause(1000);
     }
 
     /**
      * Clear the search field.
-     *
-     * @return void
      */
-    public function clearSearch(Browser $browser)
+    public function clearSearch(Browser $browser): void
     {
         $browser->clear('@search-input')->type('@search-input', ' ')->pause(1000);
     }
 
     /**
      * Click the sortable icon for the given attribute.
-     *
-     * @param  string  $attribute
-     * @return void
      */
-    public function sortBy(Browser $browser, $attribute)
+    public function sortBy(Browser $browser, string $attribute): void
     {
         $browser->click("@sort-{$attribute}")->waitForTable();
     }
 
     /**
      * Paginate to the next page of resources.
-     *
-     * @return void
      */
-    public function nextPage(Browser $browser)
+    public function nextPage(Browser $browser): void
     {
         $browser->click('@next')->waitForTable();
     }
 
     /**
      * Paginate to the previous page of resources.
-     *
-     * @return void
      */
-    public function previousPage(Browser $browser)
+    public function previousPage(Browser $browser): void
     {
         $browser->click('@previous')->waitForTable();
     }
 
     /**
      * Select all the the resources on current page.
-     *
-     * @return void
      */
-    public function selectAllOnCurrentPage(Browser $browser)
+    public function selectAllOnCurrentPage(Browser $browser): void
     {
-        $browser->within(new SelectAllDropdownComponent(), function (Browser $browser) {
+        $browser->within(new SelectAllDropdownComponent, function (Browser $browser) {
             $browser->selectAllOnCurrentPage();
         });
     }
 
     /**
      * Un-select all the the resources on current page.
-     *
-     * @return void
      */
-    public function unselectAllOnCurrentPage(Browser $browser)
+    public function unselectAllOnCurrentPage(Browser $browser): void
     {
-        $browser->within(new SelectAllDropdownComponent(), function ($browser) {
+        $browser->within(new SelectAllDropdownComponent, function ($browser) {
             $browser->unselectAllOnCurrentPage();
         });
     }
 
     /**
      * Select all the matching resources.
-     *
-     * @return void
      */
-    public function selectAllMatching(Browser $browser)
+    public function selectAllMatching(Browser $browser): void
     {
-        $browser->within(new SelectAllDropdownComponent(), function ($browser) {
+        $browser->within(new SelectAllDropdownComponent, function ($browser) {
             $browser->selectAllMatching();
         });
     }
 
     /**
      * Un-select all the matching resources.
-     *
-     * @return void
      */
-    public function unselectAllMatching(Browser $browser)
+    public function unselectAllMatching(Browser $browser): void
     {
-        $browser->within(new SelectAllDropdownComponent(), function ($browser) {
+        $browser->within(new SelectAllDropdownComponent, function ($browser) {
             $browser->unselectAllMatching();
         });
     }
 
     /**
      * Assert on the matching total matching count text.
-     *
-     * @param  int  $count
-     * @return void
      */
-    public function assertSelectAllMatchingCount(Browser $browser, $count)
+    public function assertSelectAllMatchingCount(Browser $browser, int $count): void
     {
-        $browser->within(new SelectAllDropdownComponent(), function ($browser) use ($count) {
+        $browser->within(new SelectAllDropdownComponent, function ($browser) use ($count) {
             $browser->assertSelectAllMatchingCount($count);
         });
     }
@@ -187,11 +158,9 @@ class IndexComponent extends Component
     /**
      * Set the given filter and filter value for the index.
      *
-     * @param  callable|null  $fieldCallback
-     * @param  callable|bool|null  $postCallback
-     * @return void
+     * @param  \Closure|bool|null  $postCallback
      */
-    public function runFilter(Browser $browser, $fieldCallback = null, $postCallback = null)
+    public function runFilter(Browser $browser, ?Closure $fieldCallback = null, $postCallback = null): void
     {
         $browser->openFilterSelector();
 
@@ -210,10 +179,8 @@ class IndexComponent extends Component
 
     /**
      * Reset current filter value for the index.
-     *
-     * @return void
      */
-    public function resetFilter(Browser $browser)
+    public function resetFilter(Browser $browser): void
     {
         $this->runFilter($browser, function ($browser) {
             $browser->press(Str::upper(__('Reset Filters')));
@@ -222,10 +189,8 @@ class IndexComponent extends Component
 
     /**
      * Assert current filter count for the index.
-     *
-     * @return void
      */
-    public function assertFilterCount(Browser $browser, int $count)
+    public function assertFilterCount(Browser $browser, int $count): void
     {
         $browser->within('@filter-selector-button', function ($browser) use ($count) {
             if ($count <= 0) {
@@ -238,10 +203,8 @@ class IndexComponent extends Component
 
     /**
      * Set the per page value for the index.
-     *
-     * @return void
      */
-    public function setPerPage(Browser $browser, $value)
+    public function setPerPage(Browser $browser, int $value): void
     {
         $this->runFilter($browser, function ($browser) use ($value) {
             $browser->whenAvailable('select[dusk="per-page-select"]', function ($browser) use ($value) {
@@ -252,15 +215,11 @@ class IndexComponent extends Component
 
     /**
      * Set the given filter and filter value for the index.
-     *
-     * @param  string  $name
-     * @param  string  $value
-     * @return void
      */
-    public function selectFilter(Browser $browser, $name, $value)
+    public function selectFilter(Browser $browser, string $name, mixed $value): void
     {
         $this->runFilter($browser, function ($browser) use ($name, $value) {
-            $browser->whenAvailable('select[dusk="'.$name.'-select-filter"]', function ($browser) use ($value) {
+            $browser->whenAvailable('select[dusk="'.Str::slug($name).'-select-filter"]', function ($browser) use ($value) {
                 $browser->select('', $value)->pause(1000);
             });
         });
@@ -268,10 +227,8 @@ class IndexComponent extends Component
 
     /**
      * Indicate that trashed records should not be displayed.
-     *
-     * @return void
      */
-    public function withoutTrashed(Browser $browser)
+    public function withoutTrashed(Browser $browser): void
     {
         $this->runFilter($browser, function ($browser) {
             $browser->whenAvailable('[dusk="filter-soft-deletes"]', function ($browser) {
@@ -282,10 +239,8 @@ class IndexComponent extends Component
 
     /**
      * Indicate that only trashed records should be displayed.
-     *
-     * @return void
      */
-    public function onlyTrashed(Browser $browser)
+    public function onlyTrashed(Browser $browser): void
     {
         $this->runFilter($browser, function ($browser) {
             $browser->whenAvailable('[dusk="filter-soft-deletes"]', function ($browser) {
@@ -296,10 +251,8 @@ class IndexComponent extends Component
 
     /**
      * Indicate that trashed records should be displayed.
-     *
-     * @return void
      */
-    public function withTrashed(Browser $browser)
+    public function withTrashed(Browser $browser): void
     {
         $this->runFilter($browser, function ($browser) {
             $browser->whenAvailable('[dusk="filter-soft-deletes"]', function ($browser) {
@@ -311,13 +264,11 @@ class IndexComponent extends Component
     /**
      * Open the action selector.
      *
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function openActionSelector(Browser $browser)
+    public function openActionSelector(Browser $browser): void
     {
-        $browser->whenAvailable('@action-select', function ($browser) {
+        $browser->whenAvailable('@nova-index-action-select', function ($browser) {
             $browser->click('')->pause(100);
         });
     }
@@ -339,11 +290,9 @@ class IndexComponent extends Component
     /**
      * Open the filter selector.
      *
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function openFilterSelector(Browser $browser)
+    public function openFilterSelector(Browser $browser): void
     {
         $browser->whenAvailable('@filter-selector', function ($browser) {
             $browser->click('')->pause(100);
@@ -353,12 +302,9 @@ class IndexComponent extends Component
     /**
      * Open the action selector.
      *
-     * @param  int|string  $id
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function openControlSelectorById(Browser $browser, $id)
+    public function openControlSelectorById(Browser $browser, string|int $id): void
     {
         $browser
             ->whenAvailable("@{$id}-control-selector", function ($browser) {
@@ -391,21 +337,17 @@ class IndexComponent extends Component
     /**
      * Select the action with the given URI key.
      *
-     * @param  string  $uriKey
-     * @param  callable  $fieldCallback
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function selectAction(Browser $browser, $uriKey, $fieldCallback)
+    public function selectAction(Browser $browser, string $uriKey, callable $fieldCallback): void
     {
-        $browser->whenAvailable('select[dusk="action-select"]', function ($browser) use ($uriKey) {
+        $browser->whenAvailable('@nova-index-action-select', function ($browser) use ($uriKey) {
             $browser->select('', $uriKey)
                 ->pause(100)
                 ->assertSelected('', '');
         });
 
-        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent(), function ($browser) use ($fieldCallback) {
+        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) use ($fieldCallback) {
             $fieldCallback($browser);
         });
     }
@@ -427,7 +369,7 @@ class IndexComponent extends Component
             $browser->click("button[data-action-id='{$uriKey}']");
         });
 
-        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent(), function ($browser) use ($fieldCallback) {
+        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) use ($fieldCallback) {
             $fieldCallback($browser);
         });
     }
@@ -435,13 +377,9 @@ class IndexComponent extends Component
     /**
      * Run the action with the given URI key.
      *
-     * @param  string  $uriKey
-     * @param  callable|null  $fieldCallback
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function runAction(Browser $browser, $uriKey, $fieldCallback = null)
+    public function runAction(Browser $browser, string $uriKey, ?callable $fieldCallback = null): void
     {
         $this->selectAction($browser, $uriKey, function ($browser) use ($fieldCallback) {
             if ($fieldCallback) {
@@ -476,33 +414,23 @@ class IndexComponent extends Component
 
     /**
      * Select the action with the given URI key.
-     *
-     * @param  int|string  $id
-     * @param  string  $uriKey
-     * @param  callable  $fieldCallback
-     * @return void
      */
-    public function selectInlineAction(Browser $browser, $id, $uriKey, $fieldCallback)
+    public function selectInlineAction(Browser $browser, string|int $id, string $uriKey, callable $fieldCallback): void
     {
         $browser->openControlSelectorById($id)
             ->elseWhereWhenAvailable('div[data-menu-open="true"]', function ($browser) use ($uriKey) {
                 $browser->click("button[data-action-id='{$uriKey}']");
             })->pause(500);
 
-        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent(), function ($browser) use ($fieldCallback) {
+        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) use ($fieldCallback) {
             $fieldCallback($browser);
         });
     }
 
     /**
      * Run the action with the given URI key.
-     *
-     * @param  int|string  $id
-     * @param  string  $uriKey
-     * @param  callable|null  $fieldCallback
-     * @return void
      */
-    public function runInlineAction(Browser $browser, $id, $uriKey, $fieldCallback = null)
+    public function runInlineAction(Browser $browser, string|int $id, string $uriKey, ?callable $fieldCallback = null): void
     {
         $this->selectInlineAction($browser, $id, $uriKey, function ($browser) use ($fieldCallback) {
             if ($fieldCallback) {
@@ -533,11 +461,8 @@ class IndexComponent extends Component
 
     /**
      * Replicate the given resource table row index.
-     *
-     * @param  int|string  $id
-     * @return void
      */
-    public function replicateResourceById(Browser $browser, $id)
+    public function replicateResourceById(Browser $browser, string|int $id): void
     {
         $browser->openControlSelectorById($id)
             ->elsewhereWhenAvailable("@{$id}-replicate-button", function ($browser) {
@@ -547,11 +472,8 @@ class IndexComponent extends Component
 
     /**
      * Preview the given resource table row index.
-     *
-     * @param  int|string  $id
-     * @return void
      */
-    public function previewResourceById(Browser $browser, $id)
+    public function previewResourceById(Browser $browser, string|int $id): void
     {
         $browser->openControlSelectorById($id)
             ->elsewhereWhenAvailable("@{$id}-preview-button", function ($browser) {
@@ -561,28 +483,22 @@ class IndexComponent extends Component
 
     /**
      * Delete the user at the given resource table row index.
-     *
-     * @param  int|string  $id
-     * @return void
      */
-    public function deleteResourceById(Browser $browser, $id)
+    public function deleteResourceById(Browser $browser, string|int $id): void
     {
         $browser->click("@{$id}-delete-button")
-            ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent(), function ($browser) {
+            ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, function ($browser) {
                 $browser->confirm();
             })->pause(500);
     }
 
     /**
      * Restore the user at the given resource table row index.
-     *
-     * @param  int|string  $id
-     * @return void
      */
-    public function restoreResourceById(Browser $browser, $id)
+    public function restoreResourceById(Browser $browser, string|int $id): void
     {
         $browser->click("@{$id}-restore-button")
-            ->elsewhereWhenAvailable(new Modals\RestoreResourceModalComponent(), function ($browser) {
+            ->elsewhereWhenAvailable(new Modals\RestoreResourceModalComponent, function ($browser) {
                 $browser->confirm();
             })->pause(500);
     }
@@ -611,16 +527,14 @@ class IndexComponent extends Component
 
     /**
      * Delete the resources selected via checkboxes.
-     *
-     * @return void
      */
-    public function deleteSelected(Browser $browser)
+    public function deleteSelected(Browser $browser): void
     {
         $browser->click('@delete-menu')
             ->pause(300)
             ->elsewhere('', function ($browser) {
                 $browser->click('[dusk="delete-selected-button"]')
-                    ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent(), function ($browser) {
+                    ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, function ($browser) {
                         $browser->confirm();
                     });
             })->pause(1000);
@@ -628,16 +542,14 @@ class IndexComponent extends Component
 
     /**
      * Restore the resources selected via checkboxes.
-     *
-     * @return void
      */
-    public function restoreSelected(Browser $browser)
+    public function restoreSelected(Browser $browser): void
     {
         $browser->click('@delete-menu')
             ->pause(300)
             ->elsewhere('', function ($browser) {
                 $browser->click('[dusk="restore-selected-button"]')
-                    ->elsewhereWhenAvailable(new Modals\RestoreResourceModalComponent(), function ($browser) {
+                    ->elsewhereWhenAvailable(new Modals\RestoreResourceModalComponent, function ($browser) {
                         $browser->confirm();
                     });
             })->pause(1000);
@@ -645,16 +557,14 @@ class IndexComponent extends Component
 
     /**
      * Restore the resources selected via checkboxes.
-     *
-     * @return void
      */
-    public function forceDeleteSelected(Browser $browser)
+    public function forceDeleteSelected(Browser $browser): void
     {
         $browser->click('@delete-menu')
             ->pause(300)
             ->elsewhere('', function ($browser) {
                 $browser->click('[dusk="force-delete-selected-button"]')
-                    ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent(), function ($browser) {
+                    ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, function ($browser) {
                         $browser->confirm();
                     });
             })->pause(1000);
@@ -663,11 +573,9 @@ class IndexComponent extends Component
     /**
      * Assert that the browser page contains the component.
      *
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function assert(Browser $browser)
+    public function assert(Browser $browser): void
     {
         $browser->pause(500);
 
@@ -680,12 +588,8 @@ class IndexComponent extends Component
 
     /**
      * Assert that the given resource is visible.
-     *
-     * @param  int|string  $id
-     * @param  int|string|null  $pivotId
-     * @return void
      */
-    public function assertSeeResource(Browser $browser, $id, $pivotId = null)
+    public function assertSeeResource(Browser $browser, string|int $id, string|int|null $pivotId = null): void
     {
         if (! is_null($pivotId)) {
             $browser->assertVisible('[dusk="'.$id.'-row"][data-pivot-id="'.$pivotId.'"]');
@@ -697,11 +601,10 @@ class IndexComponent extends Component
     /**
      * Assert that the given resource is not visible.
      *
-     * @param  int|string  $id
-     * @param  int|string|null  $pivotId
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Model|string|int  $id
+     * @param  \Illuminate\Database\Eloquent\Model|string|int|null  $pivotId
      */
-    public function assertDontSeeResource(Browser $browser, $id, $pivotId = null)
+    public function assertDontSeeResource(Browser $browser, mixed $id, mixed $pivotId = null): void
     {
         if (! is_null($pivotId)) {
             $browser->assertMissing('[dusk="'.$id.'-row"][data-pivot-id="'.$pivotId.'"]');
@@ -712,32 +615,27 @@ class IndexComponent extends Component
 
     /**
      * Assert that the checkbox is checked.
-     *
-     * @return void
      */
-    public function assertCheckboxChecked(Browser $browser, $selector)
+    public function assertCheckboxChecked(Browser $browser, string $selector): void
     {
         $browser->assertAttribute($selector, 'data-state', 'checked');
     }
 
     /**
      * Assert that the checkbox is not checked.
-     *
-     * @return void
      */
-    public function assertCheckboxNotChecked(Browser $browser, $selector)
+    public function assertCheckboxNotChecked(Browser $browser, string $selector): void
     {
         $browser->assertAttribute($selector, 'data-state', 'unchecked');
     }
 
     /**
      * Get the element shortcuts for the component.
-     *
-     * @return array
      */
-    public function elements()
+    public function elements(): array
     {
         return [
+            '@nova-index-action-select' => 'select[dusk="action-select"]',
             '@nova-opened-modal' => '.modal[data-modal-open=true]',
         ];
     }

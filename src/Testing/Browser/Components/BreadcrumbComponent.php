@@ -8,32 +8,24 @@ class BreadcrumbComponent extends Component
 {
     /**
      * Get the root selector for the component.
-     *
-     * @return string
      */
-    public function selector()
+    public function selector(): string
     {
         return 'nav[aria-label="breadcrumb"]';
     }
 
     /**
      * Assert current page match the title.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $title
-     * @return void
      */
-    public function assertCurrentPageTitle(Browser $browser, string $title)
+    public function assertCurrentPageTitle(Browser $browser, string $title): void
     {
         $browser->assertSeeIn('@current-page', $title);
     }
 
     /**
      * Get the element shortcuts for the page.
-     *
-     * @return array
      */
-    public function elements()
+    public function elements(): array
     {
         return [
             '@current-page' => 'li[aria-current="page"]',

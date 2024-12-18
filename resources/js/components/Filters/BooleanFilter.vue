@@ -5,14 +5,14 @@
     <template #filter>
       <div class="space-y-2 mt-2">
         <BooleanOption
-          :dusk="`${filter.name}-boolean-filter-${option.value}-option`"
-          :resource-name="resourceName"
-          :key="option.value"
           v-for="option in options"
+          :key="option.value"
+          :resource-name="resourceName"
           :filter="filter"
           :option="option"
-          @change="handleChange"
           label="label"
+          @change="$emit('change')"
+          :dusk="`${filter.uniqueKey}-${option.value}-option`"
         />
       </div>
     </template>
@@ -33,12 +33,6 @@ export default {
       required: true,
     },
     lens: String,
-  },
-
-  methods: {
-    handleChange() {
-      this.$emit('change')
-    },
   },
 
   computed: {

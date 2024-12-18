@@ -11,10 +11,8 @@ class ResourceIndexRequest extends NovaRequest
 
     /**
      * Get the paginator instance for the index request.
-     *
-     * @return array
      */
-    public function searchIndex()
+    public function searchIndex(): array
     {
         return app()->make(QueryBuilder::class, [$this->resource()])->search(
             $this, $this->newQuery(), $this->search,
@@ -24,10 +22,8 @@ class ResourceIndexRequest extends NovaRequest
 
     /**
      * Get the count of the resources.
-     *
-     * @return int
      */
-    public function toCount()
+    public function toCount(): int
     {
         return app()->make(QueryBuilder::class, [$this->resource()])->search(
             $this, $this->newQuery(), $this->search,
@@ -37,10 +33,8 @@ class ResourceIndexRequest extends NovaRequest
 
     /**
      * Get per page.
-     *
-     * @return int
      */
-    public function perPage()
+    public function perPage(): int
     {
         $resource = $this->resource();
 

@@ -28,6 +28,7 @@ class Color extends Field
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         $request = app(NovaRequest::class);

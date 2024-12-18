@@ -6,10 +6,8 @@ class Script extends Asset
 {
     /**
      * Get the Asset URL.
-     *
-     * @return string
      */
-    public function url()
+    public function url(): string
     {
         if (! $this->isRemote()) {
             return "/nova-api/scripts/{$this->name}";
@@ -23,7 +21,7 @@ class Script extends Asset
      *
      * @return array<string, string>
      */
-    public function toResponseHeaders()
+    public function toResponseHeaders(): array
     {
         return [
             'Content-Type' => 'application/javascript',

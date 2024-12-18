@@ -5,6 +5,7 @@ namespace Laravel\Nova;
 use DateTime;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Str;
+use Stringable;
 
 /**
  * @method static static make(string|self $name, string|null $path, bool|null $remote = null)
@@ -16,7 +17,7 @@ abstract class Asset implements Responsable
     /**
      * The Assert name.
      *
-     * @var string
+     * @var \Stringable|string
      */
     protected $name;
 
@@ -25,23 +26,19 @@ abstract class Asset implements Responsable
      *
      * @var string|null
      */
-    protected $path;
+    protected $path = null;
 
     /**
      * Determine Asset is remote.
      *
      * @var bool
      */
-    protected $remote;
+    protected $remote = false;
 
     /**
      * Construct a new Asset instance.
-     *
-     * @param  string|self  $name
-     * @param  string|null  $path
-     * @param  bool|null  $remote
      */
-    public function __construct($name, $path, $remote = null)
+    public function __construct(self|Stringable|string $name, ?string $path, ?bool $remote = null)
     {
         if ($name instanceof self) {
             $this->name = $name->name();
@@ -62,41 +59,32 @@ abstract class Asset implements Responsable
 
     /**
      * Make a remote URL.
-     *
-     * @param  string  $path
-     * @return static
      */
-    public static function remote($path)
+    public static function remote(string $path): static
     {
         return new static(md5($path), $path, true);
     }
 
     /**
      * Get asset name.
-     *
-     * @return string
      */
-    public function name()
+    public function name(): Stringable|string
     {
         return $this->name;
     }
 
     /**
      * Get asset path.
-     *
-     * @return string|null
      */
-    public function path()
+    public function path(): ?string
     {
         return $this->path;
     }
 
     /**
      * Determine if URL is remote.
-     *
-     * @return bool
      */
-    public function isRemote()
+    public function isRemote(): bool
     {
         return $this->remote;
     }
@@ -118,15 +106,13 @@ abstract class Asset implements Responsable
 
     /**
      * Get the Asset URL.
-     *
-     * @return string
      */
-    abstract public function url();
+    abstract public function url(): string;
 
     /**
      * Get response headers.
      *
      * @return array<string, string>
      */
-    abstract public function toResponseHeaders();
+    abstract public function toResponseHeaders(): array;
 }

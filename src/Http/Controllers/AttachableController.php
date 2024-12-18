@@ -10,41 +10,38 @@ class AttachableController extends Controller
 {
     /**
      * List the available related resources for a given resource.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return array
      */
-    public function __invoke(NovaRequest $request)
+    public function __invoke(NovaRequest $request): array
     {
         $field = $request->newResource()
                     ->availableFields($request)
                     ->filterForManyToManyRelations()
                     ->filter(function ($field) use ($request) {
-                        return $field->resourceName === $request->field &&
+                        return $field->resourceName === $request->field && // @phpstan-ignore property.notFound
+                                    $field->component === $request->component &&
                                     $field->attribute === $request->viaRelationship;
                     })->first();
 
+        abort_if(is_null($field), 404);
+
         $withTrashed = $this->shouldIncludeTrashed(
-            $request, $associatedResource = $field->resourceClass
+            $request, $associatedResource = $field->resourceClass // @phpstan-ignore property.notFound
         );
 
-        $parentResource = $request->findResourceOrFail();
+        $model = filled($request->resourceId) ? $request->findModelOrFail() : $request->model();
 
         $shouldReorderAttachableValues = $field->shouldReorderAttachableValues($request) && ! $associatedResource::usesScout();
 
         return [
-            'resources' => $field->buildAttachableQuery($request, $withTrashed)
-                        ->tap($this->getAttachableQueryResolver($request, $field))
-                        ->get()
-                        ->mapInto($field->resourceClass)
-                        ->filter(function ($resource) use ($request, $parentResource) {
-                            return $parentResource->authorizedToAttach($request, $resource->resource);
-                        })
-                        ->map(function ($resource) use ($request, $field) {
-                            return $field->formatAttachableResource($request, $resource);
-                        })->when($shouldReorderAttachableValues, function ($collection) {
-                            return $collection->sortBy('display', SORT_NATURAL | SORT_FLAG_CASE);
-                        })->values(),
+            'resources' => $field->buildAttachableQuery($request, $withTrashed) // @phpstan-ignore argument.templateType
+                ->tap($this->getAttachableQueryResolver($request, $field))
+                ->get()
+                ->mapInto($field->resourceClass)  // @phpstan-ignore property.notFound
+                ->filter->authorizedToAttach($request, $model)
+                ->map(fn ($resource) => $field->formatAttachableResource($request, $resource))
+                ->when(
+                    $shouldReorderAttachableValues, fn ($collection) => $collection->sortBy('display', SORT_NATURAL | SORT_FLAG_CASE)
+                )->values(),
             'withTrashed' => $withTrashed,
             'softDeletes' => $associatedResource::softDeletes(),
         ];
@@ -53,11 +50,9 @@ class AttachableController extends Controller
     /**
      * Determine if the query should include trashed models.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  string  $associatedResource
-     * @return bool
+     * @param  class-string<\Laravel\Nova\Resource>  $associatedResource
      */
-    protected function shouldIncludeTrashed(NovaRequest $request, $associatedResource)
+    protected function shouldIncludeTrashed(NovaRequest $request, string $associatedResource): bool
     {
         if ($request->withTrashed === 'true') {
             return true;
@@ -68,6 +63,7 @@ class AttachableController extends Controller
         if ($request->current && $associatedResource::softDeletes()) {
             $associatedModel = $associatedModel->newQueryWithoutScopes()->find($request->current);
 
+            /** @phpstan-ignore method.notFound */
             return $associatedModel ? $associatedModel->trashed() : false;
         }
 
@@ -77,22 +73,22 @@ class AttachableController extends Controller
     /**
      * Get attachable query resolver.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\PivotableField  $field
-     * @return callable(\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder):void
+     * @return callable(\Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Contracts\Database\Query\Builder):void
      */
     protected function getAttachableQueryResolver(NovaRequest $request, PivotableField $field)
     {
         return function ($query) use ($request, $field) {
             if (
                 $request->first === 'true'
-                || $field->allowDuplicateRelations
+                || $field->allowDuplicateRelations /** @phpstan-ignore property.notFound */
                 || is_null($relatedModel = $request->findModel())
             ) {
                 return;
             }
 
             $query->whereNotExists(function ($query) use ($field, $relatedModel) {
+                /** @phpstan-ignore property.notFound */
                 $relation = $relatedModel->{$field->manyToManyRelationship}();
 
                 return $relation->applyDefaultPivotQuery($query)

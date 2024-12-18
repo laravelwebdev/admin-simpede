@@ -2,7 +2,6 @@ import cloneDeep from 'lodash/cloneDeep'
 import each from 'lodash/each'
 import find from 'lodash/find'
 import filter from 'lodash/filter'
-import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import { escapeUnicode } from '@/util/escapeUnicode'
 
@@ -34,7 +33,7 @@ export default {
      * The current unencoded filter value payload
      */
     currentFilters: (state, getters) => {
-      return map(filter(state.filters), f => {
+      return filter(state.filters).map(f => {
         return {
           [f.class]: f.currentValue,
         }

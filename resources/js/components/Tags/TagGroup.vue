@@ -1,13 +1,14 @@
 <template>
   <div class="flex flex-wrap gap-2">
     <TagGroupItem
-      @tag-removed="i => $emit('tag-removed', i)"
       v-for="(tag, index) in limitedTags"
+      :key="index"
       :tag="tag"
       :index="index"
       :resource-name="resourceName"
       :editable="editable"
       :with-preview="withPreview"
+      @tag-removed="index => $emit('tag-removed', index)"
     />
 
     <Badge

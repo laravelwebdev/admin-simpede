@@ -1,28 +1,27 @@
 <template>
   <CreateForm
-    @resource-created="handleResourceCreated"
-    @create-cancelled="handleCreateCancelled"
     mode="form"
     :resource-name="resourceName"
     :from-resource-id="resourceId"
     :via-resource="viaResource"
     :via-resource-id="viaResourceId"
     :via-relationship="viaRelationship"
-    @update-form-status="onUpdateFormStatus"
-    :should-override-meta="true"
+    should-override-meta
     :form-unique-id="formUniqueId"
+    @resource-created="handleResourceCreated"
+    @create-cancelled="cancelCreatingResource"
+    @update-form-status="onUpdateFormStatus"
   />
 </template>
 
-<script>
+<script setup>
 import { mapProps } from '@/mixins'
 import ResourceCreate from '@/views/Create'
 
-export default {
+defineOptions({
   name: 'Replicate',
-
   extends: ResourceCreate,
+})
 
-  props: mapProps(['resourceName', 'resourceId']),
-}
+defineProps(mapProps(['resourceName', 'resourceId']))
 </script>

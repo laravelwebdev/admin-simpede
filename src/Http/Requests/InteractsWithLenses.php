@@ -2,6 +2,9 @@
 
 namespace Laravel\Nova\Http\Requests;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Laravel\Nova\Lenses\Lens;
 use Laravel\Nova\Query\Search;
 
 /**
@@ -11,10 +14,8 @@ trait InteractsWithLenses
 {
     /**
      * Get the lens instance for the given request.
-     *
-     * @return \Laravel\Nova\Lenses\Lens
      */
-    public function lens()
+    public function lens(): Lens
     {
         return $this->availableLenses()->first(function ($lens) {
             return $this->lens === $lens->uriKey();
@@ -23,10 +24,8 @@ trait InteractsWithLenses
 
     /**
      * Get all of the possible lenses for the request.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    public function availableLenses()
+    public function availableLenses(): Collection
     {
         return transform($this->newResource(), function ($resource) {
             abort_unless($resource::authorizedToViewAny($this), 403);
@@ -37,10 +36,8 @@ trait InteractsWithLenses
 
     /**
      * Transform the request into a search query.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function newSearchQuery()
+    public function newSearchQuery(): Builder
     {
         $lens = $this->lens();
 
@@ -51,10 +48,8 @@ trait InteractsWithLenses
 
     /**
      * Determine if the specified action exists at all.
-     *
-     * @return bool
      */
-    protected function lensExists()
+    protected function lensExists(): bool
     {
         return $this->newResource()->resolveLenses($this)->contains(function ($lens) {
             return $this->lens === $lens->uriKey();

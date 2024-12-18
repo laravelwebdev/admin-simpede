@@ -2,10 +2,8 @@
 
 namespace Laravel\Nova;
 
-use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,27 +11,22 @@ class NovaServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any package services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->registerPublishing();
         }
 
         $this->registerResources();
-        $this->registerCarbonMacros();
         $this->registerCollectionMacros();
         $this->registerRelationsMacros();
     }
 
     /**
      * Register the package's publishable resources.
-     *
-     * @return void
      */
-    protected function registerPublishing()
+    protected function registerPublishing(): void
     {
         $this->publishes([
             __DIR__.'/Console/stubs/NovaServiceProvider.stub' => app_path('Providers/NovaServiceProvider.php'),
@@ -64,33 +57,16 @@ class NovaServiceProvider extends ServiceProvider
 
     /**
      * Register the package resources such as routes, templates, etc.
-     *
-     * @return void
      */
-    protected function registerResources()
+    protected function registerResources(): void
     {
         $this->loadJsonTranslationsFrom(lang_path('vendor/nova'));
     }
 
     /**
-     * Register the Nova Carbon macros.
-     *
-     * @return void
-     */
-    protected function registerCarbonMacros()
-    {
-        Carbon::mixin(new Macros\FirstDayOfQuarter);
-        Carbon::mixin(new Macros\FirstDayOfPreviousQuarter);
-        CarbonImmutable::mixin(new Macros\FirstDayOfQuarter);
-        CarbonImmutable::mixin(new Macros\FirstDayOfPreviousQuarter);
-    }
-
-    /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->commands([
             Console\ActionCommand::class,
@@ -105,6 +81,7 @@ class NovaServiceProvider extends ServiceProvider
             Console\LensCommand::class,
             Console\CheckLicenseCommand::class,
             Console\PartitionCommand::class,
+            Console\PolicyMakeCommand::class,
             Console\ProgressCommand::class,
             Console\PublishCommand::class,
             Console\RepeatableCommand::class,
@@ -116,31 +93,25 @@ class NovaServiceProvider extends ServiceProvider
             Console\ToolCommand::class,
             Console\TrendCommand::class,
             Console\UserCommand::class,
-            Console\UpgradeCommand::class,
             Console\ValueCommand::class,
         ]);
     }
 
     /**
      * Register Collection macros.
-     *
-     * @return void
      */
-    protected function registerCollectionMacros()
+    protected function registerCollectionMacros(): void
     {
         Collection::macro('isAssoc', function () {
-            /** @phpstan-ignore-next-line */
             return Arr::isAssoc($this->toBase()->all());
         });
     }
 
     /**
      * Register Relations macros.
-     *
-     * @return void
      */
-    protected function registerRelationsMacros()
+    protected function registerRelationsMacros(): void
     {
-        BelongsToMany::mixin(new Query\Mixin\BelongsToMany());
+        BelongsToMany::mixin(new Query\Mixin\BelongsToMany);
     }
 }

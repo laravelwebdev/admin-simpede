@@ -1,5 +1,5 @@
 <template>
-  <div class="hidden" :errors="errors">
+  <div class="hidden">
     <input :dusk="field.attribute" type="hidden" :value="value" />
   </div>
 </template>

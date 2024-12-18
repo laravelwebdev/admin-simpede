@@ -8,22 +8,15 @@
   />
 </template>
 
-<script>
+<script setup>
 import { mapProps } from '@/mixins'
 import ResourceCreate from '@/views/Create'
 
-export default {
+defineOptions({
   name: 'Create',
+})
 
-  components: {
-    ResourceCreate,
-  },
-
-  props: mapProps([
-    'resourceName',
-    'viaResource',
-    'viaResourceId',
-    'viaRelationship',
-  ]),
-}
+defineProps(
+  mapProps(['resourceName', 'viaResource', 'viaResourceId', 'viaRelationship'])
+)
 </script>

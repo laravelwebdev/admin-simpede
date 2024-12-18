@@ -1,27 +1,27 @@
 <template>
   <tr
     :data-pivot-id="resource.id.pivotValue"
-    :dusk="`${resource.id.value}-row`"
+    @click.stop.prevent="handleClick"
     class="group"
     :class="{
       'divide-x divide-gray-100 dark:divide-gray-700': shouldShowColumnBorders,
     }"
-    @click.stop.prevent="handleClick"
+    :dusk="`${resource.id.value}-row`"
   >
     <!-- Resource Selection Checkbox -->
     <td
-      v-if="shouldShowCheckboxes"
+      v-if="initializingWithShowCheckboxes"
+      @click.stop
+      class="w-[1%] white-space-nowrap pl-5 pr-5 dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-900"
       :class="{
         'py-2': !shouldShowTight,
         'cursor-pointer': resource.authorizedToView,
       }"
-      class="w-[1%] white-space-nowrap pl-5 pr-5 dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-900"
-      @click.stop
     >
       <Checkbox
         v-if="shouldShowCheckboxes"
-        @change="toggleSelection"
         :model-value="checked"
+        @change="toggleSelection"
         :dusk="`${resource.id.value}-checkbox`"
         :aria-label="__('Select Resource :title', { title: resource.title })"
       />
@@ -31,6 +31,7 @@
     <td
       v-for="(field, index) in resource.fields"
       :key="field.uniqueKey"
+      class="dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-900"
       :class="{
         'px-6': index === 0 && !shouldShowCheckboxes,
         'px-2': index !== 0 || shouldShowCheckboxes,
@@ -38,7 +39,6 @@
         'whitespace-nowrap': !field.wrapping,
         'cursor-pointer': clickableRow,
       }"
-      class="dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-900"
     >
       <component
         :is="'index-' + field.component"
@@ -77,22 +77,22 @@
         <Link
           v-if="authorizedToViewAnyResources"
           :as="!resource.authorizedToView ? 'button' : 'a'"
-          v-tooltip.click="__('View')"
-          :aria-label="__('View')"
-          :dusk="`${resource['id'].value}-view-button`"
           :href="viewURL"
+          :disabled="!resource.authorizedToView ? true : null"
+          @click.stop
           class="inline-flex items-center justify-center h-9 w-9"
           :class="
             resource.authorizedToView
               ? 'text-gray-500 dark:text-gray-400 hover:[&:not(:disabled)]:text-primary-500 dark:hover:[&:not(:disabled)]:text-primary-500'
               : 'disabled:cursor-not-allowed disabled:opacity-50'
           "
-          :disabled="!resource.authorizedToView"
-          @click.stop
+          :dusk="`${resource['id'].value}-view-button`"
+          :aria-label="__('View')"
+          v-tooltip.click="__('View')"
         >
           <span class="flex items-center gap-1">
             <span>
-              <Icon name="eye" type="outline" />
+              <Icon name="eye" />
             </span>
           </span>
         </Link>
@@ -101,26 +101,26 @@
         <Link
           v-if="authorizedToUpdateAnyResources"
           :as="!resource.authorizedToUpdate ? 'button' : 'a'"
-          v-tooltip.click="viaManyToMany ? __('Edit Attached') : __('Edit')"
-          :aria-label="viaManyToMany ? __('Edit Attached') : __('Edit')"
-          :dusk="
-            viaManyToMany
-              ? `${resource['id'].value}-edit-attached-button`
-              : `${resource['id'].value}-edit-button`
-          "
           :href="updateURL"
+          :disabled="!resource.authorizedToUpdate ? true : null"
+          @click.stop
           class="inline-flex items-center justify-center h-9 w-9"
           :class="
             resource.authorizedToUpdate
               ? 'text-gray-500 dark:text-gray-400 hover:[&:not(:disabled)]:text-primary-500 dark:hover:[&:not(:disabled)]:text-primary-500'
               : 'disabled:cursor-not-allowed disabled:opacity-50'
           "
-          :disabled="!resource.authorizedToUpdate"
-          @click.stop
+          :dusk="
+            viaManyToMany
+              ? `${resource['id'].value}-edit-attached-button`
+              : `${resource['id'].value}-edit-button`
+          "
+          :aria-label="viaManyToMany ? __('Edit Attached') : __('Edit')"
+          v-tooltip.click="viaManyToMany ? __('Edit Attached') : __('Edit')"
         >
           <span class="flex items-center gap-1">
             <span>
-              <Icon name="pencil-square" type="outline" />
+              <Icon name="pencil-square" />
             </span>
           </span>
         </Link>
@@ -191,8 +191,7 @@
 </template>
 
 <script>
-import filter from 'lodash/filter'
-import { Inertia } from '@inertiajs/inertia'
+import { router } from '@inertiajs/vue3'
 import { mapGetters } from 'vuex'
 import { Button, Checkbox, Icon } from 'laravel-nova-ui'
 
@@ -242,9 +241,12 @@ export default {
     deleteModalOpen: false,
     restoreModalOpen: false,
     previewModalOpen: false,
+
+    initializingWithShowCheckboxes: false,
   }),
 
   beforeMount() {
+    this.initializingWithShowCheckboxes = this.shouldShowCheckboxes
     this.isSelected = this.selectedResources.indexOf(this.resource) > -1
   },
 
@@ -302,7 +304,7 @@ export default {
       }
       this.commandPressed
         ? window.open(this.viewURL, '_blank')
-        : Inertia.visit(this.viewURL)
+        : router.visit(this.viewURL)
     },
 
     navigateToEditView(e) {
@@ -311,7 +313,7 @@ export default {
       }
       this.commandPressed
         ? window.open(this.updateURL, '_blank')
-        : Inertia.visit(this.updateURL)
+        : router.visit(this.updateURL)
     },
 
     navigateToPreviewView(e) {
@@ -387,7 +389,7 @@ export default {
     },
 
     availableActions() {
-      return filter(this.resource.actions, a => a.showOnTableRow)
+      return this.resource.actions.filter(a => a.showOnTableRow)
     },
 
     shouldShowTight() {

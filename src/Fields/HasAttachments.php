@@ -76,7 +76,6 @@ trait HasAttachments
     /**
      * Specify the callback that should be used to discard pending file attachments.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function discard(callable $callback)
@@ -106,11 +105,9 @@ trait HasAttachments
     /**
      * Specify that file uploads should be allowed.
      *
-     * @param  string  $disk
-     * @param  string  $path
      * @return $this
      */
-    public function withFiles($disk = null, $path = '/')
+    public function withFiles(?string $disk = null, string $path = '/')
     {
         $this->withFiles = true;
 
@@ -128,13 +125,9 @@ trait HasAttachments
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
-     * @param  string  $attribute
-     * @return void|\Closure
      */
-    protected function fillAttributeWithAttachment(NovaRequest $request, $requestAttribute, $model, $attribute)
+    protected function fillAttributeWithAttachment(NovaRequest $request, string $requestAttribute, object $model, string $attribute): ?callable
     {
         $callbacks = [];
 
@@ -163,5 +156,7 @@ trait HasAttachments
                 collect($callbacks)->each->__invoke();
             };
         }
+
+        return null;
     }
 }

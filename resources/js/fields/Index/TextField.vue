@@ -21,7 +21,7 @@
           !field.copyable &&
           !shouldDisplayAsHtml
         "
-        class="whitespace-normal"
+        class="whitespace-nowrap"
       >
         {{ fieldValue }}
       </span>

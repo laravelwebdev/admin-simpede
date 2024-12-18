@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import Chartist from 'chartist'
-import 'chartist/dist/chartist.min.css'
+import { BarChart, LineChart } from 'chartist'
+import 'chartist/dist/index.css'
 
 // Default chart diameters.
 const defaultHeight = 50
@@ -34,7 +34,9 @@ export default {
   },
 
   mounted() {
-    this.chartist = new Chartist[this.chartStyle](
+    const chart = this.chartStyle
+
+    this.chartist = new chart(
       this.$refs.chart,
       { series: [this.field.data] },
       {
@@ -65,9 +67,10 @@ export default {
       let chartStyle = this.field.chartStyle.toLowerCase()
 
       // Line and Bar are the only valid types.
-      if (!validTypes.includes(chartStyle)) return 'Line'
+      if (!validTypes.includes(chartStyle) || chartStyle === 'line')
+        return LineChart
 
-      return chartStyle.charAt(0).toUpperCase() + chartStyle.slice(1)
+      return BarChart
     },
 
     /**

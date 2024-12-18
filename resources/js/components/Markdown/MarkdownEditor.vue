@@ -61,7 +61,7 @@
         <textarea ref="theTextarea" :class="{ 'bg-gray-100': readonly }" />
       </div>
       <label
-        v-if="props.uploader"
+        v-if="uploader"
         @change.prevent="handleFileSelectionClick"
         class="cursor-pointer block bg-gray-100 dark:bg-gray-700 text-gray-400 text-xxs px-2 py-1"
         :class="{ hidden: isFullScreen }"
@@ -92,14 +92,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { onMounted, onBeforeUnmount, useTemplateRef } from 'vue'
 import { useDragAndDrop } from '@/composables/useDragAndDrop'
 import { useLocalization } from '@/composables/useLocalization'
 import { useMarkdownEditing } from '@/composables/useMarkdownEditing'
 
 const { __ } = useLocalization()
 
-const emit = defineEmits(['initialize', 'change', 'fileRemoved', 'fileAdded'])
+const emitter = defineEmits([
+  'initialize',
+  'change',
+  'fileRemoved',
+  'fileAdded',
+])
 
 const props = defineProps({
   id: { type: String, required: true },
@@ -116,27 +121,27 @@ const {
   visualMode,
   previewContent,
   statusContent,
-} = useMarkdownEditing(emit, props)
+} = useMarkdownEditing(emitter, props)
 
 let markdown = null
-const theTextarea = ref(null)
-const fileInput = ref(null)
+const theTextareaRef = useTemplateRef('theTextarea')
+const fileInputRef = useTemplateRef('fileInput')
 
-const handleFileSelectionClick = () => fileInput.value.click()
+const handleFileSelectionClick = () => fileInputRef.value.click()
 const handleFileChange = () => {
   if (props.uploader && markdown.actions) {
-    const items = fileInput.value.files
+    const items = fileInputRef.value.files
 
     for (let i = 0; i < items.length; i++) {
       markdown.actions.uploadAttachment(items[i])
     }
 
-    fileInput.value.files = null
+    fileInputRef.value.files = null
   }
 }
 
 const { startedDrag, handleOnDragEnter, handleOnDragLeave } =
-  useDragAndDrop(emit)
+  useDragAndDrop(emitter)
 
 const handleOnDrop = e => {
   if (props.uploader && markdown.actions) {
@@ -151,9 +156,9 @@ const handleOnDrop = e => {
 }
 
 onMounted(() => {
-  markdown = createMarkdownEditor(this, theTextarea)
+  markdown = createMarkdownEditor(this, theTextareaRef)
 
-  emit('initialize')
+  emitter('initialize')
 })
 
 onBeforeUnmount(() => markdown.unmount())

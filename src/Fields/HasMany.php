@@ -5,9 +5,9 @@ namespace Laravel\Nova\Fields;
 use Illuminate\Http\Request;
 use Laravel\Nova\Contracts\ListableField;
 use Laravel\Nova\Contracts\RelatableField;
-use Laravel\Nova\Exceptions\HelperNotSupported;
 use Laravel\Nova\Exceptions\NovaException;
 use Laravel\Nova\Panel;
+use Stringable;
 
 /**
  * @method static static make(mixed $name, string|null $attribute = null, string|null $resource = null)
@@ -15,19 +15,6 @@ use Laravel\Nova\Panel;
 class HasMany extends Field implements ListableField, RelatableField
 {
     use Collapsable;
-
-    /**
-     * Add help text to the metric.
-     *
-     * @param  string  $text
-     * @return $this
-     *
-     * @throws HelperNotSupported
-     */
-    public function help($text)
-    {
-        throw NovaException::helperNotSupported(__METHOD__, __CLASS__);
-    }
 
     /**
      * The field's component.
@@ -67,16 +54,15 @@ class HasMany extends Field implements ListableField, RelatableField
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|null  $attribute
+     * @param  \Stringable|string  $name
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
      * @return void
      */
-    public function __construct($name, $attribute = null, $resource = null)
+    public function __construct($name, ?string $attribute = null, ?string $resource = null)
     {
         parent::__construct($name, $attribute);
 
-        $resource = $resource ?? ResourceRelationshipGuesser::guessResource($name);
+        $resource ??= ResourceRelationshipGuesser::guessResource($name);
 
         $this->resourceClass = $resource;
         $this->resourceName = $resource::uriKey();
@@ -85,20 +71,16 @@ class HasMany extends Field implements ListableField, RelatableField
 
     /**
      * Get the relationship name.
-     *
-     * @return string
      */
-    public function relationshipName()
+    public function relationshipName(): string
     {
         return $this->hasManyRelationship;
     }
 
     /**
      * Get the relationship type.
-     *
-     * @return string
      */
-    public function relationshipType()
+    public function relationshipType(): string
     {
         return 'hasMany';
     }
@@ -106,9 +88,9 @@ class HasMany extends Field implements ListableField, RelatableField
     /**
      * Determine if the field should be displayed for the given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
+    #[\Override]
     public function authorize(Request $request)
     {
         return call_user_func(
@@ -119,11 +101,10 @@ class HasMany extends Field implements ListableField, RelatableField
     /**
      * Resolve the field's value.
      *
-     * @param  mixed  $resource
-     * @param  string|null  $attribute
-     * @return void
+     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
      */
-    public function resolve($resource, $attribute = null)
+    #[\Override]
+    public function resolve($resource, ?string $attribute = null): void
     {
         //
     }
@@ -131,10 +112,9 @@ class HasMany extends Field implements ListableField, RelatableField
     /**
      * Set the displayable singular label of the resource.
      *
-     * @param  string  $singularLabel
      * @return $this
      */
-    public function singularLabel($singularLabel)
+    public function singularLabel(Stringable|string $singularLabel)
     {
         $this->singularLabel = $singularLabel;
 
@@ -142,11 +122,22 @@ class HasMany extends Field implements ListableField, RelatableField
     }
 
     /**
-     * Make current field behaves as panel.
+     * Add help text to the metric.
      *
-     * @return \Laravel\Nova\Panel
+     * @param  \Stringable|string|null  $text
+     * @return never
+     *
+     * @throws \Laravel\Nova\Exceptions\HelperNotSupported
      */
-    public function asPanel()
+    public function help($text)
+    {
+        throw NovaException::helperNotSupported(__METHOD__, __CLASS__);
+    }
+
+    /**
+     * Make current field behaves as panel.
+     */
+    public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
                     ->withMeta([
@@ -159,6 +150,7 @@ class HasMany extends Field implements ListableField, RelatableField
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge([

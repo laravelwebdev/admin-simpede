@@ -2,6 +2,8 @@
 
 namespace Laravel\Nova;
 
+use Closure;
+
 trait WithBadge
 {
     /**
@@ -28,15 +30,14 @@ trait WithBadge
     /**
      * Set the content to be used for the item's badge.
      *
-     * @param  (\Closure():(\Laravel\Nova\Badge|string))|(callable():(\Laravel\Nova\Badge|string))|\Laravel\Nova\Badge|string  $badgeCallback
-     * @param  string|null  $type
+     * @param  \Laravel\Nova\Badge|(callable():(\Laravel\Nova\Badge|string))|string  $badgeCallback
      * @return $this
      */
-    public function withBadge($badgeCallback, $type = 'info')
+    public function withBadge(Badge|callable|string $badgeCallback, string $type = 'info')
     {
         $this->badgeType = $type;
 
-        if (is_callable($badgeCallback) || $badgeCallback instanceof Badge) {
+        if (Util::isSafeCallable($badgeCallback) || $badgeCallback instanceof Badge) {
             $this->badgeCallback = $badgeCallback;
         }
 
@@ -52,12 +53,11 @@ trait WithBadge
     /**
      * Set the content to be used for the item's badge if the condition matches.
      *
-     * @param  (\Closure():(\Laravel\Nova\Badge|string))|(callable():(\Laravel\Nova\Badge|string))|\Laravel\Nova\Badge|string  $badgeCallback
-     * @param  string|null  $type
+     * @param  \Laravel\Nova\Badge|(callable():(\Laravel\Nova\Badge|string))|string  $badgeCallback
      * @param  (\Closure():(bool))|bool  $condition
      * @return $this
      */
-    public function withBadgeIf($badgeCallback, $type, $condition)
+    public function withBadgeIf(Badge|callable|string $badgeCallback, string $type, Closure|bool $condition)
     {
         $this->badgeCondition = $condition;
 
@@ -68,10 +68,8 @@ trait WithBadge
 
     /**
      * Resolve the badge for the item.
-     *
-     * @return \Laravel\Nova\Badge|null
      */
-    public function resolveBadge()
+    public function resolveBadge(): ?Badge
     {
         if (value($this->badgeCondition)) {
             if (is_callable($this->badgeCallback)) {
@@ -91,5 +89,7 @@ trait WithBadge
 
             return $this->badgeCallback;
         }
+
+        return null;
     }
 }

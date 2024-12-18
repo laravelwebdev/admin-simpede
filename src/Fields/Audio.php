@@ -8,11 +8,11 @@ class Audio extends File
 {
     use PresentsAudio;
 
-    const PRELOAD_AUTO = 'auto';
+    public const PRELOAD_AUTO = 'auto';
 
-    const PRELOAD_METADATA = 'metadata';
+    public const PRELOAD_METADATA = 'metadata';
 
-    const PRELOAD_NONE = 'none';
+    public const PRELOAD_NONE = 'none';
 
     /**
      * The field's component.
@@ -22,28 +22,19 @@ class Audio extends File
     public $component = 'audio-field';
 
     /**
-     * The file types accepted by the field.
-     *
-     * @var string
-     */
-    public $acceptedTypes = 'audio/*';
-
-    /**
      * Create a new field.
      *
-     * @param  string  $name
+     * @param  \Stringable|string  $name
      * @param  string|callable|null  $attribute
-     * @param  string|null  $disk
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, object, string, string, ?string, ?string):mixed)|null  $storageCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, $disk = 'public', $storageCallback = null)
+    public function __construct($name, mixed $attribute = null, ?string $disk = 'public', ?callable $storageCallback = null)
     {
         parent::__construct($name, $attribute, $disk, $storageCallback);
 
-        $this->preview(function ($value) {
-            return $value ? Storage::disk($this->getStorageDisk())->url($value) : null;
-        });
+        $this->acceptedTypes('audio/*')
+            ->preview(fn ($value) => $value ? Storage::disk($this->getStorageDisk())->url($value) : null);
     }
 
     /**
@@ -51,6 +42,7 @@ class Audio extends File
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), $this->audioAttributes());

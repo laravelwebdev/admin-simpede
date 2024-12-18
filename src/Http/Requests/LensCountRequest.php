@@ -2,7 +2,7 @@
 
 namespace Laravel\Nova\Http\Requests;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Laravel\Nova\Exceptions\LensCountException;
 
 class LensCountRequest extends NovaRequest
@@ -12,10 +12,8 @@ class LensCountRequest extends NovaRequest
 
     /**
      * Get the count of the lens resources.
-     *
-     * @return int
      */
-    public function toCount()
+    public function toCount(): int
     {
         return rescue(function () {
             return $this->toQuery()->toBase()->getCountForPagination();
@@ -24,10 +22,8 @@ class LensCountRequest extends NovaRequest
 
     /**
      * Transform the request into a query.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function toQuery()
+    public function toQuery(): Builder
     {
         return tap($this->lens()->query(LensRequest::createFrom($this), $this->newSearchQuery()), function ($query) {
             if (! $query instanceof Builder) {

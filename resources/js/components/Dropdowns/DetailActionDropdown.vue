@@ -113,8 +113,8 @@
 </template>
 
 <script>
-import { Deletable, InteractsWithResourceInformation, mapProps } from '@/mixins'
 import { mapGetters, mapActions } from 'vuex'
+import { Deletable, InteractsWithResourceInformation, mapProps } from '@/mixins'
 
 export default {
   emits: ['actionExecuted', 'resource-deleted', 'resource-restored'],

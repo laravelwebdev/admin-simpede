@@ -19,32 +19,14 @@ export default {
   name: 'Attach',
 
   props: {
-    resourceName: {
-      type: String,
-      required: true,
-    },
-    resourceId: {
-      required: true,
-    },
-    relatedResourceName: {
-      type: String,
-      required: true,
-    },
-    viaResource: {
-      default: '',
-    },
-    viaResourceId: {
-      default: '',
-    },
-    parentResource: {
-      type: Object,
-    },
-    viaRelationship: {
-      default: '',
-    },
-    polymorphic: {
-      default: false,
-    },
+    resourceName: { type: String, required: true },
+    resourceId: { required: true },
+    relatedResourceName: { type: String, required: true },
+    viaResource: { default: '' },
+    viaResourceId: { default: '' },
+    parentResource: { type: Object },
+    viaRelationship: { default: '' },
+    polymorphic: { default: false },
   },
 
   data: () => ({

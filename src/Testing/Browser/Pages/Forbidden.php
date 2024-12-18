@@ -8,8 +8,6 @@ class Forbidden extends Page
 {
     /**
      * Create a new page instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -18,11 +16,8 @@ class Forbidden extends Page
 
     /**
      * Assert that the browser is on the page.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
      */
-    public function assert(Browser $browser)
+    public function assert(Browser $browser): void
     {
         $browser->whenAvailable('@403-error-page', function ($browser) {
             $browser->assertSee('403');

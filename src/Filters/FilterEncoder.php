@@ -5,18 +5,11 @@ namespace Laravel\Nova\Filters;
 class FilterEncoder
 {
     /**
-     * @var array
-     */
-    public $filters;
-
-    /**
      * Create a new filter encoder instance.
-     *
-     * @param  array  $filters
      */
-    public function __construct($filters = [])
+    public function __construct(public array $filters = [])
     {
-        $this->filters = $filters;
+        //
     }
 
     /**

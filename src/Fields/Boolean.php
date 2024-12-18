@@ -20,20 +20,6 @@ class Boolean extends Field implements FilterableField
     public $component = 'boolean-field';
 
     /**
-     * The value to be used when the field is "true".
-     *
-     * @var bool
-     */
-    public $trueValue = true;
-
-    /**
-     * The value to be used when the field is "false".
-     *
-     * @var bool
-     */
-    public $falseValue = false;
-
-    /**
      * The text alignment for the field's text in tables.
      *
      * @var string
@@ -41,13 +27,26 @@ class Boolean extends Field implements FilterableField
     public $textAlign = 'center';
 
     /**
+     * The value to be used when the field is "true".
+     *
+     * @var mixed
+     */
+    public $trueValue = true;
+
+    /**
+     * The value to be used when the field is "false".
+     *
+     * @var mixed
+     */
+    public $falseValue = false;
+
+    /**
      * Resolve the given attribute from the given resource.
      *
-     * @param  mixed  $resource
-     * @param  string  $attribute
-     * @return bool|null
+     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
      */
-    protected function resolveAttribute($resource, $attribute)
+    #[\Override]
+    protected function resolveAttribute($resource, string $attribute): ?bool
     {
         $value = parent::resolveAttribute($resource, $attribute);
 
@@ -59,24 +58,24 @@ class Boolean extends Field implements FilterableField
     /**
      * Resolve the default value for the field.
      *
-     * @return bool|null
+     * @return \Laravel\Nova\Support\UndefinedValue|bool|null
      */
-    public function resolveDefaultValue(NovaRequest $request)
+    #[\Override]
+    public function resolveDefaultValue(NovaRequest $request): mixed
     {
         if ($request->isCreateOrAttachRequest() || $request->isActionRequest()) {
             return parent::resolveDefaultValue($request) ?? false;
         }
+
+        return null;
     }
 
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
-     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
-     * @param  string  $attribute
-     * @return void
      */
-    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
+    protected function fillAttributeFromRequest(NovaRequest $request, string $requestAttribute, object $model, string $attribute): void
     {
         if (isset($request[$requestAttribute])) {
             $model->{$attribute} = $request[$requestAttribute] == 1
@@ -87,11 +86,9 @@ class Boolean extends Field implements FilterableField
     /**
      * Specify the values to store for the field.
      *
-     * @param  mixed  $trueValue
-     * @param  mixed  $falseValue
      * @return $this
      */
-    public function values($trueValue, $falseValue)
+    public function values(mixed $trueValue, mixed $falseValue)
     {
         return $this->trueValue($trueValue)->falseValue($falseValue);
     }
@@ -99,10 +96,9 @@ class Boolean extends Field implements FilterableField
     /**
      * Specify the value to store when the field is "true".
      *
-     * @param  mixed  $value
      * @return $this
      */
-    public function trueValue($value)
+    public function trueValue(mixed $value)
     {
         $this->trueValue = $value;
 
@@ -112,10 +108,9 @@ class Boolean extends Field implements FilterableField
     /**
      * Specify the value to store when the field is "false".
      *
-     * @param  mixed  $value
      * @return $this
      */
-    public function falseValue($value)
+    public function falseValue(mixed $value)
     {
         $this->falseValue = $value;
 
@@ -134,10 +129,8 @@ class Boolean extends Field implements FilterableField
 
     /**
      * Prepare the field for JSON serialization.
-     *
-     * @return array
      */
-    public function serializeForFilter()
+    public function serializeForFilter(): array
     {
         return transform($this->jsonSerialize(), function ($field) {
             return Arr::only($field, ['uniqueKey']);

@@ -6,10 +6,8 @@ class Style extends Asset
 {
     /**
      * Get the Asset URL.
-     *
-     * @return string
      */
-    public function url()
+    public function url(): string
     {
         if (! $this->isRemote()) {
             return "/nova-api/styles/{$this->name}";
@@ -23,7 +21,7 @@ class Style extends Asset
      *
      * @return array<string, string>
      */
-    public function toResponseHeaders()
+    public function toResponseHeaders(): array
     {
         return [
             'Content-Type' => 'text/css',

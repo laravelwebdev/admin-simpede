@@ -6,8 +6,7 @@ module.exports = {
   content: [
     './src/**/*.php',
     './src/**/*.vue',
-    './resources/**/*{js,vue,blade.php}',
-    './node_modules/laravel-nova-ui/**/*{js,ts,vue}',
+    './resources/**/*{js,ts,vue,blade.php}',
   ],
   darkMode: 'class', // or 'media' or 'class'
   // safelist: [

@@ -9,6 +9,13 @@ import Attach from '@/views/Attach'
 import UpdateAttached from '@/views/UpdateAttached'
 // import Lens from '@/views/Lens'
 
+/**
+ * @typedef {import('./nova').default} NovaApp
+ */
+
+/**
+ * @param {NovaApp} app
+ */
 export function registerViews(app) {
   // Manually register some views...
   app.component('CustomError403', CustomError403)

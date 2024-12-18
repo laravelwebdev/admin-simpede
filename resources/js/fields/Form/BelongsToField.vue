@@ -9,15 +9,14 @@
       <div class="flex items-center">
         <SearchInput
           v-if="useSearchInput"
-          :dusk="`${field.resourceName}-search-input`"
-          :disabled="currentlyIsReadonly"
+          v-model="selectedResourceId"
+          @selected="selectResource"
           @input="performResourceSearch"
           @clear="clearResourceSelection"
-          @selected="selectResource"
+          :options="filteredResources"
           :has-error="hasError"
           :debounce="currentField.debounce"
-          :value="selectedResource"
-          :data="filteredResources"
+          :disabled="currentlyIsReadonly"
           :clearable="
             currentField.nullable ||
             editingExistingResource ||
@@ -25,8 +24,9 @@
             createdViaRelationModal
           "
           trackBy="value"
-          class="w-full"
           :mode="mode"
+          class="w-full"
+          :dusk="`${field.resourceName}-search-input`"
         >
           <div v-if="selectedResource" class="flex items-center">
             <div v-if="selectedResource.avatar" class="mr-3">
@@ -50,22 +50,25 @@
 
         <SelectControl
           v-else
-          class="w-full"
-          :has-error="hasError"
-          :dusk="`${field.resourceName}-select`"
-          :disabled="currentlyIsReadonly"
+          v-model="selectedResourceId"
+          @selected="selectResource"
           :options="availableResources"
-          v-model:selected="selectedResourceId"
-          @change="selectResourceFromSelectControl"
+          :has-error="hasError"
+          :disabled="currentlyIsReadonly"
           label="display"
+          class="w-full"
+          :dusk="`${field.resourceName}-select`"
         >
           <option value="" selected :disabled="!currentField.nullable">
             {{ placeholder }}
           </option>
         </SelectControl>
 
-        <CreateRelationButton
+        <Button
           v-if="canShowNewRelationModal"
+          variant="link"
+          size="small"
+          leading-icon="plus-circle"
           v-tooltip="__('Create :resource', { resource: field.singularLabel })"
           @click="openRelationModal"
           :dusk="`${field.attribute}-inline-create`"
@@ -96,9 +99,7 @@
 </template>
 
 <script>
-import find from 'lodash/find'
-import isNil from 'lodash/isNil'
-import storage from '@/storage/BelongsToFieldStorage'
+import { Button } from 'laravel-nova-ui'
 import {
   DependentFormField,
   HandlesValidationErrors,
@@ -106,10 +107,15 @@ import {
   PerformsSearches,
   TogglesTrashed,
 } from '@/mixins'
-import filled from '@/util/filled'
+import storage from '@/storage/BelongsToFieldStorage'
 import findIndex from 'lodash/findIndex'
+import filled from '@/util/filled'
 
 export default {
+  components: {
+    Button,
+  },
+
   mixins: [
     DependentFormField,
     HandlesValidationErrors,
@@ -126,7 +132,6 @@ export default {
     availableResources: [],
     initializingWithExistingResource: false,
     createdViaRelationModal: false,
-    selectedResource: null,
     selectedResourceId: null,
     softDeletes: false,
     withTrashed: false,
@@ -166,14 +171,14 @@ export default {
           // If we should select the initial resource and the field is
           // searchable, we won't load all the resources but we will select
           // the initial option.
-          this.getAvailableResources().then(() => this.selectInitialResource())
+          this.getAvailableResources()
         } else {
           // If we should select the initial resource but the field is not
           // searchable we should load all of the available resources into the
           // field first and select the initial option.
           this.initializingWithExistingResource = false
 
-          this.getAvailableResources().then(() => this.selectInitialResource())
+          this.getAvailableResources()
         }
       } else if (!this.isSearchable && this.currentlyIsVisible) {
         // If we don't need to select an initial resource because the user
@@ -188,15 +193,12 @@ export default {
     },
 
     /**
-     * Select a resource using the <select> control
+     * Return the field default value.
+     *
+     * @returns {string}
      */
-    selectResourceFromSelectControl(value) {
-      this.selectedResourceId = value
-      this.selectInitialResource()
-
-      if (this.field) {
-        this.emitFieldValueChange(this.fieldAttribute, this.selectedResourceId)
-      }
+    fieldDefaultValue() {
+      return null
     },
 
     /**
@@ -206,7 +208,7 @@ export default {
       this.fillIfVisible(
         formData,
         this.fieldAttribute,
-        this.selectedResource ? this.selectedResource.value : ''
+        this.selectedResourceId ?? ''
       )
       this.fillIfVisible(
         formData,
@@ -226,21 +228,16 @@ export default {
           params: this.queryParams,
         })
         .then(({ data: { resources, softDeletes, withTrashed } }) => {
-          Nova.$progress.done()
-
           if (this.initializingWithExistingResource || !this.isSearchable) {
             this.withTrashed = withTrashed
           }
 
           if (this.viaRelatedResource) {
-            let selectedResource = find(resources, r =>
+            let hasSelectedResource = resources.find(r =>
               this.isSelectedResourceId(r.value)
             )
 
-            if (
-              isNil(selectedResource) &&
-              !this.shouldIgnoreViaRelatedResource
-            ) {
+            if (!hasSelectedResource && !this.shouldIgnoreViaRelatedResource) {
               return Nova.visit('/404')
             }
           }
@@ -252,7 +249,7 @@ export default {
           this.availableResources = resources
           this.softDeletes = softDeletes
         })
-        .catch(e => {
+        .finally(() => {
           Nova.$progress.done()
         })
     },
@@ -276,29 +273,17 @@ export default {
     },
 
     /**
-     * Select the initial selected resource
-     */
-    selectInitialResource() {
-      this.selectedResource = find(this.availableResources, r =>
-        this.isSelectedResourceId(r.value)
-      )
-    },
-
-    /**
      * Toggle the trashed state of the search
      */
     toggleWithTrashed() {
-      let currentlySelectedResource
       let currentlySelectedResourceId
 
-      if (filled(this.selectedResource)) {
-        currentlySelectedResource = this.selectedResource
-        currentlySelectedResourceId = this.selectedResource.value
+      if (filled(this.selectedResourceId)) {
+        currentlySelectedResourceId = this.selectedResourceId
       }
 
       this.withTrashed = !this.withTrashed
 
-      this.selectedResource = null
       this.selectedResourceId = null
 
       if (!this.useSearchInput) {
@@ -308,11 +293,9 @@ export default {
           })
 
           if (index > -1) {
-            this.selectedResource = this.availableResources[index]
             this.selectedResourceId = currentlySelectedResourceId
           } else {
             // We didn't find the resource anymore, so let's remove the selection...
-            this.selectedResource = null
             this.selectedResourceId = null
           }
         })
@@ -335,8 +318,6 @@ export default {
       this.initializingWithExistingResource = true
       this.createdViaRelationModal = true
       this.getAvailableResources().then(() => {
-        this.selectInitialResource()
-
         this.emitFieldValueChange(this.fieldAttribute, this.selectedResourceId)
       })
     },
@@ -355,7 +336,7 @@ export default {
       this.clearSelection()
 
       if (this.viaRelatedResource && !this.createdViaRelationModal) {
-        this.updateQueryString({
+        this.pushAfterUpdatingQueryString({
           viaResource: null,
           viaResourceId: null,
           viaRelationship: null,
@@ -396,10 +377,6 @@ export default {
       }
 
       this.initializeComponent()
-
-      if (isNil(this.syncedField.value) && isNil(this.selectedResourceId)) {
-        this.selectInitialResource()
-      }
     },
 
     emitOnSyncedFieldValueChange() {
@@ -416,7 +393,7 @@ export default {
 
     isSelectedResourceId(value) {
       return (
-        !isNil(value) &&
+        value != null &&
         value?.toString() === this.selectedResourceId?.toString()
       )
     },
@@ -475,10 +452,7 @@ export default {
         component: this.field.dependentComponentKey,
         dependsOn: this.encodedDependentFieldValues,
         editing: true,
-        editMode:
-          isNil(this.resourceId) || this.resourceId === ''
-            ? 'create'
-            : 'update',
+        editMode: !filled(this.resourceId) ? 'create' : 'update',
       }
     },
 
@@ -500,7 +474,7 @@ export default {
     },
 
     authorizedToCreate() {
-      return find(Nova.config('resources'), resource => {
+      return Nova.config('resources').find(resource => {
         return resource.uriKey === this.field.resourceName
       }).authorizedToCreate
     },
@@ -544,6 +518,12 @@ export default {
 
     useSearchInput() {
       return this.isSearchable || this.viaRelatedResource
+    },
+
+    selectedResource() {
+      return this.availableResources.find(r =>
+        this.isSelectedResourceId(r.value)
+      )
     },
   },
 }

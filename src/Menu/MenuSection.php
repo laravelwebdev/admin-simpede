@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Menu;
 
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use Laravel\Nova\AuthorizedToSee;
@@ -11,7 +12,9 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Makeable;
 use Laravel\Nova\URL;
 use Laravel\Nova\WithBadge;
+use Laravel\Nova\WithComponent;
 use Laravel\Nova\WithIcon;
+use Stringable;
 
 /**
  * @method static static make(string $name, array|iterable $items = [], string $icon = 'collection')
@@ -20,9 +23,11 @@ class MenuSection implements JsonSerializable
 {
     use AuthorizedToSee;
     use Collapsable;
+    use Conditionable;
     use Macroable;
     use Makeable;
     use WithBadge;
+    use WithComponent;
     use WithIcon;
 
     /**
@@ -33,36 +38,34 @@ class MenuSection implements JsonSerializable
     public $component = 'menu-section';
 
     /**
-     * The menu's name.
+     * The element's icon.
      *
-     * @var string
+     * @var string|null
      */
-    public $name;
-
-    /**
-     * The menu's items.
-     *
-     * @var \Laravel\Nova\Menu\MenuCollection
-     */
-    public $items;
+    public $icon;
 
     /**
      * The menu's path.
      *
-     * @var string|null
+     * @var \Laravel\Nova\URL|string|null
      */
-    public $path;
+    public $path = null;
+
+    /**
+     * The menu's items.
+     */
+    public MenuCollection $items;
 
     /**
      * Construct a new Menu Section instance.
      *
-     * @param  string  $name
      * @param  array|iterable  $items
-     * @param  string  $icon
      */
-    public function __construct($name, $items = [], $icon = 'collection')
-    {
-        $this->name = $name;
+    public function __construct(
+        public Stringable|string $name,
+        iterable $items = [],
+        ?string $icon = 'collection'
+    ) {
         $this->items = new MenuCollection($items);
         $this->withIcon($icon);
     }
@@ -73,15 +76,13 @@ class MenuSection implements JsonSerializable
      * @param  class-string<\Laravel\Nova\Dashboard>  $dashboard
      * @return static
      */
-    public static function dashboard($dashboard)
+    public static function dashboard(string $dashboard)
     {
-        return with(new $dashboard(), function ($dashboard) {
+        return with(new $dashboard, function ($dashboard) {
             return static::make(
                 $dashboard->label()
             )->path('/dashboards/'.$dashboard->uriKey())
-                ->canSee(function ($request) use ($dashboard) {
-                    return $dashboard->authorizedToSee($request);
-                });
+            ->canSee(fn ($request) => $dashboard->authorizedToSee($request));
         });
     }
 
@@ -91,14 +92,12 @@ class MenuSection implements JsonSerializable
      * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
      * @return static
      */
-    public static function resource($resourceClass)
+    public static function resource(string $resourceClass)
     {
         return static::make(
             $resourceClass::label()
         )->path('/resources/'.$resourceClass::uriKey())
-        ->canSee(function ($request) use ($resourceClass) {
-            return $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request);
-        });
+        ->canSee(fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
     }
 
     /**
@@ -108,26 +107,25 @@ class MenuSection implements JsonSerializable
      * @param  class-string<\Laravel\Nova\Lenses\Lens>  $lensClass
      * @return static
      */
-    public static function lens($resourceClass, $lensClass)
+    public static function lens(string $resourceClass, string $lensClass)
     {
         return with(new $lensClass, function ($lens) use ($resourceClass) {
             return static::make($lens->name())
                 ->path('/resources/'.$resourceClass::uriKey().'/lens/'.$lens->uriKey())
-                ->canSee(function ($request) use ($lens) {
-                    return $lens->authorizedToSee($request);
-                });
+                ->canSee(fn ($request) => $lens->authorizedToSee($request));
         });
     }
 
     /**
      * Set path to the menu.
      *
-     * @param  string  $path
      * @return $this
+     *
+     * @throws \Laravel\Nova\Exceptions\NovaException
      */
-    public function path($path)
+    public function path(URL|string|null $href)
     {
-        $this->path = $path;
+        $this->path = $href;
 
         if ($this->collapsable) {
             throw new NovaException('Link menu sections cannot also be collapsable.');
@@ -140,6 +138,8 @@ class MenuSection implements JsonSerializable
      * Set the menu section as collapsable.
      *
      * @return $this
+     *
+     * @throws \Laravel\Nova\Exceptions\NovaException
      */
     public function collapsable()
     {
@@ -155,10 +155,9 @@ class MenuSection implements JsonSerializable
     /**
      * Set icon to the menu.
      *
-     * @param  string  $icon
      * @return $this
      */
-    public function icon($icon)
+    public function icon(string $icon)
     {
         $this->icon = $icon;
 

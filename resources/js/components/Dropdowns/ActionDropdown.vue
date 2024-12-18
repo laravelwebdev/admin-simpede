@@ -74,15 +74,15 @@
 </template>
 
 <script setup>
-import { useActions } from '@/composables/useActions'
-import { useStore } from 'vuex'
-const store = useStore()
 import { Button } from 'laravel-nova-ui'
+import { useStore } from 'vuex'
+import { useActions } from '@/composables/useActions'
 import DropdownMenuHeading from './DropdownMenuHeading.vue'
 
 const emitter = defineEmits(['actionExecuted'])
 
 const props = defineProps({
+  resource: {},
   resourceName: {},
   viaResource: {},
   viaResourceId: {},
@@ -94,6 +94,8 @@ const props = defineProps({
   triggerDuskAttribute: { type: String, default: null },
   showHeadings: { type: Boolean, default: false },
 })
+
+const store = useStore()
 
 const {
   errors,

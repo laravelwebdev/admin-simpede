@@ -16,7 +16,7 @@
         <label class="block mb-2" for="email">{{ __('Email Address') }}</label>
         <input
           v-model="form.email"
-          class="form-control form-input form-control-bordered w-full"
+          class="w-full form-control form-input form-control-bordered"
           :class="{ 'form-control-bordered-error': form.errors.has('email') }"
           id="email"
           type="email"

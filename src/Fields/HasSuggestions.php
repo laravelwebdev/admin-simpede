@@ -9,17 +9,17 @@ trait HasSuggestions
     /**
      * The field's suggestions callback.
      *
-     * @var array|callable
+     * @var (callable():(iterable))|iterable|null
      */
     public $suggestions;
 
     /**
      * Set the callback or array to be used to determine the field's suggestions list.
      *
-     * @param  array|callable  $suggestions
+     * @param  (callable():(iterable))|iterable  $suggestions
      * @return $this
      */
-    public function suggestions($suggestions)
+    public function suggestions(callable|iterable $suggestions)
     {
         $this->suggestions = $suggestions;
 
@@ -28,11 +28,8 @@ trait HasSuggestions
 
     /**
      * Resolve the display suggestions for the field.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return array|null
      */
-    public function resolveSuggestions(NovaRequest $request)
+    public function resolveSuggestions(NovaRequest $request): ?iterable
     {
         if (is_callable($this->suggestions)) {
             return call_user_func($this->suggestions, $request) ?? null;

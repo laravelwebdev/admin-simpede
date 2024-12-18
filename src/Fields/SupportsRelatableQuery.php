@@ -10,7 +10,6 @@ trait SupportsRelatableQuery
     /**
      * Get the relatableQuery callable.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return array
@@ -25,7 +24,6 @@ trait SupportsRelatableQuery
     /**
      * Get the relatableQuery method name.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return string|null
      */

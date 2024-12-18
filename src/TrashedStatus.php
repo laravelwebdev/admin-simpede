@@ -2,22 +2,46 @@
 
 namespace Laravel\Nova;
 
-class TrashedStatus
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Laravel\Scout\Builder as ScoutBuilder;
+
+enum TrashedStatus: string
 {
-    const DEFAULT = '';
+    case DEFAULT = '';
 
-    const WITH = 'with';
+    case WITH = 'with';
 
-    const ONLY = 'only';
+    case ONLY = 'only';
 
     /**
      * Get trashed status from boolean.
-     *
-     * @param  bool  $withTrashed
-     * @return string
      */
-    public static function fromBoolean($withTrashed)
+    public static function fromBoolean(bool $withTrashed): static
     {
         return $withTrashed ? self::WITH : self::DEFAULT;
+    }
+
+    /**
+     * Get trashed status label.
+     */
+    public function name(): string
+    {
+        return match ($this) {
+            self::DEFAULT => '-',
+            self::WITH => (string) Nova::__('With Trashed'),
+            self::ONLY => (string) Nova::__('Only Trashed'),
+        };
+    }
+
+    /**
+     * Apply the trashed state constraint to the query.
+     */
+    public function applySoftDeleteConstraint(Builder|ScoutBuilder $query): Builder|ScoutBuilder
+    {
+        return match ($this) {
+            TrashedStatus::WITH => $query->withTrashed(),
+            TrashedStatus::ONLY => $query->onlyTrashed(),
+            default => $query,
+        };
     }
 }

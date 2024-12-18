@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Http\Requests;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Contracts\RelatableField;
@@ -17,29 +18,21 @@ class LensRequest extends NovaRequest
 
     /**
      * Whether to include the table order prefix.
-     *
-     * @var bool
      */
-    protected $tableOrderPrefix = true;
+    protected bool $tableOrderPrefix = true;
 
     /**
      * Apply the specified filters to the given query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function withFilters($query)
+    public function withFilters(Builder $query): Builder
     {
         return $this->filter($query);
     }
 
     /**
      * Apply the specified filters to the given query.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function filter($query)
+    public function filter(Builder $query): Builder
     {
         $this->filters()->each->__invoke($this, $query);
 
@@ -49,13 +42,13 @@ class LensRequest extends NovaRequest
     /**
      * Apply the specified ordering to the given query.
      *
-     * @template TValue of \Illuminate\Database\Eloquent\Builder
+     * @template TValue of \Illuminate\Contracts\Database\Eloquent\Builder
      *
      * @param  TValue  $query
      * @param  (callable(TValue): (TValue))|null  $defaultCallback
      * @return TValue
      */
-    public function withOrdering($query, $defaultCallback = null)
+    public function withOrdering(Builder $query, $defaultCallback = null): Builder
     {
         if (! $this->orderBy || ! $this->orderByDirection) {
             with($query, $defaultCallback);
@@ -99,21 +92,16 @@ class LensRequest extends NovaRequest
 
     /**
      * Get all of the possibly available filters for the request.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    protected function availableFilters()
+    protected function availableFilters(): Collection
     {
         return $this->lens()->availableFilters($this);
     }
 
     /**
      * Map the given models to the appropriate resource for the request.
-     *
-     * @param  \Illuminate\Support\Collection  $models
-     * @return \Illuminate\Support\Collection
      */
-    public function toResources(Collection $models)
+    public function toResources(Collection $models): Collection
     {
         $resource = $this->resource();
 
@@ -127,9 +115,7 @@ class LensRequest extends NovaRequest
 
                 $payload['actions'] = collect(
                     $hasId === true ? array_values($lensResource->actions($this)) : []
-                )->filter(function ($action) {
-                    return $action->shownOnIndex() || $action->shownOnTableRow();
-                })
+                )->filter(fn ($action) => $action->shownOnIndex() || $action->shownOnTableRow())
                 ->filter->authorizedToSee($this)
                 ->filter->authorizedToRun($this, $model)
                 ->values();
@@ -141,11 +127,8 @@ class LensRequest extends NovaRequest
 
     /**
      * Get foreign key name for relation.
-     *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
-     * @return string
      */
-    protected function getRelationForeignKeyName(Relation $relation)
+    protected function getRelationForeignKeyName(Relation $relation): string
     {
         return method_exists($relation, 'getForeignKeyName')
             ? $relation->getForeignKeyName()
@@ -154,10 +137,8 @@ class LensRequest extends NovaRequest
 
     /**
      * Get per page.
-     *
-     * @return int
      */
-    public function perPage()
+    public function perPage(): int
     {
         $resource = $this->resource();
 
@@ -172,10 +153,9 @@ class LensRequest extends NovaRequest
 
     /**
      * Determine if this request is an action request.
-     *
-     * @return bool
      */
-    public function isActionRequest()
+    #[\Override]
+    public function isActionRequest(): bool
     {
         return $this->segment(5) == 'actions';
     }

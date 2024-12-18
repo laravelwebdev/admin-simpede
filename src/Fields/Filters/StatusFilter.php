@@ -16,7 +16,6 @@ class StatusFilter extends Filter
     /**
      * Get the filter's available options.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function options(NovaRequest $request)

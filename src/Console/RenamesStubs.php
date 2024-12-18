@@ -13,8 +13,10 @@ trait RenamesStubs
      */
     protected function renameStubs()
     {
+        $files = new Filesystem;
+
         foreach ($this->stubsToRename() as $stub) {
-            (new Filesystem)->move($stub, str_replace('.stub', '.php', $stub));
+            $files->move($stub, str_replace('.stub', '.php', $stub));
         }
     }
 

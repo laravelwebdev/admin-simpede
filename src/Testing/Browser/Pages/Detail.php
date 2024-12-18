@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Testing\Browser\Pages;
 
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Dusk\Browser;
 use Laravel\Nova\Testing\Browser\Components\ActionDropdownComponent;
 use Laravel\Nova\Testing\Browser\Components\IndexComponent;
@@ -10,40 +11,37 @@ use Laravel\Nova\Testing\Browser\Components\Modals\RestoreResourceModalComponent
 
 class Detail extends Page
 {
-    public $resourceName;
-
-    public $resourceId;
+    /**
+     * The Resource ID.
+     *
+     * @var \Illuminate\Database\Eloquent\Model|string|int
+     */
+    public mixed $resourceId;
 
     /**
      * Create a new page instance.
      *
-     * @param  string  $resourceName
-     * @param  string  $resourceId
-     * @param  array  $queryParams
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Model|string|int  $resourceId
      */
-    public function __construct($resourceName, $resourceId, $queryParams = [])
-    {
-        $this->resourceId = $resourceId;
-        $this->resourceName = $resourceName;
-        $this->queryParams = $queryParams;
+    public function __construct(
+        public string $resourceName,
+        mixed $resourceId,
+        array $queryParams = []
+    ) {
+        $this->resourceId = $resourceId instanceof Model ? $resourceId->getKey() : $resourceId;
 
-        $this->setNovaPage("/resources/{$this->resourceName}/{$this->resourceId}");
+        $this->setNovaPage("/resources/{$this->resourceName}/{$this->resourceId}", $queryParams);
     }
 
     /**
      * Run the action with the given URI key.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $uriKey
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function runAction(Browser $browser, $uriKey)
+    public function runAction(Browser $browser, string $uriKey): void
     {
         $browser->openControlSelector()
-            ->elsewhereWhenAvailable(new ActionDropdownComponent(), function ($browser) use ($uriKey) {
+            ->elsewhereWhenAvailable(new ActionDropdownComponent, function ($browser) use ($uriKey) {
                 $browser->runWithConfirmation($uriKey);
             });
     }
@@ -51,16 +49,12 @@ class Detail extends Page
     /**
      * Run the action with the given URI key.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $uriKey
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function runInstantAction(Browser $browser, $uriKey)
+    public function runInstantAction(Browser $browser, string $uriKey): void
     {
         $browser->openControlSelector()
-            ->elsewhereWhenAvailable(new ActionDropdownComponent(), function ($browser) use ($uriKey) {
+            ->elsewhereWhenAvailable(new ActionDropdownComponent, function ($browser) use ($uriKey) {
                 $browser->runWithoutConfirmation($uriKey);
             });
     }
@@ -68,16 +62,12 @@ class Detail extends Page
     /**
      * Open the action modal but cancel the action.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $uriKey
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function cancelAction(Browser $browser, $uriKey)
+    public function cancelAction(Browser $browser, string $uriKey): void
     {
         $browser->openControlSelector()
-            ->elsewhereWhenAvailable(new ActionDropdownComponent(), function ($browser) use ($uriKey) {
+            ->elsewhereWhenAvailable(new ActionDropdownComponent, function ($browser) use ($uriKey) {
                 $browser->cancel($uriKey);
             });
     }
@@ -85,12 +75,9 @@ class Detail extends Page
     /**
      * Edit the resource.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function edit(Browser $browser)
+    public function edit(Browser $browser): void
     {
         $browser->waitFor('@edit-resource-button')
             ->click('@edit-resource-button');
@@ -99,13 +86,9 @@ class Detail extends Page
     /**
      * Create the related resource.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $relatedResourceName
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function runCreateRelation(Browser $browser, $relatedResourceName)
+    public function runCreateRelation(Browser $browser, string $relatedResourceName): void
     {
         $browser->within(new IndexComponent($relatedResourceName), function ($browser) {
             $browser->waitFor('@create-button')->click('@create-button');
@@ -115,14 +98,9 @@ class Detail extends Page
     /**
      * Create the related resource.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $relatedResourceName
-     * @param  string|null  $viaRelationship
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function runAttachRelation(Browser $browser, $relatedResourceName, $viaRelationship = null)
+    public function runAttachRelation(Browser $browser, string $relatedResourceName, ?string $viaRelationship = null): void
     {
         $browser->within(new IndexComponent($relatedResourceName, $viaRelationship), function ($browser) {
             $browser->waitFor('@attach-button')->click('@attach-button');
@@ -132,12 +110,9 @@ class Detail extends Page
     /**
      * Open the delete selector.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function openControlSelector(Browser $browser)
+    public function openControlSelector(Browser $browser): void
     {
         $browser->whenAvailable("@{$this->resourceId}-control-selector", function ($browser) {
             $browser->click('');
@@ -147,12 +122,9 @@ class Detail extends Page
     /**
      * Replicate the resource.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function replicate(Browser $browser)
+    public function replicate(Browser $browser): void
     {
         $browser->openControlSelector()
             ->whenAvailable("@{$this->resourceId}-replicate-button", function ($browser) {
@@ -163,18 +135,15 @@ class Detail extends Page
     /**
      * Delete the resource.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function delete(Browser $browser)
+    public function delete(Browser $browser): void
     {
         $browser->openControlSelector()
             ->whenAvailable('@open-delete-modal-button', function ($browser) {
                 $browser->click('');
             })
-            ->elsewhereWhenAvailable(new DeleteResourceModalComponent(), function ($browser) {
+            ->elsewhereWhenAvailable(new DeleteResourceModalComponent, function ($browser) {
                 $browser->confirm();
             })->pause(1000);
     }
@@ -182,18 +151,15 @@ class Detail extends Page
     /**
      * Restore the resource.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function restore(Browser $browser)
+    public function restore(Browser $browser): void
     {
         $browser->openControlSelector()
             ->whenAvailable('@open-restore-modal-button', function ($browser) {
                 $browser->click('');
             })
-            ->elsewhereWhenAvailable(new RestoreResourceModalComponent(), function ($browser) {
+            ->elsewhereWhenAvailable(new RestoreResourceModalComponent, function ($browser) {
                 $browser->confirm();
             })->pause(1000);
     }
@@ -201,39 +167,31 @@ class Detail extends Page
     /**
      * Force delete the resource.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function forceDelete(Browser $browser)
+    public function forceDelete(Browser $browser): void
     {
         $browser->openControlSelector()
             ->whenAvailable('@open-force-delete-modal-button', function ($browser) {
                 $browser->click('');
             })
-            ->elsewhereWhenAvailable(new DeleteResourceModalComponent(), function ($browser) {
+            ->elsewhereWhenAvailable(new DeleteResourceModalComponent, function ($browser) {
                 $browser->confirm();
             })->pause(1000);
     }
 
     /**
      * Assert that the browser is on the page.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
      */
-    public function assert(Browser $browser)
+    public function assert(Browser $browser): void
     {
         $browser->assertOk()->waitFor('@nova-resource-detail');
     }
 
     /**
      * Get the element shortcuts for the page.
-     *
-     * @return array
      */
-    public function elements()
+    public function elements(): array
     {
         return [
             '@nova-resource-detail' => '[dusk="'.$this->resourceName.'-detail-component"]',

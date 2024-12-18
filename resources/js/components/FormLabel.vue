@@ -4,12 +4,8 @@
   </label>
 </template>
 
-<script>
-export default {
-  props: {
-    labelFor: {
-      type: String,
-    },
-  },
-}
+<script setup>
+defineProps({
+  labelFor: { type: String, required: false },
+})
 </script>

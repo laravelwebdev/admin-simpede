@@ -6,10 +6,9 @@ class MorphOne extends HasOne
 {
     /**
      * Get the relationship type.
-     *
-     * @return string
      */
-    public function relationshipType()
+    #[\Override]
+    public function relationshipType(): string
     {
         return 'morphOne';
     }

@@ -17,7 +17,6 @@ class MenuCollection extends Collection
     /**
      * Filter menus should be displayed for the given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return static<int, TValue>
      */
     public function authorized(Request $request)

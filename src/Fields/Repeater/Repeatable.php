@@ -8,6 +8,7 @@ use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Fields\FieldCollection;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Makeable;
+use Laravel\Nova\Nova;
 
 class Repeatable implements JsonSerializable
 {
@@ -54,7 +55,7 @@ class Repeatable implements JsonSerializable
     public function __construct($data = [])
     {
         $this->data = $data;
-        $this->fields = new FieldCollection();
+        $this->fields = new FieldCollection;
     }
 
     /**
@@ -64,7 +65,7 @@ class Repeatable implements JsonSerializable
      */
     public static function label()
     {
-        return Str::plural(Str::title(Str::snake(class_basename(get_called_class()), ' ')));
+        return Str::plural(Nova::humanize(get_called_class()));
     }
 
     /**

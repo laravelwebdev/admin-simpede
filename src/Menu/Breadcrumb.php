@@ -2,51 +2,38 @@
 
 namespace Laravel\Nova\Menu;
 
+use Illuminate\Support\Traits\Conditionable;
 use JsonSerializable;
 use Laravel\Nova\AuthorizedToSee;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Makeable;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
+use Laravel\Nova\URL;
+use Stringable;
 
 class Breadcrumb implements JsonSerializable
 {
-    use AuthorizedToSee,
-        Makeable;
-
-    /**
-     * The breadcrumb's name.
-     *
-     * @var string
-     */
-    public $name;
-
-    /**
-     * The breadcrumb's path.
-     *
-     * @var string|null
-     */
-    public $path;
+    use AuthorizedToSee;
+    use Conditionable;
+    use Makeable;
 
     /**
      * Construct a new Breadcrumb instance.
-     *
-     * @param  string  $name
-     * @param  string|null  $path
      */
-    public function __construct($name, $path = null)
-    {
-        $this->name = $name;
-        $this->path = $path;
+    public function __construct(
+        public Stringable|string $name,
+        public ?string $path = null
+    ) {
+        //
     }
 
     /**
      * Create a breadcrumb from a resource class.
      *
      * @param  \Laravel\Nova\Resource|class-string<\Laravel\Nova\Resource>  $resourceClass
-     * @return static
      */
-    public static function resource($resourceClass)
+    public static function resource(Resource|string $resourceClass): static
     {
         if ($resourceClass instanceof Resource && $resourceClass->model()->exists === true) {
             return static::make(
@@ -55,26 +42,21 @@ class Breadcrumb implements JsonSerializable
                     'title' => $resourceClass->title(),
                 ])
             )->path('/resources/'.$resourceClass::uriKey().'/'.$resourceClass->getKey())
-            ->canSee(function ($request) use ($resourceClass) {
-                return $resourceClass->authorizedToView($request);
-            });
+            ->canSee(fn ($request) => $resourceClass->authorizedToView($request));
         }
 
         return static::make(
             Nova::__($resourceClass::label())
         )->path('/resources/'.$resourceClass::uriKey())
-        ->canSee(function ($request) use ($resourceClass) {
-            return $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request);
-        });
+        ->canSee(fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
     }
 
     /**
      * Set breadcrumb's path.
      *
-     * @param  string  $href
      * @return $this
      */
-    public function path($href)
+    public function path(URL|string|null $href)
     {
         $this->path = $href;
 

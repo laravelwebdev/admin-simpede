@@ -7,7 +7,7 @@ abstract class RangedMetric extends Metric
     /**
      * The ranges available for the metric.
      *
-     * @var array<string|int, string>
+     * @var \Illuminate\Support\Collection<string|int, string>|array<string|int, string>
      */
     public $ranges = [];
 
@@ -16,7 +16,7 @@ abstract class RangedMetric extends Metric
      *
      * @var string|null
      */
-    public $selectedRangeKey;
+    public $selectedRangeKey = null;
 
     /**
      * Get the ranges available for the metric.
@@ -31,10 +31,9 @@ abstract class RangedMetric extends Metric
     /**
      * Set the default range.
      *
-     * @param  string  $key
      * @return $this
      */
-    public function defaultRange($key)
+    public function defaultRange(string $key)
     {
         $this->selectedRangeKey = $key;
 
@@ -46,6 +45,7 @@ abstract class RangedMetric extends Metric
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

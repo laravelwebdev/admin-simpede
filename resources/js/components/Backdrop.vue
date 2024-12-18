@@ -1,7 +1,7 @@
 <template>
   <div
     v-bind="$attrs"
-    v-show="props.show"
+    v-show="show"
     class="absolute inset-0 h-full"
     :style="{ top: `${scrollY}px` }"
   />
@@ -10,7 +10,11 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
-const props = defineProps({
+defineOptions({
+  inheritAttrs: false,
+})
+
+defineProps({
   show: {
     type: Boolean,
     default: false,
@@ -31,10 +35,4 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('scroll', scrollEvent)
 })
-</script>
-
-<script>
-export default {
-  inheritAttrs: false,
-}
 </script>

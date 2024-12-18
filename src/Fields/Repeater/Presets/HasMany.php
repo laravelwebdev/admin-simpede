@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Fields\Repeater\Presets;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany as EloquentHasMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -17,17 +16,16 @@ class HasMany implements Preset
     /**
      * Save the field value to permanent storage.
      *
-     * @param  string|null  $uniqueField
-     * @return \Closure|void
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      */
     public function set(
         NovaRequest $request,
         string $requestAttribute,
-        Model $model,
+        $model,
         string $attribute,
         RepeatableCollection $repeatables,
-        $uniqueField
-    ) {
+        string|int|null $uniqueField
+    ): callable {
         return function () use ($request, $requestAttribute, $model, $attribute, $repeatables, $uniqueField) {
             $repeaterItems = collect($request->input($requestAttribute));
 
@@ -70,10 +68,9 @@ class HasMany implements Preset
     /**
      * Retrieve the value from storage and hydrate the field's value.
      *
-     * @param  mixed  $model
-     * @return \Illuminate\Support\Collection
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      */
-    public function get(NovaRequest $request, $model, string $attribute, RepeatableCollection $repeatables)
+    public function get(NovaRequest $request, $model, string $attribute, RepeatableCollection $repeatables): Collection
     {
         return RepeatableCollection::make($model->{$attribute})
             ->map(function ($block) use ($repeatables) {
@@ -84,13 +81,9 @@ class HasMany implements Preset
     /**
      * Delete missing relations.
      *
-     * @param  string  $attribute
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Illuminate\Support\Collection  $repeaterItems
-     * @param  mixed  $uniqueField
-     * @return void
      */
-    public function deleteMissingRelations(string $attribute, Model $model, Collection $repeaterItems, $uniqueField): void
+    public function deleteMissingRelations(string $attribute, $model, Collection $repeaterItems, string|int|null $uniqueField): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
         $relation = $model->{$attribute}();
@@ -113,13 +106,8 @@ class HasMany implements Preset
      * Upsert relation.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Laravel\Nova\Support\Fluent  $data
-     * @param  array  $row
-     * @param  mixed  $uniqueField
-     * @param  \Illuminate\Database\Eloquent\Relations\HasMany  $relation
-     * @return void
      */
-    public function upsertRelation(Model $model, Fluent $data, array $row, $uniqueField, EloquentHasMany $relation): void
+    public function upsertRelation($model, Fluent $data, array $row, string|int|null $uniqueField, EloquentHasMany $relation): void
     {
         $model->unguarded(function () use ($data, $row, $uniqueField, $relation) {
             $uniqueValue = $row['fields'][$uniqueField];

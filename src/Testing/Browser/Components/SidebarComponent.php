@@ -8,28 +8,21 @@ class SidebarComponent extends Component
 {
     /**
      * The screen size 'desktop', 'responsive'.
-     *
-     * @var string
      */
-    public $screen = 'desktop';
+    public string $screen = 'desktop';
 
     /**
      * Create a new component instance.
-     *
-     * @param  string|null  $screen
-     * @return void
      */
-    public function __construct($screen = null)
+    public function __construct(?string $screen = null)
     {
         $this->screen = $screen ?? $this->screen;
     }
 
     /**
      * Get the root selector for the component.
-     *
-     * @return string
      */
-    public function selector()
+    public function selector(): string
     {
         return 'div[dusk="sidebar-menu"][role="navigation"][data-screen="'.$this->screen.'"]';
     }
@@ -37,12 +30,9 @@ class SidebarComponent extends Component
     /**
      * Assert that the browser page contains the component.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function assert(Browser $browser)
+    public function assert(Browser $browser): void
     {
         tap($this->selector(), function ($selector) use ($browser) {
             $browser->scrollIntoView($selector);
@@ -51,10 +41,8 @@ class SidebarComponent extends Component
 
     /**
      * Get the element shortcuts for the component.
-     *
-     * @return array
      */
-    public function elements()
+    public function elements(): array
     {
         return [
             '@current-active-link' => 'a[data-active-link=true]',

@@ -9,10 +9,9 @@ class ResourceToolElement extends FieldElement
     /**
      * Create a new resource tool.
      *
-     * @param  string  $component
      * @return void
      */
-    public function __construct($component)
+    public function __construct(?string $component = null)
     {
         parent::__construct($component);
 
