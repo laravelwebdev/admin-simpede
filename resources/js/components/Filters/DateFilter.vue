@@ -4,14 +4,15 @@
 
     <template #filter>
       <input
-        class="w-full flex form-control h-8 text-xs form-input form-control-bordered"
-        type="date"
-        :dusk="`${filter.name}-date-filter`"
-        name="date-filter"
-        autocomplete="off"
-        :value="value"
-        :placeholder="placeholder"
+        ref="dateField"
         @change="handleChange"
+        type="date"
+        name="date-filter"
+        :value="value"
+        autocomplete="off"
+        class="w-full h-8 flex form-control form-input form-control-bordered text-xs"
+        :placeholder="placeholder"
+        :dusk="filter.uniqueKey"
       />
     </template>
   </FilterContainer>
@@ -34,8 +35,8 @@ export default {
   },
 
   methods: {
-    handleChange(event) {
-      let value = event?.target?.value ?? event
+    handleChange(e) {
+      let value = e.target.value
 
       this.$store.commit(`${this.resourceName}/updateFilterState`, {
         filterClass: this.filterKey,
@@ -51,14 +52,14 @@ export default {
       return this.filter.placeholder || this.__('Choose date')
     },
 
-    value() {
-      return this.filter.currentValue
-    },
-
     filter() {
       return this.$store.getters[`${this.resourceName}/getFilter`](
         this.filterKey
       )
+    },
+
+    value() {
+      return this.filter.currentValue
     },
 
     options() {

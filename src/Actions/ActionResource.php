@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Actions;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
@@ -29,6 +30,13 @@ class ActionResource extends Resource
     public static $model = ActionEvent::class;
 
     /**
+     * The policy the resource corrsponds to.
+     *
+     * @var class-string|null
+     */
+    public static $policy = ActionResourcePolicy::class;
+
+    /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
@@ -50,55 +58,11 @@ class ActionResource extends Resource
     public static $polling = true;
 
     /**
-     * Determine if the current user can create new resources.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public static function authorizedToCreate(Request $request)
-    {
-        return false;
-    }
-
-    /**
-     * Determine if the current user can edit resources.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function authorizedToUpdate(Request $request)
-    {
-        return false;
-    }
-
-    /**
-     * Determine if the current user can replicate the given resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function authorizedToReplicate(Request $request)
-    {
-        return false;
-    }
-
-    /**
-     * Determine if the current user can delete resources.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    public function authorizedToDelete(Request $request)
-    {
-        return false;
-    }
-
-    /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
+    #[\Override]
     public function fields(NovaRequest $request)
     {
         return [
@@ -134,11 +98,10 @@ class ActionResource extends Resource
     /**
      * Build an "index" query for the given resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Contracts\Database\Eloquent\Builder
      */
-    public static function indexQuery(NovaRequest $request, $query)
+    #[\Override]
+    public static function indexQuery(NovaRequest $request, Builder $query)
     {
         return $query->with('user');
     }
@@ -146,9 +109,9 @@ class ActionResource extends Resource
     /**
      * Determine if this resource is available for navigation.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
+    #[\Override]
     public static function availableForNavigation(Request $request)
     {
         return false;
@@ -159,6 +122,7 @@ class ActionResource extends Resource
      *
      * @return bool
      */
+    #[\Override]
     public static function searchable()
     {
         return false;
@@ -167,21 +131,23 @@ class ActionResource extends Resource
     /**
      * Get the displayable label of the resource.
      *
-     * @return string
+     * @return \Stringable|string
      */
+    #[\Override]
     public static function label()
     {
-        return Nova::__('Actions');
+        return Nova::__('Action Events');
     }
 
     /**
      * Get the displayable singular label of the resource.
      *
-     * @return string
+     * @return \Stringable|string
      */
+    #[\Override]
     public static function singularLabel()
     {
-        return Nova::__('Action');
+        return Nova::__('Action Event');
     }
 
     /**
@@ -189,6 +155,7 @@ class ActionResource extends Resource
      *
      * @return string
      */
+    #[\Override]
     public static function uriKey()
     {
         return 'action-events';

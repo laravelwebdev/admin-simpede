@@ -18,6 +18,7 @@ class Help extends Card
      *
      * @return string
      */
+    #[\Override]
     public function component()
     {
         return 'help-card';

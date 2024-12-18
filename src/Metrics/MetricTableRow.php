@@ -2,14 +2,18 @@
 
 namespace Laravel\Nova\Metrics;
 
+use Closure;
 use JsonSerializable;
 use Laravel\Nova\Makeable;
+use Laravel\Nova\WithIcon;
 use Laravel\SerializableClosure\SerializableClosure;
 use Serializable;
+use Stringable;
 
 class MetricTableRow implements JsonSerializable, Serializable
 {
     use Makeable;
+    use WithIcon;
 
     /**
      * The icon of the metric row.
@@ -28,14 +32,14 @@ class MetricTableRow implements JsonSerializable, Serializable
     /**
      * The title of the metric row.
      *
-     * @var string
+     * @var \Stringable|string
      */
     public $title;
 
     /**
      * The subtitle of the metric row.
      *
-     * @var string
+     * @var \Stringable|string
      */
     public $subtitle;
 
@@ -59,12 +63,11 @@ class MetricTableRow implements JsonSerializable, Serializable
     /**
      * Set the icon for the metric row.
      *
-     * @param  string  $icon
      * @return $this
      */
-    public function icon($icon)
+    public function icon(string $icon)
     {
-        $this->icon = $icon;
+        $this->withIcon($icon);
 
         return $this;
     }
@@ -72,10 +75,9 @@ class MetricTableRow implements JsonSerializable, Serializable
     /**
      * Set the icon class for the metric row.
      *
-     * @param  string  $class
      * @return $this
      */
-    public function iconClass($class)
+    public function iconClass(string $class)
     {
         $this->iconClass = $class;
 
@@ -85,10 +87,9 @@ class MetricTableRow implements JsonSerializable, Serializable
     /**
      * Set the title for the metric row.
      *
-     * @param  string  $title
      * @return $this
      */
-    public function title($title)
+    public function title(Stringable|string $title)
     {
         $this->title = $title;
 
@@ -98,10 +99,9 @@ class MetricTableRow implements JsonSerializable, Serializable
     /**
      * Set the subtitle for the metric row.
      *
-     * @param  string  $subtitle
      * @return $this
      */
-    public function subtitle($subtitle)
+    public function subtitle(Stringable|string $subtitle)
     {
         $this->subtitle = $subtitle;
 
@@ -114,7 +114,7 @@ class MetricTableRow implements JsonSerializable, Serializable
      * @param  \Closure():array  $actionCallback
      * @return $this
      */
-    public function actions($actionCallback)
+    public function actions(Closure $actionCallback)
     {
         $this->actionCallback = $actionCallback;
 

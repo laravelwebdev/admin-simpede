@@ -2,6 +2,8 @@
 
 namespace Laravel\Nova;
 
+use Closure;
+
 trait AuthorizesRequests
 {
     /**
@@ -15,9 +17,8 @@ trait AuthorizesRequests
      * Register the Nova authentication callback.
      *
      * @param  \Closure(\Illuminate\Http\Request):bool  $callback
-     * @return static
      */
-    public static function auth($callback)
+    public static function auth(Closure $callback): static
     {
         static::$authUsing = $callback;
 
@@ -28,9 +29,8 @@ trait AuthorizesRequests
      * Determine if the given request can access the Nova dashboard.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
-    public static function check($request)
+    public static function check($request): bool
     {
         return (static::$authUsing ?: function () {
             return app()->environment('local');

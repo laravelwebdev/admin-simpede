@@ -14,6 +14,7 @@ abstract class Element implements JsonSerializable
     use Makeable;
     use Metable;
     use ProxiesCanSeeToGate;
+    use WithComponent;
 
     /**
      * The element's component.
@@ -32,10 +33,9 @@ abstract class Element implements JsonSerializable
     /**
      * Create a new element.
      *
-     * @param  string|null  $component
      * @return void
      */
-    public function __construct($component = null)
+    public function __construct(?string $component = null)
     {
         $this->component = $component ?? $this->component;
     }
@@ -43,22 +43,11 @@ abstract class Element implements JsonSerializable
     /**
      * Determine if the element should be displayed for the given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorize(Request $request)
     {
         return $this->authorizedToSee($request);
-    }
-
-    /**
-     * Get the component name for the element.
-     *
-     * @return string
-     */
-    public function component()
-    {
-        return $this->component;
     }
 
     /**

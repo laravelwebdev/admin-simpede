@@ -48,8 +48,16 @@
                   v-for="repeatable in currentField.repeatables"
                   class="space-x-2"
                 >
-                  <span><Icon solid :type="repeatable.icon" /></span>
-                  <span>{{ repeatable.singularLabel }}</span>
+                  <span>
+                    <Icon
+                      :name="repeatable.icon"
+                      type="solid"
+                      class="inline-block"
+                    />
+                  </span>
+                  <span>
+                    {{ repeatable.singularLabel }}
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenu>
             </template>
@@ -73,16 +81,19 @@
 </template>
 
 <script>
+import { Button, Icon } from 'laravel-nova-ui'
 import { FormField, HandlesValidationErrors } from '@/mixins'
+import { computed } from 'vue'
 import cloneDeep from 'lodash/cloneDeep'
 import { uid } from 'uid/single'
-import { computed } from 'vue'
-import { Button } from 'laravel-nova-ui'
 
 export default {
-  mixins: [FormField, HandlesValidationErrors],
+  components: {
+    Button,
+    Icon,
+  },
 
-  components: { Button },
+  mixins: [FormField, HandlesValidationErrors],
 
   provide() {
     return {

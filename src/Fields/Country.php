@@ -13,12 +13,12 @@ class Country extends Select
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|\Closure|callable|object|null  $attribute
+     * @param  \Stringable|string  $name
+     * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
@@ -274,9 +274,7 @@ class Country extends Select
                 'YE' => 'Yemen',
                 'ZM' => 'Zambia',
                 'ZW' => 'Zimbabwe',
-            ])->transform(function ($country) {
-                return Nova::__($country);
-            });
+            ])->transform(fn ($country) => Nova::__($country)); /** @phpstan-ignore argument.type */
         });
     }
 }

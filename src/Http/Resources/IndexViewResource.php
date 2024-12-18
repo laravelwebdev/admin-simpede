@@ -37,12 +37,11 @@ class IndexViewResource extends Resource
     /**
      * Get authorized resource for the request.
      *
-     * @param  \Laravel\Nova\Http\Requests\ResourceIndexRequest  $request
      * @return class-string<\Laravel\Nova\Resource>
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function authorizedResourceForRequest(ResourceIndexRequest $request)
+    public function authorizedResourceForRequest(ResourceIndexRequest $request): string
     {
         return tap($request->resource(), function ($resource) use ($request) {
             abort_unless($resource::authorizedToViewAny($request), 403);

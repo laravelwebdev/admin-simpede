@@ -27,13 +27,13 @@ class FieldCommand extends ComponentGeneratorCommand
      *
      * @return void
      */
-    public function handle()
+    public function handle(Filesystem $files)
     {
         if (! $this->hasValidNameArgument()) {
             return;
         }
 
-        (new Filesystem)->copyDirectory(
+        $files->copyDirectory(
             __DIR__.'/field-stubs',
             $this->componentPath()
         );
@@ -46,7 +46,7 @@ class FieldCommand extends ComponentGeneratorCommand
         $this->replace('{{ class }}', $this->componentClass(), $this->componentPath().'/src/Field.stub');
         $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/Field.stub');
 
-        (new Filesystem)->move(
+        $files->move(
             $this->componentPath().'/src/Field.stub',
             $this->componentPath().'/src/'.$this->componentClass().'.php'
         );
@@ -58,7 +58,7 @@ class FieldCommand extends ComponentGeneratorCommand
         // webpack.mix.js replacements...
         $this->replace('{{ name }}', $this->component(), $this->componentPath().'/webpack.mix.js');
 
-        (new Filesystem)->move(
+        $files->move(
             $this->componentPath().'/src/FieldServiceProvider.stub',
             $this->componentPath().'/src/FieldServiceProvider.php'
         );
@@ -67,7 +67,6 @@ class FieldCommand extends ComponentGeneratorCommand
         $this->prepareComposerReplacements();
 
         // Register the field...
-        $this->installNovaNpmDependencies();
         $this->buildComponent('field');
     }
 }

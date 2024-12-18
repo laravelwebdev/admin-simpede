@@ -4,6 +4,7 @@ namespace Laravel\Nova\Http\Controllers\Pages;
 
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
+use Inertia\Response;
 use Laravel\Nova\Http\Requests\DashboardRequest;
 use Laravel\Nova\Http\Resources\DashboardViewResource;
 use Laravel\Nova\Menu\Breadcrumb;
@@ -15,13 +16,10 @@ class DashboardController extends Controller
     /**
      * Show Resource Create page using Inertia.
      *
-     * @param  \Laravel\Nova\Http\Requests\DashboardRequest  $request
-     * @param  string  $name
-     * @return \Illuminate\Http\RedirectResponse|\Inertia\Response
-     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function __invoke(DashboardRequest $request, $name = 'main')
+    public function __invoke(DashboardRequest $request, string $name = 'main'): Response
     {
         DashboardViewResource::make($name)->authorizedDashboardForRequest($request);
 
@@ -33,12 +31,8 @@ class DashboardController extends Controller
 
     /**
      * Get breadcrumb menu for the page.
-     *
-     * @param  \Laravel\Nova\Http\Requests\DashboardRequest  $request
-     * @param  string  $name
-     * @return \Laravel\Nova\Menu\Breadcrumbs
      */
-    protected function breadcrumbs(DashboardRequest $request, string $name)
+    protected function breadcrumbs(DashboardRequest $request, string $name): Breadcrumbs
     {
         return Breadcrumbs::make([
             Breadcrumb::make(Nova::__('Dashboards')),

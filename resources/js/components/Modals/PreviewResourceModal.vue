@@ -26,20 +26,20 @@
             dusk="detail-preview-button"
             :href="$url(`/resources/${resourceName}/${resourceId}`)"
             class="ml-auto"
-            :alt="__('View :resource', { resource: title })"
+            :alt="viewResourceDetailTitle"
           >
-            <Icon type="arrow-right" />
+            <Icon name="arrow-right" />
           </Link>
         </ModalHeader>
         <ModalContent
-          class="px-8 divide-y divide-gray-100 dark:divide-gray-800 -mx-3"
+          class="px-8 divide-y divide-gray-100 dark:divide-gray-800"
         >
           <template v-if="resource">
             <component
               :key="index"
               v-for="(field, index) in resource.fields"
               :index="index"
-              :is="`detail-${field.component}`"
+              :is="componentName(field)"
               :resource-name="resourceName"
               :resource-id="resourceId"
               :resource="resource"
@@ -68,13 +68,14 @@
 </template>
 
 <script>
+import { Button, Icon } from 'laravel-nova-ui'
 import { mapProps } from '@/mixins'
 import { minimum } from '@/util'
-import { Button } from 'laravel-nova-ui'
 
 export default {
   components: {
     Button,
+    Icon,
   },
 
   emits: ['close'],
@@ -136,11 +137,23 @@ export default {
           Nova.visit(`/resources/${this.resourceName}`)
         })
     },
+
+    componentName(field) {
+      if (Nova.hasComponent(`preview-${field.component}`)) {
+        return `preview-${field.component}`
+      }
+
+      return `detail-${field.component}`
+    },
   },
 
   computed: {
     modalTitle() {
       return `${this.__('Previewing')} ${this.title}`
+    },
+
+    viewResourceDetailTitle() {
+      return this.__('View :resource', { resource: this.title ?? '' })
     },
   },
 }

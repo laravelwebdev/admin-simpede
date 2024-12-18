@@ -6,13 +6,20 @@ use Illuminate\Support\Arr;
 
 class Line extends Text implements Unfillable
 {
-    const HEADING = 'extra-large';
+    public const HEADING = 'extra-large';
 
-    const BASE = 'large';
+    public const BASE = 'large';
 
-    const SUBTITLE = 'medium';
+    public const SUBTITLE = 'medium';
 
-    const SMALL = 'small';
+    public const SMALL = 'small';
+
+    /**
+     * The line's component.
+     *
+     * @var string
+     */
+    public $component = 'line-field';
 
     /**
      * The type for the line field.
@@ -24,16 +31,9 @@ class Line extends Text implements Unfillable
     /**
      * Extra CSS classes to apply to the line.
      *
-     * @var mixed
+     * @var array|string
      */
     public $extraClasses = '';
-
-    /**
-     * The line's component.
-     *
-     * @var string
-     */
-    public $component = 'line-field';
 
     /**
      * CSS class lookup table for lines.
@@ -50,12 +50,12 @@ class Line extends Text implements Unfillable
     /**
      * Create a new field.
      *
-     * @param  string  $name
+     * @param  \Stringable|string  $name
      * @param  string|callable|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
@@ -113,10 +113,9 @@ class Line extends Text implements Unfillable
     /**
      * Set the extra CSS classes to be applied to the line field.
      *
-     * @param  mixed  $classes
      * @return $this
      */
-    public function extraClasses($classes)
+    public function extraClasses(array|string $classes)
     {
         $this->extraClasses = $classes;
 

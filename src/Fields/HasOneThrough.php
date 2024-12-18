@@ -8,6 +8,8 @@ use Laravel\Nova\Contracts\RelatableField;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Panel;
+use Laravel\Nova\Resource;
+use Stringable;
 
 /**
  * @method static static make(mixed $name, string|null $attribute = null, string|null $resource = null)
@@ -38,7 +40,7 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     /**
      * The displayable singular label of the relation.
      *
-     * @var string
+     * @var \Stringable|string
      */
     public $singularLabel;
 
@@ -47,7 +49,7 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
      *
      * @var \Laravel\Nova\Resource|null
      */
-    public $hasOneThroughResource;
+    public $hasOneThroughResource = null;
 
     /**
      * The name of the Eloquent "has one through" relationship.
@@ -61,28 +63,27 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
      *
      * @var string|int|null
      */
-    public $hasOneThroughId;
+    public $hasOneThroughId = null;
 
     /**
      * The callback used to determine if the HasOne field has already been filled.
      *
-     * @var \Closure(\Laravel\Nova\Http\Requests\NovaRequest):bool
+     * @var callable(\Laravel\Nova\Http\Requests\NovaRequest):bool
      */
     public $filledCallback;
 
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|null  $attribute
+     * @param  \Stringable|string  $name
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
      * @return void
      */
-    public function __construct($name, $attribute = null, $resource = null)
+    public function __construct($name, ?string $attribute = null, ?string $resource = null)
     {
         parent::__construct($name, $attribute);
 
-        $resource = $resource ?? ResourceRelationshipGuesser::guessResource($name);
+        $resource ??= ResourceRelationshipGuesser::guessResource($name);
 
         $this->resourceClass = $resource;
         $this->resourceName = $resource::uriKey();
@@ -104,20 +105,16 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
 
     /**
      * Get the relationship name.
-     *
-     * @return string
      */
-    public function relationshipName()
+    public function relationshipName(): string
     {
         return $this->hasOneThroughRelationship;
     }
 
     /**
      * Get the relationship type.
-     *
-     * @return string
      */
-    public function relationshipType()
+    public function relationshipType(): string
     {
         return 'hasOneThrough';
     }
@@ -125,9 +122,9 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     /**
      * Determine if the field should be displayed for the given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
+    #[\Override]
     public function authorize(Request $request)
     {
         return call_user_func(
@@ -138,11 +135,10 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     /**
      * Resolve the field's value.
      *
-     * @param  mixed  $resource
-     * @param  string|null  $attribute
-     * @return void
+     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model  $resource
      */
-    public function resolve($resource, $attribute = null)
+    #[\Override]
+    public function resolve($resource, ?string $attribute = null): void
     {
         $value = null;
 
@@ -170,10 +166,9 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     /**
      * Set the displayable singular label of the resource.
      *
-     * @param  string  $singularLabel
      * @return $this
      */
-    public function singularLabel($singularLabel)
+    public function singularLabel(Stringable|string $singularLabel)
     {
         $this->singularLabel = $singularLabel;
 
@@ -182,10 +177,8 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
 
     /**
      * Make current field behaves as panel.
-     *
-     * @return \Laravel\Nova\Panel
      */
-    public function asPanel()
+    public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
                     ->withMeta([
@@ -198,6 +191,7 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return with(app(NovaRequest::class), function ($request) {
@@ -218,10 +212,10 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     /**
      * Set the Closure used to determine if the HasOne field has already been filled.
      *
-     * @param  \Closure(\Laravel\Nova\Http\Requests\NovaRequest):bool  $callback
+     * @param  callable(\Laravel\Nova\Http\Requests\NovaRequest):bool  $callback
      * @return $this
      */
-    public function alreadyFilledWhen($callback)
+    public function alreadyFilledWhen(callable $callback)
     {
         $this->filledCallback = $callback;
 
@@ -230,21 +224,17 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
 
     /**
      * Determine if the HasOne field has alreaady been filled.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return bool
      */
-    public function alreadyFilled(NovaRequest $request)
+    public function alreadyFilled(NovaRequest $request): bool
     {
+        /** @phpstan-ignore nullCoalesce.expr */
         return call_user_func($this->filledCallback, $request) ?? false;
     }
 
     /**
      * Check showing on index.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  mixed  $resource
-     * @return bool
+     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object  $resource
      */
     public function isShownOnIndex(NovaRequest $request, $resource): bool
     {

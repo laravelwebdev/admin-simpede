@@ -6,10 +6,8 @@ class MySqlTrendDateExpression extends TrendDateExpression
 {
     /**
      * Get the value of the expression.
-     *
-     * @return mixed
      */
-    public function getValue()
+    public function getValue(): string
     {
         $offset = $this->offset();
 
@@ -21,17 +19,13 @@ class MySqlTrendDateExpression extends TrendDateExpression
             $interval = '- INTERVAL '.($offset * -1).' HOUR';
         }
 
-        switch ($this->unit) {
-            case 'month':
-                return "date_format({$this->wrap($this->column)} {$interval}, '%Y-%m')";
-            case 'week':
-                return "date_format({$this->wrap($this->column)} {$interval}, '%x-%v')";
-            case 'day':
-                return "date_format({$this->wrap($this->column)} {$interval}, '%Y-%m-%d')";
-            case 'hour':
-                return "date_format({$this->wrap($this->column)} {$interval}, '%Y-%m-%d %H:00')";
-            case 'minute':
-                return "date_format({$this->wrap($this->column)} {$interval}, '%Y-%m-%d %H:%i:00')";
-        }
+        return match ($this->unit) {
+            'month' => "date_format({$this->wrap($this->column)} {$interval}, '%Y-%m')",
+            'week' => "date_format({$this->wrap($this->column)} {$interval}, '%x-%v')",
+            'day' => "date_format({$this->wrap($this->column)} {$interval}, '%Y-%m-%d')",
+            'hour' => "date_format({$this->wrap($this->column)} {$interval}, '%Y-%m-%d %H:00')",
+            // 'minute'
+            default => "date_format({$this->wrap($this->column)} {$interval}, '%Y-%m-%d %H:%i:00')",
+        };
     }
 }

@@ -16,35 +16,12 @@
 </template>
 
 <script>
-import { minimum } from '@/util'
 import { InteractsWithDates, MetricBehavior } from '@/mixins'
 
 export default {
   name: 'ProgressMetric',
 
   mixins: [InteractsWithDates, MetricBehavior],
-
-  props: {
-    card: {
-      type: Object,
-      required: true,
-    },
-
-    resourceName: {
-      type: String,
-      default: '',
-    },
-
-    resourceId: {
-      type: [Number, String],
-      default: '',
-    },
-
-    lens: {
-      type: String,
-      default: '',
-    },
-  },
 
   data: () => ({
     loading: true,
@@ -89,35 +66,31 @@ export default {
   },
 
   methods: {
-    fetch() {
-      this.loading = true
-
-      minimum(Nova.request().get(this.metricEndpoint, this.metricPayload)).then(
-        ({
-          data: {
-            value: {
-              value,
-              target,
-              percentage,
-              prefix,
-              suffix,
-              suffixInflection,
-              format,
-              avoid,
-            },
+    handleFetchCallback() {
+      return ({
+        data: {
+          value: {
+            value,
+            target,
+            percentage,
+            prefix,
+            suffix,
+            suffixInflection,
+            format,
+            avoid,
           },
-        }) => {
-          this.value = value
-          this.target = target
-          this.percentage = percentage
-          this.format = format || this.format
-          this.avoid = avoid
-          this.prefix = prefix || this.prefix
-          this.suffix = suffix || this.suffix
-          this.suffixInflection = suffixInflection
-          this.loading = false
-        }
-      )
+        },
+      }) => {
+        this.value = value
+        this.target = target
+        this.percentage = percentage
+        this.format = format || this.format
+        this.avoid = avoid
+        this.prefix = prefix || this.prefix
+        this.suffix = suffix || this.suffix
+        this.suffixInflection = suffixInflection
+        this.loading = false
+      }
     },
   },
 
@@ -139,17 +112,6 @@ export default {
       }
 
       return payload
-    },
-
-    metricEndpoint() {
-      const lens = this.lens !== '' ? `/lens/${this.lens}` : ''
-      if (this.resourceName && this.resourceId) {
-        return `/nova-api/${this.resourceName}${lens}/${this.resourceId}/metrics/${this.card.uriKey}`
-      } else if (this.resourceName) {
-        return `/nova-api/${this.resourceName}${lens}/metrics/${this.card.uriKey}`
-      } else {
-        return `/nova-api/metrics/${this.card.uriKey}`
-      }
     },
   },
 }

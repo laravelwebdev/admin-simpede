@@ -5,34 +5,11 @@ namespace Laravel\Nova\Support;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use JsonSerializable;
+use Stringable;
 
-/**
- * @mixin \Illuminate\Support\Stringable
- */
-class PendingTranslation implements JsonSerializable
+class PendingTranslation implements JsonSerializable, Stringable
 {
     use ForwardsCalls;
-
-    /**
-     * The translation string.
-     *
-     * @var string|null
-     */
-    public $key;
-
-    /**
-     * The translation replacement.
-     *
-     * @var array<string, string>
-     */
-    public $replace = [];
-
-    /**
-     * The translation locale.
-     *
-     * @var string|null
-     */
-    public $locale = null;
 
     /**
      * The translation transformation callback.
@@ -44,15 +21,14 @@ class PendingTranslation implements JsonSerializable
     /**
      * Create a new pending translation.
      *
-     * @param  string|null  $key
      * @param  array<string, string>  $replace
-     * @param  string|null  $locale
      */
-    public function __construct($key = null, $replace = [], $locale = null)
-    {
-        $this->key = $key;
-        $this->replace = $replace;
-        $this->locale = $locale;
+    public function __construct(
+        public ?string $key = null,
+        public array $replace = [],
+        public ?string $locale = null
+    ) {
+        //
     }
 
     /**
@@ -70,13 +46,10 @@ class PendingTranslation implements JsonSerializable
 
     /**
      * Get the resolved value.
-     *
-     * @param  string|null  $locale
-     * @return string
      */
-    public function value($locale = null)
+    public function value(?string $locale = null): string
     {
-        $locale = $locale ?? $this->locale;
+        $locale ??= $this->locale;
 
         return (string) with(Str::of(
             transform(__($this->key, $this->replace, $locale), function ($translation) {
@@ -88,29 +61,23 @@ class PendingTranslation implements JsonSerializable
     /**
      * Dynamically proxy method calls to Stringable.
      *
-     * @param  string  $method
-     * @param  array  $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters)
     {
         return $this->forwardCallTo(Str::of($this->value()), $method, $parameters);
     }
 
     /**
      * Get the translation as string.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->value();
     }
 
     /**
      * Get the translation as json.
-     *
-     * @return string
      */
     public function jsonSerialize(): string
     {

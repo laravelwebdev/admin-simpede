@@ -2,27 +2,24 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FieldDownloadController extends Controller
 {
     /**
      * Download the given field's contents.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return \Illuminate\Http\Response
      */
-    public function __invoke(NovaRequest $request)
+    public function __invoke(NovaRequest $request): Response|StreamedResponse
     {
         $resource = $request->findResourceOrFail();
 
         $resource->authorizeToView($request);
 
         return $resource->downloadableFields($request)
-                    ->findFieldByAttribute($request->field, function () {
-                        abort(404);
-                    })
+                    ->findFieldByAttributeOrFail($request->field)
                     ->toDownloadResponse($request, $resource);
     }
 }

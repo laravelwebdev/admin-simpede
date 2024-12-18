@@ -4,18 +4,16 @@
     class="checkbox"
     :disabled="disabled"
     :checked="checked"
-    @change="handleChange"
+    @change="$emit('input', $event)"
     @click.stop
   />
 </template>
 
 <script setup>
-const props = defineProps({
+defineEmits(['input'])
+
+defineProps({
   checked: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
 })
-
-const emit = defineEmits(['input'])
-
-const handleChange = e => emit('input', e)
 </script>

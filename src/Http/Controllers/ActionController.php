@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Actions\ActionCollection;
@@ -14,11 +15,8 @@ class ActionController extends Controller
 {
     /**
      * List the actions for the given resource.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(NovaRequest $request)
+    public function index(NovaRequest $request): JsonResponse
     {
         $resourceId = with($request->input('resources'), function ($resourceIds) {
             return is_array($resourceIds) && count($resourceIds) === 1 ? $resourceIds[0] : null;
@@ -39,6 +37,7 @@ class ActionController extends Controller
             $pivotActionCounts = ActionCollection::make($payload['pivotActions']['actions'])->countsByTypeOnIndex();
 
             $payload['counts'] = [
+                'sole' => $actionCounts['sole'] + $pivotActionCounts['sole'],
                 'standalone' => $actionCounts['standalone'] + $pivotActionCounts['standalone'],
                 'resource' => $actionCounts['resource'] + $pivotActionCounts['resource'],
             ];
@@ -49,11 +48,8 @@ class ActionController extends Controller
 
     /**
      * Perform an action on the specified resources.
-     *
-     * @param  \Laravel\Nova\Http\Requests\ActionRequest  $request
-     * @return \Illuminate\Http\Response
      */
-    public function store(ActionRequest $request)
+    public function store(ActionRequest $request): mixed
     {
         $request->validateFields();
 
@@ -62,11 +58,8 @@ class ActionController extends Controller
 
     /**
      * Sync an action field on the specified resources.
-     *
-     * @param  \Laravel\Nova\Http\Requests\ActionRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function sync(ActionRequest $request)
+    public function sync(ActionRequest $request): JsonResponse
     {
         $action = $this->availableActions($request, $request->newResource())
             ->first(function ($action) use ($request) {
@@ -88,22 +81,15 @@ class ActionController extends Controller
     /**
      * Get the available actions for the request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  \Laravel\Nova\Resource  $resource
      * @return \Laravel\Nova\Actions\ActionCollection<int, \Laravel\Nova\Actions\Action>
      */
-    protected function availableActions(NovaRequest $request, Resource $resource)
+    protected function availableActions(NovaRequest $request, Resource $resource): ActionCollection
     {
-        switch ($request->display) {
-            case 'index':
-                $method = 'availableActionsOnIndex';
-                break;
-            case 'detail':
-                $method = 'availableActionsOnDetail';
-                break;
-            default:
-                $method = 'availableActions';
-        }
+        $method = match ($request->display) {
+            'index' => 'availableActionsOnIndex',
+            'detail' => 'availableActionsOnDetail',
+            default => 'availableActions',
+        };
 
         return $resource->{$method}($request);
     }

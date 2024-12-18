@@ -26,10 +26,8 @@ trait HasPreview
 
     /**
      * Resolve the preview URL for the field.
-     *
-     * @return string|null
      */
-    public function resolvePreviewUrl()
+    public function resolvePreviewUrl(): ?string
     {
         return is_callable($this->previewUrlCallback)
                     ? call_user_func($this->previewUrlCallback, $this->value, $this->getStorageDisk(), $this->resource)

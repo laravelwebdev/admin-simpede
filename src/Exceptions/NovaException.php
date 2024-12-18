@@ -9,11 +9,10 @@ class NovaException extends Exception
     /**
      * Create a new exception instance.
      *
-     * @param  string  $method
-     * @param  string  $class
+     * @param  class-string  $class
      * @return \Laravel\Nova\Exceptions\HelperNotSupported
      */
-    public static function helperNotSupported($method, $class)
+    public static function helperNotSupported(string $method, string $class)
     {
         return new HelperNotSupported("The {$method} helper method is not supported by the {$class} class.");
     }
@@ -21,10 +20,9 @@ class NovaException extends Exception
     /**
      * Create a new exception instance.
      *
-     * @param  string  $name
      * @return \Laravel\Nova\Exceptions\ResourceMissingException
      */
-    public static function missingResourceForRepeater($name)
+    public static function missingResourceForRepeater(string $name)
     {
         return ResourceMissingException::forRepeater("Missing resource for repeater {$name}");
     }

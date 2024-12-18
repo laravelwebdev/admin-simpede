@@ -8,6 +8,11 @@ use Brick\Money\Money;
 use NumberFormatter;
 use Symfony\Polyfill\Intl\Icu\Currencies;
 
+/**
+ * @property string|null $step
+ *
+ * @method $this step(string|null $step)
+ */
 class Currency extends Number
 {
     /**
@@ -16,13 +21,6 @@ class Currency extends Number
      * @var string
      */
     public $component = 'currency-field';
-
-    /**
-     * The format the field will be displayed in.
-     *
-     * @var string
-     */
-    public $format;
 
     /**
      * The locale of the field.
@@ -41,7 +39,7 @@ class Currency extends Number
     /**
      * The symbol used by the currency.
      *
-     * @var null|string
+     * @var string|null
      */
     public $currencySymbol = null;
 
@@ -62,12 +60,12 @@ class Currency extends Number
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|\Closure|callable|object|null  $attribute
+     * @param  \Stringable|string  $name
+     * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, $resolveCallback = null)
+    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
@@ -101,14 +99,10 @@ class Currency extends Number
 
     /**
      * Convert the value to a Money instance.
-     *
-     * @param  mixed  $value
-     * @param  null|string  $currency
-     * @return \Brick\Money\Money
      */
-    public function toMoneyInstance($value, $currency = null)
+    public function toMoneyInstance(mixed $value, ?string $currency = null): Money
     {
-        $currency = $currency ?? $this->currency;
+        $currency ??= $this->currency;
         $method = $this->minorUnits ? 'ofMinor' : 'of';
 
         $context = $this->context ?? new CustomContext(Currencies::getFractionDigits($currency));
@@ -118,13 +112,8 @@ class Currency extends Number
 
     /**
      * Format the field's value into Money format.
-     *
-     * @param  mixed  $value
-     * @param  null|string  $currency
-     * @param  null|string  $locale
-     * @return string
      */
-    public function formatMoney($value, $currency = null, $locale = null)
+    public function formatMoney(mixed $value, ?string $currency = null, ?string $locale = null): string
     {
         $money = $this->toMoneyInstance($value, $currency);
 
@@ -145,10 +134,9 @@ class Currency extends Number
     /**
      * Set the currency code for the field.
      *
-     * @param  string  $currency
      * @return $this
      */
-    public function currency($currency)
+    public function currency(string $currency)
     {
         $this->currency = strtoupper($currency);
 
@@ -160,10 +148,9 @@ class Currency extends Number
     /**
      * Set the field locale.
      *
-     * @param  string  $locale
      * @return $this
      */
-    public function locale($locale)
+    public function locale(string $locale)
     {
         $this->locale = $locale;
 
@@ -173,10 +160,9 @@ class Currency extends Number
     /**
      * Set the symbol used by the field.
      *
-     * @param  string  $symbol
      * @return $this
      */
-    public function symbol($symbol)
+    public function symbol(string $symbol)
     {
         $this->currencySymbol = $symbol;
 
@@ -209,10 +195,8 @@ class Currency extends Number
 
     /**
      * Resolve the symbol used by the currency.
-     *
-     * @return string
      */
-    public function resolveCurrencySymbol()
+    public function resolveCurrencySymbol(): string
     {
         if ($this->currencySymbol) {
             return $this->currencySymbol;
@@ -224,7 +208,6 @@ class Currency extends Number
     /**
      * Set the context used to create the Money instance.
      *
-     * @param  \Brick\Money\Context  $context
      * @return $this
      */
     public function context(Context $context)
@@ -236,11 +219,9 @@ class Currency extends Number
 
     /**
      * Check value for null value.
-     *
-     * @param  mixed  $value
-     * @return bool
      */
-    public function isValidNullValue($value)
+    #[\Override]
+    public function isValidNullValue(mixed $value): bool
     {
         if (is_null($value)) {
             return true;
@@ -251,10 +232,8 @@ class Currency extends Number
 
     /**
      * Determine the step value for the field.
-     *
-     * @return string
      */
-    protected function getStepValue()
+    protected function getStepValue(): string
     {
         return (string) 0.1 ** Currencies::getFractionDigits($this->currency);
     }
@@ -264,6 +243,7 @@ class Currency extends Number
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

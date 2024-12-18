@@ -45,4 +45,20 @@ class Fluent extends \Illuminate\Support\Fluent
 
         return $this;
     }
+
+    /**
+     * Get an attribute from the fluent instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function value($key, $default = null)
+    {
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
+        }
+
+        return value($default);
+    }
 }

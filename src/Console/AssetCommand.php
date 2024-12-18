@@ -30,13 +30,13 @@ class AssetCommand extends ComponentGeneratorCommand
      *
      * @return void
      */
-    public function handle()
+    public function handle(Filesystem $files)
     {
         if (! $this->hasValidNameArgument()) {
             return;
         }
 
-        (new Filesystem)->copyDirectory(
+        $files->copyDirectory(
             __DIR__.'/asset-stubs',
             $this->componentPath()
         );

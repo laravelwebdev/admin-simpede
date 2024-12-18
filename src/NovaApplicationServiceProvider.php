@@ -17,8 +17,8 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->gate();
-        $this->routes();
+        $this->bootAuthentication();
+        $this->bootRoutes();
 
         Nova::serving(function (ServingNova $event) {
             $this->authorization();
@@ -30,6 +30,43 @@ class NovaApplicationServiceProvider extends ServiceProvider
     }
 
     /**
+     * Bootstrap authentication services.
+     *
+     * @return void
+     */
+    protected function bootAuthentication()
+    {
+        $this->gate();
+
+        Nova::fortify()->bootstrap($this->app);
+    }
+
+    /**
+     * Bootstrap route services.
+     *
+     * @return void
+     */
+    protected function bootRoutes()
+    {
+        $this->routes();
+
+        if (! $this->app->routesAreCached()) {
+            Nova::routes()->bootstrap($this->app);
+        }
+    }
+
+    /**
+     * Register the Fortify configurations.
+     *
+     * @return void
+     */
+    protected function fortify()
+    {
+        Nova::fortify()
+            ->register();
+    }
+
+    /**
      * Register the Nova routes.
      *
      * @return void
@@ -37,8 +74,9 @@ class NovaApplicationServiceProvider extends ServiceProvider
     protected function routes()
     {
         Nova::routes()
-                ->withAuthenticationRoutes()
-                ->withPasswordResetRoutes();
+            ->withAuthenticationRoutes()
+            ->withPasswordResetRoutes()
+            ->register();
     }
 
     /**
@@ -63,11 +101,9 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     protected function gate()
     {
-        Gate::define('viewNova', function ($user) {
-            return in_array($user->email, [
-                //
-            ]);
-        });
+        Gate::define('viewNova', fn ($user) => in_array($user->email, [
+            //
+        ]));
     }
 
     /**
@@ -117,6 +153,6 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->fortify();
     }
 }

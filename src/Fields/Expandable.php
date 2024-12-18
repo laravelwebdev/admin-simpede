@@ -45,10 +45,8 @@ trait Expandable
 
     /**
      * Determine whether the field should be expanded.
-     *
-     * @return bool
      */
-    public function shouldBeExpanded()
+    public function shouldBeExpanded(): bool
     {
         if ($this->alwaysShow) {
             return true;

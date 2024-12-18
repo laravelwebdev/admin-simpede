@@ -12,7 +12,6 @@ trait EloquentFilterable
     /**
      * Make the field filter.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\EloquentFilter|null
      */
     protected function makeFilter(NovaRequest $request)
@@ -23,7 +22,6 @@ trait EloquentFilterable
     /**
      * Define filterable attribute.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return string
      */
     abstract protected function filterableAttribute(NovaRequest $request);
@@ -31,7 +29,7 @@ trait EloquentFilterable
     /**
      * Define the default filterable callback.
      *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed, string):void
+     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):void
      */
     abstract protected function defaultFilterableCallback();
 }

@@ -3,11 +3,16 @@
 namespace Laravel\Nova\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use function Laravel\Prompts\confirm;
 
 #[AsCommand(name: 'nova:action')]
-class ActionCommand extends GeneratorCommand
+class ActionCommand extends GeneratorCommand implements PromptsForMissingInput
 {
     use ResolvesStubPath;
 
@@ -54,9 +59,32 @@ class ActionCommand extends GeneratorCommand
      * @param  string  $rootNamespace
      * @return string
      */
+    #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Nova\Actions';
+    }
+
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        if ($this->didReceiveOptions($input)) {
+            return;
+        }
+
+        $input->setOption('destructive', confirm(
+            label: 'Indicate that the action deletes / destroys resources?',
+            default: false,
+        ));
+
+        $input->setOption('queued', confirm(
+            label: 'Indicates the action should be queued?',
+            default: false,
+        ));
     }
 
     /**
@@ -64,6 +92,7 @@ class ActionCommand extends GeneratorCommand
      *
      * @return array
      */
+    #[\Override]
     protected function getOptions()
     {
         return [

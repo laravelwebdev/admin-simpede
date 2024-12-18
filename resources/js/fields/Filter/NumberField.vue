@@ -7,9 +7,9 @@
         }}</span>
 
         <input
-          class="block w-full form-control form-input form-control-bordered"
+          class="w-full block form-control form-input form-control-bordered"
           v-model="startValue"
-          :dusk="`${field.uniqueKey}-range-start`"
+          :dusk="`${filter.uniqueKey}-range-start`"
           v-bind="startExtraAttributes"
         />
       </label>
@@ -19,9 +19,9 @@
           `${filter.name} - ${__('To')}`
         }}</span>
         <input
-          class="block w-full form-control form-input form-control-bordered"
+          class="w-full block form-control form-input form-control-bordered"
           v-model="endValue"
-          :dusk="`${field.uniqueKey}-range-end`"
+          :dusk="`${filter.uniqueKey}-range-end`"
           v-bind="endExtraAttributes"
         />
       </label>

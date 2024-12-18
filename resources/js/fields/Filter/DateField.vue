@@ -6,11 +6,11 @@
           `${filter.name} - ${__('From')}`
         }}</span>
         <input
-          class="flex w-full form-control form-input form-control-bordered"
           ref="startField"
           v-model="startValue"
-          :dusk="`${field.uniqueKey}-range-start`"
           v-bind="startExtraAttributes"
+          class="w-full flex form-control form-input form-control-bordered"
+          :dusk="`${filter.uniqueKey}-range-start`"
         />
       </label>
 
@@ -19,11 +19,11 @@
           `${filter.name} - ${__('To')}`
         }}</span>
         <input
-          class="flex w-full form-control form-input form-control-bordered"
           ref="endField"
           v-model="endValue"
-          :dusk="`${field.uniqueKey}-range-end`"
           v-bind="endExtraAttributes"
+          class="w-full flex form-control form-input form-control-bordered"
+          :dusk="`${filter.uniqueKey}-range-end`"
         />
       </label>
     </template>
@@ -54,11 +54,12 @@ export default {
   data: () => ({
     startValue: null,
     endValue: null,
-    debouncedHandleChange: null,
+
+    debouncedEventEmitter: null,
   }),
 
   created() {
-    this.debouncedHandleChange = debounce(() => this.handleChange(), 500)
+    this.debouncedEventEmitter = debounce(() => this.emitFilterChange(), 500)
     this.setCurrentFilterValue()
   },
 
@@ -72,11 +73,11 @@ export default {
 
   watch: {
     startValue() {
-      this.debouncedHandleChange()
+      this.debouncedEventEmitter()
     },
 
     endValue() {
-      this.debouncedHandleChange()
+      this.debouncedEventEmitter()
     },
   },
 
@@ -93,15 +94,13 @@ export default {
     },
 
     validateFilter(startValue, endValue) {
-      startValue = filled(startValue)
-        ? this.toDateTimeISO(startValue, 'start')
-        : null
-      endValue = filled(endValue) ? this.toDateTimeISO(endValue, 'end') : null
+      startValue = filled(startValue) ? this.toDateTimeISO(startValue) : null
+      endValue = filled(endValue) ? this.toDateTimeISO(endValue) : null
 
       return [startValue, endValue]
     },
 
-    handleChange() {
+    emitFilterChange() {
       this.$emit('change', {
         filterClass: this.filterKey,
         value: this.validateFilter(this.startValue, this.endValue),
@@ -119,7 +118,7 @@ export default {
       return DateTime.fromISO(value)
     },
 
-    toDateTimeISO(value, range) {
+    toDateTimeISO(value) {
       return DateTime.fromISO(value).toISODate()
     },
   },

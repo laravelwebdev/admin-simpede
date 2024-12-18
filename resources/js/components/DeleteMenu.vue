@@ -83,7 +83,6 @@
 </template>
 
 <script>
-import find from 'lodash/find'
 import { Button } from 'laravel-nova-ui'
 import { InteractsWithQueryString } from '@/mixins'
 
@@ -276,7 +275,7 @@ export default {
      */
     softDeletedResourcesSelected() {
       return Boolean(
-        find(this.selectedResources, resource => resource.softDeleted)
+        this.selectedResources.find(resource => resource.softDeleted) != null
       )
     },
   },

@@ -2,38 +2,27 @@
 
 namespace Laravel\Nova\Query\Search;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Support\Str;
 
 class SearchableJson extends Column
 {
     /**
-     * The search JSON seletor path.
-     *
-     * @var \Illuminate\Database\Query\Expression|string
-     */
-    public $jsonSelectorPath;
-
-    /**
      * Construct a new search.
      *
-     * @param  \Illuminate\Database\Query\Expression|string  $jsonSelectorPath
      * @return void
      */
-    public function __construct($jsonSelectorPath)
+    public function __construct(public Expression|string $jsonSelectorPath)
     {
-        $this->jsonSelectorPath = $jsonSelectorPath;
+        //
     }
 
     /**
      * Apply the search.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $query
-     * @param  string  $search
-     * @param  string  $connectionType
-     * @param  string  $whereOperator
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function __invoke($query, $search, string $connectionType, string $whereOperator = 'orWhere')
+    #[\Override]
+    public function __invoke(Builder $query, string $search, string $connectionType, string $whereOperator = 'orWhere'): Builder
     {
         $path = $query->getGrammar()->wrap($this->jsonSelectorPath);
         $likeOperator = $connectionType == 'pgsql' ? 'ilike' : 'like';

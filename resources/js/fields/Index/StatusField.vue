@@ -5,14 +5,10 @@
         <Loader v-if="field.type == 'loading'" width="20" class="mr-1" />
         <Icon
           v-if="field.type == 'failed'"
-          :solid="true"
-          type="exclamation-circle"
+          name="exclamation-circle"
+          type="solid"
         />
-        <Icon
-          v-if="field.type == 'success'"
-          :solid="true"
-          type="check-circle"
-        />
+        <Icon v-if="field.type == 'success'" name="check-circle" type="solid" />
       </span>
       {{ fieldValue }}
     </Badge>
@@ -20,9 +16,14 @@
 </template>
 
 <script>
+import { Icon } from 'laravel-nova-ui'
 import { FieldValue } from '@/mixins'
 
 export default {
+  components: {
+    Icon,
+  },
+
   mixins: [FieldValue],
 
   props: ['resourceName', 'field'],

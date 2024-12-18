@@ -10,11 +10,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class UserCommand extends Command
 {
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'nova:user';
+    protected $name = 'nova:user';
 
     /**
      * The console command description.
@@ -32,6 +32,6 @@ class UserCommand extends Command
     {
         Nova::createUser($this);
 
-        $this->info('User created successfully.');
+        $this->components->info('User created successfully.');
     }
 }

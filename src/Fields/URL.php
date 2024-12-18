@@ -3,6 +3,7 @@
 namespace Laravel\Nova\Fields;
 
 use Laravel\Nova\Exceptions\NovaException;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class URL extends Text
 {
@@ -16,12 +17,12 @@ class URL extends Text
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|\Closure|callable|object|null  $attribute
+     * @param  \Stringable|string  $name
+     * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
@@ -29,26 +30,37 @@ class URL extends Text
     }
 
     /**
-     * Resolve the field's value.
-     *
-     * @param  mixed  $resource
-     * @param  string|null  $attribute
-     * @return void
-     */
-    public function resolve($resource, $attribute = null)
-    {
-        $this->displayedAs = $this->name;
-
-        parent::resolve($resource, $attribute);
-    }
-
-    /**
      * Allow the field to be copyable to the clipboard inside Nova.
      *
-     * @return $this
+     * @return never
+     *
+     * @throws \Laravel\Nova\Exceptions\HelperNotSupported
      */
     public function copyable()
     {
         throw NovaException::helperNotSupported(__METHOD__, __CLASS__);
+    }
+
+    /**
+     * Prepare the field element for JSON serialization.
+     *
+     * @return array<string, mixed>
+     */
+    #[\Override]
+    public function jsonSerialize(): array
+    {
+        return with(app(NovaRequest::class), function ($request) {
+            $data = parent::jsonSerialize();
+            $displayedAs = $data['displayedAs'];
+
+            if (is_null($data['displayedAs'])) {
+                $data['displayedAs'] = match (true) {
+                    $request->isResourceIndexRequest() => $this->name,
+                    default => $data['value'],
+                };
+            }
+
+            return $data;
+        });
     }
 }

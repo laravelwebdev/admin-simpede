@@ -9,14 +9,8 @@ trait HasSearchable
 {
     /**
      * Search for the given value for a searchable field attribute.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  string  $search
-     * @param  int  $pause
-     * @return void
      */
-    public function searchInput(Browser $browser, $attribute, $search, int $pause = 500)
+    public function searchInput(Browser $browser, string $attribute, string $search, int $pause = 500): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search, $pause) {
             $browser->searchInput($search, $pause);
@@ -25,13 +19,8 @@ trait HasSearchable
 
     /**
      * Reset the searchable field.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  int  $resultIndex
-     * @return void
      */
-    public function resetSearchResult(Browser $browser, $attribute)
+    public function resetSearchResult(Browser $browser, string $attribute): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) {
             $browser->resetSearchResult();
@@ -40,13 +29,8 @@ trait HasSearchable
 
     /**
      * Select the searchable field by result index.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  int  $resultIndex
-     * @return void
      */
-    public function selectSearchResult(Browser $browser, $attribute, $resultIndex)
+    public function selectSearchResult(Browser $browser, string $attribute, int $resultIndex): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($resultIndex) {
             $browser->selectSearchResult($resultIndex);
@@ -55,24 +39,16 @@ trait HasSearchable
 
     /**
      * Select the currently highlighted searchable field.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @return void
      */
-    public function selectFirstSearchResult(Browser $browser, $attribute)
+    public function selectFirstSearchResult(Browser $browser, string $attribute): void
     {
         $this->selectSearchResult($browser, $attribute, 0);
     }
 
     /**
      * Select the currently highlighted searchable field.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @return void
      */
-    public function cancelSelectingSearchResult(Browser $browser, $attribute)
+    public function cancelSelectingSearchResult(Browser $browser, string $attribute): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) {
             $browser->cancelSelectingSearchResult();
@@ -81,14 +57,8 @@ trait HasSearchable
 
     /**
      * Search and select the searchable field by result index.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  string  $search
-     * @param  int  $resultIndex
-     * @return void
      */
-    public function searchAndSelectResult(Browser $browser, $attribute, $search, $resultIndex)
+    public function searchAndSelectResult(Browser $browser, string $attribute, string $search, int $resultIndex): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search, $resultIndex) {
             $browser->searchAndSelectResult($search, $resultIndex);
@@ -97,13 +67,8 @@ trait HasSearchable
 
     /**
      * Search and select the currently highlighted searchable field.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  string  $search
-     * @return void
      */
-    public function searchAndSelectFirstResult(Browser $browser, $attribute, $search)
+    public function searchAndSelectFirstResult(Browser $browser, string $attribute, string $search): void
     {
         $this->searchAndSelectResult($browser, $attribute, $search, 0);
     }
@@ -111,27 +76,19 @@ trait HasSearchable
     /**
      * Assert on searchable results.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
      * @param  callable(\Laravel\Nova\Browser, string):void  $fieldCallback
-     * @return void
      */
-    public function assertSearchResult(Browser $browser, $attribute, callable $fieldCallback)
+    public function assertSearchResult(Browser $browser, string $attribute, callable $fieldCallback): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($fieldCallback) {
-            $browser->assertSearchResult($search, $fieldCallback);
+            $browser->assertSearchResult($fieldCallback);
         });
     }
 
     /**
      * Assert on searchable results current value.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  string  $search
-     * @return void
      */
-    public function assertSelectedSearchResult(Browser $browser, $attribute, $search)
+    public function assertSelectedSearchResult(Browser $browser, string $attribute, string $search): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search) {
             $browser->assertSelectedSearchResult($search);
@@ -140,13 +97,8 @@ trait HasSearchable
 
     /**
      * Assert on searchable results is locked to single result.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  string  $search
-     * @return void
      */
-    public function assertSelectedFirstSearchResult(Browser $browser, $attribute, $search)
+    public function assertSelectedFirstSearchResult(Browser $browser, string $attribute, string $search): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search) {
             $browser->assertSelectedFirstSearchResult($search);
@@ -155,12 +107,8 @@ trait HasSearchable
 
     /**
      * Assert on searchable results is empty.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @return void
      */
-    public function assertEmptySearchResult(Browser $browser, $attribute)
+    public function assertEmptySearchResult(Browser $browser, string $attribute): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) {
             $browser->assertEmptySearchResult();
@@ -169,28 +117,8 @@ trait HasSearchable
 
     /**
      * Assert on searchable results has the search value.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  string|array  $search
-     * @return void
-     *
-     * @deprecated
      */
-    public function assertSearchResultHas(Browser $browser, $attribute, $search)
-    {
-        $this->assertSearchResultContains($browser, $attribute, $search);
-    }
-
-    /**
-     * Assert on searchable results has the search value.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  string|array  $search
-     * @return void
-     */
-    public function assertSearchResultContains(Browser $browser, $attribute, $search)
+    public function assertSearchResultContains(Browser $browser, string $attribute, string|array $search): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search) {
             $browser->assertSearchResultContains($search);
@@ -199,13 +127,8 @@ trait HasSearchable
 
     /**
      * Assert on searchable results doesn't has the search value.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @param  string  $attribute
-     * @param  string|array  $search
-     * @return void
      */
-    public function assertSearchResultDoesNotContains(Browser $browser, $attribute, $search)
+    public function assertSearchResultDoesNotContains(Browser $browser, string $attribute, string|array $search): void
     {
         $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search) {
             $browser->assertSearchResultDoesNotContains($search);

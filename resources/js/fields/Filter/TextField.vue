@@ -51,12 +51,12 @@ export default {
   },
 
   mounted() {
-    Nova.log(`Mounting <FilterMenu>`)
+    Nova.debug(`Mounting <FilterMenu>`)
     Nova.$on('filter-reset', this.setCurrentFilterValue)
   },
 
   beforeUnmount() {
-    Nova.log(`Unmounting <FilterMenu>`)
+    Nova.debug(`Unmounting <FilterMenu>`)
     Nova.$off('filter-reset', this.setCurrentFilterValue)
   },
 

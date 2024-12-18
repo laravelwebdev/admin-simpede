@@ -30,21 +30,12 @@
   </Card>
 </template>
 
-<script>
+<script setup>
 import { Button } from 'laravel-nova-ui'
 
-export default {
-  components: {
-    Button,
-  },
+defineEmits(['click'])
 
-  emits: ['click'],
-
-  props: {
-    resource: {
-      type: Object,
-      required: true,
-    },
-  },
-}
+defineProps({
+  resource: { type: Object, required: true },
+})
 </script>

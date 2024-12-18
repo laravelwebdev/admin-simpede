@@ -8,18 +8,19 @@
     <template #field>
       <div class="space-y-4">
         <div class="flex items-center">
-          <SearchSearchInput
+          <ComboBoxInput
             ref="searchable"
-            :dusk="`${field.resourceName}-search-input`"
+            v-model="value"
             @input="performSearch"
             :error="hasError"
             :debounce="field.debounce"
             :options="tags"
-            @selected="selectResource"
+            placeholder="Search"
             trackBy="value"
             :disabled="currentlyIsReadonly"
             :loading="loading"
             class="w-full"
+            :dusk="`${field.resourceName}-search-input`"
           >
             <template #option="{ dusk, selected, option }">
               <SearchInputResult
@@ -29,13 +30,16 @@
                 :dusk="dusk"
               />
             </template>
-          </SearchSearchInput>
+          </ComboBoxInput>
 
-          <CreateRelationButton
+          <Button
             v-if="field.showCreateRelationButton"
             v-tooltip="
               __('Create :resource', { resource: field.singularLabel })
             "
+            variant="link"
+            size="small"
+            leading-icon="plus-circle"
             @click="openRelationModal"
             :dusk="`${field.attribute}-inline-create`"
             tabindex="0"
@@ -75,6 +79,12 @@
 </template>
 
 <script>
+import { Button } from 'laravel-nova-ui'
+import storage from '@/storage/PivotableFieldStorage'
+import searchStorage from '@/storage/ResourceSearchStorage'
+import TagList from '@/components/Tags/TagList'
+import SearchInputResult from '@/components/Inputs/SearchInputResult'
+import PreviewResourceModal from '@/components/Modals/PreviewResourceModal'
 import {
   DependentFormField,
   PerformsSearches,
@@ -83,13 +93,15 @@ import {
 } from '@/mixins'
 import { minimum } from '@/util'
 import first from 'lodash/first'
-import storage from '@/storage/ResourceSearchStorage'
-import TagList from '../../components/Tags/TagList'
-import SearchInputResult from '../../components/Inputs/SearchInputResult'
-import PreviewResourceModal from '../../components/Modals/PreviewResourceModal'
 
 export default {
-  components: { PreviewResourceModal, SearchInputResult, TagList },
+  components: {
+    Button,
+    PreviewResourceModal,
+    SearchInputResult,
+    TagList,
+  },
+
   mixins: [DependentFormField, PerformsSearches, HandlesValidationErrors],
 
   props: {
@@ -134,33 +146,41 @@ export default {
       )
     },
 
-    async getAvailableResources(search) {
+    /**
+     * Get all of the available resources for the current search / trashed state.
+     */
+    getAvailableResources(search = '') {
       this.loading = true
 
       const queryParams = {
         search: search,
         current: null,
         first: false,
-        // withTrashed: true,
+        withTrashed: false,
       }
 
-      const { data } = await minimum(
-        storage.fetchAvailableResources(this.currentField.resourceName, {
-          params: queryParams,
-        }),
+      return minimum(
+        storage
+          .fetchAvailableResources(
+            this.resourceName,
+            this.resourceId,
+            this.currentField.resourceName,
+            {
+              params: {
+                ...queryParams,
+                component: this.currentField.component,
+                viaRelationship: this.currentField.attribute,
+              },
+            }
+          )
+          .then(({ data: { resources } }) => {
+            this.tags = resources
+          })
+          .finally(() => {
+            this.loading = false
+          }),
         250
       )
-
-      this.loading = false
-      this.tags = data.resources
-    },
-
-    selectResource(resource) {
-      const found = this.value.filter(t => t.value === resource.value)
-
-      if (found.length === 0) {
-        this.value.push(resource)
-      }
     },
 
     handleSetResource({ id }) {
@@ -170,12 +190,12 @@ export default {
         first: true,
       }
 
-      storage
+      searchStorage
         .fetchAvailableResources(this.currentField.resourceName, {
           params: queryParams,
         })
         .then(({ data: { resources } }) => {
-          this.selectResource(first(resources))
+          this.$refs.searchable.choose(first(resources))
         })
         .finally(() => {
           this.closeRelationModal()
@@ -183,7 +203,7 @@ export default {
     },
 
     removeResource(index) {
-      this.value.splice(index, 1)
+      this.$refs.searchable.remove(index)
     },
 
     openRelationModal() {

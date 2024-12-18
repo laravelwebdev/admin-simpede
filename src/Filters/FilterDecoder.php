@@ -2,34 +2,25 @@
 
 namespace Laravel\Nova\Filters;
 
+use Illuminate\Support\Collection;
 use Laravel\Nova\Query\ApplyFilter;
 
 class FilterDecoder
 {
     /**
-     * The filter string to be decoded.
-     *
-     * @var string
-     */
-    protected $filterString;
-
-    /**
      * The filters available via the request.
-     *
-     * @var \Illuminate\Support\Collection
      */
-    protected $availableFilters;
+    protected Collection $availableFilters;
 
     /**
      * Create a new FilterDecoder instance.
-     *
-     * @param  string  $filterString
-     * @param  \Illuminate\Support\Collection|array|null  $availableFilters
      */
-    public function __construct($filterString, $availableFilters = null)
-    {
+    public function __construct(
+        protected ?string $filterString,
+        ?iterable $availableFilters = null
+    ) {
         $this->filterString = $filterString;
-        $this->availableFilters = collect($availableFilters);
+        $this->availableFilters = Collection::make($availableFilters ?? []);
     }
 
     /**
@@ -37,7 +28,7 @@ class FilterDecoder
      *
      * @return \Illuminate\Support\Collection<int, \Laravel\Nova\Query\ApplyFilter>
      */
-    public function filters()
+    public function filters(): Collection
     {
         if (empty($filters = $this->decodeFromBase64String())) {
             return collect();
@@ -74,7 +65,7 @@ class FilterDecoder
      *
      * @return array<int, array<class-string<\Laravel\Nova\Filters\Filter>|string, mixed>>
      */
-    public function decodeFromBase64String()
+    public function decodeFromBase64String(): array
     {
         if (empty($this->filterString)) {
             return [];

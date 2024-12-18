@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import isNil from 'lodash/isNil'
 import { FieldValue } from '@/mixins'
 
 export default {
@@ -24,7 +23,7 @@ export default {
 
   computed: {
     hasPreviewableAudio() {
-      return !isNil(this.field.previewUrl)
+      return this.field.previewUrl != null
     },
 
     defaultAttributes() {

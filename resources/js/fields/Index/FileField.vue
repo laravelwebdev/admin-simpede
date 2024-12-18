@@ -27,7 +27,6 @@
 
 <script>
 import { FieldValue } from '@/mixins'
-import { computed } from 'vue'
 
 export default {
   mixins: [FieldValue],

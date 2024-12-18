@@ -27,40 +27,40 @@ class DateTime extends Field implements FilterableField
     /**
      * The original raw value of the field.
      *
-     * @var string
+     * @var string|null
      */
-    public $originalValue;
+    public $originalValue = null;
 
     /**
      * The minimum value that can be assigned to the field.
      *
      * @var string|null
      */
-    public $min;
+    public $min = null;
 
     /**
      * The maximum value that can be assigned to the field.
      *
      * @var string|null
      */
-    public $max;
+    public $max = null;
 
     /**
      * The step size the field will increment and decrement by.
      *
      * @var int|null
      */
-    public $step;
+    public $step = null;
 
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|\Closure|callable|object|null  $attribute
+     * @param  \Stringable|string  $name
+     * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback ?? function ($value, $request) {
             if (! is_null($value)) {
@@ -78,10 +78,9 @@ class DateTime extends Field implements FilterableField
     /**
      * The minimum value that can be assigned to the field.
      *
-     * @param  \Carbon\CarbonInterface|string  $min
      * @return $this
      */
-    public function min($min)
+    public function min(CarbonInterface|string $min)
     {
         if (is_string($min)) {
             $min = Carbon::parse($min);
@@ -95,10 +94,9 @@ class DateTime extends Field implements FilterableField
     /**
      * The maximum value that can be assigned to the field.
      *
-     * @param  \Carbon\CarbonInterface|string  $max
      * @return $this
      */
-    public function max($max)
+    public function max(CarbonInterface|string $max)
     {
         if (is_string($max)) {
             $max = Carbon::parse($max);
@@ -112,10 +110,9 @@ class DateTime extends Field implements FilterableField
     /**
      * The step size the field will increment and decrement by.
      *
-     * @param  int|\Carbon\CarbonInterval  $step
      * @return $this
      */
-    public function step($step)
+    public function step(CarbonInterval|int $step)
     {
         $this->step = $step instanceof CarbonInterval ? $step->totalSeconds : $step;
 
@@ -125,10 +122,12 @@ class DateTime extends Field implements FilterableField
     /**
      * Resolve the default value for the field.
      *
-     * @return string
+     * @return \Laravel\Nova\Support\UndefinedValue|string|null
      */
-    public function resolveDefaultValue(NovaRequest $request)
+    #[\Override]
+    public function resolveDefaultValue(NovaRequest $request): mixed
     {
+        /** @var \Laravel\Nova\Support\UndefinedValue|\DateTimeInterface|string|null $value */
         $value = parent::resolveDefaultValue($request);
 
         if ($value instanceof DateTimeInterface) {
@@ -143,12 +142,10 @@ class DateTime extends Field implements FilterableField
     /**
      * Resolve the field's value using the display callback.
      *
-     * @param  mixed  $value
-     * @param  mixed  $resource
-     * @param  string  $attribute
-     * @return void
+     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
      */
-    protected function resolveUsingDisplayCallback($value, $resource, $attribute)
+    #[\Override]
+    protected function resolveUsingDisplayCallback(mixed $value, $resource, string $attribute): void
     {
         $this->usesCustomizedDisplay = true;
 
@@ -175,7 +172,7 @@ class DateTime extends Field implements FilterableField
     /**
      * Define the default filterable callback.
      *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed, string):\Illuminate\Database\Eloquent\Builder
+     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):\Illuminate\Contracts\Database\Eloquent\Builder
      */
     protected function defaultFilterableCallback()
     {
@@ -194,10 +191,8 @@ class DateTime extends Field implements FilterableField
 
     /**
      * Prepare the field for JSON serialization.
-     *
-     * @return array
      */
-    public function serializeForFilter()
+    public function serializeForFilter(): array
     {
         return transform($this->jsonSerialize(), function ($field) {
             return Arr::only($field, [
@@ -216,6 +211,7 @@ class DateTime extends Field implements FilterableField
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge([

@@ -16,13 +16,13 @@
         </div>
 
         <input
-          class="flex-shrink flex-grow flex-auto leading-normal w-px flex-1 rounded-l-none form-control form-input form-control-bordered"
-          :id="currentField.uniqueKey"
-          :dusk="field.attribute"
           v-bind="extraAttributes"
+          :id="currentField.uniqueKey"
+          :value="value"
           :disabled="currentlyIsReadonly"
           @input="handleChange"
-          :value="value"
+          class="flex-shrink flex-grow flex-auto leading-normal w-px flex-1 rounded-l-none form-control form-input form-control-bordered"
+          :dusk="field.attribute"
         />
       </div>
     </template>
@@ -45,19 +45,18 @@ export default {
         max: this.currentField.max,
         step: this.currentField.step,
         pattern: this.currentField.pattern,
-        placeholder: this.currentField.placeholder || this.field.name,
+        placeholder: this.placeholder,
         class: this.errorClasses,
       }
     },
-    extraAttributes() {
-      const attrs = this.currentField.extraAttributes
 
+    extraAttributes() {
       return {
         // Leave the default attributes even though we can now specify
         // whatever attributes we like because the old number field still
         // uses the old field attributes
         ...this.defaultAttributes,
-        ...attrs,
+        ...this.currentField.extraAttributes,
       }
     },
   },

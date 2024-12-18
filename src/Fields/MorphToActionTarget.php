@@ -16,11 +16,9 @@ class MorphToActionTarget extends MorphTo
 
     /**
      * Determine if the field is not redundant.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return bool
      */
-    public function isNotRedundant(NovaRequest $request)
+    #[\Override]
+    public function isNotRedundant(NovaRequest $request): bool
     {
         return true;
     }
@@ -28,11 +26,10 @@ class MorphToActionTarget extends MorphTo
     /**
      * Resolve the field's value.
      *
-     * @param  mixed  $resource
-     * @param  string|null  $attribute
-     * @return void
+     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
      */
-    public function resolve($resource, $attribute = null)
+    #[\Override]
+    public function resolve($resource, ?string $attribute = null): void
     {
         parent::resolve($resource, $attribute);
 

@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\NotificationRequest;
 use Laravel\Nova\Notifications\Notification;
@@ -11,12 +12,14 @@ class NotificationDeleteAllController extends Controller
 {
     /**
      * Delete all notifications.
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(NotificationRequest $request)
+    public function __invoke(NotificationRequest $request): JsonResponse
     {
-        Notification::whereNotifiableId(Nova::user($request)->getKey())->delete();
+        $userId = Nova::user($request)->getKey();
+
+        dispatch_sync(function () use ($userId) {
+            Notification::whereNotifiableId($userId)->delete();
+        })->afterResponse();
 
         return response()->json();
     }

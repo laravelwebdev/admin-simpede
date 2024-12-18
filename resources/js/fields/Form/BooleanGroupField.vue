@@ -23,12 +23,11 @@
 </template>
 
 <script>
+import { DependentFormField, HandlesValidationErrors } from '@/mixins'
 import find from 'lodash/find'
-import isNil from 'lodash/isNil'
 import fromPairs from 'lodash/fromPairs'
 import map from 'lodash/map'
 import merge from 'lodash/merge'
-import { DependentFormField, HandlesValidationErrors } from '@/mixins'
 
 export default {
   mixins: [HandlesValidationErrors, DependentFormField],
@@ -44,7 +43,7 @@ export default {
     setInitialValue() {
       let values = merge(this.finalPayload, this.currentField.value || {})
 
-      this.value = map(this.currentField.options, o => {
+      this.value = this.currentField.options.map(o => {
         return {
           name: o.name,
           label: o.label,

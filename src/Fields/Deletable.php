@@ -28,7 +28,6 @@ trait Deletable
     /**
      * Specify the callback that should be used to delete the field.
      *
-     * @param  callable  $deleteCallback
      * @return $this
      */
     public function delete(callable $deleteCallback)
@@ -41,10 +40,9 @@ trait Deletable
     /**
      * Specify if the underlying file is able to be deleted.
      *
-     * @param  bool  $deletable
      * @return $this
      */
-    public function deletable($deletable = true)
+    public function deletable(bool $deletable = true)
     {
         $this->deletable = $deletable;
 

@@ -7,11 +7,11 @@
 
       <SelectControl
         v-if="ranges.length > 0"
-        class="ml-auto w-[6rem] shrink-0"
-        size="xxs"
+        :value="selectedRangeKey"
+        @update:modelValue="$emit('selected', $event)"
         :options="ranges"
-        :selected="selectedRangeKey"
-        @change="handleChange"
+        size="xxs"
+        class="ml-auto w-[6rem] shrink-0"
         :aria-label="__('Select Ranges')"
       />
     </div>
@@ -21,7 +21,7 @@
         v-if="icon"
         class="rounded-lg bg-primary-500 text-white h-14 w-14 flex items-center justify-center"
       >
-        <Icon :type="icon" width="24" height="24" />
+        <Icon :name="icon" class="inline-block" />
       </div>
 
       <div>
@@ -105,11 +105,16 @@
 </template>
 
 <script>
-import { increaseOrDecrease, singularOrPlural } from '@/util'
+import { Icon } from 'laravel-nova-ui'
 import { CopiesToClipboard } from '@/mixins'
+import { increaseOrDecrease, singularOrPlural } from '@/util'
 
 export default {
   name: 'BaseValueMetric',
+
+  components: {
+    Icon,
+  },
 
   mixins: [CopiesToClipboard],
 
@@ -135,15 +140,11 @@ export default {
     zeroResult: { default: false },
   },
 
-  data: () => ({ copied: false }),
+  data: () => ({
+    copied: false,
+  }),
 
   methods: {
-    handleChange(event) {
-      let value = event?.target?.value || event
-
-      this.$emit('selected', value)
-    },
-
     handleCopyClick() {
       if (this.copyable) {
         this.copied = true

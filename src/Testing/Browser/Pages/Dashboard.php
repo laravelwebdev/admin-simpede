@@ -6,38 +6,27 @@ use Laravel\Dusk\Browser;
 
 class Dashboard extends Page
 {
-    public $dashboardName;
-
     /**
      * Create a new page instance.
-     *
-     * @param  string  $dashboardName
-     * @return void
      */
-    public function __construct($dashboardName = 'main')
-    {
-        $this->dashboardName = $dashboardName;
-
+    public function __construct(
+        public string $dashboardName = 'main'
+    ) {
         $this->setNovaPage("/dashboards/{$this->dashboardName}");
     }
 
     /**
      * Assert that the browser is on the page.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
      */
-    public function assert(Browser $browser)
+    public function assert(Browser $browser): void
     {
         $browser->assertOk()->waitFor('@nova-dashboard');
     }
 
     /**
      * Get the element shortcuts for the page.
-     *
-     * @return array
      */
-    public function elements()
+    public function elements(): array
     {
         return [
             '@nova-dashboard' => "[dusk='dashboard-{$this->dashboardName}']",

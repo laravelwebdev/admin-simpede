@@ -30,13 +30,13 @@ class ResourceToolCommand extends ComponentGeneratorCommand
      *
      * @return void
      */
-    public function handle()
+    public function handle(Filesystem $files)
     {
         if (! $this->hasValidNameArgument()) {
             return;
         }
 
-        (new Filesystem)->copyDirectory(
+        $files->copyDirectory(
             __DIR__.'/resource-tool-stubs',
             $this->componentPath()
         );
@@ -53,7 +53,7 @@ class ResourceToolCommand extends ComponentGeneratorCommand
         $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/Tool.stub');
         $this->replace('{{ title }}', $this->componentTitle(), $this->componentPath().'/src/Tool.stub');
 
-        (new Filesystem)->move(
+        $files->move(
             $this->componentPath().'/src/Tool.stub',
             $this->componentPath().'/src/'.$this->componentClass().'.php'
         );

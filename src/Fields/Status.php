@@ -78,19 +78,14 @@ class Status extends Text implements Unfillable
 
     /**
      * Resolve the field's status CSS class.
-     *
-     * @return string
      */
-    protected function resolveTypeClass()
+    protected function resolveTypeClass(): string
     {
-        switch ($this->resolveStatusType()) {
-            case 'loading':
-                return 'bg-gray-100 text-gray-500 dark:bg-gray-900 dark:text-gray-400';
-            case 'failed':
-                return 'bg-red-100 text-red-600 dark:bg-red-400 dark:text-red-900';
-            default:
-                return 'bg-green-100 text-green-600 dark:bg-green-400 dark:text-green-900';
-        }
+        return match ($this->resolveStatusType()) {
+            'loading' => 'bg-gray-100 text-gray-500 dark:bg-gray-900 dark:text-gray-400',
+            'failed' => 'bg-red-100 text-red-600 dark:bg-red-400 dark:text-red-900',
+            default => 'bg-green-100 text-green-600 dark:bg-green-400 dark:text-green-900',
+        };
     }
 
     /**
@@ -98,6 +93,7 @@ class Status extends Text implements Unfillable
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge([
@@ -109,7 +105,6 @@ class Status extends Text implements Unfillable
     /**
      * Make the field filter.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -119,10 +114,8 @@ class Status extends Text implements Unfillable
 
     /**
      * Prepare the field for JSON serialization.
-     *
-     * @return array
      */
-    public function serializeForFilter()
+    public function serializeForFilter(): array
     {
         return transform($this->jsonSerialize(), function ($field) {
             return Arr::only($field, [

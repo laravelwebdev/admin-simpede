@@ -6,8 +6,12 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Nova;
 
+/**
+ * @internal
+ */
 trait CallsQueuedActions
 {
     use Batchable;
@@ -17,39 +21,30 @@ trait CallsQueuedActions
 
     /**
      * The action class name.
-     *
-     * @var \Laravel\Nova\Actions\Action
      */
-    public $action;
+    public Action $action;
 
     /**
      * The method that should be called on the action.
-     *
-     * @var string
      */
-    public $method;
+    public string $method;
 
     /**
      * The resolved fields.
-     *
-     * @var \Laravel\Nova\Fields\ActionFields
      */
-    public $fields;
+    public ActionFields $fields;
 
     /**
      * The batch ID of the action event records.
-     *
-     * @var string
      */
-    public $actionBatchId;
+    public string $actionBatchId;
 
     /**
      * Call the action using the given callback.
      *
      * @param  callable(\Laravel\Nova\Actions\Action):void  $callback
-     * @return void
      */
-    protected function callAction($callback)
+    protected function callAction(callable $callback): void
     {
         Nova::usingActionEvent(function ($actionEvent) {
             if (! $this->action->withoutActionEvents) {
@@ -87,10 +82,8 @@ trait CallsQueuedActions
 
     /**
      * Get the display name for the queued job.
-     *
-     * @return string
      */
-    public function displayName()
+    public function displayName(): string
     {
         return get_class($this->action);
     }

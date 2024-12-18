@@ -6,10 +6,8 @@ class PostgresTrendDateExpression extends TrendDateExpression
 {
     /**
      * Get the value of the expression.
-     *
-     * @return mixed
      */
-    public function getValue()
+    public function getValue(): string
     {
         $offset = $this->offset();
 
@@ -21,17 +19,13 @@ class PostgresTrendDateExpression extends TrendDateExpression
             $interval = '- interval \''.($offset * -1).' HOUR\'';
         }
 
-        switch ($this->unit) {
-            case 'month':
-                return "to_char({$this->wrap($this->column)} {$interval}, 'YYYY-MM')";
-            case 'week':
-                return "to_char({$this->wrap($this->column)} {$interval}, 'IYYY-IW')";
-            case 'day':
-                return "to_char({$this->wrap($this->column)} {$interval}, 'YYYY-MM-DD')";
-            case 'hour':
-                return "to_char({$this->wrap($this->column)} {$interval}, 'YYYY-MM-DD HH24:00')";
-            case 'minute':
-                return "to_char({$this->wrap($this->column)} {$interval}, 'YYYY-MM-DD HH24:mi:00')";
-        }
+        return match ($this->unit) {
+            'month' => "to_char({$this->wrap($this->column)} {$interval}, 'YYYY-MM')",
+            'week' => "to_char({$this->wrap($this->column)} {$interval}, 'IYYY-IW')",
+            'day' => "to_char({$this->wrap($this->column)} {$interval}, 'YYYY-MM-DD')",
+            'hour' => "to_char({$this->wrap($this->column)} {$interval}, 'YYYY-MM-DD HH24:00')",
+            // 'minute'
+            default => "to_char({$this->wrap($this->column)} {$interval}, 'YYYY-MM-DD HH24:mi:00')",
+        };
     }
 }

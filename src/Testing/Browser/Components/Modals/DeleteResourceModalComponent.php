@@ -8,22 +8,16 @@ class DeleteResourceModalComponent extends ModalComponent
 {
     /**
      * Modal confirmation button.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
      */
-    public function confirm(Browser $browser)
+    public function confirm(Browser $browser): void
     {
         $browser->click('@confirm-delete-button');
     }
 
     /**
      * Modal cancelation button.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
      */
-    public function cancel(Browser $browser)
+    public function cancel(Browser $browser): void
     {
         $browser->click('@cancel-delete-button');
     }

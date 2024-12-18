@@ -1,13 +1,7 @@
 <template>
   <PanelItem :index="index" :field="field">
     <template #value>
-      <Icon
-        viewBox="0 0 24 24"
-        width="24"
-        height="24"
-        :type="type"
-        :class="color"
-      />
+      <IconBoolean :value="field.value" :nullable="field.nullable" />
     </template>
   </PanelItem>
 </template>
@@ -19,14 +13,6 @@ export default {
   computed: {
     label() {
       return this.field.value == true ? this.__('Yes') : this.__('No')
-    },
-
-    type() {
-      return this.field.value == true ? 'check-circle' : 'x-circle'
-    },
-
-    color() {
-      return this.field.value == true ? 'text-green-500' : 'text-red-500'
     },
   },
 }

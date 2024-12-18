@@ -1,5 +1,3 @@
-import isNil from 'lodash/isNil'
-
 export default class InlineFormData {
   constructor(attribute, formData) {
     this.attribute = attribute
@@ -49,7 +47,7 @@ export default class InlineFormData {
   name(attribute) {
     let [name, ...nested] = attribute.split('[')
 
-    if (!isNil(nested) && nested.length > 0) {
+    if (nested != null && nested.length > 0) {
       return `${this.attribute}[${name}][${nested.join('[')}`
     }
 

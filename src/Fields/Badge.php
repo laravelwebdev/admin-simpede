@@ -8,17 +8,11 @@ use Laravel\Nova\Badge as BadgeComponent;
 use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Fields\Filters\SelectFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Stringable;
 
 class Badge extends Field implements FilterableField, Unfillable
 {
     use FieldFilterable;
-
-    /**
-     * The text alignment for the field's text in tables.
-     *
-     * @var string
-     */
-    public $textAlign = 'center';
 
     /**
      * The field's component.
@@ -28,25 +22,32 @@ class Badge extends Field implements FilterableField, Unfillable
     public $component = 'badge-field';
 
     /**
+     * The text alignment for the field's text in tables.
+     *
+     * @var string
+     */
+    public $textAlign = 'center';
+
+    /**
      * The labels that should be applied to the field's possible values.
      *
-     * @var array<array-key, string>
+     * @var array<array-key, \Stringable|string>
      */
-    public $labels;
+    public $labels = [];
 
     /**
      * The callback used to determine the field's label.
      *
      * @var (callable(mixed):(string))|null
      */
-    public $labelCallback;
+    public $labelCallback = null;
 
     /**
      * The mapping used for matching custom values to in-built badge types.
      *
      * @var array<array-key, string>
      */
-    public $map;
+    public $map = [];
 
     /**
      * Indicates if the field should show icons.
@@ -58,7 +59,7 @@ class Badge extends Field implements FilterableField, Unfillable
     /**
      * The built-in badge types and their corresponding CSS classes.
      *
-     * @var array<array-key, string>
+     * @var array<array-key, string|array<int, string>>
      */
     public $types = [];
 
@@ -77,18 +78,17 @@ class Badge extends Field implements FilterableField, Unfillable
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|\Closure|callable|object|null  $attribute
+     * @param  \Stringable|string  $name
+     * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
-        $this->addTypes(BadgeComponent::$types);
-
-        $this->exceptOnForms();
+        $this->addTypes(BadgeComponent::$types)
+            ->exceptOnForms();
     }
 
     /**
@@ -174,7 +174,7 @@ class Badge extends Field implements FilterableField, Unfillable
      * @param  array<array-key, string>  $icons
      * @return $this
      */
-    public function icons($icons)
+    public function icons(array $icons)
     {
         $this->withIcons = true;
         $this->icons = $icons;
@@ -185,11 +185,9 @@ class Badge extends Field implements FilterableField, Unfillable
     /**
      * Resolve the Badge's CSS classes based on the field's value.
      *
-     * @return string
-     *
      * @throws \Exception
      */
-    public function resolveBadgeClasses()
+    public function resolveBadgeClasses(): array|string
     {
         $mappedValue = $this->map[$this->value] ?? $this->value;
 
@@ -202,21 +200,16 @@ class Badge extends Field implements FilterableField, Unfillable
 
     /**
      * Resolve the display label for the Badge.
-     *
-     * @return string
      */
-    public function resolveLabel()
+    public function resolveLabel(): Stringable|string
     {
         return $this->resolveLabelFor($this->value);
     }
 
     /**
      * Resolve the display label for the Badge.
-     *
-     * @param  string|int  $value
-     * @return string
      */
-    protected function resolveLabelFor($value)
+    protected function resolveLabelFor(string|int $value): Stringable|string
     {
         if (isset($this->labelCallback)) {
             return call_user_func($this->labelCallback, $value);
@@ -228,7 +221,6 @@ class Badge extends Field implements FilterableField, Unfillable
     /**
      * Make the field filter.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -239,12 +231,12 @@ class Badge extends Field implements FilterableField, Unfillable
     /**
      * Prepare the field for JSON serialization.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function serializeForFilter()
+    public function serializeForFilter(): array
     {
         return transform(parent::jsonSerialize(), function ($field) {
-            /** @phpstan-ignore-next-line */
+            /** @phpstan-ignore argument.type */
             $options = collect($this->map)->keys()->transform(function ($value) {
                 return ['value' => $value, 'label' => $this->resolveLabelFor($value)];
             })->all();
@@ -262,10 +254,8 @@ class Badge extends Field implements FilterableField, Unfillable
 
     /**
      * Resolve the display icon for the Badge.
-     *
-     * @return string
      */
-    public function resolveIcon()
+    public function resolveIcon(): string
     {
         $mappedValue = $this->map[$this->value] ?? $this->value;
 
@@ -281,6 +271,7 @@ class Badge extends Field implements FilterableField, Unfillable
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

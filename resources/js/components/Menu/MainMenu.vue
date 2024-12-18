@@ -14,18 +14,16 @@
   </div>
 </template>
 
-<script>
-import { mapGetters } from 'vuex'
+<script setup>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
-export default {
+defineOptions({
   name: 'MainMenu',
+})
 
-  computed: {
-    ...mapGetters(['mainMenu']),
+const store = useStore()
 
-    hasItems() {
-      return this.mainMenu.length > 0
-    },
-  },
-}
+const mainMenu = computed(() => store.getters.mainMenu)
+const hasItems = computed(() => mainMenu.value.length > 0)
 </script>

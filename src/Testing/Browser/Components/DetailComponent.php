@@ -2,36 +2,36 @@
 
 namespace Laravel\Nova\Testing\Browser\Components;
 
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Dusk\Browser;
 
 class DetailComponent extends Component
 {
-    public $resourceName;
-
-    public $resourceId;
+    /**
+     * The Resource ID.
+     *
+     * @var \Illuminate\Database\Eloquent\Model|string|int
+     */
+    public mixed $resourceId;
 
     /**
      * Create a new component instance.
      *
-     * @param  string  $resourceName
-     * @param  int  $resourceId
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Model|string|int  $resourceId
      */
-    public function __construct($resourceName, $resourceId)
-    {
-        $this->resourceName = $resourceName;
-        $this->resourceId = $resourceId;
+    public function __construct(
+        public string $resourceName,
+        mixed $resourceId
+    ) {
+        $this->resourceId = $resourceId instanceof Model ? $resourceId->getKey() : $resourceId;
     }
 
     /**
      * Open the delete selector.
      *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
-     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function openControlSelector(Browser $browser)
+    public function openControlSelector(Browser $browser): void
     {
         $browser->whenAvailable("@{$this->resourceId}-control-selector", function ($browser) {
             $browser->click('');
@@ -40,21 +40,16 @@ class DetailComponent extends Component
 
     /**
      * Get the root selector for the component.
-     *
-     * @return string
      */
-    public function selector()
+    public function selector(): string
     {
         return '@'.$this->resourceName.'-detail-component';
     }
 
     /**
      * Assert that the browser page contains the component.
-     *
-     * @param  \Laravel\Dusk\Browser  $browser
-     * @return void
      */
-    public function assert(Browser $browser)
+    public function assert(Browser $browser): void
     {
         tap($this->selector(), function ($selector) use ($browser) {
             $browser->pause(100)
@@ -65,10 +60,8 @@ class DetailComponent extends Component
 
     /**
      * Get the element shortcuts for the component.
-     *
-     * @return array
      */
-    public function elements()
+    public function elements(): array
     {
         return [];
     }

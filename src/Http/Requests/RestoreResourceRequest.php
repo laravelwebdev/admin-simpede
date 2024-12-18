@@ -4,46 +4,38 @@ namespace Laravel\Nova\Http\Requests;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Laravel\Nova\TrashedStatus;
 
 class RestoreResourceRequest extends DeletionRequest
 {
     /**
      * Get the selected models for the action in chunks.
      *
-     * @param  int  $count
      * @param  \Closure(\Illuminate\Support\Collection):void  $callback
-     * @return mixed
      */
-    public function chunks($count, Closure $callback)
+    public function chunks(int $count, Closure $callback): void
     {
-        return $this->chunkWithAuthorization($count, $callback, function ($models) {
+        $this->chunkWithAuthorization($count, $callback, function ($models) {
             return $this->restorableModels($models);
         });
     }
 
     /**
      * Get the models that may be restored.
-     *
-     * @param  \Illuminate\Support\Collection  $models
-     * @return \Illuminate\Support\Collection
      */
-    protected function restorableModels(Collection $models)
+    protected function restorableModels(Collection $models): Collection
     {
         return $models->mapInto($this->resource())
-                        ->filter
-                        ->isSoftDeleted()
-                        ->filter
-                        ->authorizedToRestore($this)
+                        ->filter->isSoftDeleted()
+                        ->filter->authorizedToRestore($this)
                         ->map->model();
     }
 
     /**
      * Get the trashed status of the request.
-     *
-     * @return string
      */
-    protected function trashed()
+    protected function trashed(): TrashedStatus
     {
-        return 'with';
+        return TrashedStatus::WITH;
     }
 }

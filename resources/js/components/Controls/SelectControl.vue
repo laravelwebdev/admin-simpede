@@ -2,7 +2,7 @@
   <div class="flex relative" :class="$attrs.class">
     <select
       v-bind="defaultAttributes"
-      :value="selected"
+      :value="modelValue"
       @change="handleChange"
       class="w-full block form-control form-control-bordered form-input"
       ref="selectControl"
@@ -43,80 +43,92 @@
       </template>
     </select>
 
-    <IconArrow
-      class="pointer-events-none absolute text-gray-700 right-[11px]"
-      :class="{
-        'top-[15px]': size === 'md',
-        'top-[13px]': size === 'sm',
-        'top-[11px]': size === 'xs',
-        'top-[9px]': size === 'xxs',
-      }"
-    />
+    <span
+      class="pointer-events-none absolute inset-y-0 right-[11px] flex items-center"
+    >
+      <IconArrow />
+    </span>
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, onBeforeMount, useAttrs, useTemplateRef } from 'vue'
 import groupBy from 'lodash/groupBy'
-import map from 'lodash/map'
 import omit from 'lodash/omit'
 
-export default {
-  emits: ['change'],
-
+defineOptions({
   inheritAttrs: false,
+})
 
-  props: {
-    hasError: { type: Boolean, default: false },
-    label: { default: 'label' },
-    options: { type: Array, default: [] },
-    disabled: { type: Boolean, default: false },
-    selected: {},
-    size: {
-      type: String,
-      default: 'md',
-      validator: val => ['xxs', 'xs', 'sm', 'md'].includes(val),
-    },
+const emitter = defineEmits(['selected'])
+
+const props = defineProps({
+  hasError: { type: Boolean, default: false },
+  label: { default: 'label' },
+  value: { default: null },
+  options: { type: Array, default: [] },
+  disabled: { type: Boolean, default: false },
+  size: {
+    type: String,
+    default: 'md',
+    validator: val => ['xxs', 'xs', 'sm', 'md'].includes(val),
   },
+})
 
-  methods: {
-    labelFor(option) {
-      return this.label instanceof Function
-        ? this.label(option)
-        : option[this.label]
-    },
+const modelValue = defineModel()
 
-    attrsFor(option) {
-      return {
-        ...(option.attrs || {}),
-        ...{ value: option.value },
-      }
-    },
+const attrs = useAttrs()
 
-    isSelected(option) {
-      return option.value == this.selected
-    },
+const selectControlRef = useTemplateRef('selectControl')
 
-    isDisabled(option) {
-      return option.disabled === true
-    },
+onBeforeMount(() => {
+  if (modelValue.value == null && props.value != null) {
+    modelValue.value = props.value
+  }
+})
 
-    handleChange(event) {
-      this.$emit('change', event.target.value)
-    },
-
-    resetSelection() {
-      this.$refs.selectControl.selectedIndex = 0
-    },
-  },
-
-  computed: {
-    defaultAttributes() {
-      return omit(this.$attrs, ['class'])
-    },
-
-    groupedOptions() {
-      return groupBy(this.options, option => option.group || '')
-    },
-  },
+const labelFor = option => {
+  return props.label instanceof Function
+    ? props.label(option)
+    : option[props.label]
 }
+
+const attrsFor = option => {
+  return {
+    ...(option.attrs || {}),
+    ...{ value: option.value },
+  }
+}
+
+const isSelected = option => {
+  return option.value == modelValue.value
+}
+
+const isDisabled = option => {
+  return option.disabled === true
+}
+
+const handleChange = event => {
+  let value = event.target.value
+
+  let selectedValue = props.options.find(
+    o => value === o.value || value === o.value.toString()
+  )
+
+  modelValue.value = selectedValue?.value ?? props.value
+  emitter('selected', selectedValue)
+}
+
+const resetSelection = () => {
+  selectControlRef.value.selectedIndex = 0
+}
+
+const defaultAttributes = computed(() => omit(attrs, ['class']))
+const groupedOptions = computed(() =>
+  groupBy(props.options, option => option.group || '')
+)
+
+defineExpose({
+  resetSelection,
+})
 </script>

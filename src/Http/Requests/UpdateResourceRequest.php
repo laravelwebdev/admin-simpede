@@ -6,10 +6,9 @@ class UpdateResourceRequest extends NovaRequest
 {
     /**
      * Determine if this request is an update or update-attached request.
-     *
-     * @return bool
      */
-    public function isUpdateOrUpdateAttachedRequest()
+    #[\Override]
+    public function isUpdateOrUpdateAttachedRequest(): bool
     {
         return true;
     }

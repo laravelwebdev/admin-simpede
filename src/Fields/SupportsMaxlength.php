@@ -7,11 +7,9 @@ trait SupportsMaxlength
     /**
      * Set a maxlength value for the field.
      *
-     * @param  int  $value
-     * @param  bool  $enforce
      * @return $this
      */
-    public function maxlength($value, $enforce = false)
+    public function maxlength(int $value, bool $enforce = false)
     {
         $this->withMeta(['maxlength' => $value]);
 

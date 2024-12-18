@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Contracts\Downloadable;
 use Laravel\Nova\DeleteField;
@@ -12,11 +13,8 @@ class FieldDestroyController extends Controller
 {
     /**
      * Delete the file at the given field.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @return \Illuminate\Http\Response
      */
-    public function __invoke(NovaRequest $request)
+    public function __invoke(NovaRequest $request): Response
     {
         $resource = $request->findResourceOrFail();
 
@@ -24,9 +22,7 @@ class FieldDestroyController extends Controller
 
         $field = $resource->updateFields($request)
                     ->whereInstanceOf(Downloadable::class)
-                    ->findFieldByAttribute($request->field, function () {
-                        abort(404);
-                    });
+                    ->findFieldByAttributeOrFail($request->field);
 
         DeleteField::forRequest(
             $request, $field, $resource->resource

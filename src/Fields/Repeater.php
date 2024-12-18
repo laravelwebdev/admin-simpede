@@ -44,44 +44,43 @@ class Repeater extends Field
     public $stacked = false;
 
     /**
-     * Indicates whether the field should use all available white-space.
+     * Indicates if the field should be sortable.
      *
-     * @var bool
-     */
-    public $fullWidth = false;
-
-    /**
-     * The repeatable types used for the Repeater.
-     *
-     * @var \Laravel\Nova\Fields\Repeater\RepeatableCollection
-     */
-    public $repeatables;
-
-    /**
      * @var bool
      */
     public $sortable = true;
 
     /**
+     * Indicates whether the field should use all available white-space.
+     */
+    public $fullWidth = false;
+
+    /**
+     * The repeatable types used for the Repeater.
+     */
+    public RepeatableCollection $repeatables;
+
+    /**
+     * The repeatable type unique field.
+     *
      * @var string|null
      */
-    public $uniqueField;
+    public $uniqueField = null;
 
     /**
      * The preset used for the field.
      *
      * @var \Laravel\Nova\Fields\Repeater\Presets\Preset|null
      */
-    public $preset;
+    public $preset = null;
 
     /**
      * Create a new field.
      *
-     * @param  string  $name
-     * @param  string|null  $attribute
+     * @param  \Stringable|string  $name
      * @param  (callable(mixed, mixed, ?string):mixed)|null  $resolveCallback
      */
-    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, ?string $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
@@ -123,7 +122,9 @@ class Repeater extends Field
      */
     public function asJson()
     {
-        return $this->preset(new JSON);
+        return $this->preset(new JSON)
+            ->onlyOnForms()
+            ->showOnDetail();
     }
 
     /**
@@ -136,14 +137,14 @@ class Repeater extends Field
      */
     public function asHasMany($resourceClass = null)
     {
-        /** @var class-string<\Laravel\Nova\Resource>|null $resource */
-        $resource = $resourceClass ?? ResourceRelationshipGuesser::guessResource($this->name);
+        /** @var class-string<\Laravel\Nova\Resource>|null $resourceClass */
+        $resourceClass ??= ResourceRelationshipGuesser::guessResource($this->name);
 
-        if ($resource) {
-            $this->resourceClass = $resource;
-            $this->resourceName = $resource::uriKey();
+        if ($resourceClass) {
+            $this->resourceClass = $resourceClass;
+            $this->resourceName = $resourceClass::uriKey();
 
-            return $this->preset(new HasMany);
+            return $this->preset(new HasMany)->onlyOnForms();
         }
 
         throw NovaException::missingResourceForRepeater($this->name);
@@ -162,11 +163,9 @@ class Repeater extends Field
     /**
      * Resolve the given attribute from the given resource.
      *
-     * @param  mixed  $resource
-     * @param  string  $attribute
-     * @return mixed
+     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object|array  $resource
      */
-    protected function resolveAttribute($resource, $attribute)
+    protected function resolveAttribute($resource, string $attribute): mixed
     {
         $request = app(NovaRequest::class);
 
@@ -187,12 +186,9 @@ class Repeater extends Field
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
-     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
-     * @param  string  $attribute
-     * @return \Closure
      */
-    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
+    protected function fillAttributeFromRequest(NovaRequest $request, string $requestAttribute, object $model, string $attribute): callable
     {
         return $this->getPreset()->set($request, $requestAttribute, $model, $attribute, $this->repeatables, $this->uniqueField);
     }
@@ -204,7 +200,7 @@ class Repeater extends Field
      *
      * @phpstan-return array<string, TFieldValidationRules>
      */
-    public function getCreationRules(NovaRequest $request)
+    public function getCreationRules(NovaRequest $request): array
     {
         return array_merge_recursive(parent::getCreationRules($request), $this->formatRules());
     }
@@ -216,7 +212,7 @@ class Repeater extends Field
      *
      * @phpstan-return array<string, TFieldValidationRules>
      */
-    public function getUpdateRules(NovaRequest $request)
+    public function getUpdateRules(NovaRequest $request): array
     {
         return array_merge_recursive(parent::getUpdateRules($request), $this->formatRules());
     }
@@ -228,7 +224,7 @@ class Repeater extends Field
      *
      * @phpstan-return array<string, TFieldValidationRules>
      */
-    protected function formatRules()
+    protected function formatRules(): array
     {
         $request = app(NovaRequest::class);
 
@@ -243,19 +239,49 @@ class Repeater extends Field
             ->flatMap(function (Repeatable $repeatable, $index) use ($request) {
                 return FieldCollection::make($repeatable->fields($request))
                     ->mapWithKeys(function (Field $field) use ($index) {
-                        return ["{$this->validationKey()}.{$index}.fields.{$field->attribute}" => $field->rules];
+                        $key = "{$this->validationKey()}.{$index}.fields";
+
+                        return [
+                            "{$key}.{$field->attribute}" => $this->replaceRulesPlaceholder($field->rules, $key),
+                        ];
                     });
             })
             ->all();
     }
 
     /**
+     * Replaces all rules any final formatting of the given validation rules.
+     *
+     *
+     * @return array<array-key, mixed>
+     *
+     * @phpstan-return array<array-key, TFieldValidationRules>
+     */
+    protected function replaceRulesPlaceholder(array $rules, string $replaceWith = ''): array
+    {
+        $replacements = array_filter([
+            '{{repeatable}}' => str_replace(['\'', '"', ',', '\\'], '', $replaceWith),
+        ]);
+
+        if (empty($replacements)) {
+            return $rules;
+        }
+
+        return collect($rules)->map(function ($rules) use ($replacements) {
+            return collect($rules)->map(function ($rule) use ($replacements) {
+                return is_string($rule)
+                    ? str_replace(array_keys($replacements), array_values($replacements), $rule)
+                    : $rule;
+            })->all();
+        })->flatten()->all();
+    }
+
+    /**
      * Set the unique database column to use when attempting upserts.
      *
-     * @param  string|null  $key
      * @return $this
      */
-    public function uniqueField($key)
+    public function uniqueField(?string $key)
     {
         $this->uniqueField = $key;
 

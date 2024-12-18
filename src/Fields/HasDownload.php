@@ -2,7 +2,10 @@
 
 namespace Laravel\Nova\Fields;
 
+use Illuminate\Http\Response;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Resource;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 trait HasDownload
 {
@@ -47,12 +50,8 @@ trait HasDownload
 
     /**
      * Create an HTTP response to download the underlying field.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
-     * @param  \Laravel\Nova\Resource  $resource
-     * @return \Illuminate\Http\Response
      */
-    public function toDownloadResponse(NovaRequest $request, $resource)
+    public function toDownloadResponse(NovaRequest $request, Resource $resource): Response|StreamedResponse
     {
         return call_user_func(
             $this->downloadResponseCallback,
