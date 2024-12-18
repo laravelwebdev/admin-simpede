@@ -110,6 +110,15 @@ export default class Nova {
         },
       }
     }
+
+    /** @private */
+    this.__started = false
+
+    /** @private */
+    this.__booted = false
+
+    /** @private */
+    this.__deployed = false
   }
 
   /**
@@ -131,6 +140,8 @@ export default class Nova {
 
     this.bootingCallbacks.forEach(callback => callback(this.app, this.store))
     this.bootingCallbacks = []
+
+    this.__booted = true
   }
 
   /**
@@ -163,8 +174,11 @@ export default class Nova {
         return page
       },
       setup: ({ el, App, props, plugin }) => {
+        this.debug('engine start')
+
         /** @protected */
         this.mountTo = el
+
         /**
          * @protected
          * @type VueApp
@@ -185,6 +199,12 @@ export default class Nova {
             },
           },
         })
+
+        this.debug('engine ready')
+
+        this.__started = true
+
+        this.deploy()
       },
     })
   }
@@ -216,7 +236,9 @@ export default class Nova {
       attributeFilter: ['class'],
     })
 
-    this.boot()
+    if (!this.__booted) {
+      this.boot()
+    }
 
     if (this.config('notificationCenterEnabled')) {
       /** @private */
@@ -226,6 +248,16 @@ export default class Nova {
         }
       }, this.config('notificationPollingInterval'))
     }
+
+    this.deploy()
+  }
+
+  deploy() {
+    if (!this.__started || !this.__booted || this.__deployed) {
+      return
+    }
+
+    this.debug('engage thrusters')
 
     this.registerStoreModules()
 
@@ -263,6 +295,8 @@ export default class Nova {
     this.applyTheme()
 
     this.log('All systems go...')
+
+    this.__deployed = true
   }
 
   /**
