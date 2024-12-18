@@ -154,11 +154,11 @@ export default {
 
   computed: {
     usernameLabel() {
-      return this.username === 'Username'
+      return 'Username'
     },
 
     usernameInputType() {
-      return this.username === 'text'
+      return 'text'
     },
 
     supportsPasswordReset() {
