@@ -876,7 +876,7 @@ class Nova
     /**
      * Check to see if Nova is valid for the configured license key.
      */
-    public static function checkLicense(): ClientResponse
+    public static function checkLicense(): bool
     {
         return true;
     }
