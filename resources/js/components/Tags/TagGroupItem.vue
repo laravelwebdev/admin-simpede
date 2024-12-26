@@ -19,7 +19,7 @@
         type="button"
         class="opacity-50 hover:opacity-75 dark:opacity-100 dark:hover:opacity-50"
       >
-        <Icon name="x-mark" type="micro" />
+        <Icon type="x" width="16" height="16" />
       </button>
     </Badge>
 
@@ -35,7 +35,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Icon } from 'laravel-nova-ui'
 
 const shown = ref(false)
 

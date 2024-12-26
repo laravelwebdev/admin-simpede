@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\MetricRequest;
 
@@ -10,8 +9,11 @@ class MetricController extends Controller
 {
     /**
      * List the metrics for the given resource.
+     *
+     * @param  \Laravel\Nova\Http\Requests\MetricRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(MetricRequest $request): JsonResponse
+    public function index(MetricRequest $request)
     {
         return response()->json(
             $request->availableMetrics()
@@ -20,8 +22,11 @@ class MetricController extends Controller
 
     /**
      * Get the specified metric's value.
+     *
+     * @param  \Laravel\Nova\Http\Requests\MetricRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(MetricRequest $request): JsonResponse
+    public function show(MetricRequest $request)
     {
         return response()->json([
             'value' => $request->metric()->resolve($request),

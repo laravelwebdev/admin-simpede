@@ -7,9 +7,10 @@ use Illuminate\Http\Request;
 class DetachAnyAttachment
 {
     /**
-     * Delete any attachments from the field.
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
      */
-    public function __invoke(Request $request): void
+    public function __invoke(Request $request)
     {
         call_user_func(new DetachAttachment, $request);
         call_user_func(new DetachPendingAttachment, $request);

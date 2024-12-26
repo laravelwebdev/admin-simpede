@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Fields;
 
-use Illuminate\Support\Collection;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 /**
@@ -33,18 +32,20 @@ class Stack extends Field
 
     /**
      * The contents of the Stack field.
+     *
+     * @var array|\Illuminate\Support\Collection
      */
-    public Collection $lines;
+    public $lines;
 
     /**
      * Create a new Stack field.
      *
-     * @param  \Stringable|string  $name
+     * @param  string  $name
      * @param  string|array<int, class-string<\Laravel\Nova\Fields\Field>|callable>|null  $attribute
-     * @param  iterable<int, class-string<\Laravel\Nova\Fields\Field>|callable>  $lines
+     * @param  array<int, class-string<\Laravel\Nova\Fields\Field>|callable>  $lines
      * @return void
      */
-    public function __construct($name, mixed $attribute = null, iterable $lines = [])
+    public function __construct($name, $attribute = null, $lines = [])
     {
         if (is_array($attribute)) {
             $lines = $attribute;
@@ -53,33 +54,47 @@ class Stack extends Field
 
         parent::__construct($name, $attribute);
 
-        $this->lines = Collection::make($lines);
+        $this->lines = $lines;
     }
 
     /**
      * Resolve the field's value for display.
      *
-     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
+     * @param  mixed  $resource
+     * @param  string|null  $attribute
+     * @return void
      */
-    #[\Override]
-    public function resolveForDisplay($resource, ?string $attribute = null): void
+    public function resolveForDisplay($resource, $attribute = null)
     {
         $this->prepareLines($resource, $attribute);
     }
 
     /**
+     * Prepare the stack for JSON serialization.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        return array_merge(parent::jsonSerialize(), [
+            'lines' => $this->lines->all(),
+        ]);
+    }
+
+    /**
      * Prepare each line for serialization.
      *
-     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model|object  $resource
+     * @param  mixed  $resource
+     * @param  string  $attribute
+     * @return void
      */
-    public function prepareLines($resource, ?string $attribute = null): void
+    public function prepareLines($resource, $attribute = null)
     {
         $this->ensureLinesAreResolveable();
 
         $request = app(NovaRequest::class);
 
         $this->lines = $this->lines->filter(function ($field) use ($request, $resource) {
-            /** @var \Laravel\Nova\Fields\Field $field */
             if ($request->isResourceIndexRequest()) {
                 return $field->isShownOnIndex($request, $resource);
             }
@@ -90,36 +105,27 @@ class Stack extends Field
 
     /**
      * Get field lines.
+     *
+     * @return \Illuminate\Support\Collection
      */
-    public function fields(): Collection
+    public function fields()
     {
-        return $this->lines->whereInstanceOf(Field::class);
+        return collect($this->lines)->whereInstanceOf(Field::class);
     }
 
     /**
      * Ensure that each line for the field is resolvable.
+     *
+     * @return void
      */
-    protected function ensureLinesAreResolveable(): void
+    protected function ensureLinesAreResolveable()
     {
-        $this->lines = $this->lines->map(function ($line) {
+        $this->lines = collect($this->lines)->map(function ($line) {
             if (is_callable($line)) {
                 return Line::make('Anonymous', $line);
             }
 
             return $line;
         });
-    }
-
-    /**
-     * Prepare the stack for JSON serialization.
-     *
-     * @return array<string, mixed>
-     */
-    #[\Override]
-    public function jsonSerialize(): array
-    {
-        return array_merge(parent::jsonSerialize(), [
-            'lines' => $this->lines->all(),
-        ]);
     }
 }

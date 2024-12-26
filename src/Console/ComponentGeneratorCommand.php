@@ -3,14 +3,11 @@
 namespace Laravel\Nova\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Str;
 use Laravel\Nova\Console\Concerns\AcceptsNameAndVendor;
 use Symfony\Component\Process\Process;
 
-use function Laravel\Prompts\confirm;
-
-abstract class ComponentGeneratorCommand extends Command implements PromptsForMissingInput
+abstract class ComponentGeneratorCommand extends Command
 {
     use AcceptsNameAndVendor, ResolvesStubPath;
 
@@ -41,29 +38,27 @@ abstract class ComponentGeneratorCommand extends Command implements PromptsForMi
             $this->addRepositoryToRootComposer();
             $this->addRequireToRootComposer();
 
-            if (confirm('Would you like to update your Composer packages?', true)) {
+            if ($this->confirm('Would you like to update your Composer packages?', true)) {
                 $this->composerUpdate();
 
                 $this->output->newLine();
             }
         }
 
-        if ($interactsWithComposer === true && $interactsWithNpm === true) {
+        if ($interactsWithNpm === true) {
             if (file_exists(base_path('package.json'))) {
                 $this->addScriptsToRootNpmPackage();
             } else {
-                $this->components->warn('Please create a package.json to the root of your project.');
+                $this->warn('Please create a package.json to the root of your project.');
             }
 
-            if (confirm("Would you like to install the {$componentType}'s NPM dependencies?", true)) {
-                $this->installNovaNpmDependencies();
-
+            if ($this->confirm("Would you like to install the {$componentType}'s NPM dependencies?", true)) {
                 $this->installNpmDependencies();
 
                 $this->output->newLine();
             }
 
-            if (confirm("Would you like to compile the {$componentType}'s assets?", true)) {
+            if ($this->confirm("Would you like to compile the {$componentType}'s assets?", true)) {
                 $this->compileAssets();
 
                 $this->output->newLine();
@@ -96,9 +91,9 @@ abstract class ComponentGeneratorCommand extends Command implements PromptsForMi
      *
      * @return void
      */
-    protected function composerUpdate(?string $directory = null)
+    protected function composerUpdate()
     {
-        $this->executeCommand('composer update', $directory ?? getcwd());
+        $this->executeCommand('composer update', getcwd());
     }
 
     /**
@@ -173,9 +168,7 @@ abstract class ComponentGeneratorCommand extends Command implements PromptsForMi
      */
     protected function installNovaNpmDependencies()
     {
-        $this->composerUpdate($this->componentPath());
-
-        $this->executeCommand('npm install --save-dev "vendor/laravel/nova-devtool"', $this->componentPath());
+        $this->executeCommand('npm set progress=false && npm ci', realpath(__DIR__.'/../../'));
     }
 
     /**
@@ -279,17 +272,5 @@ abstract class ComponentGeneratorCommand extends Command implements PromptsForMi
     protected function component()
     {
         return $this->argument('name');
-    }
-
-    /**
-     * Prompt for missing input arguments using the returned questions.
-     *
-     * @return array<string, string>
-     */
-    protected function promptForMissingArgumentsUsing(): array
-    {
-        return [
-            'name' => "What's the component name?",
-        ];
     }
 }

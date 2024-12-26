@@ -3,17 +3,17 @@ import debounce from 'lodash/debounce'
 export default {
   data: () => ({
     search: '',
+    selectedResource: null,
     selectedResourceId: null,
     availableResources: [],
   }),
 
   methods: {
     /**
-     * Set the currently selected resource.
-     *
-     * @param {object} resource
+     * Set the currently selected resource
      */
     selectResource(resource) {
+      this.selectedResource = resource
       this.selectedResourceId = resource.value
 
       if (this.field) {
@@ -39,6 +39,7 @@ export default {
      * Clear the selected resource and availableResources
      */
     clearSelection() {
+      this.selectedResource = null
       this.selectedResourceId = null
       this.availableResources = []
 
@@ -53,8 +54,6 @@ export default {
 
     /**
      * Perform a search to get the relatable resources.
-     *
-     * @param {string} search
      */
     performSearch(search) {
       this.search = search

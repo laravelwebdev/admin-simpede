@@ -8,8 +8,8 @@
   </div>
 </template>
 
-<script setup>
-defineOptions({
+<script>
+export default {
   name: 'Auth',
-})
+}
 </script>

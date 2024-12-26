@@ -2,9 +2,9 @@
 
 namespace Laravel\Nova\Fields;
 
+use Closure;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
-use Laravel\Nova\Util;
 
 trait FormatsRelatableDisplayValues
 {
@@ -18,9 +18,10 @@ trait FormatsRelatableDisplayValues
     /**
      * Format the associatable display value.
      *
-     * @param  \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model  $resource
+     * @param  mixed  $resource
+     * @return string
      */
-    protected function formatDisplayValue($resource): string
+    protected function formatDisplayValue($resource)
     {
         if (! $resource instanceof Resource) {
             $resource = Nova::newResourceFromModel($resource);
@@ -36,14 +37,16 @@ trait FormatsRelatableDisplayValues
     /**
      * Set the column that should be displayed for the field.
      *
-     * @param  (callable(mixed):(string))|string  $display
+     * @param  (\Closure(mixed):(string))|string  $display
      * @return $this
      */
-    public function display(callable|string $display)
+    public function display($display)
     {
-        $this->display = Util::isSafeCallable($display)
-            ? $display
-            : fn ($resource) => $resource->{$display};
+        $this->display = $display instanceof Closure
+                        ? $display
+                        : function ($resource) use ($display) {
+                            return $resource->{$display};
+                        };
 
         return $this;
     }

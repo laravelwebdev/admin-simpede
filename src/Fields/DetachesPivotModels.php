@@ -11,14 +11,14 @@ trait DetachesPivotModels
     /**
      * Get the pivot record detachment callback for the field.
      *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, mixed):bool
+     * @return \Closure(\Laravel\Nova\Http\Requests\NovaRequest, mixed):bool
      */
-    protected function detachmentCallback(): callable
+    protected function detachmentCallback()
     {
         return function ($request, $model) {
             $pivotAccessor = $model->{$this->attribute}()->getPivotAccessor();
 
-            foreach ($model->{$this->attribute}()->withoutGlobalScopes()->lazy() as $related) {
+            foreach ($model->{$this->attribute}()->withoutGlobalScopes()->cursor() as $related) {
                 $resource = Nova::newResourceFromModel($related);
 
                 $pivot = $related->{$pivotAccessor};

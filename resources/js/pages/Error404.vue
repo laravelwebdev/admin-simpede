@@ -2,11 +2,12 @@
   <CustomError404 />
 </template>
 
-<script setup>
+<script>
 import Guest from '@/layouts/Guest'
 
-defineOptions({
+export default {
   name: 'Error404Page',
+
   layout: Guest,
-})
+}
 </script>

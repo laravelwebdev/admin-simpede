@@ -6,21 +6,18 @@ use Laravel\Nova\Exceptions\HelperNotSupported;
 use Laravel\Nova\Makeable;
 use Laravel\Nova\Nova;
 use Laravel\Nova\URL;
-use Laravel\Nova\WithComponent;
-use Stringable;
 
 class NovaNotification extends \Illuminate\Notifications\Notification
 {
     use Makeable;
-    use WithComponent;
 
-    public const SUCCESS_TYPE = 'success';
+    const SUCCESS_TYPE = 'success';
 
-    public const ERROR_TYPE = 'error';
+    const ERROR_TYPE = 'error';
 
-    public const WARNING_TYPE = 'warning';
+    const WARNING_TYPE = 'warning';
 
-    public const INFO_TYPE = 'info';
+    const INFO_TYPE = 'info';
 
     /**
      * The notification available types text CSS.
@@ -51,14 +48,14 @@ class NovaNotification extends \Illuminate\Notifications\Notification
     /**
      * The message used for the notification.
      *
-     * @var \Stringable|string|null
+     * @var string|null
      */
-    public $message = null;
+    public $message;
 
     /**
      * The text used for the call-to-action button label.
      *
-     * @var \Stringable|string
+     * @var string
      */
     public $actionText = 'View';
 
@@ -67,7 +64,7 @@ class NovaNotification extends \Illuminate\Notifications\Notification
      *
      * @var \Laravel\Nova\URL|string|null
      */
-    public $actionUrl = null;
+    public $actionUrl;
 
     /**
      * Determine if URL should be open in new tab.
@@ -86,9 +83,10 @@ class NovaNotification extends \Illuminate\Notifications\Notification
     /**
      * Set the icon used for the notification.
      *
+     * @param  string  $icon
      * @return $this
      */
-    public function icon(string $icon)
+    public function icon($icon)
     {
         $this->icon = $icon;
 
@@ -98,9 +96,10 @@ class NovaNotification extends \Illuminate\Notifications\Notification
     /**
      * Set the message used for the notification.
      *
+     * @param  string  $message
      * @return $this
      */
-    public function message(Stringable|string $message)
+    public function message($message)
     {
         $this->message = $message;
 
@@ -110,9 +109,10 @@ class NovaNotification extends \Illuminate\Notifications\Notification
     /**
      * Set the URL used for the notification call-to-action button.
      *
+     * @param  string  $url
      * @return $this
      */
-    public function url(URL|string $url)
+    public function url($url)
     {
         $this->actionUrl = $url;
 
@@ -122,9 +122,11 @@ class NovaNotification extends \Illuminate\Notifications\Notification
     /**
      * Set the action text and URL used for the notification.
      *
+     * @param  string  $text
+     * @param  \Laravel\Nova\URL|string  $url
      * @return $this
      */
-    public function action(string $text, URL|string $url)
+    public function action(string $text, $url)
     {
         $this->actionText = $text;
         $this->actionUrl = $url;
@@ -151,6 +153,7 @@ class NovaNotification extends \Illuminate\Notifications\Notification
     /**
      * Set the notification's visual type.
      *
+     * @param  string  $type
      * @return $this
      */
     public function type(string $type = 'success')
@@ -168,7 +171,7 @@ class NovaNotification extends \Illuminate\Notifications\Notification
     public function toNova()
     {
         return [
-            'component' => $this->component(),
+            'component' => $this->component,
             'icon' => $this->icon,
             'message' => $this->message,
             'actionText' => Nova::__($this->actionText),

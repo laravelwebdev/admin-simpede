@@ -10,9 +10,18 @@
   </span>
 </template>
 
-<script setup>
-defineProps({
-  label: { type: [Boolean, String], required: false },
-  extraClasses: { type: [Array, String], required: false },
-})
+<script>
+export default {
+  props: {
+    label: {
+      type: [Boolean, String],
+      required: false,
+    },
+
+    extraClasses: {
+      type: [Array, String],
+      required: false,
+    },
+  },
+}
 </script>

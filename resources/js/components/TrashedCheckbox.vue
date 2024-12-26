@@ -4,22 +4,28 @@
       v-bind="{ ...$attrs }"
       :dusk="`${resourceName}-with-trashed-checkbox`"
       :checked="withTrashed"
-      @input="$emit('input')"
+      @input="toggleWithTrashed"
     >
       <span>{{ __('With Trashed') }}</span>
     </CheckboxWithLabel>
   </div>
 </template>
 
-<script setup>
-defineOptions({
+<script>
+export default {
+  emits: ['input'],
+
   inheritAttrs: false,
-})
 
-defineEmits(['input'])
+  props: {
+    resourceName: String,
+    withTrashed: Boolean,
+  },
 
-defineProps({
-  resourceName: String,
-  withTrashed: Boolean,
-})
+  methods: {
+    toggleWithTrashed() {
+      this.$emit('input')
+    },
+  },
+}
 </script>

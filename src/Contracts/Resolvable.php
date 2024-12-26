@@ -12,14 +12,18 @@ interface Resolvable
     /**
      * Resolve the element's value.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object|array  $resource
+     * @param  mixed  $resource
+     * @param  string|null  $attribute
+     * @return void
      */
-    public function resolve($resource, ?string $attribute = null): void;
+    public function resolve($resource, $attribute = null);
 
     /**
      * Resolve the field's value for display.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object|array  $resource
+     * @param  mixed  $resource
+     * @param  string|null  $attribute
+     * @return void
      */
-    public function resolveForDisplay($resource, ?string $attribute = null): void;
+    public function resolveForDisplay($resource, $attribute = null);
 }

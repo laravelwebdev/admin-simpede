@@ -10,8 +10,8 @@
       <MultiSelectControl
         :id="currentField.uniqueKey"
         :dusk="field.attribute"
-        v-model="value"
-        @update:modelValue="handleChange"
+        v-model:selected="value"
+        @change="handleChange"
         class="w-full"
         :class="errorClasses"
         :options="currentField.options"
@@ -31,8 +31,10 @@
 </template>
 
 <script>
-import { DependentFormField, HandlesValidationErrors } from '@/mixins'
+import filter from 'lodash/filter'
+import map from 'lodash/map'
 import merge from 'lodash/merge'
+import { DependentFormField, HandlesValidationErrors } from '@/mixins'
 import filled from '@/util/filled'
 
 export default {
@@ -55,11 +57,12 @@ export default {
         ? merge(this.currentField.value || [], this.value)
         : this.value
 
-      let selectedOptions = (this.currentField.options ?? []).filter(
+      let selectedOptions = filter(
+        this.currentField.options ?? [],
         o => values.includes(o.value) || values.includes(o.value.toString())
       )
 
-      this.value = selectedOptions.map(o => o.value)
+      this.value = map(selectedOptions, o => o.value)
     },
 
     /**
@@ -95,6 +98,13 @@ export default {
      * Handle the selection change event.
      */
     handleChange(values) {
+      let selectedOptions = filter(
+        this.currentField.options ?? [],
+        o => values.includes(o.value) || values.includes(o.value.toString())
+      )
+
+      this.value = map(selectedOptions, o => o.value)
+
       if (this.field) {
         this.emitFieldValueChange(this.fieldAttribute, this.value)
       }
@@ -110,7 +120,7 @@ export default {
      * Return the field options filtered by the search string.
      */
     filteredOptions() {
-      let options = this.currentField.options ?? []
+      let options = this.currentField.options || []
 
       return options.filter(option => {
         return (

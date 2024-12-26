@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Metrics;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Filters\FilterDecoder;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -11,12 +10,15 @@ trait ResolvesFilters
 {
     /**
      * Filters for the metric.
+     *
+     * @var \Illuminate\Support\Collection|null
      */
-    protected ?Collection $filters = null;
+    protected $filters;
 
     /**
      * Set filters for current metric.
      *
+     * @param  \Illuminate\Support\Collection  $filters
      * @return $this
      */
     public function setAvailableFilters(Collection $filters)
@@ -28,8 +30,12 @@ trait ResolvesFilters
 
     /**
      * Apply filter query.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    public function applyFilterQuery(NovaRequest $request, Builder $query): Builder
+    public function applyFilterQuery(NovaRequest $request, $query)
     {
         if ($this->filters instanceof Collection) {
             (new FilterDecoder($request->filter, $this->filters))

@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Actions\ActionCollection;
@@ -14,8 +13,11 @@ class LensActionController extends Controller
 {
     /**
      * List the actions for the given resource.
+     *
+     * @param  \Laravel\Nova\Http\Requests\LensRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(LensRequest $request): JsonResponse
+    public function index(LensRequest $request)
     {
         $lens = $request->lens();
 
@@ -31,7 +33,6 @@ class LensActionController extends Controller
             $pivotActionCounts = ActionCollection::make($payload['pivotActions']['actions'])->countsByTypeOnIndex();
 
             $payload['counts'] = [
-                'sole' => $actionCounts['sole'] + $pivotActionCounts['sole'],
                 'standalone' => $actionCounts['standalone'] + $pivotActionCounts['standalone'],
                 'resource' => $actionCounts['resource'] + $pivotActionCounts['resource'],
             ];
@@ -42,8 +43,11 @@ class LensActionController extends Controller
 
     /**
      * Perform an action on the specified resources.
+     *
+     * @param  \Laravel\Nova\Http\Requests\LensActionRequest  $request
+     * @return \Illuminate\Http\Response
      */
-    public function store(LensActionRequest $request): mixed
+    public function store(LensActionRequest $request)
     {
         $request->validateFields();
 
@@ -52,8 +56,11 @@ class LensActionController extends Controller
 
     /**
      * Sync an action field on the specified resources.
+     *
+     * @param  \Laravel\Nova\Http\Requests\LensActionRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function sync(LensActionRequest $request): JsonResponse
+    public function sync(LensActionRequest $request)
     {
         $action = $request->lens()->availableActions($request)
             ->first(function ($action) use ($request) {

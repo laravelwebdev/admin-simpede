@@ -9,8 +9,11 @@ class UndefinedValue implements \JsonSerializable
 {
     /**
      * Determine if value is equivalent to "undefined" or "null".
+     *
+     * @param  mixed  $value
+     * @return bool
      */
-    public static function equalsTo(mixed $value): bool
+    public static function equalsTo($value)
     {
         return $value instanceof UndefinedValue || is_null($value);
     }

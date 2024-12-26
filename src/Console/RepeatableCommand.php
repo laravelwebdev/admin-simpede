@@ -5,12 +5,7 @@ namespace Laravel\Nova\Console;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-
-use function Illuminate\Filesystem\join_paths;
-use function Laravel\Prompts\suggest;
 
 #[AsCommand(name: 'nova:repeatable')]
 class RepeatableCommand extends GeneratorCommand
@@ -39,12 +34,23 @@ class RepeatableCommand extends GeneratorCommand
     protected $type = 'Repeatable';
 
     /**
+     * Execute the console command.
+     *
+     * @return bool|null
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    public function handle()
+    {
+        parent::handle();
+    }
+
+    /**
      * Build the class with the given name.
      *
      * @param  string  $name
      * @return string
      */
-    #[\Override]
     protected function buildClass($name)
     {
         $resourceName = $this->argument('name');
@@ -92,13 +98,9 @@ class RepeatableCommand extends GeneratorCommand
      * @param  string  $rootNamespace
      * @return string
      */
-    #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
-        return match (true) {
-            is_dir(app_path(join_paths('Nova', 'Repeater'))) => $rootNamespace.'\Nova\Repeater',
-            default => $rootNamespace.'\Nova\Repeaters',
-        };
+        return $rootNamespace.'\Nova\Repeater';
     }
 
     /**
@@ -114,32 +116,10 @@ class RepeatableCommand extends GeneratorCommand
     }
 
     /**
-     * Interact further with the user if they were prompted for missing arguments.
-     *
-     * @return void
-     */
-    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
-    {
-        if ($this->didReceiveOptions($input)) {
-            return;
-        }
-
-        $model = suggest(
-            'What model should this repeatable be for? (Optional)',
-            $this->possibleModels()
-        );
-
-        if ($model) {
-            $input->setOption('model', $model);
-        }
-    }
-
-    /**
      * Get the console command options.
      *
      * @return array
      */
-    #[\Override]
     protected function getOptions()
     {
         return [

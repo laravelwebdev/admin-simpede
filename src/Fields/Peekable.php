@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Fields;
 
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Resource;
 
 trait Peekable
 {
@@ -20,7 +19,7 @@ trait Peekable
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(bool))|bool  $callback
      * @return $this
      */
-    public function peekable(callable|bool $callback = true)
+    public function peekable($callback = true)
     {
         $this->peekable = $callback;
 
@@ -41,8 +40,11 @@ trait Peekable
 
     /**
      * Resolve whether the relation is able to be peeked at.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return mixed
      */
-    public function isPeekable(NovaRequest $request): bool
+    public function isPeekable(NovaRequest $request)
     {
         if (is_callable($this->peekable)) {
             $this->peekable = call_user_func($this->peekable, $request);
@@ -53,8 +55,11 @@ trait Peekable
 
     /**
      * Determine if the relation has fields that can be peeked at.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return bool
      */
-    public function hasFieldsToPeekAt(NovaRequest $request): bool
+    public function hasFieldsToPeekAt(NovaRequest $request)
     {
         if (! $request->isPresentationRequest() && ! $request->isResourcePreviewRequest()) {
             return false;
@@ -69,14 +74,16 @@ trait Peekable
 
     /**
      * Return the appropriate related Resource for the field.
+     *
+     * @return \Laravel\Nova\Resource|null
      */
-    protected function relatedResource(): ?Resource
+    protected function relatedResource()
     {
         if ($this instanceof MorphTo) {
             return $this->morphToResource;
         }
 
-        /** @phpstan-ignore property.notFound */
+        /** @phpstan-ignore-next-line */
         return $this->belongsToResource;
     }
 }

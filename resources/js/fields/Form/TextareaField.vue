@@ -9,12 +9,13 @@
       <div class="space-y-1">
         <textarea
           v-bind="extraAttributes"
+          class="block w-full form-control form-input form-control-bordered py-3 h-auto"
           :id="currentField.uniqueKey"
-          :value="value"
-          :maxlength="field.enforceMaxlength ? field.maxlength : -1"
-          @input="handleChange"
-          class="w-full h-auto py-3 block form-control form-input form-control-bordered"
           :dusk="field.attribute"
+          :value="value"
+          @input="handleChange"
+          :maxlength="field.enforceMaxlength ? field.maxlength : -1"
+          :placeholder="placeholder"
         />
 
         <CharacterCounter
@@ -38,14 +39,16 @@ export default {
       return {
         rows: this.currentField.rows,
         class: this.errorClasses,
-        placeholder: this.placeholder,
+        placeholder: this.field.name,
       }
     },
 
     extraAttributes() {
+      const attrs = this.currentField.extraAttributes
+
       return {
         ...this.defaultAttributes,
-        ...this.currentField.extraAttributes,
+        ...attrs,
       }
     },
   },

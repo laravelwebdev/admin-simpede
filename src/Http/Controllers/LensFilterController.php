@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -10,8 +9,11 @@ class LensFilterController extends Controller
 {
     /**
      * List the lenses for the given resource.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(NovaRequest $request): JsonResponse
+    public function index(NovaRequest $request)
     {
         $lenses = $request->newResource()->availableLenses($request);
 

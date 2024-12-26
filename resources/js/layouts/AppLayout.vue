@@ -24,46 +24,52 @@
   </div>
 </template>
 
-<script setup>
-import { useLocalization } from '@/composables/useLocalization'
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+<script>
 import MainHeader from '@/layouts/MainHeader'
 import Footer from '@/layouts/Footer'
 
-defineOptions({
-  name: 'AppLayout',
-})
+export default {
+  components: {
+    MainHeader,
+    Footer,
+  },
 
-const { __ } = useLocalization()
+  mounted() {
+    Nova.$on('error', this.handleError)
+    Nova.$on('token-expired', this.handleTokenExpired)
+  },
 
-const handleError = message => {
-  Nova.error(message)
-}
+  beforeUnmount() {
+    Nova.$off('error', this.handleError)
+    Nova.$off('token-expired', this.handleTokenExpired)
+  },
 
-const handleTokenExpired = () => {
-  Nova.$toasted.show(__('Sorry, your session has expired.'), {
-    action: {
-      onClick: () => Nova.redirectToLogin(),
-      text: __('Reload'),
+  methods: {
+    handleError(message) {
+      Nova.error(message)
     },
-    duration: null,
-    type: 'error',
-  })
 
-  setTimeout(() => {
-    Nova.redirectToLogin()
-  }, 5000)
+    handleTokenExpired() {
+      // @TODO require Nova._createToast() to support action with link.
+      Nova.$toasted.show(this.__('Sorry, your session has expired.'), {
+        action: {
+          onClick: () => Nova.redirectToLogin(),
+          text: this.__('Reload'),
+        },
+        duration: null,
+        type: 'error',
+      })
+
+      setTimeout(() => {
+        Nova.redirectToLogin()
+      }, 5000)
+    },
+  },
+
+  computed: {
+    breadcrumbsEnabled() {
+      return Nova.config('breadcrumbsEnabled')
+    },
+  },
 }
-
-const breadcrumbsEnabled = computed(() => Nova.config('breadcrumbsEnabled'))
-
-onMounted(() => {
-  Nova.$on('error', handleError)
-  Nova.$on('token-expired', handleTokenExpired)
-})
-
-onBeforeUnmount(() => {
-  Nova.$off('error', handleError)
-  Nova.$off('token-expired', handleTokenExpired)
-})
 </script>

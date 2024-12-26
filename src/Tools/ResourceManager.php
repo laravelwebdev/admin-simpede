@@ -25,6 +25,7 @@ class ResourceManager extends Tool implements HasMenu
     /**
      * Build the menu that renders the navigation links for the tool.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function menu(Request $request)
@@ -50,7 +51,6 @@ class ResourceManager extends Tool implements HasMenu
      */
     public function unGroupedMenu($resources, Request $request)
     {
-        /** @phpstan-ignore argument.templateType */
         return $resources->flatten()->map(function ($resource) use ($request) {
             if (method_exists($resource, 'menu')) {
                 return (new $resource)->menu($request);

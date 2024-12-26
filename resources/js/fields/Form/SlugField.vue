@@ -10,11 +10,11 @@
         <input
           v-bind="extraAttributes"
           ref="theInput"
-          v-model="value"
-          :id="field.uniqueKey"
-          :disabled="isReadonly"
           class="w-full form-control form-input form-control-bordered"
+          :id="field.uniqueKey"
           :dusk="field.attribute"
+          v-model="value"
+          :disabled="isReadonly"
         />
 
         <button
@@ -106,15 +106,10 @@ export default {
       return this.getFieldAttributeChangeEventName(this.field.from)
     },
 
-    placeholder() {
-      return this.field.placeholder ?? null
-    },
-
     extraAttributes() {
       return {
-        class: this.errorClasses,
-        placeholder: this.placeholder,
         ...this.field.extraAttributes,
+        class: this.errorClasses,
       }
     },
   },

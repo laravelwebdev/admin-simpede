@@ -15,7 +15,7 @@ trait ManagesPresets
      * Define the preset the field should use, optionally providing a new preset class to add.
      *
      * @param  string  $preset
-     * @param  class-string|null  $presetClass
+     * @param  string|null  $presetClass
      * @return $this
      */
     public function preset($preset, $presetClass = null)

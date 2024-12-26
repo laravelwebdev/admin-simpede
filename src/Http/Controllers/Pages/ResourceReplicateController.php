@@ -4,7 +4,6 @@ namespace Laravel\Nova\Http\Controllers\Pages;
 
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
-use Inertia\Response;
 use Laravel\Nova\Http\Requests\ResourceCreateOrAttachRequest;
 use Laravel\Nova\Menu\Breadcrumb;
 use Laravel\Nova\Menu\Breadcrumbs;
@@ -15,9 +14,12 @@ class ResourceReplicateController extends Controller
     /**
      * Show Resource Replicate page using Inertia.
      *
+     * @param  \Laravel\Nova\Http\Requests\ResourceCreateOrAttachRequest  $request
+     * @return \Inertia\Response
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function __invoke(ResourceCreateOrAttachRequest $request): Response
+    public function __invoke(ResourceCreateOrAttachRequest $request)
     {
         abort_unless($request->findModelQuery()->exists(), 404);
 
@@ -35,8 +37,11 @@ class ResourceReplicateController extends Controller
 
     /**
      * Get breadcrumb menu for the page.
+     *
+     * @param  \Laravel\Nova\Http\Requests\ResourceCreateOrAttachRequest  $request
+     * @return \Laravel\Nova\Menu\Breadcrumbs
      */
-    protected function breadcrumbs(ResourceCreateOrAttachRequest $request): Breadcrumbs
+    protected function breadcrumbs(ResourceCreateOrAttachRequest $request)
     {
         $resourceClass = $request->resource();
 

@@ -2,20 +2,13 @@
   <div class="h-full flex items-start justify-center">
     <div class="relative w-full">
       <!-- Remove Button -->
-      <button
+      <RemoveButton
         v-if="removable"
-        type="button"
-        class="absolute z-20 top-[-10px] right-[-9px] rounded-full shadow bg-white dark:bg-gray-800 text-center flex items-center justify-center h-[20px] w-[21px]"
-        @click.stop="$emit('removed')"
+        class="absolute z-20 top-[-10px] right-[-9px]"
+        @click.stop="handleRemoveClick"
         v-tooltip="__('Remove')"
         :dusk="$attrs.dusk"
-      >
-        <Icon
-          name="x-circle"
-          type="solid"
-          class="text-gray-800 dark:text-gray-200"
-        />
-      </button>
+      />
 
       <div
         class="bg-gray-50 dark:bg-gray-700 relative aspect-square flex items-center justify-center border-2 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg"
@@ -42,7 +35,7 @@
         />
         <div v-else>
           <div class="rounded bg-gray-200 border-2 border-gray-200 p-4">
-            <Icon name="document-text" class="!w-[50px] !h-[50px]" />
+            <Icon type="document-text" width="50" height="50" />
           </div>
         </div>
       </div>
@@ -54,23 +47,16 @@
 </template>
 
 <script setup>
-import { computed, toRef } from 'vue'
-import { Icon } from 'laravel-nova-ui'
 import { useFilePreviews } from '@/composables/useFilePreviews'
 import { useLocalization } from '@/composables/useLocalization'
+import { computed, toRef } from 'vue'
 
-defineOptions({
-  inheritAttrs: false,
-})
-
-defineEmits(['removed'])
-
+const { __ } = useLocalization()
+const emit = defineEmits(['removed'])
 const props = defineProps({
   file: { type: Object },
   removable: { type: Boolean, default: true },
 })
-
-const { __ } = useLocalization()
 
 const uploadingLabel = computed(() => {
   if (props.file.processing) {
@@ -89,4 +75,12 @@ const uploadingPercentage = computed(() => {
 })
 
 const { previewUrl, isImage } = useFilePreviews(toRef(props, 'file'))
+
+const handleRemoveClick = () => emit('removed')
+</script>
+
+<script>
+export default {
+  inheritAttrs: false,
+}
 </script>

@@ -4,6 +4,7 @@ import forIn from 'lodash/forIn'
 import get from 'lodash/get'
 import identity from 'lodash/identity'
 import isEmpty from 'lodash/isEmpty'
+import isNil from 'lodash/isNil'
 import pickBy from 'lodash/pickBy'
 import FormField from './FormField'
 import { mapProps } from './propTypes'
@@ -46,16 +47,16 @@ export default {
   },
 
   mounted() {
-    if (filled(this.relatedResourceName)) {
+    if (this.relatedResourceName !== '' && !isNil(this.relatedResourceName)) {
       this.pivot = true
 
-      if (filled(this.relatedResourceId)) {
+      if (this.relatedResourceId !== '' && !isNil(this.relatedResourceId)) {
         this.editMode = 'update-attached'
       } else {
         this.editMode = 'attach'
       }
     } else {
-      if (filled(this.resourceId)) {
+      if (this.resourceId !== '' && !isNil(this.resourceId)) {
         this.editMode = 'update'
       }
     }
@@ -107,10 +108,6 @@ export default {
 
     /**
      * Provide a function to fills FormData when field is visible.
-     *
-     * @param {FormData} formData
-     * @param {string} attribute
-     * @param {any} value
      */
     fillIfVisible(formData, attribute, value) {
       if (this.currentlyIsVisible) {
@@ -134,7 +131,6 @@ export default {
                 viaResourceId: this.viaResourceId,
                 viaRelationship: this.viaRelationship,
                 field: this.fieldAttribute,
-                inline: this.shownViaNewRelationModal,
                 component: this.field.dependentComponentKey,
               },
               identity
@@ -159,7 +155,7 @@ export default {
             )
           }
 
-          if (this.syncedField.value == null) {
+          if (isNil(this.syncedField.value)) {
             this.syncedField.value = snapshot.value
             this.revertSyncedFieldToPreviousValue(snapshot)
           } else {
@@ -198,9 +194,6 @@ export default {
       this.emitFieldValueChange(this.field.attribute, this.currentField.value)
     },
 
-    /**
-     * @returns {boolean}
-     */
     syncedFieldValueHasNotChanged() {
       const value = this.currentField.value
 
@@ -208,33 +201,27 @@ export default {
         return !filled(this.value)
       }
 
-      return value != null && value?.toString() === this.value?.toString()
+      return !isNil(value) && value?.toString() === this.value?.toString()
     },
   },
 
   computed: {
     /**
      * Determine the current field
-     *
-     * @returns {object}
      */
     currentField() {
       return this.syncedField || this.field
     },
 
     /**
-     * Determine if the field is in visible mode.
-     *
-     * @returns {boolean}
+     * Determine if the field is in visible mode
      */
     currentlyIsVisible() {
       return this.currentField.visible
     },
 
     /**
-     * Determine if the field is in readonly mode.
-     *
-     * @returns {boolean}
+     * Determine if the field is in readonly mode
      */
     currentlyIsReadonly() {
       if (this.syncedField !== null) {
@@ -249,25 +236,16 @@ export default {
       )
     },
 
-    /**
-     * @returns {string[]}
-     */
     dependsOn() {
       return this.field.dependsOn || []
     },
 
-    /**
-     * @returns {{[key: string]: any}}
-     */
     currentFieldValues() {
       return {
         [this.fieldAttribute]: this.value,
       }
     },
 
-    /**
-     * @returns {{[key: string]: any}}
-     */
     dependentFieldValues() {
       return {
         ...this.currentFieldValues,
@@ -275,18 +253,10 @@ export default {
       }
     },
 
-    /**
-     * @returns {string}
-     */
     encodedDependentFieldValues() {
       return btoa(escapeUnicode(JSON.stringify(this.dependentFieldValues)))
     },
 
-    /**
-     * Get the correct field sync endpoint URL.
-     *
-     * @returns {string}
-     */
     syncFieldEndpoint() {
       if (this.editMode === 'update-attached') {
         return `/nova-api/${this.resourceName}/${this.resourceId}/update-pivot-fields/${this.relatedResourceName}/${this.relatedResourceId}`

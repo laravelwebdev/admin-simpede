@@ -12,9 +12,10 @@ trait ResolvesActions
     /**
      * Get the actions that are available for the given request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Actions\ActionCollection<int, \Laravel\Nova\Actions\Action>
      */
-    public function availableActions(NovaRequest $request): ActionCollection
+    public function availableActions(NovaRequest $request)
     {
         $resource = $this->resource;
 
@@ -45,9 +46,10 @@ trait ResolvesActions
     /**
      * Get the actions that are available for the given index request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Actions\ActionCollection<int, \Laravel\Nova\Actions\Action>
      */
-    public function availableActionsOnIndex(NovaRequest $request): ActionCollection
+    public function availableActionsOnIndex(NovaRequest $request)
     {
         $resource = $this->resource;
 
@@ -72,9 +74,10 @@ trait ResolvesActions
     /**
      * Get the actions that are available for the given detail request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Actions\ActionCollection<int, \Laravel\Nova\Actions\Action>
      */
-    public function availableActionsOnDetail(NovaRequest $request): ActionCollection
+    public function availableActionsOnDetail(NovaRequest $request)
     {
         return $this->resolveActions($request)
                     ->authorizedToSeeOnDetail($request)
@@ -85,9 +88,10 @@ trait ResolvesActions
     /**
      * Get the resource table row actions that are available for the given index request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Actions\ActionCollection<int, \Laravel\Nova\Actions\Action>
      */
-    public function availableActionsOnTableRow(NovaRequest $request): ActionCollection
+    public function availableActionsOnTableRow(NovaRequest $request)
     {
         return $this->resolveActions($request)
                     ->authorizedToSeeOnTableRow($request)
@@ -98,9 +102,10 @@ trait ResolvesActions
     /**
      * Get the actions for the given request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Actions\ActionCollection<int, \Laravel\Nova\Actions\Action>
      */
-    public function resolveActions(NovaRequest $request): ActionCollection
+    public function resolveActions(NovaRequest $request)
     {
         return ActionCollection::make(
             $this->filter($this->actions($request))
@@ -110,9 +115,10 @@ trait ResolvesActions
     /**
      * Get the "pivot" actions that are available for the given request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Actions\ActionCollection<int, \Laravel\Nova\Actions\Action>
      */
-    public function availablePivotActions(NovaRequest $request): ActionCollection
+    public function availablePivotActions(NovaRequest $request)
     {
         return $this->resolvePivotActions($request)
                     ->authorizedToSeeOnIndex($request)
@@ -122,9 +128,10 @@ trait ResolvesActions
     /**
      * Get the "pivot" actions for the given request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Actions\ActionCollection<int, \Laravel\Nova\Actions\Action>
      */
-    public function resolvePivotActions(NovaRequest $request): ActionCollection
+    public function resolvePivotActions(NovaRequest $request)
     {
         if ($request->viaRelationship()) {
             return ActionCollection::make(
@@ -138,9 +145,10 @@ trait ResolvesActions
     /**
      * Get the "pivot" actions for the given request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array<int, \Laravel\Nova\Actions\Action>
      */
-    protected function getPivotActions(NovaRequest $request): array
+    protected function getPivotActions(NovaRequest $request)
     {
         $resource = Nova::resourceInstanceForKey($request->viaResource);
 
@@ -161,9 +169,10 @@ trait ResolvesActions
     /**
      * Merge the default actions with the given actions.
      *
+     * @param  array  $actions
      * @return array<int, \Laravel\Nova\Actions\Action>
      */
-    public static function defaultsWith(array $actions): array
+    public static function defaultsWith(array $actions)
     {
         return array_merge(static::defaultActions(), $actions);
     }
@@ -183,6 +192,7 @@ trait ResolvesActions
     /**
      * Get the actions available on the entity.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function actions(NovaRequest $request)

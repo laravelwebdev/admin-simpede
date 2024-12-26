@@ -16,19 +16,27 @@ class VaporAudio extends VaporFile
     public $component = 'vapor-audio-field';
 
     /**
+     * The file types accepted by the field.
+     *
+     * @var string
+     */
+    public $acceptedTypes = 'audio/*';
+
+    /**
      * Create a new field.
      *
-     * @param  \Stringable|string  $name
-     * @param  string|callable|null  $attribute
+     * @param  string  $name
+     * @param  string|null  $attribute
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, object, string, string, ?string, ?string):mixed)|null  $storageCallback
      * @return void
      */
-    public function __construct($name, mixed $attribute = null, ?callable $storageCallback = null)
+    public function __construct($name, $attribute = null, $storageCallback = null)
     {
         parent::__construct($name, $attribute, $storageCallback);
 
-        $this->acceptedTypes('audio/*')
-            ->preview(fn ($value) => $value ? Storage::disk($this->getStorageDisk())->temporaryUrl($value, now()->addMinutes(10)) : null);
+        $this->preview(function ($value) {
+            return $value ? Storage::disk($this->getStorageDisk())->temporaryUrl($value, now()->addMinutes(10)) : null;
+        });
     }
 
     /**
@@ -36,7 +44,6 @@ class VaporAudio extends VaporFile
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), $this->audioAttributes());

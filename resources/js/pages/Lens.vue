@@ -6,17 +6,29 @@
   />
 </template>
 
-<script setup>
+<script>
 import { mapProps } from '@/mixins'
 import ResourceLens from '@/views/Lens'
 
-defineOptions({
+export default {
   name: 'Lens',
-})
 
-defineProps({
-  lens: { type: String, required: true },
-  searchable: { type: Boolean, default: false },
-  ...mapProps(['resourceName']),
-})
+  components: {
+    ResourceLens,
+  },
+
+  props: {
+    lens: {
+      type: String,
+      required: true,
+    },
+
+    searchable: {
+      type: Boolean,
+      default: false,
+    },
+
+    ...mapProps(['resourceName']),
+  },
+}
 </script>

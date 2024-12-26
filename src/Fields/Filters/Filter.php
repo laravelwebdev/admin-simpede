@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Fields\Filters;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Filters\Filter as BaseFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -10,13 +9,20 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 abstract class Filter extends BaseFilter
 {
     /**
+     * The filter's field.
+     *
+     * @var \Laravel\Nova\Contracts\FilterableField&\Laravel\Nova\Fields\Field
+     */
+    public $field;
+
+    /**
      * Construct a new filter.
      *
      * @param  \Laravel\Nova\Contracts\FilterableField&\Laravel\Nova\Fields\Field  $field
      */
-    public function __construct(public FilterableField $field)
+    public function __construct(FilterableField $field)
     {
-        //
+        $this->field = $field;
     }
 
     /**
@@ -42,9 +48,12 @@ abstract class Filter extends BaseFilter
     /**
      * Apply the filter to the given query.
      *
-     * @return \Illuminate\Contracts\Database\Eloquent\Builder
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function apply(NovaRequest $request, Builder $query, mixed $value)
+    public function apply(NovaRequest $request, $query, $value)
     {
         $this->field->applyFilter($request, $query, $value);
 
@@ -66,14 +75,10 @@ abstract class Filter extends BaseFilter
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
-        $component = $this->component();
-
         return array_merge(parent::jsonSerialize(), [
-            'uniqueKey' => sprintf('%s-%s-filter', $this->field->attribute, $component),
-            'component' => "filter-{$component}",
+            'component' => 'filter-'.$this->component,
             'field' => $this->serializeField(),
         ]);
     }

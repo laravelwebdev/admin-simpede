@@ -6,9 +6,10 @@ class CreateResourceRequest extends NovaRequest
 {
     /**
      * Determine if this request is a create or attach request.
+     *
+     * @return bool
      */
-    #[\Override]
-    public function isCreateOrAttachRequest(): bool
+    public function isCreateOrAttachRequest()
     {
         return true;
     }

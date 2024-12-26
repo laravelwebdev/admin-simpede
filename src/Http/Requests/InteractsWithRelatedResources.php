@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Http\Requests;
 
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
 
@@ -11,9 +10,10 @@ trait InteractsWithRelatedResources
     /**
      * Find the parent resource model instance for the request.
      *
-     * @return \Laravel\Nova\Resource<\Illuminate\Database\Eloquent\Model>
+     * @param  string|int|null  $resourceId
+     * @return \Laravel\Nova\Resource
      */
-    public function findParentResource(string|int|null $resourceId = null): Resource
+    public function findParentResource($resourceId = null)
     {
         $resource = $this->viaResource();
 
@@ -23,11 +23,12 @@ trait InteractsWithRelatedResources
     /**
      * Find the parent resource model instance for the request.
      *
+     * @param  string|int|null  $resourceId
      * @return \Laravel\Nova\Resource<\Illuminate\Database\Eloquent\Model>
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findParentResourceOrFail(string|int|null $resourceId = null): Resource
+    public function findParentResourceOrFail($resourceId = null)
     {
         $resource = $this->viaResource();
 
@@ -36,8 +37,11 @@ trait InteractsWithRelatedResources
 
     /**
      * Find the parent resource model instance for the request.
+     *
+     * @param  string|int|null  $resourceId
+     * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function findParentModel(string|int|null $resourceId = null): ?Model
+    public function findParentModel($resourceId = null)
     {
         if (! $this->viaRelationship()) {
             return null;
@@ -51,10 +55,12 @@ trait InteractsWithRelatedResources
     /**
      * Find the parent resource model instance for the request or abort.
      *
+     * @param  string|int|null  $resourceId
+     * @return \Illuminate\Database\Eloquent\Model
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findParentModelOrFail(string|int|null $resourceId = null): Model
+    public function findParentModelOrFail($resourceId = null)
     {
         return once(function () use ($resourceId) {
             $query = Nova::modelInstanceForKey($this->viaResource)->newQueryWithoutScopes();
@@ -70,9 +76,10 @@ trait InteractsWithRelatedResources
     /**
      * Find the related resource instance for the request.
      *
-     * @return \Laravel\Nova\Resource<\Illuminate\Database\Eloquent\Model>
+     * @param  string|int|null  $resourceId
+     * @return \Laravel\Nova\Resource
      */
-    public function findRelatedResource(string|int|null $resourceId = null): Resource
+    public function findRelatedResource($resourceId = null)
     {
         $resource = $this->relatedResource();
 
@@ -82,11 +89,12 @@ trait InteractsWithRelatedResources
     /**
      * Find the related resource instance for the request or abort.
      *
+     * @param  string|int|null  $resourceId
      * @return \Laravel\Nova\Resource<\Illuminate\Database\Eloquent\Model>
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findRelatedResourceOrFail(string|int|null $resourceId = null): Resource
+    public function findRelatedResourceOrFail($resourceId = null)
     {
         $resource = $this->relatedResource();
 
@@ -95,8 +103,11 @@ trait InteractsWithRelatedResources
 
     /**
      * Find the related resource model instance for the request.
+     *
+     * @param  string|int|null  $resourceId
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function findRelatedModel(string|int|null $resourceId = null): Model
+    public function findRelatedModel($resourceId = null)
     {
         return rescue(function () use ($resourceId) {
             return $this->findRelatedModelOrFail($resourceId);
@@ -106,10 +117,12 @@ trait InteractsWithRelatedResources
     /**
      * Find the parent resource model instance for the request or abort.
      *
+     * @param  string|int|null  $resourceId
+     * @return \Illuminate\Database\Eloquent\Model
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function findRelatedModelOrFail(string|int|null $resourceId = null): Model
+    public function findRelatedModelOrFail($resourceId = null)
     {
         return once(function () use ($resourceId) {
             $query = Nova::modelInstanceForKey($this->relatedResource)->newQueryWithoutScopes();
@@ -124,8 +137,10 @@ trait InteractsWithRelatedResources
 
     /**
      * Get the displayable pivot model name for a "via relationship" request.
+     *
+     * @return string
      */
-    public function pivotName(): string
+    public function pivotName()
     {
         if (! $this->viaRelationship()) {
             return Resource::DEFAULT_PIVOT_NAME;
@@ -149,9 +164,9 @@ trait InteractsWithRelatedResources
     /**
      * Get the class name of the "related" resource being requested.
      *
-     * @return class-string<\Laravel\Nova\Resource>|null
+     * @return class-string<\Laravel\Nova\Resource>
      */
-    public function relatedResource(): ?string
+    public function relatedResource()
     {
         return Nova::resourceForKey($this->relatedResource);
     }
@@ -161,7 +176,7 @@ trait InteractsWithRelatedResources
      *
      * @return \Laravel\Nova\Resource<\Illuminate\Database\Eloquent\Model>
      */
-    public function newRelatedResource(): Resource
+    public function newRelatedResource()
     {
         $resource = $this->relatedResource();
 
@@ -171,9 +186,9 @@ trait InteractsWithRelatedResources
     /**
      * Get the class name of the "via" resource being requested.
      *
-     * @return class-string<\Laravel\Nova\Resource>|null
+     * @return class-string<\Laravel\Nova\Resource>
      */
-    public function viaResource(): ?string
+    public function viaResource()
     {
         return Nova::resourceForKey($this->viaResource);
     }
@@ -183,7 +198,7 @@ trait InteractsWithRelatedResources
      *
      * @return \Laravel\Nova\Resource<\Illuminate\Database\Eloquent\Model>
      */
-    public function newViaResource(): Resource
+    public function newViaResource()
     {
         $resource = $this->viaResource();
 
@@ -192,16 +207,20 @@ trait InteractsWithRelatedResources
 
     /**
      * Determine if the request is via a relationship.
+     *
+     * @return bool
      */
-    public function viaRelationship(): bool
+    public function viaRelationship()
     {
         return filled($this->viaResource) && filled($this->viaResourceId) && $this->viaRelationship;
     }
 
     /**
      * Determine if this request is via a many-to-many relationship.
+     *
+     * @return bool
      */
-    public function viaManyToMany(): bool
+    public function viaManyToMany()
     {
         return in_array(
             $this->relationshipType,

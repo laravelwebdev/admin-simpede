@@ -9,10 +9,9 @@
         <DropdownMenu width="auto">
           <ul v-if="value.length > 0" class="max-w-xxs space-y-2 py-3 px-4">
             <li
-              v-for="(option, index) in value"
-              :key="index"
-              class="flex items-center rounded-full font-bold text-sm leading-tight space-x-2"
+              v-for="option in value"
               :class="classes[option.checked]"
+              class="flex items-center rounded-full font-bold text-sm leading-tight space-x-2"
             >
               <IconBoolean class="flex-none" :value="option.checked" />
               <span class="ml-1">{{ option.label }}</span>
@@ -31,6 +30,8 @@
 </template>
 
 <script>
+import filter from 'lodash/filter'
+import map from 'lodash/map'
 import { Button } from 'laravel-nova-ui'
 
 export default {
@@ -51,8 +52,15 @@ export default {
   created() {
     this.field.value = this.field.value || {}
 
-    this.value = this.field.options
-      .filter(o => {
+    this.value = filter(
+      map(this.field.options, o => {
+        return {
+          name: o.name,
+          label: o.label,
+          checked: this.field.value[o.name] || false,
+        }
+      }),
+      o => {
         if (this.field.hideFalseValues === true && o.checked === false) {
           return false
         } else if (this.field.hideTrueValues === true && o.checked === true) {
@@ -60,14 +68,8 @@ export default {
         }
 
         return true
-      })
-      .map(o => {
-        return {
-          name: o.name,
-          label: o.label,
-          checked: this.field.value[o.name] || false,
-        }
-      })
+      }
+    )
   },
 }
 </script>

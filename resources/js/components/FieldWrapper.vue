@@ -3,8 +3,10 @@
     <slot />
   </div>
 </template>
-<script setup>
-defineProps({
-  stacked: { type: Boolean, default: false },
-})
+<script>
+export default {
+  props: {
+    stacked: { type: Boolean, default: false },
+  },
+}
 </script>

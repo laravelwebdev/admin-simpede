@@ -6,6 +6,8 @@ class HomePage extends Page
 {
     /**
      * Create a new page instance.
+     *
+     * @return void
      */
     public function __construct()
     {

@@ -5,7 +5,6 @@ namespace Laravel\Nova\Exceptions;
 use Illuminate\Auth\AuthenticationException as BaseAuthenticationException;
 use Inertia\Inertia;
 use Laravel\Nova\Nova;
-use Laravel\Nova\URL;
 
 class AuthenticationException extends BaseAuthenticationException
 {
@@ -26,7 +25,7 @@ class AuthenticationException extends BaseAuthenticationException
             return response(null, 401);
         }
 
-        if ($request->inertia() || Nova::routes()->loginPath !== false) {
+        if ($request->inertia() || config('nova.routes.login', false) !== false) {
             return $this->redirectForInertia($request);
         }
 
@@ -35,12 +34,12 @@ class AuthenticationException extends BaseAuthenticationException
 
     /**
      * Determine the location the user should be redirected to.
+     *
+     * @return string
      */
-    protected function location(): URL|string
+    protected function location()
     {
-        $loginPath = Nova::routes()->loginPath;
-
-        return $loginPath !== false ? $loginPath : Nova::url('login');
+        return config('nova.routes.login') ?: Nova::url('login');
     }
 
     /**

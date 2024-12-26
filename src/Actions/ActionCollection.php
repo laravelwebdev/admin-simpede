@@ -16,6 +16,7 @@ class ActionCollection extends Collection
     /**
      * Get the actions that are authorized for viewing on the index.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return static<TKey, TValue>
      */
     public function authorizedToSeeOnIndex(NovaRequest $request)
@@ -24,7 +25,7 @@ class ActionCollection extends Collection
             ->filter(function ($action) use ($request) {
                 if ($action->sole === true) {
                     return ! $request->allResourcesSelected()
-                        && $request->selectedResourceIds()->count() <= 1
+                        && $request->selectedResourceIds()->count() === 1
                         && $action->authorizedToSee($request);
                 }
 
@@ -35,54 +36,49 @@ class ActionCollection extends Collection
     /**
      * Get the actions that are authorized for viewing on detail pages.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return static<TKey, TValue>
      */
     public function authorizedToSeeOnDetail(NovaRequest $request)
     {
-        return $this->filter->shownOnDetail()
-            ->filter->authorizedToSee($request);
+        return $this->filter->shownOnDetail()->filter->authorizedToSee($request);
     }
 
     /**
      * Get the actions that are authorized for viewing on table rows.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return static<TKey, TValue>
      */
     public function authorizedToSeeOnTableRow(NovaRequest $request)
     {
-        return $this->filter->shownOnTableRow()
-            ->filter->authorizedToSee($request);
+        return $this->filter->shownOnTableRow()->filter->authorizedToSee($request);
     }
 
     /**
      * Determine whether the actions available for display can be executed.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return $this
      */
     public function withAuthorizedToRun(NovaRequest $request, $model)
     {
-        return $this->each(
-            fn (Action $action) => $action->authorizedToRun($request, $model)
-        );
+        return $this->each(function (Action $action) use ($request, $model) {
+            $action->authorizedToRun($request, $model);
+        });
     }
 
     /**
      * Return action counts by type on index.
      *
-     * @return array{sole: int, standalone: int, resource: int}
+     * @return array{standalone: mixed, resource: mixed}
      */
-    public function countsByTypeOnIndex(): array
+    public function countsByTypeOnIndex()
     {
-        [$standalone, $actions] = $this->filter->shownOnIndex()
-            ->partition->isStandalone();
-
-        [$sole, $resource] = $actions->partition(
-            fn ($action) => $action->sole === true
-        );
+        [$standalone, $resource] = $this->filter->shownOnIndex()->partition->isStandalone();
 
         return [
-            'sole' => $sole->count(),
             'standalone' => $standalone->count(),
             'resource' => $resource->count(),
         ];

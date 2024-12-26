@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Http\Requests;
 
-use Illuminate\Support\Collection;
 use Laravel\Nova\Metrics\Metric;
 
 /**
@@ -12,8 +11,10 @@ class MetricRequest extends NovaRequest
 {
     /**
      * Get the metric instance for the given request.
+     *
+     * @return \Laravel\Nova\Metrics\Metric
      */
-    public function metric(): Metric
+    public function metric()
     {
         return $this->availableMetrics()->first(function ($metric) {
             return $this->metric === $metric->uriKey();
@@ -22,8 +23,10 @@ class MetricRequest extends NovaRequest
 
     /**
      * Get the metric instance for the given detail request.
+     *
+     * @return \Laravel\Nova\Metrics\Metric
      */
-    public function detailMetric(): Metric
+    public function detailMetric()
     {
         return $this->availableMetricsForDetail()->first(function ($metric) {
             return $this->metric === $metric->uriKey();
@@ -35,7 +38,7 @@ class MetricRequest extends NovaRequest
      *
      * @return \Illuminate\Support\Collection<int, \Laravel\Nova\Metrics\Metric>
      */
-    public function availableMetrics(): Collection
+    public function availableMetrics()
     {
         $resource = $this->newResource();
 
@@ -62,7 +65,7 @@ class MetricRequest extends NovaRequest
      *
      * @return \Illuminate\Support\Collection<int, \Laravel\Nova\Metrics\Metric>
      */
-    public function availableMetricsForDetail(): Collection
+    public function availableMetricsForDetail()
     {
         $resource = $this->newResource();
 

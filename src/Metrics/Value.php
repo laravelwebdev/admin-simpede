@@ -3,18 +3,12 @@
 namespace Laravel\Nova\Metrics;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Contracts\Database\Query\Expression;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Laravel\Nova\Http\Requests\NovaRequest;
+use Illuminate\Database\Eloquent\Builder;
 use Laravel\Nova\Nova;
-use Laravel\Nova\WithIcon;
 
 abstract class Value extends RangedMetric
 {
     use RoundingPrecision;
-    use WithIcon;
 
     /**
      * The element's component.
@@ -33,19 +27,26 @@ abstract class Value extends RangedMetric
     /**
      * Set the icon for the metric.
      *
+     * @param  string  $icon
      * @return $this
      */
-    public function icon(string $icon)
+    public function icon($icon)
     {
-        return $this->withIcon($icon);
+        $this->icon = $icon;
+
+        return $this;
     }
 
     /**
      * Return a value result showing the growth of an count aggregate over time.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string|null  $column
+     * @param  string|null  $dateColumn
+     * @return \Laravel\Nova\Metrics\ValueResult
      */
-    public function count(NovaRequest $request, Builder|Model|string $model, Expression|string|null $column = null, ?string $dateColumn = null): ValueResult
+    public function count($request, $model, $column = null, $dateColumn = null)
     {
         return $this->aggregate($request, $model, 'count', $column, $dateColumn);
     }
@@ -53,9 +54,13 @@ abstract class Value extends RangedMetric
     /**
      * Return a value result showing the growth of an average aggregate over time.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string  $column
+     * @param  string|null  $dateColumn
+     * @return \Laravel\Nova\Metrics\ValueResult
      */
-    public function average(NovaRequest $request, Builder|Model|string $model, Expression|string $column, ?string $dateColumn = null): ValueResult
+    public function average($request, $model, $column, $dateColumn = null)
     {
         return $this->aggregate($request, $model, 'avg', $column, $dateColumn);
     }
@@ -63,9 +68,13 @@ abstract class Value extends RangedMetric
     /**
      * Return a value result showing the growth of a sum aggregate over time.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string  $column
+     * @param  string|null  $dateColumn
+     * @return \Laravel\Nova\Metrics\ValueResult
      */
-    public function sum(NovaRequest $request, Builder|Model|string $model, Expression|string $column, ?string $dateColumn = null): ValueResult
+    public function sum($request, $model, $column, $dateColumn = null)
     {
         return $this->aggregate($request, $model, 'sum', $column, $dateColumn);
     }
@@ -73,9 +82,13 @@ abstract class Value extends RangedMetric
     /**
      * Return a value result showing the growth of a maximum aggregate over time.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string  $column
+     * @param  string|null  $dateColumn
+     * @return \Laravel\Nova\Metrics\ValueResult
      */
-    public function max(NovaRequest $request, Builder|Model|string $model, Expression|string $column, ?string $dateColumn = null): ValueResult
+    public function max($request, $model, $column, $dateColumn = null)
     {
         return $this->aggregate($request, $model, 'max', $column, $dateColumn);
     }
@@ -83,9 +96,13 @@ abstract class Value extends RangedMetric
     /**
      * Return a value result showing the growth of a minimum aggregate over time.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Illuminate\Database\Query\Expression|string  $column
+     * @param  string|null  $dateColumn
+     * @return \Laravel\Nova\Metrics\ValueResult
      */
-    public function min(NovaRequest $request, Builder|Model|string $model, Expression|string $column, ?string $dateColumn = null): ValueResult
+    public function min($request, $model, $column, $dateColumn = null)
     {
         return $this->aggregate($request, $model, 'min', $column, $dateColumn);
     }
@@ -93,22 +110,22 @@ abstract class Value extends RangedMetric
     /**
      * Return a value result showing the growth of a model over a given time frame.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|class-string<\Illuminate\Database\Eloquent\Model>  $model
+     * @param  string  $function
+     * @param  \Illuminate\Database\Query\Expression|string|null  $column
+     * @param  string|null  $dateColumn
+     * @return \Laravel\Nova\Metrics\ValueResult
      */
-    protected function aggregate(
-        NovaRequest $request,
-        Builder|Model|string $model,
-        string $function,
-        Expression|string|null $column = null,
-        ?string $dateColumn = null
-    ): ValueResult {
+    protected function aggregate($request, $model, $function, $column = null, $dateColumn = null)
+    {
         $query = $model instanceof Builder ? $model : (new $model)->newQuery();
 
-        $query->tap(
-            fn ($query) => $this->applyFilterQuery($request, $query)
-        );
+        $query->tap(function ($query) use ($request) {
+            return $this->applyFilterQuery($request, $query);
+        });
 
-        $column ??= $query->getModel()->getQualifiedKeyName();
+        $column = $column ?? $query->getModel()->getQualifiedKeyName();
 
         if ($request->range === 'ALL') {
             return $this->result(
@@ -120,7 +137,7 @@ abstract class Value extends RangedMetric
             );
         }
 
-        $dateColumn ??= $query->getModel()->getQualifiedCreatedAtColumn();
+        $dateColumn = $dateColumn ?? $query->getModel()->getQualifiedCreatedAtColumn();
         $timezone = Nova::resolveUserTimezone($request) ?? $this->getDefaultTimezone($request);
         $range = $request->range ?? 1;
 
@@ -149,9 +166,11 @@ abstract class Value extends RangedMetric
     /**
      * Calculate the previous range and calculate any short-cuts.
      *
+     * @param  string|int  $range
+     * @param  string  $timezone
      * @return array<int, \Carbon\CarbonInterface>
      */
-    protected function previousRange(string|int $range, string $timezone): array
+    protected function previousRange($range, $timezone)
     {
         if ($range == 'TODAY') {
             return [
@@ -201,9 +220,10 @@ abstract class Value extends RangedMetric
     /**
      * Calculate the previous quarter range.
      *
+     * @param  string  $timezone
      * @return array<int, \Carbon\CarbonImmutable>
      */
-    protected function previousQuarterRange(string $timezone): array
+    protected function previousQuarterRange($timezone)
     {
         return [
             CarbonImmutable::now($timezone)->subQuarterWithOverflow()->startOfQuarter(),
@@ -214,9 +234,11 @@ abstract class Value extends RangedMetric
     /**
      * Calculate the current range and calculate any short-cuts.
      *
+     * @param  string|int  $range
+     * @param  string  $timezone
      * @return array<int, \Carbon\CarbonInterface>
      */
-    protected function currentRange(string|int $range, string $timezone): array
+    protected function currentRange($range, $timezone)
     {
         if ($range == 'TODAY') {
             return [
@@ -266,9 +288,10 @@ abstract class Value extends RangedMetric
     /**
      * Calculate the previous quarter range.
      *
+     * @param  string  $timezone
      * @return array<int, \Carbon\CarbonImmutable>
      */
-    protected function currentQuarterRange(string $timezone): array
+    protected function currentQuarterRange($timezone)
     {
         return [
             CarbonImmutable::now($timezone)->startOfQuarter(),
@@ -280,16 +303,20 @@ abstract class Value extends RangedMetric
      * Create a new value metric result.
      *
      * @param  int|float|numeric-string|null  $value
+     * @return \Laravel\Nova\Metrics\ValueResult
      */
-    public function result($value): ValueResult
+    public function result($value)
     {
         return new ValueResult($value);
     }
 
     /**
      * Get default timezone.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
      */
-    private function getDefaultTimezone(Request $request): ?string
+    private function getDefaultTimezone($request)
     {
         return $request->timezone ?? config('app.timezone');
     }
@@ -299,7 +326,6 @@ abstract class Value extends RangedMetric
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

@@ -21,35 +21,26 @@ trait Authorizable
      */
     public static function authorizable()
     {
-        return ! is_null(static::authorizationGate());
-    }
-
-    /**
-     * Determine the given resource is authorizable gate.
-     *
-     * @return \Illuminate\Auth\Access\Gate|null
-     */
-    public static function authorizationGate()
-    {
-        return Gate::getPolicyFor(
-            Util::resolveResourceOrModelForAuthorization(new static(static::newModel()))
-        );
+        return ! is_null(Gate::getPolicyFor(static::newModel()));
     }
 
     /**
      * Determine if the resource should be available for the given request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function authorizeToViewAny(Request $request)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return;
         }
 
-        if (is_callable([$gate, 'viewAny'])) {
+        $gate = Gate::getPolicyFor(static::newModel());
+
+        if (! is_null($gate) && method_exists($gate, 'viewAny')) {
             $this->authorizeTo($request, 'viewAny');
         }
     }
@@ -57,24 +48,26 @@ trait Authorizable
     /**
      * Determine if the resource should be available for the given request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public static function authorizedToViewAny(Request $request)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
 
-        $resource = Util::resolveResourceOrModelForAuthorization(new static(static::newModel()));
+        $gate = Gate::getPolicyFor(static::newModel());
 
-        return is_callable([$gate, 'viewAny'])
-            ? Gate::forUser(Nova::user($request))->check('viewAny', $resource)
-            : true;
+        return ! is_null($gate) && method_exists($gate, 'viewAny')
+                        ? Gate::forUser(Nova::user($request))->check('viewAny', get_class(static::newModel()))
+                        : true;
     }
 
     /**
      * Determine if the current user can view the given resource or throw an exception.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -87,6 +80,7 @@ trait Authorizable
     /**
      * Determine if the current user can view the given resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorizedToView(Request $request)
@@ -97,6 +91,7 @@ trait Authorizable
     /**
      * Determine if the current user can create new resources or throw an exception.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -109,14 +104,13 @@ trait Authorizable
     /**
      * Determine if the current user can create new resources.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public static function authorizedToCreate(Request $request)
     {
         if (static::authorizable()) {
-            $resource = Util::resolveResourceOrModelForAuthorization(new static(static::newModel()));
-
-            return Gate::forUser(Nova::user($request))->check('create', $resource);
+            return Gate::forUser(Nova::user($request))->check('create', get_class(static::newModel()));
         }
 
         return true;
@@ -125,6 +119,7 @@ trait Authorizable
     /**
      * Determine if the current user can update the given resource or throw an exception.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -137,6 +132,7 @@ trait Authorizable
     /**
      * Determine if the current user can update the given resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorizedToUpdate(Request $request)
@@ -147,17 +143,20 @@ trait Authorizable
     /**
      * Determine if the current user can replicate the given resource or throw an exception.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function authorizeToReplicate(Request $request)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return;
         }
 
-        if (is_callable([$gate, 'replicate'])) {
+        $gate = Gate::getPolicyFor(static::newModel());
+
+        if (! is_null($gate) && method_exists($gate, 'replicate')) {
             $this->authorizeTo($request, 'replicate');
 
             return;
@@ -170,24 +169,26 @@ trait Authorizable
     /**
      * Determine if the current user can replicate the given resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorizedToReplicate(Request $request)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
 
-        $resource = Util::resolveResourceOrModelForAuthorization($this);
+        $gate = Gate::getPolicyFor(static::newModel());
 
-        return is_callable([$gate, 'replicate'])
-            ? Gate::forUser(Nova::user($request))->check('replicate', $resource)
-            : $this->authorizedToCreate($request) && $this->authorizedToUpdate($request);
+        return ! is_null($gate) && method_exists($gate, 'replicate')
+                        ? Gate::forUser(Nova::user($request))->check('replicate', $this->model())
+                        : $this->authorizedToCreate($request) && $this->authorizedToUpdate($request);
     }
 
     /**
      * Determine if the current user can delete the given resource or throw an exception.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return void
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -200,6 +201,7 @@ trait Authorizable
     /**
      * Determine if the current user can delete the given resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorizedToDelete(Request $request)
@@ -210,6 +212,7 @@ trait Authorizable
     /**
      * Determine if the current user can restore the given resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorizedToRestore(Request $request)
@@ -220,6 +223,7 @@ trait Authorizable
     /**
      * Determine if the current user can force delete the given resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorizedToForceDelete(Request $request)
@@ -230,87 +234,93 @@ trait Authorizable
     /**
      * Determine if the user can add / associate models of the given type to the resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @return bool
      */
     public function authorizedToAdd(NovaRequest $request, $model)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
 
-        $resource = Util::resolveResourceOrModelForAuthorization($this);
+        $gate = Gate::getPolicyFor($this->model());
         $method = 'add'.class_basename($model);
 
-        return is_callable([$gate, $method])
-            ? Gate::forUser(Nova::user($request))->check($method, $resource)
-            : true;
+        return ! is_null($gate) && method_exists($gate, $method)
+                        ? Gate::forUser(Nova::user($request))->check($method, $this->model())
+                        : true;
     }
 
     /**
      * Determine if the user can attach any models of the given type to the resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @return bool
      */
     public function authorizedToAttachAny(NovaRequest $request, $model)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
 
-        $resource = Util::resolveResourceOrModelForAuthorization($this);
+        $gate = Gate::getPolicyFor($this->model());
         $method = 'attachAny'.Str::singular(class_basename($model));
 
-        return is_callable([$gate, $method])
-            ? Gate::forUser(Nova::user($request))->check($method, [$resource])
-            : true;
+        return ! is_null($gate) && method_exists($gate, $method)
+                    ? Gate::forUser(Nova::user($request))->check($method, [$this->model()])
+                    : true;
     }
 
     /**
      * Determine if the user can attach models of the given type to the resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @return bool
      */
     public function authorizedToAttach(NovaRequest $request, $model)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
 
-        $resource = Util::resolveResourceOrModelForAuthorization($this);
+        $gate = Gate::getPolicyFor($this->model());
         $method = 'attach'.Str::singular(class_basename($model));
 
-        return is_callable([$gate, $method])
-            ? Gate::forUser(Nova::user($request))->check($method, [$resource, $model])
-            : true;
+        return ! is_null($gate) && method_exists($gate, $method)
+                    ? Gate::forUser(Nova::user($request))->check($method, [$this->model(), $model])
+                    : true;
     }
 
     /**
      * Determine if the user can detach models of the given type to the resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model|string  $model
      * @param  string  $relationship
      * @return bool
      */
     public function authorizedToDetach(NovaRequest $request, $model, $relationship)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
 
-        $resource = Util::resolveResourceOrModelForAuthorization($this);
+        $gate = Gate::getPolicyFor($this->model());
         $method = 'detach'.Str::singular(class_basename($model));
 
-        return is_callable([$gate, $method])
-            ? Gate::forUser(Nova::user($request))->check($method, [$resource, $model])
-            : true;
+        return ! is_null($gate) && method_exists($gate, $method)
+                    ? Gate::forUser(Nova::user($request))->check($method, [$this->model(), $model])
+                    : true;
     }
 
     /**
      * Determine if the user can run the given action.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Laravel\Nova\Actions\Action  $action
      * @return bool
      */
     public function authorizedToRunAction(NovaRequest $request, Action $action)
@@ -319,78 +329,83 @@ trait Authorizable
             return $this->authorizedToRunDestructiveAction($request, $action);
         }
 
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
 
-        $resource = Util::resolveResourceOrModelForAuthorization($this);
+        $gate = Gate::getPolicyFor($this->model());
+
         $method = 'runAction';
 
-        return is_callable([$gate, $method])
-            ? Gate::forUser(Nova::user($request))->check($method, [$resource, $action])
-            : $this->authorizedToUpdate($request);
+        return ! is_null($gate) && method_exists($gate, $method)
+                        ? Gate::forUser(Nova::user($request))->check($method, [$this->model(), $action])
+                        : $this->authorizedToUpdate($request);
     }
 
     /**
      * Determine if the user can run the given action.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Laravel\Nova\Actions\DestructiveAction  $action
      * @return bool
      */
     public function authorizedToRunDestructiveAction(NovaRequest $request, DestructiveAction $action)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
 
-        $resource = Util::resolveResourceOrModelForAuthorization($this);
+        $gate = Gate::getPolicyFor($this->model());
+
         $method = 'runDestructiveAction';
 
-        return is_callable([$gate, $method])
-            ? Gate::forUser(Nova::user($request))->check($method, [$resource, $action])
-            : $this->authorizedToDelete($request);
+        return ! is_null($gate) && method_exists($gate, $method)
+                        ? Gate::forUser(Nova::user($request))->check($method, [$this->model(), $action])
+                        : $this->authorizedToDelete($request);
     }
 
     /**
      * Determine if the current user can impersonate the given resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return bool
      */
     public function authorizedToImpersonate(NovaRequest $request)
     {
         $user = Nova::user($request);
 
-        $resource = $this->model();
-
         return app(ImpersonatesUsers::class)->impersonating($request) === false
-            && ! $resource->is($user)
-            && $resource instanceof Authenticatable
-            && (method_exists($resource, 'canBeImpersonated') && $resource->canBeImpersonated() === true)
-            && (method_exists($user, 'canImpersonate') && $user->canImpersonate() === true);
+                    && ! $this->resource->is($user)
+                    && $this->resource instanceof Authenticatable
+                    && (method_exists($this->resource, 'canBeImpersonated') && $this->resource->canBeImpersonated() === true)
+                    && (method_exists($user, 'canImpersonate') && $user->canImpersonate() === true);
     }
 
     /**
      * Determine if the current user has a given ability.
      *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $ability
+     * @return void
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function authorizeTo(Request $request, string $ability): void
+    public function authorizeTo(Request $request, $ability)
     {
         if (static::authorizable()) {
-            $resource = Util::resolveResourceOrModelForAuthorization($this);
-
-            Gate::forUser(Nova::user($request))->authorize($ability, $resource);
+            Gate::forUser(Nova::user($request))->authorize($ability, $this->resource);
         }
     }
 
     /**
      * Determine if the current user can view the given resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $ability
+     * @return bool
      */
-    public function authorizedTo(Request $request, string $ability): bool
+    public function authorizedTo(Request $request, $ability)
     {
-        $resource = Util::resolveResourceOrModelForAuthorization($this);
-
-        return static::authorizable()
-            ? Gate::forUser(Nova::user($request))->check($ability, $resource)
-            : true;
+        return static::authorizable() ? Gate::forUser(Nova::user($request))->check($ability, $this->resource) : true;
     }
 }

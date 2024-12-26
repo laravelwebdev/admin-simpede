@@ -15,8 +15,11 @@ class DetachPendingAttachment
 
     /**
      * Delete an attachment from the field.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
      */
-    public function __invoke(Request $request): void
+    public function __invoke(Request $request)
     {
         static::$model::where('draft_id', $request->draftId)
             ->when($request->has('attachment'), function ($query) use ($request) {

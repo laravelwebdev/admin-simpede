@@ -9,7 +9,7 @@
       <div class="flex items-center">
         <input
           type="date"
-          class="w-56 form-control form-input form-control-bordered"
+          class="form-control form-input form-control-bordered"
           ref="dateTimePicker"
           :id="currentField.uniqueKey"
           :dusk="field.attribute"
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import isNil from 'lodash/isNil'
 import { DateTime } from 'luxon'
 import { DependentFormField, HandlesValidationErrors } from '@/mixins'
 import filled from '@/util/filled'
@@ -40,7 +41,7 @@ export default {
      * Set the initial value for the field
      */
     setInitialValue() {
-      if (this.currentField.value != null) {
+      if (!isNil(this.currentField.value)) {
         this.value = DateTime.fromISO(
           this.currentField.value || this.value
         ).toISODate()

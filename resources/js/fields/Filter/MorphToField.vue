@@ -4,10 +4,11 @@
 
     <template #filter>
       <SelectControl
-        v-model="value"
+        :dusk="`${field.uniqueKey}-filter`"
+        v-model:selected="value"
+        @change="value = $event"
         :options="field.morphToTypes"
         label="singularLabel"
-        :dusk="filter.uniqueKey"
       >
         <option value="" :selected="value === ''">&mdash;</option>
       </SelectControl>
@@ -17,6 +18,8 @@
 
 <script>
 import debounce from 'lodash/debounce'
+import find from 'lodash/find'
+import isNil from 'lodash/isNil'
 
 export default {
   emits: ['change'],
@@ -35,11 +38,11 @@ export default {
 
   data: () => ({
     value: null,
-    debouncedEventEmitter: null,
+    debouncedHandleChange: null,
   }),
 
   created() {
-    this.debouncedEventEmitter = debounce(() => this.emitFilterChange(), 500)
+    this.debouncedHandleChange = debounce(() => this.handleChange(), 500)
     this.setCurrentFilterValue()
   },
 
@@ -53,27 +56,29 @@ export default {
 
   watch: {
     value() {
-      this.debouncedEventEmitter()
+      this.debouncedHandleChange()
     },
   },
 
   methods: {
     setCurrentFilterValue() {
-      let selectedOption = this.field.morphToTypes.find(
-        o => o.type === this.filter.currentValue
+      let selectedOption = find(
+        this.field.morphToTypes,
+        v => v.type === this.filter.currentValue
       )
 
-      this.value = selectedOption != null ? selectedOption.value : ''
+      this.value = !isNil(selectedOption) ? selectedOption.value : ''
     },
 
-    emitFilterChange() {
-      let selectedOption = this.field.morphToTypes.find(
-        o => o.value === this.value
+    handleChange() {
+      let selectedOption = find(
+        this.field.morphToTypes,
+        v => v.value === this.value
       )
 
       this.$emit('change', {
         filterClass: this.filterKey,
-        value: selectedOption != null ? selectedOption.type : '',
+        value: !isNil(selectedOption) ? selectedOption.type : '',
       })
     },
   },

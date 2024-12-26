@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Contracts;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -18,13 +17,17 @@ interface Filter
     /**
      * Apply the filter to the given query.
      *
-     * @return \Illuminate\Contracts\Database\Eloquent\Builder
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function apply(NovaRequest $request, Builder $query, mixed $value);
+    public function apply(NovaRequest $request, $query, $value);
 
     /**
      * Determine if the filter should be available for the given request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorizedToSee(Request $request);

@@ -2,26 +2,35 @@
 
 namespace Laravel\Nova\Query\Search;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Database\Query\Expression;
 
 class Column
 {
     /**
+     * The search column.
+     *
+     * @var \Illuminate\Database\Query\Expression|string
+     */
+    public $column;
+
+    /**
      * Construct a new search.
      *
+     * @param  \Illuminate\Database\Query\Expression|string  $column
      * @return void
      */
-    public function __construct(public ExpressionContract|string $column)
+    public function __construct($column)
     {
-        //
+        $this->column = $column;
     }
 
     /**
      * Create Column instance for raw expression value.
+     *
+     * @param  string  $column
+     * @return mixed
      */
-    public static function raw(string $column): static
+    public static function raw($column)
     {
         return new static(new Expression($column));
     }
@@ -30,10 +39,11 @@ class Column
      * Create Column instance from raw expression or fluent string.
      *
      * @param  \Illuminate\Database\Query\Expression|string  $column
+     * @return mixed
      */
-    public static function from(ExpressionContract|string $column): static|SearchableJson|SearchableRelation
+    public static function from($column)
     {
-        if ($column instanceof ExpressionContract) {
+        if ($column instanceof Expression) {
             return new static($column);
         }
 
@@ -50,8 +60,14 @@ class Column
 
     /**
      * Apply the search.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $query
+     * @param  string  $search
+     * @param  string  $connectionType
+     * @param  string  $whereOperator
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function __invoke(Builder $query, string $search, string $connectionType, string $whereOperator = 'orWhere'): Builder
+    public function __invoke($query, $search, string $connectionType, string $whereOperator = 'orWhere')
     {
         return $query->{$whereOperator}(
             $this->columnName($query),
@@ -62,9 +78,12 @@ class Column
 
     /**
      * Get the column name.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $query
+     * @return string
      */
-    protected function columnName(Builder $query): ExpressionContract|string
+    protected function columnName($query)
     {
-        return $this->column instanceof ExpressionContract ? $this->column : $query->qualifyColumn($this->column);
+        return $this->column instanceof Expression ? $this->column : $query->qualifyColumn($this->column);
     }
 }

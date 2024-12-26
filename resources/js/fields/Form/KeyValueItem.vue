@@ -4,13 +4,11 @@
       class="flex flex-grow border-b border-gray-200 dark:border-gray-700 key-value-fields"
     >
       <div
-        class="flex-none w-48"
-        @click="handleKeyFieldFocus"
+        class="flex-none w-48 cursor-text"
         :class="[
-          !isEditable || readOnlyKeys
-            ? disabledBackgroundColors
-            : defaultBackgroundColors,
-          editMode === true ? 'cursor-text' : 'cursor-default',
+          readOnlyKeys || !isEditable
+            ? 'bg-gray-50 dark:bg-gray-800'
+            : 'bg-white dark:bg-gray-900',
         ]"
       >
         <textarea
@@ -20,18 +18,16 @@
           @focus="handleKeyFieldFocus"
           ref="keyField"
           type="text"
-          class="font-mono text-xs resize-none block w-full px-3 py-3 dark:text-gray-400 bg-clip-border"
+          class="font-mono text-xs resize-none block w-full px-3 py-3 dark:text-gray-400 bg-clip-border focus:outline-none focus:ring focus:ring-inset"
           :readonly="!isEditable || readOnlyKeys"
           :tabindex="!isEditable || readOnlyKeys ? -1 : 0"
           style="background-clip: border-box"
-          :class="[
-            !isEditable || readOnlyKeys
-              ? `${disabledBackgroundColors} focus:outline-none cursor-normal`
-              : defaultBackgroundColors,
-            editMode === true
-              ? 'hover:bg-20 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:ring focus:ring-inset'
-              : 'focus:outline-none cursor-default',
-          ]"
+          :class="{
+            'bg-white dark:bg-gray-800 focus:outline-none cursor-not-allowed':
+              !isEditable || readOnlyKeys,
+            'hover:bg-20 focus:bg-white dark:bg-gray-900 dark:focus:bg-gray-900':
+              isEditable && !readOnlyKeys,
+          }"
         />
       </div>
 
@@ -39,8 +35,9 @@
         @click="handleValueFieldFocus"
         class="flex-grow border-l border-gray-200 dark:border-gray-700"
         :class="[
-          !isEditable ? disabledBackgroundColors : defaultBackgroundColors,
-          editMode === true ? 'cursor-text' : 'cursor-default',
+          readOnlyKeys || !isEditable
+            ? 'bg-gray-50 dark:bg-gray-700'
+            : 'bg-white dark:bg-gray-900',
         ]"
       >
         <textarea
@@ -50,30 +47,26 @@
           @focus="handleValueFieldFocus"
           ref="valueField"
           type="text"
-          class="font-mono text-xs block w-full px-3 py-3 dark:text-gray-400 bg-clip-border"
+          class="font-mono text-xs block w-full px-3 py-3 dark:text-gray-400"
           :readonly="!isEditable"
           :tabindex="!isEditable ? -1 : 0"
-          :class="[
-            !isEditable
-              ? `${disabledBackgroundColors} focus:outline-none cursor-normal`
-              : defaultBackgroundColors,
-            editMode === true
-              ? 'hover:bg-20 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:ring focus:ring-inset'
-              : 'focus:outline-none cursor-default',
-          ]"
+          :class="{
+            'bg-white dark:bg-gray-800 focus:outline-none': !isEditable,
+            'hover:bg-20 focus:bg-white dark:bg-gray-900 dark:focus:bg-gray-900 focus:outline-none focus:ring focus:ring-inset':
+              isEditable,
+          }"
         />
       </div>
     </div>
 
     <div
       v-if="isEditable && canDeleteRow"
-      class="flex items-center h-11 w-11 absolute -right-[50px]"
+      class="flex justify-center h-11 w-11 absolute -right-[50px]"
     >
       <Button
         @click="$emit('remove-row', item.id)"
         :dusk="`remove-key-value-${index}`"
         variant="link"
-        size="small"
         state="danger"
         type="button"
         tabindex="0"
@@ -98,9 +91,9 @@ export default {
   props: {
     index: Number,
     item: Object,
-    editMode: {
+    disabled: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     readOnly: {
       type: Boolean,
@@ -135,19 +128,8 @@ export default {
     isNotObject() {
       return !(this.item.value instanceof Object)
     },
-
     isEditable() {
-      return !this.readOnly
-    },
-
-    defaultBackgroundColors() {
-      return 'bg-white dark:bg-gray-900'
-    },
-
-    disabledBackgroundColors() {
-      return this.editMode === true
-        ? 'bg-gray-50 dark:bg-gray-700'
-        : this.defaultBackgroundColors
+      return !this.readOnly && !this.disabled
     },
   },
 }

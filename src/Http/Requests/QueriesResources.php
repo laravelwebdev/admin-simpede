@@ -2,17 +2,16 @@
 
 namespace Laravel\Nova\Http\Requests;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Laravel\Nova\TrashedStatus;
-
 trait QueriesResources
 {
     use DecodesFilters;
 
     /**
      * Transform the request into a query.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function toQuery(): Builder
+    public function toQuery()
     {
         $resource = $this->resource();
 
@@ -24,57 +23,61 @@ trait QueriesResources
 
     /**
      * Get a new query builder for the underlying model.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function newQuery(): Builder
+    public function newQuery()
     {
         if (! $this->viaRelationship()) {
-            /** @return \Illuminate\Database\Eloquent\Builder */
             return $this->model()->newQuery();
         }
 
         abort_unless($this->newViaResource()->hasRelatableField($this, $this->viaRelationship), 409);
 
-        /** @return \Illuminate\Database\Eloquent\Relations\Relation */
         return forward_static_call([$this->viaResource(), 'newModel'])
-            ->newQueryWithoutScopes()->findOrFail(
-                $this->viaResourceId
-            )->{$this->viaRelationship}();
+                        ->newQueryWithoutScopes()->findOrFail(
+                            $this->viaResourceId
+                        )->{$this->viaRelationship}();
     }
 
     /**
      * Get a new query builder for the underlying model.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function newQueryWithoutScopes(): Builder
+    public function newQueryWithoutScopes()
     {
         if (! $this->viaRelationship()) {
-            /** @return \Illuminate\Database\Eloquent\Builder */
             return $this->model()->newQueryWithoutScopes();
         }
 
         abort_unless($this->newViaResource()->hasRelatableField($this, $this->viaRelationship), 409);
 
-        /** @return \Illuminate\Database\Eloquent\Relations\Relation */
         return forward_static_call([$this->viaResource(), 'newModel'])
-            ->newQueryWithoutScopes()->findOrFail(
-                $this->viaResourceId
-            )->{$this->viaRelationship}()->withoutGlobalScopes();
+                    ->newQueryWithoutScopes()->findOrFail(
+                        $this->viaResourceId
+                    )->{$this->viaRelationship}()->withoutGlobalScopes();
     }
 
     /**
      * Get the orderings for the request.
+     *
+     * @return array
      */
-    public function orderings(): array
+    public function orderings()
     {
         return ! empty($this->orderBy)
-            ? [$this->orderBy => $this->orderByDirection]
-            : [];
+                        ? [$this->orderBy => $this->orderByDirection]
+                        : [];
     }
 
     /**
      * Get the trashed status of the request.
+     *
+     * @return string
      */
-    protected function trashed(): TrashedStatus
+    protected function trashed()
     {
-        return TrashedStatus::tryFrom($this->trashed) ?? TrashedStatus::DEFAULT;
+        return $this->trashed;
     }
 }

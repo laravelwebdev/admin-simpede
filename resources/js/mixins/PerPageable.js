@@ -13,17 +13,13 @@ export default {
      * Update the desired amount of resources per page.
      */
     perPageChanged() {
-      this.pushAfterUpdatingQueryString({
-        [this.perPageParameter]: this.perPage,
-      })
+      this.updateQueryString({ [this.perPageParameter]: this.perPage })
     },
   },
 
   computed: {
     /**
      * Get the current per page value from the query string.
-     *
-     * @returns {number}
      */
     currentPerPage() {
       return this.queryStringParams[this.perPageParameter] || 25

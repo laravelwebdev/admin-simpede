@@ -1,3 +1,10 @@
+<script setup>
+defineProps({
+  width: { type: [Number, String], required: false, default: 50 },
+  fillColor: { type: String, required: false, default: 'currentColor' },
+})
+</script>
+
 <template>
   <svg
     class="mx-auto block"
@@ -74,10 +81,3 @@
     </circle>
   </svg>
 </template>
-
-<script setup>
-defineProps({
-  width: { type: [Number, String], required: false, default: 50 },
-  fillColor: { type: String, required: false, default: 'currentColor' },
-})
-</script>

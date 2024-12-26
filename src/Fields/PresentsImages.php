@@ -42,9 +42,10 @@ trait PresentsImages
     /**
      * Set the maximum width of the component.
      *
+     * @param  int  $maxWidth
      * @return $this
      */
-    public function maxWidth(int $maxWidth)
+    public function maxWidth($maxWidth)
     {
         $this->maxWidth = $maxWidth;
 
@@ -54,9 +55,10 @@ trait PresentsImages
     /**
      * Set the width of the image on the index view.
      *
+     * @param  int  $width
      * @return $this
      */
-    public function indexWidth(int $width)
+    public function indexWidth($width)
     {
         $this->indexWidth = $width;
 
@@ -66,9 +68,10 @@ trait PresentsImages
     /**
      * Set the width of the image on the detail view.
      *
+     * @param  int  $detailWidth
      * @return $this
      */
-    public function detailWidth(int $detailWidth)
+    public function detailWidth($detailWidth)
     {
         $this->detailWidth = $detailWidth;
 
@@ -102,9 +105,10 @@ trait PresentsImages
     /**
      * Display the image thumbnail with square edges.
      *
+     * @param  string  $aspect
      * @return $this
      */
-    public function aspect(string $aspect)
+    public function aspect($aspect)
     {
         $this->aspect = $aspect;
 
@@ -123,16 +127,20 @@ trait PresentsImages
 
     /**
      * Determine whether the field should have squared corners.
+     *
+     * @return bool
      */
-    public function isSquared(): bool
+    public function isSquared()
     {
         return $this->rounded == false;
     }
 
     /**
      * Return the attributes to present the image with.
+     *
+     * @return array
      */
-    public function imageAttributes(): array
+    public function imageAttributes()
     {
         return [
             'indexWidth' => $this->indexWidth,

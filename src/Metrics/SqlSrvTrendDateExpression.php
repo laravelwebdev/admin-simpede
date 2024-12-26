@@ -6,8 +6,10 @@ class SqlSrvTrendDateExpression extends TrendDateExpression
 {
     /**
      * Get the value of the expression.
+     *
+     * @return mixed
      */
-    public function getValue(): string
+    public function getValue()
     {
         $column = $this->wrap($this->column);
         $offset = $this->offset();
@@ -20,13 +22,21 @@ class SqlSrvTrendDateExpression extends TrendDateExpression
 
         $date = "DATEADD(hour, {$interval}, {$column})";
 
-        return match ($this->unit) {
-            'month' => "FORMAT({$date}, 'yyyy-MM')",
-            'week' => "concat(YEAR({$date}), '-', datepart(ISO_WEEK, {$date}))",
-            'day' => "FORMAT({$date}, 'yyyy-MM-dd')",
-            'hour' => "FORMAT({$date}, 'yyyy-MM-dd HH:00')",
-            // minute
-            default => "FORMAT({$date}, 'yyyy-MM-dd HH:mm:00')",
-        };
+        switch ($this->unit) {
+            case 'month':
+                return "FORMAT({$date}, 'yyyy-MM')";
+            case 'week':
+                return "concat(
+                    YEAR({$date}),
+                    '-',
+                    datepart(ISO_WEEK, {$date})
+                )";
+            case 'day':
+                return "FORMAT({$date}, 'yyyy-MM-dd')";
+            case 'hour':
+                return "FORMAT({$date}, 'yyyy-MM-dd HH:00')";
+            case 'minute':
+                return "FORMAT({$date}, 'yyyy-MM-dd HH:mm:00')";
+        }
     }
 }

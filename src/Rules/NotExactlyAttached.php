@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
@@ -12,19 +11,37 @@ use Laravel\Nova\ResourceToolElement;
 class NotExactlyAttached implements Rule
 {
     /**
+     * The request instance.
+     *
+     * @var \Laravel\Nova\Http\Requests\NovaRequest
+     */
+    public $request;
+
+    /**
+     * The model instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    public $model;
+
+    /**
      * Create a new rule instance.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
      * @return void
      */
-    public function __construct(public NovaRequest $request, public Model $model)
+    public function __construct(NovaRequest $request, $model)
     {
-        //
+        $this->model = $model;
+        $this->request = $request;
     }
 
     /**
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -40,9 +57,9 @@ class NotExactlyAttached implements Rule
         $resource = Nova::newResourceFromModel($this->model);
 
         $fields = $resource->resolvePivotFields($this->request, $this->request->relatedResource)
-            ->reject(
-                fn ($field) => $field instanceof ResourceToolElement || $field->isComputed()
-            );
+            ->reject(function ($field) {
+                return $field instanceof ResourceToolElement || $field->computed();
+            });
 
         if ($fields->isEmpty()) {
             return true;

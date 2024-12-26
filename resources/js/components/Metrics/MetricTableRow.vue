@@ -9,7 +9,7 @@
         'text-gray-400 dark:text-gray-600': !row.iconClass,
       }"
     >
-      <Icon :name="row.icon" class="inline-block" />
+      <Heroicon :type="row.icon" />
     </td>
 
     <td
@@ -47,9 +47,8 @@
               >
                 <div class="py-1">
                   <DropdownMenuItem
-                    v-for="(action, index) in row.actions"
-                    :key="index"
                     v-bind="actionAttributes(action)"
+                    v-for="action in row.actions"
                   >
                     {{ action.name }}
                   </DropdownMenuItem>
@@ -64,17 +63,23 @@
 </template>
 
 <script>
-import { Button, Icon } from 'laravel-nova-ui'
+import isNull from 'lodash/isNull'
 import omitBy from 'lodash/omitBy'
+import { Button, Icon } from 'laravel-nova-ui'
+import Heroicon from '@/components/Icons/Icon'
 
 export default {
   components: {
     Button,
     Icon,
+    Heroicon,
   },
 
   props: {
-    row: { type: Object, required: true },
+    row: {
+      type: Object,
+      required: true,
+    },
   },
 
   methods: {
@@ -100,7 +105,7 @@ export default {
           data: item.data || null,
           headers: item.headers || null,
         },
-        value => value === null
+        isNull
       )
     },
   },

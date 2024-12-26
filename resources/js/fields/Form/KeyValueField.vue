@@ -9,7 +9,6 @@
   >
     <template #field>
       <FormKeyValueTable
-        v-show="theData.length > 0"
         :edit-mode="!currentlyIsReadonly"
         :can-delete-row="currentField.canDeleteRow"
       >
@@ -55,6 +54,7 @@
 <script>
 import findIndex from 'lodash/findIndex'
 import fromPairs from 'lodash/fromPairs'
+import map from 'lodash/map'
 import reject from 'lodash/reject'
 import tap from 'lodash/tap'
 import { DependentFormField, HandlesValidationErrors } from '@/mixins'
@@ -98,11 +98,15 @@ export default {
      * Set the initial value for the field
      */
     populateKeyValueData() {
-      this.theData = Object.entries(this.value || {}).map(([key, value]) => ({
+      this.theData = map(Object.entries(this.value || {}), ([key, value]) => ({
         id: guid(),
         key: `${key}`,
         value,
       }))
+
+      if (this.theData.length === 0) {
+        this.addRow()
+      }
     },
 
     /**
@@ -165,7 +169,7 @@ export default {
     finalPayload() {
       return fromPairs(
         reject(
-          this.theData.map(row =>
+          map(this.theData, row =>
             row && row.key ? [row.key, row.value] : undefined
           ),
           row => row === undefined

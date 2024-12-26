@@ -2,47 +2,52 @@
 
 namespace Laravel\Nova\Query;
 
-use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Contracts\Database\Query\Builder as BaseBuilder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\LazyCollection;
-use Illuminate\Support\Traits\Conditionable;
 use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\TrashedStatus;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Laravel\Scout\Contracts\PaginatesEloquentModels;
 use RuntimeException;
-use WeakMap;
 
 class Builder implements QueryBuilder
 {
-    use Conditionable;
+    /**
+     * The resource class.
+     *
+     * @var class-string<\Laravel\Nova\Resource>
+     */
+    protected $resourceClass;
 
     /**
      * The original query builder instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|null
      */
-    protected ?EloquentBuilder $originalQueryBuilder = null;
+    protected $originalQueryBuilder;
 
     /**
      * The query builder instance.
+     *
+     * @var \Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation|null
      */
-    protected EloquentBuilder|ScoutBuilder|null $queryBuilder = null;
+    protected $queryBuilder;
 
     /**
      * Optional callbacks before model query execution.
      *
-     * @var array<int, callable(\Illuminate\Contracts\Database\Eloquent\Builder):void>
+     * @var array<int, callable(\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation):void>
      */
-    protected array $queryCallbacks = [];
+    protected $queryCallbacks = [];
 
     /**
      * Determine query callbacks has been applied.
+     *
+     * @var bool
      */
-    protected WeakMap $appliedQueryCallbacks;
+    protected $appliedQueryCallbacks = false;
 
     /**
      * Construct a new query builder for a resource.
@@ -50,23 +55,23 @@ class Builder implements QueryBuilder
      * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
      * @return void
      */
-    public function __construct(
-        protected readonly string $resourceClass
-    ) {
-        $this->appliedQueryCallbacks = new WeakMap;
+    public function __construct($resourceClass)
+    {
+        $this->resourceClass = $resourceClass;
     }
 
     /**
      * Build a "whereKey" query for the given resource.
      *
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $query
+     * @param  string  $key
      * @return $this
      */
-    public function whereKey(EloquentBuilder $query, string|int $key)
+    public function whereKey($query, $key)
     {
         $this->setOriginalQueryBuilder($this->queryBuilder = $query);
 
         $this->tap(function ($query) use ($key) {
-            /** @var \Illuminate\Contracts\Database\Eloquent\Builder $query */
             $query->whereKey($key);
         });
 
@@ -76,18 +81,18 @@ class Builder implements QueryBuilder
     /**
      * Build a "search" query for the given resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $query
+     * @param  string|null  $search
      * @param  array<int, \Laravel\Nova\Query\ApplyFilter>  $filters
      * @param  array<string, string>  $orderings
+     * @param  string  $withTrashed
      * @return $this
      */
-    public function search(
-        NovaRequest $request,
-        EloquentBuilder $query,
-        ?string $search = null,
-        array $filters = [],
-        array $orderings = [],
-        TrashedStatus $withTrashed = TrashedStatus::DEFAULT
-    ) {
+    public function search(NovaRequest $request, $query, $search = null,
+        array $filters = [], array $orderings = [],
+        $withTrashed = TrashedStatus::DEFAULT)
+    {
         $this->setOriginalQueryBuilder($query);
 
         $hasSearchKeyword = ! empty(trim($search ?? ''));
@@ -100,7 +105,7 @@ class Builder implements QueryBuilder
 
                 if ($query instanceof MorphToMany || $query instanceof BelongsToMany) {
                     $this->tap(function ($queryBuilder) use ($query) {
-                        /** @var \Illuminate\Contracts\Database\Eloquent\Builder $queryBuilder */
+                        /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $queryBuilder */
                         $queryBuilder->whereIn(
                             $this->resourceClass::newModel()->getQualifiedKeyName(),
                             $query->allRelatedIds()
@@ -111,7 +116,7 @@ class Builder implements QueryBuilder
 
             if (! $hasSearchKeyword && ! $hasOrderings) {
                 $this->tap(function ($query) {
-                    /** @var \Illuminate\Contracts\Database\Eloquent\Builder $query */
+                    /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $query */
                     $this->resourceClass::defaultOrderings($query);
                 });
             }
@@ -122,7 +127,7 @@ class Builder implements QueryBuilder
         }
 
         $this->tap(function ($query) use ($request, $search, $filters, $orderings, $withTrashed) {
-            /** @var \Illuminate\Contracts\Database\Eloquent\Builder $query */
+            /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $query */
             $this->resourceClass::buildIndexQuery(
                 $request, $query, $search, $filters, $orderings, $withTrashed
             );
@@ -134,10 +139,10 @@ class Builder implements QueryBuilder
     /**
      * Pass the query to a given callback.
      *
-     * @param  callable(\Illuminate\Contracts\Database\Eloquent\Builder):void  $callback
+     * @param  callable(\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation):void  $callback
      * @return $this
      */
-    public function tap(callable $callback)
+    public function tap($callback)
     {
         $this->queryCallbacks[] = $callback;
 
@@ -147,9 +152,10 @@ class Builder implements QueryBuilder
     /**
      * Set the "take" directly to Scout or Eloquent builder.
      *
+     * @param  int  $limit
      * @return $this
      */
-    public function take(?int $limit)
+    public function take($limit)
     {
         $this->queryBuilder->take($limit);
 
@@ -159,40 +165,55 @@ class Builder implements QueryBuilder
     /**
      * Defer setting a "limit" using query callback and only executed via Eloquent builder.
      *
+     * @param  int  $limit
      * @return $this
      */
-    public function limit(?int $limit)
+    public function limit($limit)
     {
         return $this->tap(function ($query) use ($limit) {
-            /** @var \Illuminate\Contracts\Database\Eloquent\Builder $query */
+            /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $query */
             $query->limit($limit);
         });
     }
 
     /**
      * Get the results of the search.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function get(): EloquentCollection
+    public function get()
     {
         return $this->applyQueryCallbacks($this->queryBuilder)->get();
     }
 
     /**
      * Get a lazy collection for the given query by chunks of the given size.
+     *
+     * @param  int  $chunkSize
+     * @return \Illuminate\Support\LazyCollection
      */
-    public function lazy(int $chunkSize = 1000): LazyCollection
+    public function lazy($chunkSize = 1000)
     {
+        if (! method_exists($this->queryBuilder, 'lazy')) {
+            return $this->cursor();
+        }
+
         return $this->applyQueryCallbacks($this->queryBuilder)->lazy($chunkSize);
     }
 
     /**
      * Get a lazy collection for the given query.
+     *
+     * @return \Illuminate\Support\LazyCollection
      */
-    public function cursor(): LazyCollection
+    public function cursor()
     {
         $queryBuilder = $this->applyQueryCallbacks($this->queryBuilder);
 
-        if (! $queryBuilder instanceof ScoutBuilder && empty($queryBuilder->getEagerLoads())) {
+        if (
+            method_exists($queryBuilder, 'cursor')
+            && (! $queryBuilder instanceof ScoutBuilder && empty($queryBuilder->getEagerLoads()))
+        ) {
             return $queryBuilder->cursor();
         }
 
@@ -202,9 +223,10 @@ class Builder implements QueryBuilder
     /**
      * Get the paginated results of the query.
      *
+     * @param  int  $perPage
      * @return array{0: \Illuminate\Contracts\Pagination\Paginator, 1: int|null, 2: bool}
      */
-    public function paginate(int $perPage): array
+    public function paginate($perPage)
     {
         $queryBuilder = $this->applyQueryCallbacks($this->queryBuilder);
 
@@ -222,9 +244,11 @@ class Builder implements QueryBuilder
     /**
      * Get the paginated results of the Scout query.
      *
+     * @param  \Laravel\Scout\Builder  $queryBuilder
+     * @param  int  $perPage
      * @return array{0: \Illuminate\Contracts\Pagination\Paginator, 1: int|null, 2: false}
      */
-    protected function paginateFromScout(ScoutBuilder $queryBuilder, int $perPage): array
+    protected function paginateFromScout(ScoutBuilder $queryBuilder, $perPage)
     {
         $originalQueryBuilder = clone $this->originalQueryBuilder;
 
@@ -271,8 +295,9 @@ class Builder implements QueryBuilder
 
             $paginated->setCollection(
                 $paginated->getCollection()
-                    ->sortBy(fn ($model) => $objectIdPositions[$model->getScoutKey()], SORT_NUMERIC)
-                    ->values()
+                    ->sortBy(function ($model) use ($objectIdPositions) {
+                        return $objectIdPositions[$model->getScoutKey()];
+                    }, SORT_NUMERIC)->values()
             );
         }
 
@@ -281,32 +306,41 @@ class Builder implements QueryBuilder
 
     /**
      * Get the count of the total records for the paginator.
+     *
+     * @return int|null
      */
-    public function getCountForPagination(): ?int
+    public function getCountForPagination()
     {
         return $this->toBaseQueryBuilder()->getCountForPagination();
     }
 
     /**
      * Convert the query builder to an Eloquent query builder (skip using Scout).
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation
      */
-    public function toBase(): EloquentBuilder
+    public function toBase()
     {
         return $this->applyQueryCallbacks($this->originalQueryBuilder);
     }
 
     /**
      * Convert the query builder to an fluent query builder (skip using Scout).
+     *
+     * @return \Illuminate\Database\Query\Builder
      */
-    public function toBaseQueryBuilder(): BaseBuilder
+    public function toBaseQueryBuilder()
     {
         return $this->toBase()->toBase();
     }
 
     /**
      * Set original query builder instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $queryBuilder
+     * @return void
      */
-    protected function setOriginalQueryBuilder(EloquentBuilder $queryBuilder): void
+    protected function setOriginalQueryBuilder($queryBuilder)
     {
         if (isset($this->originalQueryBuilder)) {
             throw new RuntimeException('Unable to override $originalQueryBuilder, please create a new '.self::class);
@@ -317,19 +351,31 @@ class Builder implements QueryBuilder
 
     /**
      * Apply any query callbacks to the query builder.
+     *
+     * @param  \Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $queryBuilder
+     * @return \Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation
      */
-    protected function applyQueryCallbacks(EloquentBuilder|ScoutBuilder $queryBuilder): EloquentBuilder|ScoutBuilder
+    protected function applyQueryCallbacks($queryBuilder)
     {
-        return $this->appliedQueryCallbacks[$queryBuilder] ??= $this->handleQueryCallbacks($queryBuilder);
+        if (! $this->appliedQueryCallbacks) {
+            $this->handleQueryCallbacks($queryBuilder);
+
+            $this->appliedQueryCallbacks = true;
+        }
+
+        return $queryBuilder;
     }
 
     /**
      * Handle any query callbacks to the query builder.
+     *
+     * @param  \Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $queryBuilder
+     * @return \Laravel\Scout\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation
      */
-    protected function handleQueryCallbacks(EloquentBuilder|ScoutBuilder $queryBuilder): EloquentBuilder|ScoutBuilder
+    protected function handleQueryCallbacks($queryBuilder)
     {
         $callback = function ($query) {
-            /** @var \Illuminate\Contracts\Database\Eloquent\Builder $query */
+            /** @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation $query */
             collect($this->queryCallbacks)
                 ->filter()
                 ->each(function ($callback) use ($query) {

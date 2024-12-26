@@ -2,20 +2,20 @@
 
 namespace Laravel\Nova\Http\Requests;
 
-use Illuminate\Support\Collection;
 use Laravel\Nova\Metrics\Metric;
 use Laravel\Nova\Nova;
 
 /**
- * @property-read string $dashboard
  * @property-read string $metric
  */
 class DashboardMetricRequest extends NovaRequest
 {
     /**
      * Get the metric instance for the given request.
+     *
+     * @return \Laravel\Nova\Metrics\Metric
      */
-    public function metric(): Metric
+    public function metric()
     {
         return $this->availableMetrics()->first(function ($metric) {
             return $this->metric === $metric->uriKey();
@@ -24,13 +24,11 @@ class DashboardMetricRequest extends NovaRequest
 
     /**
      * Get all of the possible metrics for the request.
+     *
+     * @return \Illuminate\Support\Collection
      */
-    public function availableMetrics(): Collection
+    public function availableMetrics()
     {
-        return Collection::make(Nova::dashboardForKey($this->dashboard, $this)->cards())
-            ->unique()
-            ->filter->authorize($this)
-            ->values()
-            ->whereInstanceOf(Metric::class);
+        return Nova::allAvailableDashboardCards($this)->whereInstanceOf(Metric::class);
     }
 }

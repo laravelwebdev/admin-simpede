@@ -24,7 +24,13 @@
           tabindex="0"
           class="cursor-pointer text-gray-500 inline-flex items-center"
         >
-          <Icon name="download" type="micro" class="mr-2" />
+          <Icon
+            class="mr-2"
+            type="download"
+            view-box="0 0 24 24"
+            width="16"
+            height="16"
+          />
           <span class="class mt-1">{{ __('Download') }}</span>
         </a>
       </p>
@@ -33,12 +39,9 @@
 </template>
 
 <script>
-import { Icon } from 'laravel-nova-ui'
 import { FieldValue } from '@/mixins'
 
 export default {
-  components: { Icon },
-
   mixins: [FieldValue],
 
   props: ['index', 'resource', 'resourceName', 'resourceId', 'field'],

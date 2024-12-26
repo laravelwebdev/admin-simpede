@@ -3,25 +3,20 @@
 namespace Laravel\Nova\Fields;
 
 use Laravel\Nova\Contracts\Cover;
-use Laravel\Nova\Nova;
 
 class Avatar extends Image implements Cover
 {
     /**
      * Create a new field.
      *
-     * @param  \Stringable|string|null  $name
-     * @param  string|callable|null  $attribute
+     * @param  string|null  $name
+     * @param  string|null  $attribute
+     * @param  string|null  $disk
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, object, string, string, ?string, ?string):(mixed))|null  $storageCallback
      * @return void
      */
-    public function __construct($name = null, mixed $attribute = null, ?string $disk = null, ?callable $storageCallback = null)
+    public function __construct($name = 'Avatar', $attribute = null, $disk = null, $storageCallback = null)
     {
-        if (is_null($name)) {
-            $attribute ??= 'avatar';
-            $name = Nova::__('Avatar');
-        }
-
         parent::__construct($name, $attribute, $disk, $storageCallback);
 
         $this->rounded();
@@ -30,9 +25,11 @@ class Avatar extends Image implements Cover
     /**
      * Create Avatar field using Gravatar service.
      *
-     * @param  \Stringable|string|null  $name
+     * @param  string  $name
+     * @param  string|null  $attribute
+     * @return \Laravel\Nova\Fields\Gravatar
      */
-    public static function gravatar($name = null, string $attribute = 'email'): Gravatar
+    public static function gravatar($name = 'Avatar', $attribute = 'email')
     {
         return new Gravatar($name, $attribute);
     }
@@ -40,9 +37,11 @@ class Avatar extends Image implements Cover
     /**
      * Create Avatar field using ui-avatars service.
      *
-     * @param  \Stringable|string|null  $name
+     * @param  string  $name
+     * @param  string|null  $attribute
+     * @return \Laravel\Nova\Fields\UiAvatar
      */
-    public static function uiavatar($name = null, string $attribute = 'name'): UiAvatar
+    public static function uiavatar($name = 'Avatar', $attribute = 'name')
     {
         return new UiAvatar($name, $attribute);
     }

@@ -35,13 +35,13 @@ class CheckLicenseCommand extends Command
         $response = Nova::checkLicense();
 
         if ($response) {
-            $this->components->info('Your license key is valid and correctly configured! Thank you for being a Nova customer. 🚀');
+            $this->info('Your license key is valid and correctly configured! Thank you for being a Nova customer. 🚀');
 
-            return self::SUCCESS;
+            return 0;
         }
 
-        $this->components->error($response->json('message'));
+        $this->error($response->json('message'));
 
-        return self::FAILURE;
+        return 1;
     }
 }

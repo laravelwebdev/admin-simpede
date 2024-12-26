@@ -43,6 +43,10 @@
 </template>
 
 <script>
+import each from 'lodash/each'
+import map from 'lodash/map'
+import tap from 'lodash/tap'
+import reject from 'lodash/reject'
 import {
   TogglesTrashed,
   PerformsSearches,
@@ -51,9 +55,6 @@ import {
   mapProps,
 } from '@/mixins'
 import InlineFormData from './InlineFormData'
-import map from 'lodash/map'
-import reject from 'lodash/reject'
-import tap from 'lodash/tap'
 
 export default {
   emits: [
@@ -127,7 +128,7 @@ export default {
     fill(formData) {
       if (this.isEditing && this.isVisible) {
         tap(new InlineFormData(this.fieldAttribute, formData), form => {
-          this.availableFields.forEach(field => {
+          each(this.availableFields, field => {
             field.fill(form)
           })
         })
@@ -143,10 +144,10 @@ export default {
       this.panels = []
       this.fields = []
 
-      try {
-        const {
-          data: { title, panels, fields },
-        } = await Nova.request().get(this.getFieldsEndpoint, {
+      const {
+        data: { title, panels, fields },
+      } = await Nova.request()
+        .get(this.getFieldsEndpoint, {
           params: {
             editing: true,
             editMode: this.editMode,
@@ -156,45 +157,45 @@ export default {
             relationshipType: this.field.relationshipType,
           },
         })
-
-        this.fields = map(fields, field => {
-          if (
-            field.resourceName === this.field.from.viaResource &&
-            field.relationshipType === 'belongsTo' &&
-            (this.editMode === 'create' ||
-              field.belongsToId.toString() ===
-                this.field.from.viaResourceId.toString())
-          ) {
-            field.visible = false
-            field.fill = () => {}
-          } else if (
-            field.relationshipType === 'morphTo' &&
-            (this.editMode === 'create' ||
-              (field.resourceName === this.field.from.viaResource &&
-                field.morphToId.toString() ===
-                  this.field.from.viaResourceId.toString()))
-          ) {
-            field.visible = false
-            field.fill = () => {}
+        .catch(error => {
+          if ([403, 404].includes(error.response.status)) {
+            Nova.error(this.__('There was a problem fetching the resource.'))
           }
-
-          field.validationKey = `${this.fieldAttribute}.${field.validationKey}`
-
-          return field
         })
 
-        this.loading = false
-
-        Nova.$emit('resource-loaded', {
-          resourceName: this.resourceName,
-          resourceId: this.resourceId ? this.resourceId.toString() : null,
-          mode: this.editMode,
-        })
-      } catch (error) {
-        if ([403, 404].includes(error.response.status)) {
-          Nova.error(this.__('There was a problem fetching the resource.'))
+      this.fields = map(fields, field => {
+        if (
+          field.resourceName === this.field.from.viaResource &&
+          field.relationshipType === 'belongsTo' &&
+          (this.editMode === 'create' ||
+            field.belongsToId.toString() ===
+              this.field.from.viaResourceId.toString())
+        ) {
+          field.visible = false
+          field.fill = () => {}
+        } else if (
+          field.relationshipType === 'morphTo' &&
+          (this.editMode === 'create' ||
+            (field.resourceName === this.field.from.viaResource &&
+              field.morphToId.toString() ===
+                this.field.from.viaResourceId.toString()))
+        ) {
+          field.visible = false
+          field.fill = () => {}
         }
-      }
+
+        field.validationKey = `${this.fieldAttribute}.${field.validationKey}`
+
+        return field
+      })
+
+      this.loading = false
+
+      Nova.$emit('resource-loaded', {
+        resourceName: this.resourceName,
+        resourceId: this.resourceId ? this.resourceId.toString() : null,
+        mode: this.editMode,
+      })
     },
 
     showEditForm() {

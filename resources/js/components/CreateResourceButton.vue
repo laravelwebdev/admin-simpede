@@ -1,7 +1,7 @@
 <template>
   <div v-if="shouldShowButtons">
     <!-- Attach Related Models -->
-    <InertiaButton
+    <ButtonInertiaLink
       class="shrink-0"
       v-if="shouldShowAttachButton"
       dusk="attach-button"
@@ -23,10 +23,10 @@
           {{ __('Attach') }}
         </span>
       </slot>
-    </InertiaButton>
+    </ButtonInertiaLink>
 
     <!-- Create Related Models -->
-    <InertiaButton
+    <ButtonInertiaLink
       v-else-if="shouldShowCreateButton"
       class="shrink-0 h-9 px-4 focus:outline-none ring-primary-200 dark:ring-gray-600 focus:ring text-white dark:text-gray-800 inline-flex items-center font-bold"
       dusk="create-button"
@@ -45,7 +45,7 @@
       <span class="inline-block md:hidden">
         {{ __('Create') }}
       </span>
-    </InertiaButton>
+    </ButtonInertiaLink>
   </div>
 </template>
 
@@ -75,7 +75,8 @@ const props = defineProps({
 
 const shouldShowAttachButton = computed(() => {
   return (
-    ['belongsToMany', 'morphToMany'].includes(props.relationshipType) &&
+    (props.relationshipType === 'belongsToMany' ||
+      props.relationshipType === 'morphToMany') &&
     props.authorizedToRelate
   )
 })

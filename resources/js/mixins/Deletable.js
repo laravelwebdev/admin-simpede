@@ -1,4 +1,5 @@
 import filter from 'lodash/filter'
+import map from 'lodash/map'
 
 export default {
   methods: {
@@ -11,9 +12,6 @@ export default {
 
     /**
      * Delete the given resources.
-     *
-     * @param {int[]|string[]} resources
-     * @param {Function|null} [callback=null]
      */
     deleteResources(resources, callback = null) {
       if (this.viaManyToMany) {
@@ -294,9 +292,9 @@ export default {
 }
 
 function mapResources(resources) {
-  return resources.map(resource => resource.id.value)
+  return map(resources, resource => resource.id.value)
 }
 
 function mapPivots(resources) {
-  return filter(resources.map(resource => resource.id.pivotValue))
+  return filter(map(resources, resource => resource.id.pivotValue))
 }

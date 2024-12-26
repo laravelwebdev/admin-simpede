@@ -8,6 +8,8 @@ class Login extends Page
 {
     /**
      * Create a new page instance.
+     *
+     * @return void
      */
     public function __construct()
     {
@@ -16,16 +18,22 @@ class Login extends Page
 
     /**
      * Assert that the browser is on the page.
+     *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
      */
-    public function assert(Browser $browser): void
+    public function assert(Browser $browser)
     {
         $browser->assertOk();
     }
 
     /**
      * Assert page not found.
+     *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
      */
-    public function assertOk(Browser $browser): void
+    public function assertOk(Browser $browser)
     {
         $browser->waitForLocation($this->novaPageUrl)->assertPathIs($this->novaPageUrl);
     }

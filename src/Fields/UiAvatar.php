@@ -2,10 +2,8 @@
 
 namespace Laravel\Nova\Fields;
 
-use Laravel\Nova\Nova;
-
 /**
- * @method static static make(\Stringable|string|null $name = null, string $attribute = 'name')
+ * @method static static make(mixed $name = 'Avatar', string|null $attribute = 'name')
  */
 class UiAvatar extends Avatar implements Unfillable
 {
@@ -23,28 +21,31 @@ class UiAvatar extends Avatar implements Unfillable
     /**
      * Create a new field.
      *
-     * @param  \Stringable|string|null  $name
+     * @param  string  $name
+     * @param  string|null  $attribute
      * @return void
      */
-    public function __construct($name = null, string $attribute = 'name')
+    public function __construct($name = 'Avatar', $attribute = 'name')
     {
-        parent::__construct($name ?? Nova::__('Avatar'), $attribute);
+        parent::__construct($name, $attribute ?? 'name');
 
-        $this->exceptOnForms()
-            ->disableDownload();
+        $this->exceptOnForms();
     }
 
     /**
      * Resolve the field's value.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object  $resource
+     * @param  mixed  $resource
+     * @param  string|null  $attribute
+     * @return void
      */
-    #[\Override]
-    public function resolve($resource, ?string $attribute = null): void
+    public function resolve($resource, $attribute = null)
     {
         parent::resolve($resource, $attribute);
 
-        $callback = fn () => 'https://ui-avatars.com/api/?'.http_build_query(array_merge($this->settings, ['name' => $this->value]));
+        $callback = function () {
+            return 'https://ui-avatars.com/api/?'.http_build_query(array_merge($this->settings, ['name' => $this->value]));
+        };
 
         $this->preview($callback)->thumbnail($callback);
     }
@@ -52,9 +53,10 @@ class UiAvatar extends Avatar implements Unfillable
     /**
      * Set the font-size.
      *
+     * @param  float|int  $fontSize
      * @return $this
      */
-    public function fontSize(float|int $fontSize)
+    public function fontSize($fontSize)
     {
         $this->settings['font-size'] = $fontSize;
 
@@ -64,9 +66,10 @@ class UiAvatar extends Avatar implements Unfillable
     /**
      * Set the color.
      *
+     * @param  string  $color
      * @return $this
      */
-    public function color(string $color)
+    public function color($color)
     {
         $this->settings['color'] = ltrim($color, '#');
 
@@ -76,9 +79,10 @@ class UiAvatar extends Avatar implements Unfillable
     /**
      * Set the background color.
      *
+     * @param  string  $color
      * @return $this
      */
-    public function backgroundColor(string $color)
+    public function backgroundColor($color)
     {
         $this->settings['background'] = ltrim($color, '#');
 
@@ -102,7 +106,6 @@ class UiAvatar extends Avatar implements Unfillable
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge([

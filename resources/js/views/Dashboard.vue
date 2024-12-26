@@ -22,28 +22,24 @@
         tabindex="0"
       >
         <Icon
-          name="refresh"
-          type="mini"
-          class="!w-3 !h-3 text-gray-500 dark:text-gray-400"
+          class="text-gray-500 dark:text-gray-400"
+          :solid="true"
+          type="refresh"
+          width="14"
           v-tooltip="__('Refresh')"
         />
       </button>
     </div>
 
     <div v-if="shouldShowCards">
-      <Cards v-if="cards.length > 0" :dashboard="name" :cards="cards" />
+      <Cards v-if="cards.length > 0" :cards="cards" />
     </div>
   </LoadingView>
 </template>
 <script>
-import { Icon } from 'laravel-nova-ui'
 import { minimum } from '@/util'
 
 export default {
-  components: {
-    Icon,
-  },
-
   props: {
     name: {
       type: String,

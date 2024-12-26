@@ -8,11 +8,10 @@
   </a>
 </template>
 
-<script setup>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
+<script>
+import { mapGetters } from 'vuex'
 
-const store = useStore()
-
-const validLicense = computed(() => store.getters.validLicense)
+export default {
+  computed: mapGetters(['validLicense']),
+}
 </script>

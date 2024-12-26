@@ -1,8 +1,4 @@
-import { Errors } from '../util/FormValidation'
-
-/**
- * @typedef {import('axios').AxiosResponse} AxiosResponse
- */
+import { Errors } from 'form-backend-validation'
 
 export default {
   props: {
@@ -18,12 +14,8 @@ export default {
   methods: {
     /**
      * Handle all response error.
-     *
-     * @param {AxiosResponse} error
      */
     handleResponseError(error) {
-      Nova.debug(error, 'error')
-
       if (error.response === undefined || error.response.status == 500) {
         Nova.error(this.__('There was a problem submitting the form.'))
       } else if (error.response.status == 422) {
@@ -41,8 +33,6 @@ export default {
 
     /**
      * Handle creating response error.
-     *
-     * @param {AxiosResponse} error
      */
     handleOnCreateResponseError(error) {
       this.handleResponseError(error)
@@ -50,8 +40,6 @@ export default {
 
     /**
      * Handle updating response error.
-     *
-     * @param {AxiosResponse} error
      */
     handleOnUpdateResponseError(error) {
       if (error.response && error.response.status == 409) {

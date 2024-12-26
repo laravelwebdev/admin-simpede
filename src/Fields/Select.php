@@ -7,14 +7,13 @@ use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Exceptions\NovaException;
 use Laravel\Nova\Fields\Filters\SelectFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Nova;
 use Laravel\Nova\Util;
 use Stringable;
 
 /**
  * @phpstan-type TOptionLabel \Stringable|string|array{label: string, group?: string}
  * @phpstan-type TOptionValue string|int
- * @phpstan-type TOption iterable<TOptionValue, TOptionLabel>|class-string<\BackedEnum>
+ * @phpstan-type TOption iterable<TOptionValue, TOptionLabel>
  */
 class Select extends Field implements FilterableField
 {
@@ -32,21 +31,21 @@ class Select extends Field implements FilterableField
     /**
      * The field's options callback.
      *
-     * @var iterable<string|int, array<string, mixed>|string>|callable|class-string<\BackedEnum>|null
+     * @var array<string|int, array<string, mixed>|string>|\Closure|callable|\Illuminate\Support\Collection|null
      *
-     * @phpstan-var TOption|(callable(): (TOption))|null
+     * @phpstan-var TOption|(callable(): (TOption))|(\Closure(): (TOption))|null
      */
     public $optionsCallback;
 
     /**
      * Set the options for the select menu.
      *
-     * @param  iterable<string|int, array<string, mixed>|string>|callable|class-string<\BackedEnum>  $options
+     * @param  array<string|int, array<string, mixed>|string>|\Closure|callable|\Illuminate\Support\Collection  $options
      * @return $this
      *
-     * @phpstan-param TOption|(callable(): (TOption)) $options
+     * @phpstan-param TOption|(callable(): (TOption))|(\Closure(): (TOption)) $options
      */
-    public function options(iterable|callable|string $options)
+    public function options($options)
     {
         $this->optionsCallback = $options;
 
@@ -78,7 +77,7 @@ class Select extends Field implements FilterableField
      *
      * @return $this
      *
-     * @throws \Laravel\Nova\Exceptions\HelperNotSupported
+     * @throws \Exception
      */
     public function withSubtitles()
     {
@@ -88,6 +87,7 @@ class Select extends Field implements FilterableField
     /**
      * Make the field filter.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -97,8 +97,10 @@ class Select extends Field implements FilterableField
 
     /**
      * Prepare the field for JSON serialization.
+     *
+     * @return array
      */
-    public function serializeForFilter(): array
+    public function serializeForFilter()
     {
         return transform($this->jsonSerialize(), function ($field) {
             return Arr::only($field, [
@@ -114,23 +116,15 @@ class Select extends Field implements FilterableField
     /**
      * Serialize options for the field.
      *
+     * @param  bool  $searchable
      * @return array<int, array<string, mixed>>
      *
-     * @phpstan-return array<int, array{group?: string, label: string, value: TOptionValue}>
+     * @phpstan-return array<int, array{group: string, label: string, value: TOptionValue}>
      */
-    protected function serializeOptions(bool $searchable): array
+    protected function serializeOptions($searchable)
     {
         /** @var TOption $options */
         $options = value($this->optionsCallback);
-
-        if (is_string($options) && enum_exists($options)) {
-            /** @var class-string<\BackedEnum> $options */
-            return collect($options::cases())
-                ->map(fn ($option) => [
-                    'label' => Nova::humanize($option),
-                    'value' => $option->value,
-                ])->all();
-        }
 
         if (is_callable($options)) {
             $options = $options();
@@ -156,7 +150,6 @@ class Select extends Field implements FilterableField
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         $this->withMeta([

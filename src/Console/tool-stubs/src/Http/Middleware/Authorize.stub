@@ -2,21 +2,19 @@
 
 namespace {{ namespace }}\Http\Middleware;
 
-use Closure;
-use Illuminate\Http\Request;
 use Laravel\Nova\Nova;
-use Laravel\Nova\Tool;
 use {{ namespace }}\{{ class }};
-use Symfony\Component\HttpFoundation\Response;
 
 class Authorize
 {
     /**
      * Handle the incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request):mixed  $next
+     * @return \Illuminate\Http\Response
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle($request, $next)
     {
         $tool = collect(Nova::registeredTools())->first([$this, 'matchesTool']);
 
@@ -25,8 +23,11 @@ class Authorize
 
     /**
      * Determine whether this tool belongs to the package.
+     *
+     * @param  \Laravel\Nova\Tool  $tool
+     * @return bool
      */
-    public function matchesTool(Tool $tool): bool
+    public function matchesTool($tool)
     {
         return $tool instanceof {{ class }};
     }

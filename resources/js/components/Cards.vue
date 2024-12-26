@@ -14,7 +14,6 @@
         v-show="!collapsed"
         v-for="card in filteredCards"
         :card="card"
-        :dashboard="dashboard"
         :resource="resource"
         :resource-name="resourceName"
         :resource-id="resourceId"
@@ -26,6 +25,7 @@
 </template>
 
 <script>
+import filter from 'lodash/filter'
 import { Collapsable } from '@/mixins'
 import filled from '@/util/filled'
 
@@ -37,11 +37,6 @@ export default {
 
     resource: {
       type: Object,
-      required: false,
-    },
-
-    dashboard: {
-      type: String,
       required: false,
     },
 
@@ -74,25 +69,19 @@ export default {
      */
     filteredCards() {
       if (this.onlyOnDetail) {
-        return this.cards.filter(c => c.onlyOnDetail == true)
+        return filter(this.cards, c => c.onlyOnDetail == true)
       }
 
-      return this.cards.filter(c => c.onlyOnDetail == false)
+      return filter(this.cards, c => c.onlyOnDetail == false)
     },
 
     localStorageKey() {
       let name = this.resourceName
 
-      if (filled(this.dashboard)) {
-        name = `dashboard.${this.dashboard}`
-      } else {
-        if (filled(this.lens)) {
-          name = `lens.${name}.${this.lens}`
-        } else if (filled(this.resourceId)) {
-          name = `resource.${name}.${this.resourceId}`
-        } else {
-          name = `resource.${name}`
-        }
+      if (filled(this.lens)) {
+        name = `${name}.${this.lens}`
+      } else if (filled(this.resourceId)) {
+        name = `${name}.${this.resourceId}`
       }
 
       return `nova.cards.${name}.collapsed`

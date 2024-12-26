@@ -8,11 +8,10 @@
     <ol>
       <li
         v-for="(item, index) in breadcrumbs"
-        :key="index"
+        class="inline-block"
         v-bind="{
           'aria-current': index === breadcrumbs.length - 1 ? 'page' : null,
         }"
-        class="inline-block"
       >
         <div class="flex items-center">
           <Link
@@ -24,10 +23,9 @@
           </Link>
           <span v-else>{{ item.name }}</span>
           <Icon
+            type="chevron-right"
             v-if="index < breadcrumbs.length - 1"
-            name="chevron-right"
-            type="micro"
-            class="mx-2 text-gray-300 dark:text-gray-700"
+            class="w-4 h-4 mx-2 text-gray-300 dark:text-gray-700"
           />
         </div>
       </li>
@@ -35,13 +33,16 @@
   </nav>
 </template>
 
-<script setup>
-import { Icon } from 'laravel-nova-ui'
-import { computed } from 'vue'
-import { useStore } from 'vuex'
+<script>
+import { mapGetters } from 'vuex'
 
-const store = useStore()
+export default {
+  computed: {
+    ...mapGetters(['breadcrumbs']),
 
-const breadcrumbs = computed(() => store.getters.breadcrumbs)
-const hasItems = computed(() => breadcrumbs.value.length > 0)
+    hasItems() {
+      return this.breadcrumbs.length > 0
+    },
+  },
+}
 </script>

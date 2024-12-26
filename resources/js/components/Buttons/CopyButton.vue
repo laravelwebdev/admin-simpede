@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    @click="denouncedHandleClick"
+    @click="handleClick"
     class="inline-flex items-center px-2 space-x-1 -mx-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-500 active:text-gray-600 dark:hover:bg-gray-900"
     :class="{
       'rounded-lg': !rounded,
@@ -18,12 +18,12 @@
 import { ref } from 'vue'
 import debounce from 'lodash/debounce'
 
-defineProps({
+const copied = ref(false)
+
+const props = defineProps({
   rounded: { type: Boolean, default: true },
   withIcon: { type: Boolean, default: true },
 })
-
-const copied = ref(false)
 
 const denouncedHandleClick = debounce(
   () => {
@@ -33,4 +33,6 @@ const denouncedHandleClick = debounce(
   2000,
   { leading: true, trailing: false }
 )
+
+const handleClick = () => denouncedHandleClick()
 </script>

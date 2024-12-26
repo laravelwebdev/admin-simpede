@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Testing\Browser\Pages;
 
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Dusk\Browser;
 use Laravel\Nova\Testing\Browser\Components\Modals\CreateRelationModalComponent;
 
@@ -10,40 +9,44 @@ class Update extends Page
 {
     use InteractsWithRelations;
 
-    /**
-     * The Resource ID.
-     *
-     * @var \Illuminate\Database\Eloquent\Model|string|int
-     */
-    public mixed $resourceId;
+    public $resourceName;
+
+    public $resourceId;
+
+    public $queryParams;
 
     /**
      * Create a new page instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string|int  $resourceId
-     * @param  array<string, mixed>  $queryParams
+     * @param  string  $resourceName
+     * @param  int  $resourceId
+     * @param  array  $queryParams
      * @return void
      */
-    public function __construct(
-        public string $resourceName,
-        mixed $resourceId,
-        array $queryParams = []
-    ) {
-        $this->resourceId = $resourceId instanceof Model ? $resourceId->getKey() : $resourceId;
+    public function __construct($resourceName, $resourceId, $queryParams = [])
+    {
+        $this->resourceName = $resourceName;
+        $this->resourceId = $resourceId;
+        $this->queryParams = $queryParams;
 
-        $this->setNovaPage("/resources/{$this->resourceName}/{$this->resourceId}/edit", $queryParams);
+        $this->setNovaPage("/resources/{$this->resourceName}/{$this->resourceId}/edit");
     }
 
     /**
      * Run the inline create relation.
      *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @param  string  $uriKey
+     * @param  callable  $fieldCallback
+     * @return void
+     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function runInlineCreate(Browser $browser, string $uriKey, callable $fieldCallback): void
+    public function runInlineCreate(Browser $browser, $uriKey, callable $fieldCallback)
     {
         $browser->whenAvailable("@{$uriKey}-inline-create", function ($browser) use ($fieldCallback) {
             $browser->click('')
-                ->elsewhereWhenAvailable(new CreateRelationModalComponent, function ($browser) use ($fieldCallback) {
+                ->elsewhereWhenAvailable(new CreateRelationModalComponent(), function ($browser) use ($fieldCallback) {
                     $fieldCallback($browser);
 
                     $browser->confirm()->pause(250);
@@ -54,9 +57,12 @@ class Update extends Page
     /**
      * Click the update button.
      *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
+     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function update(Browser $browser): void
+    public function update(Browser $browser)
     {
         $browser->dismissToasted()
             ->waitFor('@update-button')
@@ -67,9 +73,12 @@ class Update extends Page
     /**
      * Click the update and continue editing button.
      *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
+     *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function updateAndContinueEditing(Browser $browser): void
+    public function updateAndContinueEditing(Browser $browser)
     {
         $browser->dismissToasted()
             ->waitFor('@update-and-continue-editing-button')
@@ -79,8 +88,11 @@ class Update extends Page
 
     /**
      * Click the cancel button.
+     *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
      */
-    public function cancel(Browser $browser): void
+    public function cancel(Browser $browser)
     {
         $browser->dismissToasted()
             ->click('@cancel-update-button');
@@ -88,8 +100,11 @@ class Update extends Page
 
     /**
      * Assert that the browser is on the page.
+     *
+     * @param  \Laravel\Dusk\Browser  $browser
+     * @return void
      */
-    public function assert(Browser $browser): void
+    public function assert(Browser $browser)
     {
         $browser->assertOk()->waitFor('@nova-form');
     }

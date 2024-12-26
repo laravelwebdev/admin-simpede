@@ -1,39 +1,31 @@
+import find from 'lodash/find'
+
 export default {
   computed: {
     /**
      * Get the resource information object for the current resource.
-     *
-     * @returns {object|null}
      */
     resourceInformation() {
-      return (
-        Nova.config('resources').find(resource => {
-          return resource.uriKey === this.resourceName
-        }) || null
-      )
+      return find(Nova.config('resources'), resource => {
+        return resource.uriKey === this.resourceName
+      })
     },
 
     /**
      * Get the resource information object for the current resource.
-     *
-     * @returns {object|null}
      */
     viaResourceInformation() {
       if (!this.viaResource) {
         return
       }
 
-      return (
-        Nova.config('resources').find(resource => {
-          return resource.uriKey === this.viaResource
-        }) || null
-      )
+      return find(Nova.config('resources'), resource => {
+        return resource.uriKey === this.viaResource
+      })
     },
 
     /**
      * Determine if the user is authorized to create the current resource.
-     *
-     * @returns {boolean}
      */
     authorizedToCreate() {
       if (

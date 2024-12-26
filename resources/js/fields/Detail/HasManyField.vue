@@ -20,7 +20,8 @@ export default {
   emits: ['actionExecuted'],
 
   props: {
-    ...mapProps(['resourceName', 'resourceId', 'field']),
+    ...mapProps(['resourceId', 'field']),
+    resourceName: {},
     resource: {},
   },
 

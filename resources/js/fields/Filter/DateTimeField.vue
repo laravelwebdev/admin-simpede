@@ -8,12 +8,13 @@
           }}</span>
 
           <input
+            @change="handleStartDateChange"
+            :value="startDateValue"
+            class="flex w-full form-control form-input form-control-bordered"
             ref="startField"
-            v-model="startValue"
+            :dusk="`${field.uniqueKey}-range-start`"
             type="datetime-local"
-            class="w-full flex form-control form-input form-control-bordered"
             :placeholder="__('Start')"
-            :dusk="`${filter.uniqueKey}-range-start`"
           />
         </label>
 
@@ -23,12 +24,13 @@
           }}</span>
 
           <input
+            @change="handleEndDateChange"
+            :value="endDateValue"
+            class="flex w-full form-control form-input form-control-bordered"
             ref="endField"
-            v-model="endValue"
+            :dusk="`${field.uniqueKey}-range-end`"
             type="datetime-local"
-            class="w-full flex form-control form-input form-control-bordered"
             :placeholder="__('End')"
-            :dusk="`${filter.uniqueKey}-range-end`"
           />
         </label>
       </div>
@@ -40,6 +42,7 @@
 import { DateTime } from 'luxon'
 import debounce from 'lodash/debounce'
 import filled from '@/util/filled'
+import { end } from '@popperjs/core'
 
 export default {
   emits: ['change'],
@@ -51,14 +54,15 @@ export default {
   },
 
   data: () => ({
-    startValue: null,
-    endValue: null,
-
-    debouncedEventEmitter: null,
+    startDateValue: null,
+    endDateValue: null,
+    debouncedStartDateHandleChange: null,
+    debouncedEndDateHandleChange: null,
+    debouncedEmit: null,
   }),
 
   created() {
-    this.debouncedEventEmitter = debounce(() => this.emitFilterChange(), 500)
+    this.debouncedEmit = debounce(() => this.emitChange(), 500)
     this.setCurrentFilterValue()
   },
 
@@ -70,25 +74,18 @@ export default {
     Nova.$off('filter-reset', this.handleFilterReset)
   },
 
-  watch: {
-    startValue() {
-      this.debouncedEventEmitter()
-    },
-
-    endValue() {
-      this.debouncedEventEmitter()
-    },
-  },
-
   methods: {
+    end() {
+      return end
+    },
     setCurrentFilterValue() {
       let [startValue, endValue] = this.filter.currentValue || [null, null]
 
-      this.startValue = filled(startValue)
+      this.startDateValue = filled(startValue)
         ? DateTime.fromISO(startValue).toFormat("yyyy-MM-dd'T'HH:mm")
         : null
 
-      this.endValue = filled(endValue)
+      this.endDateValue = filled(endValue)
         ? DateTime.fromISO(endValue).toFormat("yyyy-MM-dd'T'HH:mm")
         : null
     },
@@ -103,10 +100,20 @@ export default {
       return [startValue, endValue]
     },
 
-    emitFilterChange() {
+    handleStartDateChange(e) {
+      this.startDateValue = e.target.value
+      this.debouncedEmit()
+    },
+
+    handleEndDateChange(e) {
+      this.endDateValue = e.target.value
+      this.debouncedEmit()
+    },
+
+    emitChange() {
       this.$emit('change', {
         filterClass: this.filterKey,
-        value: this.validateFilter(this.startValue, this.endValue),
+        value: this.validateFilter(this.startDateValue, this.endDateValue),
       })
     },
 

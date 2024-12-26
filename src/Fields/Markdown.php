@@ -40,7 +40,7 @@ class Markdown extends Field implements DeletableContract, FilterableField, Prev
     /**
      * The built-in presets for the Markdown field.
      *
-     * @var array<string, class-string<\Laravel\Nova\Fields\Markdown\MarkdownPreset>>
+     * @var string[]
      */
     public $presets = [
         'default' => DefaultPreset::class,
@@ -51,9 +51,13 @@ class Markdown extends Field implements DeletableContract, FilterableField, Prev
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
+     * @param  string  $attribute
+     * @return void|\Closure
      */
-    protected function fillAttribute(NovaRequest $request, string $requestAttribute, object $model, string $attribute): ?callable
+    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         return $this->fillAttributeWithAttachment($request, $requestAttribute, $model, $attribute);
     }
@@ -71,6 +75,7 @@ class Markdown extends Field implements DeletableContract, FilterableField, Prev
     /**
      * Make the field filter.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -80,8 +85,10 @@ class Markdown extends Field implements DeletableContract, FilterableField, Prev
 
     /**
      * Prepare the field for JSON serialization.
+     *
+     * @return array
      */
-    public function serializeForFilter(): array
+    public function serializeForFilter()
     {
         return transform($this->jsonSerialize(), function ($field) {
             return Arr::only($field, [

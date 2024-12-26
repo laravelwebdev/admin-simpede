@@ -6,44 +6,38 @@
       class="flex items-center bg-gray-50 dark:bg-gray-800 py-2 px-3 rounded-t"
     >
       <div class="flex items-center space-x-2">
-        <Button
+        <IconButton
           v-if="sortable"
-          as="div"
-          size="small"
-          icon="arrow-up"
-          variant="ghost"
-          padding="tight"
-          @click="$emit('move-up', index)"
           dusk="row-move-up-button"
+          @click="$emit('move-up', index)"
+          iconType="arrow-up"
+          solid
+          small
         />
-        <Button
+        <IconButton
           v-if="sortable"
-          as="div"
-          size="small"
-          icon="arrow-down"
-          variant="ghost"
-          padding="tight"
-          @click="$emit('move-down', index)"
           dusk="row-move-down-button"
+          @click="$emit('move-down', index)"
+          iconType="arrow-down"
+          solid
+          small
         />
       </div>
 
-      <Button
-        as="div"
-        size="small"
-        icon="trash"
-        variant="ghost"
-        padding="tight"
-        @click.stop.prevent="beforeRemove"
+      <IconButton
         dusk="row-delete-button"
+        @click.stop.prevent="beforeRemove"
         class="ml-auto"
+        iconType="trash"
+        solid
+        small
       />
     </div>
 
     <div
       class="grid grid-cols-full divide-y divide-gray-100 dark:divide-gray-700"
     >
-      <div v-for="(field, fieldIndex) in item.fields" :key="field.uniqueKey">
+      <div v-for="(field, fieldIndex) in item.fields">
         <component
           :ref="fieldRefs[`fields.${field.attribute}`]"
           :is="'form-' + field.component"
@@ -69,10 +63,13 @@
 </template>
 
 <script setup>
-import { Button } from 'laravel-nova-ui'
 import { ref, provide, computed, inject } from 'vue'
-import { useLocalization } from '@/composables/useLocalization'
 import fromPairs from 'lodash/fromPairs'
+import first from 'lodash/first'
+import { useLocalization } from '@/composables/useLocalization'
+
+const emit = defineEmits(['click', 'move-up', 'move-down', 'file-deleted'])
+const { __ } = useLocalization()
 
 const props = defineProps({
   field: { type: Object, required: true },
@@ -82,10 +79,6 @@ const props = defineProps({
   sortable: { type: Boolean, required: false },
   viaParent: { type: String },
 })
-
-const emitter = defineEmits(['click', 'move-up', 'move-down', 'file-deleted'])
-
-const { __ } = useLocalization()
 
 provide(
   'viaParent',
@@ -118,6 +111,6 @@ const remove = () => {
     // await fieldRefs[k]?.value[0]?.beforeRemove?()
   })
 
-  emitter('click', props.index)
+  emit('click', props.index)
 }
 </script>

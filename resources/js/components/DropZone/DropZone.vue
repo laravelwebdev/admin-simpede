@@ -16,7 +16,6 @@
       <div v-if="files.length > 0" class="grid grid-cols-4 gap-x-6 gap-y-2">
         <FilePreviewBlock
           v-for="(file, index) in files"
-          :key="index"
           :file="file"
           @removed="() => handleRemove(index)"
           :rounded="rounded"
@@ -39,12 +38,7 @@
       >
         <div class="flex items-center space-x-4 pointer-events-none">
           <p class="text-center pointer-events-none">
-            <Button
-              as="div"
-              :leading-icon="
-                multiple ? 'arrow-up-on-square-stack' : 'arrow-up-tray'
-              "
-            >
+            <Button as="div">
               {{ multiple ? __('Choose Files') : __('Choose File') }}
             </Button>
           </p>
@@ -65,16 +59,13 @@
 </template>
 
 <script setup>
-import { Button } from 'laravel-nova-ui'
 import { ref } from 'vue'
 import { useLocalization } from '@/composables/useLocalization'
 import { useDragAndDrop } from '@/composables/useDragAndDrop'
+import { Button } from 'laravel-nova-ui'
 
-defineOptions({
-  inheritAttrs: false,
-})
-
-const emitter = defineEmits(['fileChanged', 'fileRemoved'])
+const emit = defineEmits(['fileChanged', 'fileRemoved'])
+const { __ } = useLocalization()
 
 const props = defineProps({
   files: { type: Array, default: [] },
@@ -84,10 +75,8 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
 })
 
-const { __ } = useLocalization()
-
 const { startedDrag, handleOnDragEnter, handleOnDragLeave } =
-  useDragAndDrop(emitter)
+  useDragAndDrop(emit)
 
 const demFiles = ref([])
 const fileInput = ref()
@@ -99,20 +88,26 @@ const handleOnDrop = e => {
     ? e.dataTransfer.files
     : [e.dataTransfer.files[0]]
 
-  emitter('fileChanged', demFiles.value)
+  emit('fileChanged', demFiles.value)
 }
 
 const handleChange = () => {
   demFiles.value = props.multiple
     ? fileInput.value.files
     : [fileInput.value.files[0]]
-  emitter('fileChanged', demFiles.value)
+  emit('fileChanged', demFiles.value)
   fileInput.value.files = null
 }
 
 const handleRemove = index => {
-  emitter('fileRemoved', index)
+  emit('fileRemoved', index)
   fileInput.value.files = null
   fileInput.value.value = null
+}
+</script>
+
+<script>
+export default {
+  inheritAttrs: false,
 }
 </script>

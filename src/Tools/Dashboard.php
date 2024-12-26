@@ -12,6 +12,7 @@ class Dashboard extends Tool
     /**
      * Build the menu that renders the navigation links for the tool.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function menu(Request $request)
@@ -19,16 +20,17 @@ class Dashboard extends Tool
         $dashboards = collect(Nova::availableDashboards($request));
 
         if ($dashboards->count() > 1) {
-            return MenuSection::make(
-                Nova::__('Dashboards'), $dashboards->map(fn ($dashboard) => $dashboard->menu($request))
-            )->collapsable()
-            ->icon('squares-2-x-2');
+            return MenuSection::make(Nova::__('Dashboards'), $dashboards->map(function ($dashboard) use ($request) {
+                return $dashboard->menu($request);
+            }))
+            ->collapsable()
+            ->icon('view-grid');
         }
 
         if ($dashboards->count() == 1) {
             return MenuSection::make($dashboards->first()->label(), $dashboards)
                 ->path("/dashboards/{$dashboards->first()->uriKey()}")
-                ->icon('squares-2-x-2');
+                ->icon('view-grid');
         }
     }
 }

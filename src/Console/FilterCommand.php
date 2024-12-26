@@ -54,7 +54,6 @@ class FilterCommand extends GeneratorCommand
      * @param  string  $rootNamespace
      * @return string
      */
-    #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Nova\Filters';
@@ -65,7 +64,6 @@ class FilterCommand extends GeneratorCommand
      *
      * @return array
      */
-    #[\Override]
     protected function getOptions()
     {
         return [

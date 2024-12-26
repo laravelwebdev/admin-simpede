@@ -19,19 +19,25 @@ interface FilterableField
     /**
      * Apply the filter to the given query.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder  $query
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  mixed  $value
+     * @return void
      */
-    public function applyFilter(NovaRequest $request, $query, mixed $value): void;
+    public function applyFilter(NovaRequest $request, $query, $value);
 
     /**
      * Make the field filter.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter|null
      */
     public function resolveFilter(NovaRequest $request);
 
     /**
      * Prepare the field for JSON serialization.
+     *
+     * @return array
      */
-    public function serializeForFilter(): array;
+    public function serializeForFilter();
 }

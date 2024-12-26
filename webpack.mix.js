@@ -1,5 +1,4 @@
 let mix = require('laravel-mix')
-let webpack = require('webpack')
 let tailwindcss = require('tailwindcss')
 let path = require('path')
 let postcssImport = require('postcss-import')
@@ -18,9 +17,8 @@ let postcssRtlcss = require('postcss-rtlcss')
 
 mix
   .js('resources/js/app.js', 'public')
-  .ts('resources/ui/ui.js', 'public/ui.js')
   .vue({ version: 3 })
-  // .sourceMaps()
+  .sourceMaps()
   .extract()
   .setPublicPath('public')
   .postCss('resources/css/app.css', 'public', [
@@ -30,22 +28,7 @@ mix
   ])
   .copy('resources/fonts/', 'public/fonts')
   .alias({ '@': path.join(__dirname, 'resources/js/') })
-  .webpackConfig({
-    externals: {
-      'laravel-nova-ui': 'LaravelNovaUi',
-    },
-    plugins: [
-      new webpack.DefinePlugin({
-        // Temporary fixes: https://github.com/vuejs/vue-cli/pull/7443
-        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
-      })
-    ],
-    resolve: {
-      symlinks: false,
-      alias: { vue: path.resolve("./node_modules/vue") }
-    },
-    output: { uniqueName: 'laravel/nova' }
-  })
+  .webpackConfig({ output: { uniqueName: 'laravel/nova' } })
   .options({
     vue: {
       exposeFilename: true,

@@ -28,9 +28,9 @@ class MultiSelect extends Field implements FilterableField
     /**
      * The field's options callback.
      *
-     * @var iterable<string|int, array<string, mixed>|string>|callable|null
+     * @var array<string|int, array<string, mixed>|string>|\Closure|callable|\Illuminate\Support\Collection|null
      *
-     * @phpstan-var TOption|(callable(): (TOption))|null
+     * @phpstan-var TOption|(callable(): (TOption))|(\Closure(): (TOption))|null
      */
     public $optionsCallback;
 
@@ -44,12 +44,12 @@ class MultiSelect extends Field implements FilterableField
     /**
      * Set the options for the select menu.
      *
-     * @param  iterable<string|int, array<string, mixed>|string>|callable  $options
+     * @param  array<string|int, array<string, mixed>|string>|\Closure|callable|\Illuminate\Support\Collection  $options
      * @return $this
      *
-     * @phpstan-param TOption|(callable(): (TOption)) $options
+     * @phpstan-param TOption|(callable(): (TOption))|(\Closure(): (TOption)) $options
      */
-    public function options(iterable|callable $options)
+    public function options($options)
     {
         $this->optionsCallback = $options;
 
@@ -71,10 +71,13 @@ class MultiSelect extends Field implements FilterableField
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
+     * @param  string  $attribute
+     * @return mixed
      */
-    #[\Override]
-    protected function fillAttributeFromRequest(NovaRequest $request, string $requestAttribute, object $model, string $attribute): void
+    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         if ($request->exists($requestAttribute)) {
             $value = $request[$requestAttribute];
@@ -86,6 +89,7 @@ class MultiSelect extends Field implements FilterableField
     /**
      * Make the field filter.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter
      */
     protected function makeFilter(NovaRequest $request)
@@ -96,7 +100,7 @@ class MultiSelect extends Field implements FilterableField
     /**
      * Define the default filterable callback.
      *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):\Illuminate\Contracts\Database\Eloquent\Builder
+     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed, string):\Illuminate\Database\Eloquent\Builder
      */
     protected function defaultFilterableCallback()
     {
@@ -107,8 +111,10 @@ class MultiSelect extends Field implements FilterableField
 
     /**
      * Prepare the field for JSON serialization.
+     *
+     * @return array
      */
-    public function serializeForFilter(): array
+    public function serializeForFilter()
     {
         return transform($this->jsonSerialize(), function ($field) {
             return Arr::only($field, [
@@ -148,7 +154,6 @@ class MultiSelect extends Field implements FilterableField
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         $this->withMeta([

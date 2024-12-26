@@ -1,5 +1,6 @@
+import { Errors } from 'form-backend-validation'
+import isNil from 'lodash/isNil'
 import { mapProps } from './propTypes'
-import { Errors } from '../util/FormValidation'
 
 export default {
   emits: ['file-upload-started', 'file-upload-finished'],
@@ -26,10 +27,7 @@ export default {
 
   methods: {
     /**
-     * Upload an attachment.
-     *
-     * @param {any} file
-     * @param {{onUploadProgress?: Function, onCompleted?: Function, onFailure?: Function}}
+     * Upload an attachment
      */
     uploadAttachment(file, { onUploadProgress, onCompleted, onFailure }) {
       const data = new FormData()
@@ -37,15 +35,15 @@ export default {
       data.append('attachment', file)
       data.append('draftId', this.draftId)
 
-      if (onUploadProgress == null) {
+      if (isNil(onUploadProgress)) {
         onUploadProgress = () => {}
       }
 
-      if (onFailure == null) {
+      if (isNil(onFailure)) {
         onFailure = () => {}
       }
 
-      if (onCompleted == null) {
+      if (isNil(onCompleted)) {
         throw 'Missing onCompleted parameter'
       }
 
@@ -83,9 +81,7 @@ export default {
     },
 
     /**
-     * Remove an attachment from the server.
-     *
-     * @param {string} url
+     * Remove an attachment from the server
      */
     flagFileForRemoval(url) {
       const fileIndex = this.files.findIndex(file => file.url === url)
@@ -98,11 +94,6 @@ export default {
       this.filesToRemove.push({ url })
     },
 
-    /**
-     * Unflag an attachment from removal.
-     *
-     * @param {string} url
-     */
     unflagFileForRemoval(url) {
       const fileIndex = this.filesToRemove.findIndex(file => file.url === url)
 
@@ -129,7 +120,7 @@ export default {
     clearFilesMarkedForRemoval() {
       if (this.field.withFiles) {
         this.filesToRemove.forEach(file => {
-          Nova.debug('deleting', file)
+          console.log('deleting', file)
           Nova.request()
             .delete(
               `/nova-api/${this.resourceName}/field-attachment/${this.fieldAttribute}`,
@@ -148,16 +139,14 @@ export default {
     },
 
     /**
-     * Fill draft id for the field.
-     *
-     * @param {FormData} formData
+     * Fill draft id for the field
      */
     fillAttachmentDraftId(formData) {
       let attribute = this.fieldAttribute
 
       let [name, ...nested] = attribute.split('[')
 
-      if (nested != null && nested.length > 0) {
+      if (!isNil(nested) && nested.length > 0) {
         let last = nested.pop()
 
         if (nested.length > 0) {

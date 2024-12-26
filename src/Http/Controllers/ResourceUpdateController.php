@@ -2,11 +2,9 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Laravel\Nova\Actions\ActionEvent;
 use Laravel\Nova\Exceptions\ResourceSaveCancelledException;
 use Laravel\Nova\Http\Requests\UpdateResourceRequest;
 use Laravel\Nova\Nova;
@@ -18,15 +16,20 @@ class ResourceUpdateController extends Controller
 {
     /**
      * The action event for the action.
+     *
+     * @var \Laravel\Nova\Actions\ActionEvent|null
      */
-    protected ?ActionEvent $actionEvent = null;
+    protected $actionEvent;
 
     /**
      * Create a new resource.
      *
+     * @param  \Laravel\Nova\Http\Requests\UpdateResourceRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException
      */
-    public function __invoke(UpdateResourceRequest $request): JsonResponse
+    public function __invoke(UpdateResourceRequest $request)
     {
         $model = $request->findModelQuery()->lockForUpdate()->firstOrFail();
 
@@ -68,6 +71,7 @@ class ResourceUpdateController extends Controller
 
             return response()->json([
                 'id' => $model->getKey(),
+                'resource' => $model->attributesToArray(),
                 'redirect' => URL::make($resource::redirectAfterUpdate($request, $resource)),
             ]);
         } catch (Throwable $e) {
@@ -79,9 +83,11 @@ class ResourceUpdateController extends Controller
     /**
      * Determine if the model has been updated since it was retrieved.
      *
+     * @param  \Laravel\Nova\Http\Requests\UpdateResourceRequest  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
      */
-    protected function modelHasBeenUpdatedSinceRetrieval(UpdateResourceRequest $request, $model): bool
+    protected function modelHasBeenUpdatedSinceRetrieval(UpdateResourceRequest $request, $model)
     {
         $resource = $request->newResource();
 

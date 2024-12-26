@@ -7,12 +7,12 @@
   />
 </template>
 
-<script setup>
+<script>
 import { mapProps } from '@/mixins'
 
-defineOptions({
+export default {
   name: 'Detail',
-})
 
-defineProps(mapProps(['resourceName', 'resourceId']))
+  props: mapProps(['resourceName', 'resourceId']),
+}
 </script>

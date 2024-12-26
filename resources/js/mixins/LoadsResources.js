@@ -4,9 +4,6 @@ export default {
   props: mapProps(['resourceName', 'viaRelationship']),
 
   computed: {
-    /**
-     * @returns {string}
-     */
     localStorageKey() {
       let name = this.resourceName
 

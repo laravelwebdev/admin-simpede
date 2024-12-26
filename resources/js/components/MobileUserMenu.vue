@@ -1,13 +1,13 @@
 <script setup>
 import { useStore } from 'vuex'
 import { computed } from 'vue'
-import { Icon } from 'laravel-nova-ui'
 import Badge from './Badges/Badge.vue'
 import identity from 'lodash/identity'
+import isNull from 'lodash/isNull'
 import omitBy from 'lodash/omitBy'
 import pickBy from 'lodash/pickBy'
 import { useLocalization } from '../composables/useLocalization'
-import { router } from '@inertiajs/vue3'
+import { Inertia } from '@inertiajs/inertia'
 
 const { __ } = useLocalization()
 
@@ -41,7 +41,7 @@ const formattedItems = computed(() => {
             data: i.data || null,
             headers: i.headers || null,
           },
-          value => value === null
+          isNull
         ),
         identity
       ),
@@ -70,16 +70,19 @@ const supportsAuthentication = computed(() => {
   )
 })
 
-const supportsUserSecurity = computed(() => Nova.hasSecurityFeatures())
+const hasUserMenu = computed(() => {
+  return (
+    store.getters.currentUser &&
+    (formattedItems.value.length > 0 ||
+      supportsAuthentication.value ||
+      store.getters.currentUser?.impersonating)
+  )
+})
 
 const handleStopImpersonating = () => {
   if (confirm(__('Are you sure you want to stop impersonating?'))) {
     store.dispatch('stopImpersonating')
   }
-}
-
-const visitUserSecurityPage = () => {
-  Nova.visit('/user-security')
 }
 
 const attempt = async () => {
@@ -94,7 +97,7 @@ const attempt = async () => {
 
         Nova.redirectToLogin()
       })
-      .catch(() => router.reload())
+      .catch(() => Inertia.reload())
   }
 }
 </script>
@@ -104,9 +107,10 @@ const attempt = async () => {
     <div class="flex flex-col gap-2">
       <div class="inline-flex items-center shrink-0 gap-2 px-2">
         <Icon
+          type="finger-print"
+          :solid="true"
           v-if="store.getters.currentUser?.impersonating"
-          name="finger-print"
-          type="solid"
+          class="w-7 h-7"
         />
         <img
           v-else-if="store.getters.currentUser?.avatar"
@@ -145,15 +149,6 @@ const attempt = async () => {
           class="block w-full py-2 px-2 text-gray-600 dark:text-gray-400 hover:opacity-50 text-left"
         >
           {{ __('Stop Impersonating') }}
-        </button>
-
-        <button
-          type="button"
-          v-if="supportsUserSecurity"
-          @click="visitUserSecurityPage"
-          class="block w-full py-2 px-2 text-gray-600 dark:text-gray-400 hover:opacity-50 text-left"
-        >
-          {{ __('User Security') }}
         </button>
 
         <button

@@ -13,12 +13,33 @@ class Breadcrumbs implements JsonSerializable
     use Makeable;
 
     /**
-     * Construct a new Breadcrumb instance.
+     * The breadcrumb's path.
+     *
+     * @var string|null
      */
-    public function __construct(
-        public ?iterable $items = null
-    ) {
-        //
+    public $items;
+
+    /**
+     * Construct a new Breadcrumb instance.
+     *
+     * @param  string|null  $items
+     */
+    public function __construct($items = null)
+    {
+        $this->items = $items;
+    }
+
+    /**
+     * Set breadcrumb's path.
+     *
+     * @param  string  $href
+     * @return $this
+     */
+    public function items($href)
+    {
+        $this->items = $href;
+
+        return $this;
     }
 
     /**

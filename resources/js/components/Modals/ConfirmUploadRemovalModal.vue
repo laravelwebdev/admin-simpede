@@ -12,15 +12,14 @@
       </ModalContent>
       <ModalFooter>
         <div class="ml-auto">
-          <Button
-            variant="link"
-            state="mellow"
+          <LinkButton
+            dusk="cancel-upload-delete-button"
+            type="button"
             @click.prevent="handleClose"
             class="mr-3"
-            dusk="cancel-upload-delete-button"
           >
             {{ __('Cancel') }}
-          </Button>
+          </LinkButton>
 
           <Button
             @click.prevent="handleConfirm"

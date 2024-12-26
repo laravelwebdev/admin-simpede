@@ -2,11 +2,12 @@
   <CustomAppError />
 </template>
 
-<script setup>
+<script>
 import Guest from '@/layouts/Guest'
 
-defineOptions({
+export default {
   name: 'AppErrorPage',
+
   layout: Guest,
-})
+}
 </script>

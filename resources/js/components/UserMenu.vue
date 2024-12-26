@@ -13,10 +13,10 @@
       <span class="inline-flex items-center shrink-0 gap-2">
         <span class="hidden lg:inline-block">
           <Icon
+            type="finger-print"
+            :solid="true"
             v-if="currentUser.impersonating"
-            name="finger-print"
-            type="solid"
-            class="!w-7 !h-7"
+            class="w-7 h-7"
           />
           <img
             v-else-if="currentUser.avatar"
@@ -35,49 +35,37 @@
     <template #menu>
       <DropdownMenu width="200" class="px-1">
         <nav class="py-1">
-          <div class="divide-y divide-gray-100 dark:divide-gray-700">
-            <div v-if="formattedItems.length > 0">
-              <component
-                :is="item.component"
-                v-for="item in formattedItems"
-                :key="item.path"
-                v-bind="item.props"
-                v-on="item.on"
-              >
-                <span v-if="item.badge" class="mr-1">
-                  <Badge :extra-classes="item.badge.typeClass">
-                    {{ item.badge.value }}
-                  </Badge>
-                </span>
+          <component
+            :is="item.component"
+            v-for="item in formattedItems"
+            :key="item.path"
+            v-bind="item.props"
+            v-on="item.on"
+          >
+            <span v-if="item.badge" class="mr-1">
+              <Badge :extra-classes="item.badge.typeClass">
+                {{ item.badge.value }}
+              </Badge>
+            </span>
 
-                {{ item.name }}
-              </component>
-            </div>
+            {{ item.name }}
+          </component>
 
-            <DropdownMenuItem
-              as="button"
-              v-if="currentUser.impersonating"
-              @click="handleStopImpersonating"
-            >
-              {{ __('Stop Impersonating') }}
-            </DropdownMenuItem>
+          <DropdownMenuItem
+            as="button"
+            v-if="currentUser.impersonating"
+            @click="handleStopImpersonating"
+          >
+            {{ __('Stop Impersonating') }}
+          </DropdownMenuItem>
 
-            <DropdownMenuItem
-              as="button"
-              v-if="supportsUserSecurity"
-              @click="visitUserSecurityPage"
-            >
-              {{ __('User Security') }}
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              as="button"
-              v-if="supportsAuthentication"
-              @click="attempt"
-            >
-              {{ __('Logout') }}
-            </DropdownMenuItem>
-          </div>
+          <DropdownMenuItem
+            as="button"
+            v-if="supportsAuthentication"
+            @click="attempt"
+          >
+            {{ __('Logout') }}
+          </DropdownMenuItem>
         </nav>
       </DropdownMenu>
     </template>
@@ -97,17 +85,17 @@
 </template>
 
 <script>
-import { Button, Icon } from 'laravel-nova-ui'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { router } from '@inertiajs/vue3'
+import { Inertia } from '@inertiajs/inertia'
 import identity from 'lodash/identity'
+import isNull from 'lodash/isNull'
 import omitBy from 'lodash/omitBy'
 import pickBy from 'lodash/pickBy'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
+import { Button } from 'laravel-nova-ui'
 
 export default {
   components: {
     Button,
-    Icon,
   },
 
   props: {
@@ -130,13 +118,9 @@ export default {
             Nova.redirectToLogin()
           })
           .catch(e => {
-            router.reload()
+            Inertia.reload()
           })
       }
-    },
-
-    visitUserSecurityPage() {
-      Nova.visit('/user-security')
     },
 
     handleStopImpersonating() {
@@ -190,7 +174,7 @@ export default {
                 headers: i.headers || null,
                 as: method === 'GET' ? 'link' : 'form-button',
               },
-              value => value === null
+              isNull
             ),
             identity
           ),
@@ -218,12 +202,12 @@ export default {
       )
     },
 
-    supportsUserSecurity() {
-      return Nova.hasSecurityFeatures()
-    },
-
     customLogoutPath() {
       return Nova.config('customLogoutPath')
+    },
+
+    componentName() {
+      return 'Dropdown'
     },
 
     dropdownPlacement() {

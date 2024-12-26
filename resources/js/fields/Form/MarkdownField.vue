@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import isNil from 'lodash/isNil'
 import {
   DependentFormField,
   HandlesFieldAttachments,
@@ -109,7 +110,7 @@ export default {
         {
           params: {
             editing: true,
-            editMode: this.resourceId == null ? 'create' : 'update',
+            editMode: isNil(this.resourceId) ? 'create' : 'update',
           },
         }
       )

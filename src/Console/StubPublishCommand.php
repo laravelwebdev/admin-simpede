@@ -28,13 +28,13 @@ class StubPublishCommand extends Command
      *
      * @return void
      */
-    public function handle(Filesystem $files)
+    public function handle()
     {
-        $stubsPath = $this->laravel->basePath('stubs/nova');
+        if (! is_dir($stubsPath = $this->laravel->basePath('stubs/nova'))) {
+            (new Filesystem)->makeDirectory($stubsPath, 0755, true);
+        }
 
-        $files->ensureDirectoryExists($stubsPath, 0755, true);
-
-        collect([
+        $files = [
             __DIR__.'/stubs/action.stub' => $stubsPath.'/action.stub',
             __DIR__.'/stubs/action.queued.stub' => $stubsPath.'/action.queued.stub',
             __DIR__.'/stubs/base-resource.stub' => $stubsPath.'/base-resource.stub',
@@ -51,12 +51,14 @@ class StubPublishCommand extends Command
             __DIR__.'/stubs/trend.stub' => $stubsPath.'/trend.stub',
             __DIR__.'/stubs/user-resource.stub' => $stubsPath.'/user-resource.stub',
             __DIR__.'/stubs/value.stub' => $stubsPath.'/value.stub',
-        ])->each(function ($to, $from) use ($files) {
-            if (! $files->exists($to) || $this->option('force')) {
-                $files->put($to, $files->get($from));
-            }
-        });
+        ];
 
-        $this->components->info('Nova stubs published successfully.');
+        foreach ($files as $from => $to) {
+            if (! file_exists($to) || $this->option('force')) {
+                file_put_contents($to, file_get_contents($from));
+            }
+        }
+
+        $this->info('Nova stubs published successfully.');
     }
 }

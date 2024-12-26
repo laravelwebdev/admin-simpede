@@ -78,10 +78,6 @@ const propTypes = {
   },
 }
 
-/**
- * @param {string[]} attributes
- * @returns {{[key: string]: object}}
- */
 export function mapProps(attributes) {
   return pick(propTypes, attributes)
 }

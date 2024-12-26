@@ -13,6 +13,6 @@ trait Actionable
      */
     public function actions()
     {
-        return $this->morphMany(Nova::actionResource()::$model, 'actionable');
+        return $this->morphMany(Nova::actionEvent(), 'actionable');
     }
 }

@@ -2,13 +2,25 @@
 
 namespace Laravel\Nova;
 
-use Closure;
 use JsonSerializable;
-use Stringable;
 
 class Badge implements JsonSerializable
 {
     use Makeable;
+
+    /**
+     * The value for the badge.
+     *
+     * @var string|\Closure
+     */
+    public $value;
+
+    /**
+     * The type for the badge.
+     *
+     * @var string
+     */
+    public $type;
 
     public const SUCCESS_TYPE = 'success';
 
@@ -23,7 +35,7 @@ class Badge implements JsonSerializable
      *
      * @var array<string, string>
      */
-    public static array $types = [
+    public static $types = [
         'success' => 'bg-green-100 text-green-600 dark:bg-green-500 dark:text-green-900',
         'info' => 'bg-sky-100 text-sky-600 dark:bg-sky-600 dark:text-sky-900',
         'danger' => 'bg-red-100 text-red-600 dark:bg-red-400 dark:text-red-900',
@@ -34,11 +46,10 @@ class Badge implements JsonSerializable
      * Create a new badge instance.
      *
      * @param  string  $value
+     * @param  string  $type
      */
-    public function __construct(
-        public Closure|Stringable|string $value,
-        public string $type = 'info'
-    ) {
+    public function __construct($value, $type = 'info')
+    {
         $this->value = $value;
         $this->type = $type;
     }
@@ -46,9 +57,10 @@ class Badge implements JsonSerializable
     /**
      * Set the type to be used for the badge.
      *
+     * @param  string  $type
      * @return $this
      */
-    public function type(string $type)
+    public function type($type)
     {
         $this->type = $type;
 

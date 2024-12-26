@@ -10,14 +10,14 @@ trait Filterable
     /**
      * The callback used to determine if the field is filterable.
      *
-     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):(void))|null
+     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed, string):(void))|null
      */
     public $filterableCallback;
 
     /**
      * The callback used to determine if the field is filterable.
      *
-     * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):(void))|null  $filterableCallback
+     * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed, string):(void))|null  $filterableCallback
      * @return $this
      */
     public function filterable(?callable $filterableCallback = null)
@@ -51,17 +51,22 @@ trait Filterable
     /**
      * Apply the filter to the given query.
      *
-     * @param  \Illuminate\Contracts\Database\Eloquent\Builder  $query
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  mixed  $value
+     * @return void
      */
-    public function applyFilter(NovaRequest $request, $query, mixed $value): void
+    public function applyFilter(NovaRequest $request, $query, $value)
     {
         call_user_func($this->filterableCallback, $request, $query, $value, $this->filterableAttribute($request));
     }
 
     /**
      * Prepare the field for JSON serialization.
+     *
+     * @return array
      */
-    public function serializeForFilter(): array
+    public function serializeForFilter()
     {
         return $this->jsonSerialize();
     }
@@ -69,6 +74,7 @@ trait Filterable
     /**
      * Make the field filter.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter|null
      */
     public function resolveFilter(NovaRequest $request)
@@ -79,7 +85,7 @@ trait Filterable
     /**
      * Define the default filterable callback.
      *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed):\Illuminate\Contracts\Database\Eloquent\Builder
+     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Builder, mixed):\Illuminate\Database\Eloquent\Builder
      */
     protected function defaultFilterableCallback()
     {
@@ -91,6 +97,7 @@ trait Filterable
     /**
      * Define filterable attribute.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return string
      */
     protected function filterableAttribute(NovaRequest $request)
@@ -101,6 +108,7 @@ trait Filterable
     /**
      * Make the field filter.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return \Laravel\Nova\Fields\Filters\Filter|null
      */
     abstract protected function makeFilter(NovaRequest $request);

@@ -16,12 +16,12 @@ class PasswordConfirmation extends Password
     /**
      * Create a new field.
      *
-     * @param  \Stringable|string  $name
-     * @param  string|callable|null  $attribute
+     * @param  string  $name
+     * @param  string|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
      * @return void
      */
-    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
+    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
@@ -31,10 +31,13 @@ class PasswordConfirmation extends Password
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
+     * @param  string  $attribute
+     * @return void
      */
-    #[\Override]
-    protected function fillAttribute(NovaRequest $request, string $requestAttribute, object $model, string $attribute): void
+    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         //
     }

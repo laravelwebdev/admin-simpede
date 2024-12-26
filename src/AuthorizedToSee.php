@@ -12,16 +12,17 @@ trait AuthorizedToSee
      *
      * @var (\Closure(\Illuminate\Http\Request):(bool))|null
      */
-    public $seeCallback = null;
+    public $seeCallback;
 
     /**
      * Determine if the filter or action should be available for the given request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function authorizedToSee(Request $request)
     {
-        return is_callable($this->seeCallback) ? call_user_func($this->seeCallback, $request) : true;
+        return $this->seeCallback ? call_user_func($this->seeCallback, $request) : true;
     }
 
     /**

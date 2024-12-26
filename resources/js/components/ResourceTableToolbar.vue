@@ -138,9 +138,7 @@
 import { Button } from 'laravel-nova-ui'
 
 export default {
-  components: {
-    Button,
-  },
+  components: { Button },
 
   emits: ['start-polling', 'stop-polling', 'deselect'],
 
@@ -197,7 +195,6 @@ export default {
     'updatePerPageChanged',
     'viaManyToMany',
     'viaResource',
-    'loading',
   ],
 
   computed: {

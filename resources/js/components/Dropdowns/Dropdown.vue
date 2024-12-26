@@ -18,10 +18,10 @@ import {
   ref,
   Teleport,
   Transition,
-  useId,
   watch,
   withModifiers,
 } from 'vue'
+import { useId } from '../../composables/useId'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { renderSlotFragments } from '../../util/renderSlotFragments'
 import { useCloseOnEsc } from '../../composables/useCloseOnEsc'
@@ -45,8 +45,6 @@ export default {
     const teleportedRef = ref(null)
     const menuRef = ref(null)
 
-    const dropdownId = useId()
-
     const { activate, deactivate } = useFocusTrap(menuRef, {
       initialFocus: false,
       allowOutsideClick: true,
@@ -69,9 +67,9 @@ export default {
     useCloseOnEsc(() => (menuShown.value = false))
 
     const dropdownButtonLabel = computed(
-      () => `nova-ui-dropdown-button-${dropdownId}`
+      () => `nova-ui-dropdown-button-${useId()}`
     )
-    const menuLabel = computed(() => `nova-ui-dropdown-menu-${dropdownId}`)
+    const menuLabel = computed(() => `nova-ui-dropdown-menu-${useId()}`)
 
     const resolvedPlacement = computed(() => {
       if (!Nova.config('rtlEnabled')) {

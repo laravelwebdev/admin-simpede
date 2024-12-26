@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\ResourceCreateOrAttachRequest;
 use Laravel\Nova\Http\Resources\CreateViewResource;
@@ -13,9 +12,10 @@ class CreationFieldSyncController extends Controller
     /**
      * Synchronize the field for creation view.
      *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @param  \Laravel\Nova\Http\Requests\ResourceCreateOrAttachRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(ResourceCreateOrAttachRequest $request): JsonResponse
+    public function __invoke(ResourceCreateOrAttachRequest $request)
     {
         $resource = $request->has('fromResourceId')
                         ? ReplicateViewResource::make($request->fromResourceId)->newResourceWith($request)

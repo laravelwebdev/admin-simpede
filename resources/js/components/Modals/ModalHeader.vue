@@ -6,3 +6,9 @@
     <slot />
   </Heading>
 </template>
+
+<script>
+export default {
+  //
+}
+</script>

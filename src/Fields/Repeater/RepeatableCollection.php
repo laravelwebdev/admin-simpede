@@ -37,7 +37,7 @@ class RepeatableCollection extends Collection
      * Return the first Repeatable by its model class.
      *
      * @param  class-string  $class
-     * @return callable|mixed|null
+     * @return \Closure|mixed|null
      */
     public function findByModelClass($class)
     {

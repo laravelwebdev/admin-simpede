@@ -35,9 +35,9 @@ class NovaExceptionHandler extends ExceptionHandler
      * Prepare exception for rendering.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    #[\Override]
     public function render($request, Throwable $e)
     {
         if (Util::isNovaRequest($request)) {

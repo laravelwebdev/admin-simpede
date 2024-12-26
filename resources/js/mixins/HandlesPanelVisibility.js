@@ -1,3 +1,6 @@
+import each from 'lodash/each'
+import filter from 'lodash/filter'
+
 export default {
   emits: ['field-shown', 'field-hidden'],
 
@@ -6,23 +9,17 @@ export default {
   }),
 
   created() {
-    this.panel.fields.forEach(field => {
+    each(this.panel.fields, field => {
       this.visibleFieldsForPanel[field.attribute] = field.visible
     })
   },
 
   methods: {
-    /**
-     * @param {string} field
-     */
     handleFieldShown(field) {
       this.visibleFieldsForPanel[field] = true
       this.$emit('field-shown', field)
     },
 
-    /**
-     * @param {string} field
-     */
     handleFieldHidden(field) {
       this.visibleFieldsForPanel[field] = false
       this.$emit('field-hidden', field)
@@ -30,12 +27,9 @@ export default {
   },
 
   computed: {
-    /**
-     * @returns {number}
-     */
     visibleFieldsCount() {
-      return Object.values(this.visibleFieldsForPanel).filter(
-        visible => visible === true
+      return Object.entries(
+        filter(this.visibleFieldsForPanel, visible => visible === true)
       ).length
     },
   },

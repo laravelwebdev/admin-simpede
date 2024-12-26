@@ -5,10 +5,10 @@
     <template #filter>
       <input
         class="w-full form-control form-input form-control-bordered"
-        v-bind="extraAttributes"
         v-model="value"
-        :id="filter.uniqueKey"
-        :dusk="filter.uniqueKey"
+        :id="field.uniqueKey"
+        :dusk="`${field.uniqueKey}-filter`"
+        v-bind="extraAttributes"
       />
     </template>
   </FilterContainer>
@@ -35,11 +35,11 @@ export default {
 
   data: () => ({
     value: null,
-    debouncedEventEmitter: null,
+    debouncedHandleChange: null,
   }),
 
   created() {
-    this.debouncedEventEmitter = debounce(() => this.emitFilterChange(), 500)
+    this.debouncedHandleChange = debounce(() => this.handleChange(), 500)
     this.setCurrentFilterValue()
   },
 
@@ -53,7 +53,7 @@ export default {
 
   watch: {
     value() {
-      this.debouncedEventEmitter()
+      this.debouncedHandleChange()
     },
   },
 
@@ -62,7 +62,7 @@ export default {
       this.value = this.filter.currentValue
     },
 
-    emitFilterChange() {
+    handleChange() {
       this.$emit('change', {
         filterClass: this.filterKey,
         value: this.value,

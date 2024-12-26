@@ -4,8 +4,8 @@
   </div>
 </template>
 
-<script setup>
-defineOptions({
-  name: 'Guest',
-})
+<script>
+export default {
+  //
+}
 </script>

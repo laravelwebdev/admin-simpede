@@ -4,7 +4,6 @@ namespace Laravel\Nova\Fields;
 
 use Closure;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Nova\Contracts\Deletable as DeletableContract;
 use Laravel\Nova\Contracts\Downloadable as DownloadableContract;
@@ -62,42 +61,44 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
     /**
      * The column where the file's original name should be stored.
      *
-     * @var string|null
+     * @var string
      */
-    public $originalNameColumn = null;
+    public $originalNameColumn;
 
     /**
      * Create a new field.
      *
-     * @param  \Stringable|string  $name
-     * @param  string|callable|null  $attribute
+     * @param  string  $name
+     * @param  string|null  $attribute
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, object, string, string, ?string, ?string):(mixed))|null  $storageCallback
      * @return void
      */
-    public function __construct($name, mixed $attribute = null, ?callable $storageCallback = null)
+    public function __construct($name, $attribute = null, $storageCallback = null)
     {
         parent::__construct($name, $attribute);
 
         $this->prepareStorageCallback($storageCallback);
 
-        $this->thumbnail(fn () => null)
-            ->preview(fn () => null)
-            ->download(function ($request, $model) {
-                return Storage::disk($this->getStorageDisk())->download($this->value);
-            })->delete(function () {
-                if ($this->value) {
-                    Storage::disk($this->getStorageDisk())->delete($this->value);
+        $this->thumbnail(function () {
+            return null;
+        })->preview(function () {
+            return null;
+        })->download(function ($request, $model) {
+            return Storage::disk($this->getStorageDisk())->download($this->value);
+        })->delete(function () {
+            if ($this->value) {
+                Storage::disk($this->getStorageDisk())->delete($this->value);
 
-                    return $this->columnsThatShouldBeDeleted();
-                }
-            });
+                return $this->columnsThatShouldBeDeleted();
+            }
+        });
     }
 
     /**
      * Set the name of the disk the file is stored on by default.
      *
      * @param  string  $disk
-     * @return never
+     * @return $this
      *
      * @throws \Exception
      */
@@ -143,8 +144,9 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
      * Prepare the storage callback.
      *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, object, string, string, ?string, ?string):(mixed))|null  $storageCallback
+     * @return void
      */
-    protected function prepareStorageCallback(?callable $storageCallback): void
+    protected function prepareStorageCallback($storageCallback)
     {
         $this->storageCallback = $storageCallback ?? function ($request, $model, $attribute, $requestAttribute) {
             return $this->mergeExtraStorageColumns($request, $requestAttribute, [
@@ -155,8 +157,12 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
 
     /**
      * Store the file on disk.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $requestAttribute
+     * @return string
      */
-    protected function storeFile(Request $request, string $requestAttribute): string
+    protected function storeFile($request, $requestAttribute)
     {
         return with($request->input('vaporFile')[$requestAttribute]['key'], function ($key) use ($request) {
             $fileName = $this->storeAsCallback
@@ -171,8 +177,13 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
 
     /**
      * Merge the specified extra file information columns into the storable attributes.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $requestAttribute
+     * @param  array  $attributes
+     * @return array
      */
-    protected function mergeExtraStorageColumns(Request $request, string $requestAttribute, array $attributes): array
+    protected function mergeExtraStorageColumns($request, string $requestAttribute, array $attributes)
     {
         if ($this->originalNameColumn) {
             $attributes[$this->originalNameColumn] = $request->input($requestAttribute);
@@ -183,8 +194,10 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
 
     /**
      * Get an array of the columns that should be deleted and their values.
+     *
+     * @return array
      */
-    protected function columnsThatShouldBeDeleted(): array
+    protected function columnsThatShouldBeDeleted()
     {
         $attributes = [$this->attribute => null];
 
@@ -198,9 +211,10 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
     /**
      * Specify the column where the file's original name should be stored.
      *
+     * @param  string  $column
      * @return $this
      */
-    public function storeOriginalName(string $column)
+    public function storeOriginalName($column)
     {
         $this->originalNameColumn = $column;
 
@@ -210,12 +224,16 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
     /**
      * Hydrate the given attribute on the model based on the incoming request.
      *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
+     * @param  string  $attribute
+     * @return mixed
      */
-    protected function fillAttribute(NovaRequest $request, string $requestAttribute, $model, string $attribute): mixed
+    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         if (is_null(optional($request->input('vaporFile'))[$requestAttribute])) {
-            return null;
+            return;
         }
 
         $hasExistingFile = ! is_null($this->getStoragePath());
@@ -231,7 +249,7 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
         );
 
         if ($result === true) {
-            return null;
+            return;
         }
 
         if ($result instanceof Closure) {
@@ -257,8 +275,6 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
                 );
             };
         }
-
-        return null;
     }
 
     /**
@@ -266,7 +282,6 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
      *
      * @return array<string, mixed>
      */
-    #[\Override]
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [

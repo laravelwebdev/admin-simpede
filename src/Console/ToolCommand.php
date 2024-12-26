@@ -30,13 +30,15 @@ class ToolCommand extends ComponentGeneratorCommand
      *
      * @return void
      */
-    public function handle(Filesystem $files)
+    public function handle()
     {
         if (! $this->hasValidNameArgument()) {
             return;
         }
 
-        $files->copyDirectory(
+        $noInteraction = $this->option('no-interaction');
+
+        (new Filesystem)->copyDirectory(
             __DIR__.'/tool-stubs',
             $this->componentPath()
         );
@@ -60,7 +62,7 @@ class ToolCommand extends ComponentGeneratorCommand
         $this->replace('{{ title }}', $this->componentTitle(), $this->componentPath().'/src/Tool.stub');
         $this->replace(['{{ component }}', '{{ name }}'], $this->componentName(), $this->componentPath().'/src/Tool.stub');
 
-        $files->move(
+        (new Filesystem)->move(
             $this->componentPath().'/src/Tool.stub',
             $this->componentPath().'/src/'.$this->componentClass().'.php'
         );

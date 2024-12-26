@@ -5,10 +5,10 @@
 
       <button type="button" @click="handleChange" class="p-0 m-0">
         <IconBoolean
+          :dusk="`${field.uniqueKey}-filter`"
           class="mt-2"
           :value="value"
           :nullable="true"
-          :dusk="filter.uniqueKey"
         />
       </button>
     </div>

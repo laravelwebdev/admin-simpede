@@ -40,7 +40,7 @@ abstract class Dashboard extends Element implements HasMenu
     /**
      * Get the displayable name of the dashboard.
      *
-     * @return \Stringable|string
+     * @return string
      */
     public function name()
     {
@@ -77,6 +77,7 @@ abstract class Dashboard extends Element implements HasMenu
     /**
      * Build the menu that renders the navigation links for the tool.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function menu(Request $request)
