@@ -49,7 +49,9 @@ class LoginController extends Controller
             return Inertia::location($loginPath);
         }
         $years = range(config('nova.initialyear'), date('Y'));
-        return Inertia::render('Nova.Login', ['years' => $years]);
+        return Inertia::render('Nova.Login', [
+            'years' => $years,
+        ]);
     }
 
     /**
