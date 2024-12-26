@@ -99,6 +99,7 @@
 import Auth from '@/layouts/Auth'
 import { Button, Checkbox } from 'laravel-nova-ui'
 
+defineProps({ years: Array })
 export default {
   name: 'LoginPage',
 
