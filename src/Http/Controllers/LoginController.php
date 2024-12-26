@@ -48,8 +48,8 @@ class LoginController extends Controller
         if ($loginPath = config('nova.routes.login', false)) {
             return Inertia::location($loginPath);
         }
-
-        return Inertia::render('Nova.Login', []);
+        $years = range(config('nova.initialyear'), date('Y'));
+        return Inertia::render('Nova.Login', ['years' => $years]);
     }
 
     /**

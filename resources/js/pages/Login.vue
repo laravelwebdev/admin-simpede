@@ -146,10 +146,6 @@ export default {
     forgotPasswordPath() {
       return Nova.config('forgotPasswordPath')
     },
-    years () {
-        const year = new Date().getFullYear()
-        return Array.from({length: year - 2023}, (value, index) => year - index)
-      },
   },
 }
 </script>
