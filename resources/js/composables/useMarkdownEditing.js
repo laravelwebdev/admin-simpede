@@ -8,7 +8,7 @@ const { __ } = useLocalization()
 
 const defineMarkdownCommands = (
   editor,
-  { props, emit, isFocused, filesUploadingCount, filesUploadedCount, files }
+  { props, emitter, isFocused, filesUploadingCount, filesUploadedCount, files }
 ) => {
   const doc = editor.getDoc()
 
@@ -95,7 +95,7 @@ const defineMarkdownCommands = (
             value = value.replace(placeholder, `![${path}](${url})`)
 
             doc.setValue(value)
-            emit('change', value)
+            emitter('change', value)
 
             filesUploadedCount.value = filesUploadedCount.value + 1
           },
@@ -179,7 +179,7 @@ const defineMarkdownKeyMaps = (editor, actions) => {
 const defineMarkdownEvents = (
   editor,
   commands,
-  { props, emit, isFocused, files, filesUploadingCount, filesUploadedCount }
+  { props, emitter, isFocused, files, filesUploadingCount, filesUploadedCount }
 ) => {
   const doc = editor.getDoc()
 
@@ -220,7 +220,7 @@ const defineMarkdownEvents = (
       return
     }
 
-    emit('change', cm.getValue())
+    emitter('change', cm.getValue())
   })
 
   doc.on(
@@ -231,11 +231,11 @@ const defineMarkdownEvents = (
       files.value
         .filter(file => !newFiles.includes(file))
         .filter((url, index, array) => array.indexOf(url) === index)
-        .forEach(file => emit('file-removed', file))
+        .forEach(file => emitter('file-removed', file))
       newFiles
         .filter(url => !files.value.includes(url))
         .filter((url, index, array) => array.indexOf(url) === index)
-        .forEach(file => emit('file-added', file))
+        .forEach(file => emitter('file-added', file))
       files.value = newFiles
     }, 1000)
   )
@@ -254,7 +254,7 @@ const defineMarkdownEvents = (
 const bootstrap = (
   theTextarea,
   {
-    emit,
+    emitter,
     props,
     isEditable,
     isFocused,
@@ -275,13 +275,14 @@ const bootstrap = (
       Enter: 'newlineAndIndentContinueMarkdownList',
     },
     readOnly: props.readonly,
+    autoRefresh: true,
   })
 
   const doc = editor.getDoc()
 
   const commands = defineMarkdownCommands(editor, {
     props,
-    emit,
+    emitter,
     isFocused,
     filesUploadingCount,
     filesUploadedCount,
@@ -293,7 +294,7 @@ const bootstrap = (
 
   defineMarkdownEvents(editor, commands, {
     props,
-    emit,
+    emitter,
     isFocused,
     files,
     filesUploadingCount,
@@ -321,7 +322,7 @@ const bootstrap = (
   }
 }
 
-export function useMarkdownEditing(emit, props) {
+export function useMarkdownEditing(emitter, props) {
   const isFullScreen = ref(false)
   const isFocused = ref(false)
   const previewContent = ref('')
@@ -368,7 +369,7 @@ export function useMarkdownEditing(emit, props) {
   return {
     createMarkdownEditor: (context, theTextarea) => {
       return bootstrap.call(context, theTextarea, {
-        emit,
+        emitter,
         props,
         isEditable,
         isFocused,

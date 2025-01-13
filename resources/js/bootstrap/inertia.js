@@ -1,18 +1,20 @@
 import { router } from '@inertiajs/vue3'
-import debounce from 'lodash/debounce'
 
 export function setupInertia(app, store) {
-  document.addEventListener('inertia:before', () => {
+  router.on('before', () => {
     ;(async () => {
       app.debug('Syncing Inertia props to the store via `inertia:before`...')
       await store.dispatch('assignPropsFromInertia')
     })()
   })
 
-  document.addEventListener('inertia:navigate', () => {
+  router.on('navigate', () => {
     ;(async () => {
       app.debug('Syncing Inertia props to the store via `inertia:navigate`...')
       await store.dispatch('assignPropsFromInertia')
     })()
   })
+
+  router.on('start', () => app.$progress.start())
+  router.on('finish', () => app.$progress.done())
 }

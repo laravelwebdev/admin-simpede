@@ -56,6 +56,7 @@ export default {
         lineWrapping: true,
         lineNumbers: true,
         theme: 'dracula',
+        autoRefresh: true,
         ...{ readOnly: this.currentlyIsReadonly },
         ...this.currentField.options,
       }

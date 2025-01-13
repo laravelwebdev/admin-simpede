@@ -278,6 +278,8 @@ class Action implements JsonSerializable
     /**
      * Return a redirect response from the action.
      *
+     * @no-named-arguments
+     *
      * @param  (\Closure():(string))|(\Closure(\Illuminate\Database\Eloquent\Model):(string))|string|null  $url
      */
     public static function redirect(Stringable|string $name, Closure|string|null $url = null): static|ActionResponse
@@ -341,6 +343,8 @@ class Action implements JsonSerializable
     /**
      * Return a Inertia visit from the action.
      *
+     * @no-named-arguments
+     *
      * @template TVisit of \Laravel\Nova\URL|string
      * @template TQueryString of array<string, mixed>
      *
@@ -371,6 +375,8 @@ class Action implements JsonSerializable
 
     /**
      * Return an open in new tab response from the action.
+     *
+     * @no-named-arguments
      *
      * @param  (\Closure():(string))|(\Closure(\Illuminate\Database\Eloquent\Model):(string))|string|null  $url
      */
@@ -430,6 +436,8 @@ class Action implements JsonSerializable
 
     /**
      * Return an action modal response from the action.
+     *
+     * @no-named-arguments
      *
      * @param  string|array<string, mixed>  $modal
      * @param  (\Closure():(array<string, mixed>))|(\Closure(\Illuminate\Database\Eloquent\Model):(array<string, mixed>))|array<string, mixed>  $data
@@ -557,6 +565,8 @@ class Action implements JsonSerializable
 
     /**
      * Return a dangerous message response from the action.
+     *
+     * @no-named-arguments
      */
     public static function danger(Stringable|string $name, ?string $message = null): static|ActionResponse
     {

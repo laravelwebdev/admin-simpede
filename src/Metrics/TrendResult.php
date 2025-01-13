@@ -5,6 +5,9 @@ namespace Laravel\Nova\Metrics;
 use JsonSerializable;
 use Stringable;
 
+/**
+ * @phpstan-import-type TNumbroFormat from \Laravel\Nova\Metrics\ValueResult
+ */
 class TrendResult implements JsonSerializable
 {
     use TransformsResults;
@@ -167,9 +170,12 @@ class TrendResult implements JsonSerializable
     /**
      * Set the metric value formatting.
      *
+     * @param  array<string, mixed>|string  $format
      * @return $this
+     *
+     * @phpstan-param TNumbroFormat|string  $format
      */
-    public function format(string $format)
+    public function format(array|string $format)
     {
         $this->format = $format;
 

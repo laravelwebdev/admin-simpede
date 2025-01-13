@@ -130,6 +130,7 @@ class NovaCoreServiceProvider extends ServiceProvider
                 app(ImpersonatesUsers::class)->flushImpersonationData(request());
             });
 
+            /** @phpstan-ignore class.notFound */
             $event->listen(RequestReceived::class, function ($event) {
                 Nova::flushState();
                 /** @phpstan-ignore class.notFound */

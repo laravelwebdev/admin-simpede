@@ -95,6 +95,10 @@
   </div>
 </template>
 
+<script setup>
+defineProps({ years: Array })
+</script>
+
 <script>
 import Auth from '@/layouts/Auth'
 import { Button, Checkbox } from 'laravel-nova-ui'
@@ -168,10 +172,7 @@ export default {
     forgotPasswordPath() {
       return Nova.config('forgotPasswordPath')
     },
-    years () {
-      const year = new Date().getFullYear()
-      return Array.from({length: year - 2023}, (value, index) => year - index)
-    },
+    
   },
 }
 </script>

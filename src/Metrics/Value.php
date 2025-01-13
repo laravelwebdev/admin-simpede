@@ -206,8 +206,8 @@ abstract class Value extends RangedMetric
     protected function previousQuarterRange(string $timezone): array
     {
         return [
-            CarbonImmutable::now($timezone)->subQuarterWithOverflow()->startOfQuarter(),
-            CarbonImmutable::now($timezone)->subQuarterWithOverflow()->subSecond(),
+            CarbonImmutable::now($timezone)->subQuarterWithoutOverflow()->startOfQuarter(),
+            CarbonImmutable::now($timezone)->subQuarterWithoutOverflow()->subSecond(),
         ];
     }
 

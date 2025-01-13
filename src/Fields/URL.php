@@ -26,7 +26,8 @@ class URL extends Text
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
-        $this->textAlign(Field::CENTER_ALIGN);
+        $this->textAlign(Field::CENTER_ALIGN)
+            ->withAutoCompletion('url');
     }
 
     /**

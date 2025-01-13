@@ -33,7 +33,7 @@ class LensViewResource extends Resource
 
         return [
             'name' => $lens->name(),
-            'resources' => $resources = $request->toResources($paginator->getCollection()),
+            'resources' => $resources = $request->toResources($paginator->getCollection()), // @phpstan-ignore method.notFound
             'prev_page_url' => $paginator->previousPageUrl(),
             'next_page_url' => $paginator->nextPageUrl(),
             'per_page' => $paginator->perPage(),

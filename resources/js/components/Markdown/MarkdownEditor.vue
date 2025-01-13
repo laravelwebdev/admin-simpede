@@ -1,6 +1,6 @@
 <template>
   <div
-    :dusk="id"
+    :dusk="attribute"
     class="bg-white dark:bg-gray-900 rounded-lg"
     :class="{
       'markdown-fullscreen fixed inset-0 z-50 overflow-x-hidden overflow-y-auto':
@@ -65,7 +65,7 @@
         @change.prevent="handleFileSelectionClick"
         class="cursor-pointer block bg-gray-100 dark:bg-gray-700 text-gray-400 text-xxs px-2 py-1"
         :class="{ hidden: isFullScreen }"
-        :dusk="`${id}-file-picker`"
+        :dusk="`${attribute}-file-picker`"
       >
         <span>{{ statusContent }}</span>
         <input
@@ -107,7 +107,7 @@ const emitter = defineEmits([
 ])
 
 const props = defineProps({
-  id: { type: String, required: true },
+  attribute: { type: String, required: true },
   readonly: { type: Boolean, default: false },
   previewer: { type: [Object, Function], required: false, default: null },
   uploader: { type: [Object, Function], required: false, default: null },

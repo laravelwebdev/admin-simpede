@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Fields;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Resource;
@@ -51,7 +52,7 @@ trait HasDownload
     /**
      * Create an HTTP response to download the underlying field.
      */
-    public function toDownloadResponse(NovaRequest $request, Resource $resource): Response|StreamedResponse
+    public function toDownloadResponse(NovaRequest $request, Resource $resource): Response|RedirectResponse|StreamedResponse
     {
         return call_user_func(
             $this->downloadResponseCallback,

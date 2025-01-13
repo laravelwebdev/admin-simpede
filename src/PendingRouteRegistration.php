@@ -62,6 +62,11 @@ class PendingRouteRegistration
     public bool $withDefaultAuthentication = false;
 
     /**
+     * Indicate if Nova is being used to handle e-mail verification.
+     */
+    public bool $withEmailVerification = false;
+
+    /**
      * The authentications middlewares.
      *
      * @var array<int, class-string|string>
@@ -140,6 +145,30 @@ class PendingRouteRegistration
 
         $this->forgotPasswordPath = $forgotPassword;
         $this->resetPasswordPath = $resetPassword;
+
+        return $this;
+    }
+
+    /**
+     * Register Nova with e-mail verification routes.
+     *
+     * @return $this
+     */
+    public function withEmailVerificationRoutes()
+    {
+        $this->withEmailVerification = true;
+
+        return $this;
+    }
+
+    /**
+     * Register Nova without e-mail verification routes.
+     *
+     * @return $this
+     */
+    public function withoutEmailVerificationRoutes()
+    {
+        $this->withEmailVerification = false;
 
         return $this;
     }
@@ -254,30 +283,29 @@ class PendingRouteRegistration
      */
     protected function bootstrapEmailVerificationRoutes(Application $app): void
     {
-        if (! Nova::fortify()->enabled(Features::emailVerification())) {
+        if (! Nova::fortify()->enabled(Features::emailVerification()) || $this->withEmailVerification === false) {
             return;
         }
 
         $verificationLimiter = config('fortify.limiters.verification', '6,1');
         $middlewares = [...$this->authenticationMiddlewares, 'nova.auth'];
         $middlewaresWithLimiter = [...$middlewares, "throttle:{$verificationLimiter}"];
+        $hasVerifyRoute = Route::has('verification.verify');
 
         Nova::router(middleware: $middlewares)
             ->get('/email/verify', EmailVerificationPromptController::class)
             ->name('nova.pages.verification.notice');
 
         Nova::router(middleware: $middlewaresWithLimiter)
-            ->as('nova.pages.')
-            ->group(function (Router $router) {
-                $router->get('/email/verify/{id}/{hash}', VerifyEmailController::class)->name('verification.verify');
-                $router->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])->name('verification.send');
-            });
+            ->group(function (Router $router) use ($hasVerifyRoute) {
+                if (! $hasVerifyRoute) {
+                    $router->get('/email/verify/{id}/{hash}', VerifyEmailController::class)
+                        ->name('verification.verify');
+                }
 
-        if (! (Fortify::$registersRoutes === true || Route::has('verification.verify'))) {
-            Nova::router(middleware: $middlewaresWithLimiter)
-                ->get('/email/verify/{id}/{hash}', VerifyEmailController::class)
-                ->name('verification.verify');
-        }
+                $router->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+                    ->name('nova.pages.verification.send');
+            });
     }
 
     /**

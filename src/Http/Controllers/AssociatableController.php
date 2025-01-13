@@ -30,15 +30,17 @@ class AssociatableController extends Controller
         $shouldReorderAssociatableValues = $field->shouldReorderAssociatableValues($request) && ! $associatedResource::usesScout();
 
         $query = method_exists($field, 'searchAssociatableQuery')
-            ? $field->searchAssociatableQuery($request, $withTrashed)
-            : $field->buildAssociatableQuery($request, $withTrashed);
+            ? $field->searchAssociatableQuery($request, $associatedResource, $withTrashed)
+            : $field->buildAssociatableQuery($request, $associatedResource, $withTrashed);
 
         return [
             'resources' => $query->take($limit)
                         ->get()
-                        ->mapInto($field->resourceClass)
-                        ->filter->authorizedToAdd($request, $request->model())
-                        ->map(fn ($resource) => $field->formatAssociatableResource($request, $resource))
+                        ->mapInto($associatedResource)
+                        ->when(
+                            $request->isCreateOrAttachRequest() || $request->isUpdateOrUpdateAttachedRequest(),
+                            fn ($resources) => $resources->filter->authorizedToAdd($request, $request->model())
+                        )->map(fn ($resource) => $field->formatAssociatableResource($request, $resource))
                         ->when($shouldReorderAssociatableValues, fn ($collection) => $collection->sortBy('display'))
                         ->values(),
             'softDeletes' => $associatedResource::softDeletes(),

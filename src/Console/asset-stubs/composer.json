@@ -12,7 +12,7 @@
     },
     "require-dev": {
         "laravel/nova": "^5.0",
-        "laravel/nova-devtool": "^1.1"
+        "laravel/nova-devtool": "^1.2"
     },
     "repositories": [
         { "type": "composer", "url": "https://nova.laravel.com" }

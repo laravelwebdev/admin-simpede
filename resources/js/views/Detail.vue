@@ -37,7 +37,9 @@
         :resource="resource"
         :resource-id="resourceId"
         :resource-name="resourceName"
-        :class="{ 'mb-8': panel.withToolbar && panel.fields.length > 0 }"
+        :class="{
+          'mb-8': panel.fields.length > 0,
+        }"
       >
         <div v-if="panel.showToolbar" class="md:flex items-center mb-3">
           <div class="flex flex-auto truncate items-center">

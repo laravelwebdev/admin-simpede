@@ -15,6 +15,7 @@
           :id="currentField.uniqueKey"
           :dusk="field.attribute"
           :disabled="currentlyIsReadonly"
+          :autocomplete="currentField.autocomplete"
           :maxlength="field.enforceMaxlength ? field.maxlength : -1"
         />
 

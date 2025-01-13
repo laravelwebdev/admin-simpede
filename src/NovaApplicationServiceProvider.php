@@ -17,9 +17,6 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->bootAuthentication();
-        $this->bootRoutes();
-
         Nova::serving(function (ServingNova $event) {
             $this->authorization();
             $this->registerExceptionHandler();
@@ -76,6 +73,7 @@ class NovaApplicationServiceProvider extends ServiceProvider
         Nova::routes()
             ->withAuthenticationRoutes()
             ->withPasswordResetRoutes()
+            ->withoutEmailVerificationRoutes()
             ->register();
     }
 
@@ -154,5 +152,10 @@ class NovaApplicationServiceProvider extends ServiceProvider
     public function register()
     {
         $this->fortify();
+
+        $this->booted(function () {
+            $this->bootAuthentication();
+            $this->bootRoutes();
+        });
     }
 }

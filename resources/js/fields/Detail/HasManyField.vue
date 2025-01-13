@@ -5,11 +5,12 @@
     :via-resource="resourceName"
     :via-resource-id="resourceId"
     :via-relationship="field.hasManyRelationship"
-    :relationship-type="'hasMany'"
+    relationship-type="hasMany"
     @actionExecuted="actionExecuted"
     :load-cards="false"
     :initialPerPage="field.perPage || 5"
     :should-override-meta="false"
+    :collapsable="field.collapsable"
   />
 </template>
 

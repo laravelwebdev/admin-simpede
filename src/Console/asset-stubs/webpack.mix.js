@@ -13,3 +13,4 @@ mix
     '@': path.join(__dirname, 'resources/js/'),
   })
   .nova('{{ name }}')
+  .version()

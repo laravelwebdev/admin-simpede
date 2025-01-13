@@ -10,7 +10,7 @@
         ref="theMarkdownEditor"
         v-show="currentlyIsVisible"
         :class="{ 'form-control-bordered-error': hasError }"
-        :id="field.attribute"
+        :attribute="field.attribute"
         :previewer="previewer"
         :uploader="uploader"
         :readonly="currentlyIsReadonly"
@@ -27,6 +27,7 @@
 import {
   DependentFormField,
   HandlesFieldAttachments,
+  HandlesFieldPreviews,
   HandlesValidationErrors,
   mapProps,
 } from '@/mixins'
@@ -35,6 +36,7 @@ export default {
   mixins: [
     HandlesValidationErrors,
     HandlesFieldAttachments,
+    HandlesFieldPreviews,
     DependentFormField,
   ],
 
@@ -96,27 +98,6 @@ export default {
       }
 
       this.handleChange(value)
-    },
-
-    async fetchPreviewContent(value) {
-      Nova.$progress.start()
-
-      const {
-        data: { preview },
-      } = await Nova.request().post(
-        `/nova-api/${this.resourceName}/field/${this.fieldAttribute}/preview`,
-        { value },
-        {
-          params: {
-            editing: true,
-            editMode: this.resourceId == null ? 'create' : 'update',
-          },
-        }
-      )
-
-      Nova.$progress.done()
-
-      return preview
     },
   },
 

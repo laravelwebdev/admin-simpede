@@ -3,7 +3,7 @@
     :field="currentField"
     :errors="errors"
     :full-width-content="fullWidthContent"
-    :key="index"
+    :key="trixIndex"
     :show-help-text="showHelpText"
   >
     <template #field>
@@ -41,7 +41,7 @@ export default {
     DependentFormField,
   ],
 
-  data: () => ({ index: 0 }),
+  data: () => ({ trixIndex: 0 }),
 
   mounted() {
     Nova.$on(this.fieldAttributeValueEventName, this.listenToValueChanges)
@@ -105,11 +105,11 @@ export default {
 
     onSyncedField() {
       this.handleChange(this.currentField.value ?? this.value)
-      this.index++
+      this.trixIndex++
     },
 
     listenToValueChanges(value) {
-      this.index++
+      this.trixIndex++
     },
   },
 

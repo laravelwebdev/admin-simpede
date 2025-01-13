@@ -17,6 +17,8 @@ class UpdateViewResource extends Resource
     {
         $resource = $this->newResourceWith($request);
 
+        $resource->authorizeToUpdate($request);
+
         return [
             'title' => (string) $resource->title(),
             'fields' => $fields = $resource->updateFieldsWithinPanels($request, $resource)->applyDependsOnWithDefaultValues($request),
@@ -33,11 +35,11 @@ class UpdateViewResource extends Resource
      */
     public function newResourceWith(ResourceUpdateOrUpdateAttachedRequest $request): NovaResource
     {
-        return tap($request->newResourceWith(
+        return $request->newResourceWith(
             tap($request->findModelQuery(), function ($query) use ($request) {
                 $resource = $request->resource();
                 $resource::editQuery($request, $query);
             })->firstOrFail()
-        ))->authorizeToUpdate($request);
+        );
     }
 }

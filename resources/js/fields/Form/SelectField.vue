@@ -21,6 +21,7 @@
         :mode="mode"
         class="w-full"
         :dusk="`${field.attribute}-search-input`"
+        :autocomplete="currentField.autocomplete"
       >
         <!-- The Selected Option Slot -->
         <div v-if="selectedOption" class="flex items-center">

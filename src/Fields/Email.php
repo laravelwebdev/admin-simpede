@@ -35,6 +35,8 @@ class Email extends Text implements FilterableField
         }
 
         parent::__construct($name ?? Nova::__('Email'), $attribute, $resolveCallback);
+
+        $this->withAutoCompletion('email');
     }
 
     /**

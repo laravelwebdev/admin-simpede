@@ -13,6 +13,7 @@ class Text extends Field implements FilterableField
     use Copyable;
     use FieldFilterable;
     use HasSuggestions;
+    use SupportsAutoCompletion;
     use SupportsDependentFields;
     use SupportsMaxlength;
 

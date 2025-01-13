@@ -3,6 +3,7 @@
     :resourceName="resourceName"
     :shouldOverrideMeta="true"
     :shouldEnableShortcut="true"
+    :collapsable="false"
   />
 </template>
 

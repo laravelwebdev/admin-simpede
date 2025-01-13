@@ -7,13 +7,13 @@
       @keydown.down.prevent="open"
       @keydown.up.prevent="open"
       :class="{
-        'ring dark:border-gray-500 dark:ring-gray-700': showSearchInput,
+        'ring dark:border-gray-500 dark:ring-gray-700': dropdownShown,
         'form-input-border-error': error,
         'bg-gray-50 dark:bg-gray-700': disabled || readOnly,
       }"
       class="relative flex items-center form-control form-input form-control-bordered form-select pr-6"
-      :tabindex="showSearchInput ? -1 : 0"
-      :aria-expanded="showSearchInput === true ? 'true' : 'false'"
+      :tabindex="dropdownShown ? -1 : 0"
+      :aria-expanded="dropdownShown === true ? 'true' : 'false'"
       :dusk="`${dusk}-selected`"
     >
       <span
@@ -53,7 +53,7 @@
 
   <teleport to="body">
     <div
-      v-if="showSearchInput"
+      v-if="dropdownShown"
       ref="dropdown"
       class="rounded-lg px-0 bg-white dark:bg-gray-900 shadow border border-gray-200 dark:border-gray-700 absolute top-0 left-0 my-1 overflow-hidden"
       :style="{ width: inputWidth + 'px', zIndex: 2000 }"
@@ -62,7 +62,7 @@
       <!-- Search Input -->
       <input
         :disabled="disabled || readOnly"
-        v-model="searchValue"
+        v-model="searchText"
         ref="search"
         @keydown.enter.prevent="chooseSelected"
         @keydown.down.prevent="move(1)"
@@ -70,8 +70,9 @@
         class="h-10 outline-none w-full px-3 text-sm leading-normal bg-white dark:bg-gray-700 rounded-t border-b border-gray-200 dark:border-gray-800"
         tabindex="-1"
         type="search"
-        :placeholder="__('Search')"
+        :autocomplete="autocomplete"
         spellcheck="false"
+        :placeholder="__('Search')"
       />
 
       <!-- Search Results -->
@@ -107,11 +108,7 @@
       </div>
     </div>
 
-    <Backdrop
-      @click="close"
-      :show="showSearchInput"
-      :style="{ zIndex: 1999 }"
-    />
+    <Backdrop @click="close" :show="dropdownShown" :style="{ zIndex: 1999 }" />
   </teleport>
 </template>
 
@@ -130,6 +127,7 @@ import debounce from 'lodash/debounce'
 import get from 'lodash/get'
 import findIndex from 'lodash/findIndex'
 import { mapProps } from '@/mixins'
+import { useEventListener } from '@vueuse/core'
 
 defineOptions({
   inheritAttrs: false,
@@ -138,6 +136,7 @@ defineOptions({
 const emitter = defineEmits(['clear', 'input', 'shown', 'closed', 'selected'])
 
 const props = defineProps({
+  autocomplete: { type: String, required: false, default: null },
   dusk: { type: String, required: true },
   disabled: { type: Boolean, default: false },
   readOnly: { type: Boolean, default: false },
@@ -153,8 +152,8 @@ const props = defineProps({
 const modelValue = defineModel()
 
 const debouncer = debounce(callback => callback(), props.debounce)
-const showSearchInput = ref(false)
-const searchValue = ref('')
+const dropdownShown = ref(false)
+const searchText = ref('')
 const selectedOptionIndex = ref(0)
 const popper = ref(null)
 const inputWidth = ref(null)
@@ -165,7 +164,7 @@ const inputRef = useTemplateRef('input')
 const searchRef = useTemplateRef('search')
 const selectedRef = useTemplateRef('selected')
 
-watch(searchValue, search => {
+watch(searchText, newValue => {
   selectedOptionIndex.value = 0
   if (containerRef.value) {
     containerRef.value.scrollTop = 0
@@ -176,11 +175,11 @@ watch(searchValue, search => {
   }
 
   debouncer(() => {
-    emitter('input', search)
+    emitter('input', newValue)
   })
 })
 
-watch(showSearchInput, show => {
+watch(dropdownShown, show => {
   if (show) {
     let selected = findIndex(props.options, [
       props.trackBy,
@@ -209,20 +208,21 @@ watch(showSearchInput, show => {
   }
 })
 
-onBeforeMount(() => {
-  document.addEventListener('keydown', handleEscape)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('keydown', handleEscape)
-})
-
-function handleEscape(event) {
+// Lifecycle Methods
+useEventListener(document, 'keydown', event => {
   // 'tab' or 'escape'
-  if (showSearchInput.value && (event.keyCode == 9 || event.keyCode == 27)) {
+  if (dropdownShown.value && [9, 27].includes(event.keyCode)) {
     setTimeout(() => close(), 50)
+
+    return
   }
-}
+
+  if (event.composed && [13, 229].includes(event.keyCode)) {
+    searchText.value = event.target.value
+
+    return
+  }
+})
 
 function getTrackedByKey(option) {
   return get(option, props.trackBy)
@@ -230,14 +230,14 @@ function getTrackedByKey(option) {
 
 function open() {
   if (!props.disabled && !props.readOnly) {
-    showSearchInput.value = true
-    searchValue.value = ''
+    dropdownShown.value = true
+    searchText.value = ''
     emitter('shown')
   }
 }
 
 function close() {
-  showSearchInput.value = false
+  dropdownShown.value = false
   emitter('closed')
 }
 

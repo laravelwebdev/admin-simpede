@@ -190,7 +190,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
         }
 
         $model = suggest(
-            'What model should this resource be for? (Optional)',
+            'Which model is this resource for? (Optional)',
             $this->possibleModels()
         );
 

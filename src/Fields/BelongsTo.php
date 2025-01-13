@@ -2,12 +2,10 @@
 
 namespace Laravel\Nova\Fields;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Laravel\Nova\Contracts\FilterableField;
-use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Contracts\RelatableField;
 use Laravel\Nova\Fields\Filters\BelongsToFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -15,7 +13,6 @@ use Laravel\Nova\Http\Requests\ResourceIndexRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
 use Laravel\Nova\Rules\Relatable;
-use Laravel\Nova\TrashedStatus;
 use Laravel\Nova\Util;
 use Stringable;
 
@@ -215,7 +212,7 @@ class BelongsTo extends Field implements FilterableField, RelatableField
     public function getRules(NovaRequest $request): array
     {
         $query = $this->buildAssociatableQuery(
-            $request, $request->{$this->attribute.'_trashed'} === 'true'
+            $request, $this->resourceClass, $request->{$this->attribute.'_trashed'} === 'true'
         )->toBase();
 
         return array_merge_recursive(parent::getRules($request), [
@@ -283,49 +280,6 @@ class BelongsTo extends Field implements FilterableField, RelatableField
                 $relation->associate($relation->getQuery()->withoutGlobalScopes()->find($value));
             }
         }
-    }
-
-    /**
-     * Build an associatable query for the field.
-     */
-    public function searchAssociatableQuery(NovaRequest $request, bool $withTrashed = false): QueryBuilder
-    {
-        /** @var \Illuminate\Database\Eloquent\Model $model */
-        $model = forward_static_call(
-            [$resourceClass = $this->resourceClass, 'newModel']
-        );
-
-        $query = app()->make(QueryBuilder::class, [$resourceClass]);
-
-        $request->first === 'true'
-            ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
-            : $query->search(
-                $request, $model->newQuery(), $request->search,
-                [], [], TrashedStatus::fromBoolean($withTrashed)
-            );
-
-        return $query->tap(function (Builder $query) use ($request, $resourceClass, $model) {
-            $this->applyAssociatableCallbacks($query, $request, $resourceClass, $model);
-        });
-    }
-
-    /**
-     * Build an associatable query for the field.
-     */
-    public function buildAssociatableQuery(NovaRequest $request, bool $withTrashed = false): QueryBuilder
-    {
-        /** @var \Illuminate\Database\Eloquent\Model $model */
-        $model = forward_static_call(
-            [$resourceClass = $this->resourceClass, 'newModel']
-        );
-
-        /** @var QueryBuilder $query */
-        $query = app()->make(QueryBuilder::class, [$resourceClass]);
-
-        return $query->search($request, $model->newQuery(), null, [], [], TrashedStatus::fromBoolean($withTrashed))
-                    ->tap(function (Builder $query) use ($request, $resourceClass, $model) {
-                        $this->applyAssociatableCallbacks($query, $request, $resourceClass, $model);
-                    });
     }
 
     /**

@@ -117,16 +117,20 @@ export default {
   },
 
   mounted() {
-    autosize(this.$refs.keyField)
-    autosize(this.$refs.valueField)
+    this.$nextTick(() => {
+      autosize(this.$refs.keyField)
+      autosize(this.$refs.valueField)
+    })
   },
 
   methods: {
     handleKeyFieldFocus() {
+      autosize(this.$refs.keyField)
       this.$refs.keyField.select()
     },
 
     handleValueFieldFocus() {
+      autosize(this.$refs.valueField)
       this.$refs.valueField.select()
     },
   },

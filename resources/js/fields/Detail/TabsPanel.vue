@@ -14,21 +14,24 @@
       :class="[panel.showTitle && !panel.showToolbar ? 'mt-3' : '']"
     >
       <TabGroup>
-        <TabList :aria-label="panel.name" class="tab-menu">
+        <TabList
+          :aria-label="panel.name"
+          class="tab-menu divide-x dark:divide-gray-700 border-l-gray-200 border-r-gray-200 border-t-gray-200 border-b-gray-200 dark:border-l-gray-700 dark:border-r-gray-700 dark:border-t-gray-700 dark:border-b-gray-700"
+        >
           <Tab
-            v-for="(tab, index) in sortedTabs(tabs)"
+            v-for="(tab, tabListIndex) in sortedTabs(tabs)"
             as="template"
-            :key="index"
+            :key="tabListIndex"
             v-slot="{ selected }"
           >
             <button
               :dusk="`${tab.attribute}-tab-trigger`"
               :class="[
                 selected
-                  ? 'active text-primary-500 font-bold border-b-2 border-b-primary-500'
+                  ? 'active text-primary-500 font-bold border-b-2 !border-b-primary-500'
                   : 'text-gray-600 hover:text-gray-800 dark:text-gray-400 hover:dark:text-gray-200',
               ]"
-              class="tab-item border-gray-200"
+              class="tab-item"
             >
               <span class="capitalize">{{ tab.meta.name }}</span>
             </button>
@@ -37,21 +40,25 @@
 
         <TabPanels>
           <TabPanel
-            v-for="(tab, index) in sortedTabs(tabs)"
-            :key="index"
+            v-for="(tab, tabPanelIndex) in sortedTabs(tabs)"
+            :key="tabPanelIndex"
             :label="tab.name"
             :dusk="`${tab.attribute}-tab-content`"
             :class="[tab.attribute, tab.classes, 'tab']"
           >
             <div class="divide-y divide-gray-100 dark:divide-gray-700">
-              <KeepAlive v-for="(field, index) in tab.fields" :key="index">
+              <KeepAlive
+                v-for="(field, fieldIndex) in tab.fields"
+                :key="fieldIndex"
+              >
                 <component
                   :is="componentName(field)"
                   :class="{
-                    'remove-bottom-border': index === tab.fields.length - 1,
+                    'remove-bottom-border':
+                      fieldIndex === tab.fields.length - 1,
                   }"
                   :field="field"
-                  :index="index"
+                  :index="fieldIndex"
                   :resource="resource"
                   :resource-id="resourceId"
                   :resource-name="resourceName"
@@ -93,6 +100,10 @@ const props = defineProps({
 const tabs = computed(() => {
   return props.panel.fields.reduce((tabs, field) => {
     if (!(field.tab?.attribute in tabs)) {
+      if (field?.collapsable === true) {
+        field.collapsable = false
+      }
+
       tabs[field.tab.attribute] = {
         name: field.tab,
         attribute: field.tab.attribute,

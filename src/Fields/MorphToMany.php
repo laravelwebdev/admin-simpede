@@ -6,12 +6,10 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Contracts\Deletable as DeletableContract;
 use Laravel\Nova\Contracts\ListableField;
 use Laravel\Nova\Contracts\PivotableField;
-use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
 use Laravel\Nova\Resource;
 use Laravel\Nova\Rules\RelatableAttachment;
-use Laravel\Nova\TrashedStatus;
 use Stringable;
 
 /**
@@ -27,7 +25,6 @@ class MorphToMany extends Field implements DeletableContract, ListableField, Piv
     use FormatsRelatableDisplayValues;
     use ManyToManyCreationRules;
     use Searchable;
-    use SupportsRelatableQuery;
     use SupportsWithTrashedRelatables;
 
     /**
@@ -173,42 +170,6 @@ class MorphToMany extends Field implements DeletableContract, ListableField, Piv
     {
         return array_merge_recursive(parent::getCreationRules($request), [
             $this->attribute => array_filter($this->getManyToManyCreationRules($request)),
-        ]);
-    }
-
-    /**
-     * Build an attachable query for the field.
-     */
-    public function buildAttachableQuery(NovaRequest $request, bool $withTrashed = false): QueryBuilder
-    {
-        $model = forward_static_call([$resourceClass = $this->resourceClass, 'newModel']);
-
-        $query = app()->make(QueryBuilder::class, [$resourceClass]);
-
-        $request->first === 'true'
-                        ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
-                        : $query->search(
-                            $request, $model->newQuery(), $request->search,
-                            [], [], TrashedStatus::fromBoolean($withTrashed)
-                        );
-
-        return $query->tap(function ($query) use ($request, $model) {
-            forward_static_call($this->relatableQueryCallable($request, $this->resourceClass, $model), $request, $query, $this);
-        });
-    }
-
-    /**
-     * Format the given attachable resource.
-     *
-     * @param  mixed  $resource
-     */
-    public function formatAttachableResource(NovaRequest $request, $resource): array
-    {
-        return array_filter([
-            'avatar' => $resource->resolveAvatarUrl($request),
-            'display' => $this->formatDisplayValue($resource),
-            'value' => optional(ID::forResource($resource))->value ?? $resource->getKey(),
-            'subtitle' => $resource->subtitle(),
         ]);
     }
 

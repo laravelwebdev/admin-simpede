@@ -76,8 +76,12 @@ Route::delete('impersonate', [ImpersonateController::class, 'stopImpersonating']
 
 // Fields...
 Route::get('/{resource}/field/{field}', FieldController::class);
-Route::post('/{resource}/field/{field}/preview', FieldPreviewController::class);
-Route::post('/{resource}/field-attachment/{field}', [FieldAttachmentController::class, 'store'])->middleware(ValidatePostSize::class);
+Route::middleware(ValidatePostSize::class)
+    ->group(function (Router $router) {
+        $router->post('/{resource}/field/{field}/preview', [FieldPreviewController::class, 'create']);
+        $router->post('/{resource}/{resourceId}/field/{field}/preview', [FieldPreviewController::class, 'update']);
+        $router->post('/{resource}/field-attachment/{field}', [FieldAttachmentController::class, 'store']);
+    });
 Route::delete('/{resource}/field-attachment/{field}', [FieldAttachmentController::class, 'destroyAttachment']);
 Route::get('/{resource}/field-attachment/{field}/draftId', [FieldAttachmentController::class, 'draftId']);
 Route::delete('/{resource}/field-attachment/{field}/{draftId}', [FieldAttachmentController::class, 'destroyPending']);
@@ -91,6 +95,8 @@ Route::middleware(ValidatePostSize::class)
         $router->patch('/{resource}/{resourceId}/update-fields', [UpdateFieldController::class, 'sync']);
         $router->patch('/{resource}/{resourceId}/creation-pivot-fields/{relatedResource}', [CreationPivotFieldController::class, 'sync']);
         $router->patch('/{resource}/{resourceId}/update-pivot-fields/{relatedResource}/{relatedResourceId}', [UpdatePivotFieldController::class, 'sync']);
+        $router->post('/{resource}/{resourceId}/field/{field}/preview/{relatedResource}', [FieldPreviewController::class, 'createPivot']);
+        $router->post('/{resource}/{resourceId}/field/{field}/preview/{relatedResource}/{relatedResourceId}', [FieldPreviewController::class, 'updatePivot']);
     });
 Route::get('/{resource}/{resourceId}/download/{field}', FieldDownloadController::class);
 Route::delete('/{resource}/{resourceId}/field/{field}', FieldDestroyController::class);

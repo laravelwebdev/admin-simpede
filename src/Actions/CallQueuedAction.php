@@ -86,13 +86,13 @@ class CallQueuedAction
      */
     protected function failedMethodName(): ?string
     {
-        if (($method = $this->failedMethodForModel()) &&
-            method_exists($this->action, $method)) {
+        $method = $this->failedMethodForModel();
+
+        if (method_exists($this->action, $method)) {
             return $method;
         }
 
-        return method_exists($this->action, 'failed')
-                    ? 'failed' : null;
+        return method_exists($this->action, 'failed') ? 'failed' : null;
     }
 
     /**

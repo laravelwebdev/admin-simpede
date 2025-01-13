@@ -6,7 +6,6 @@ use BackedEnum;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Stringable;
 
@@ -74,7 +73,7 @@ class Util
         }
 
         if (is_array($value)) {
-            return count($value) === 2 && ! Arr::isAssoc($value) && method_exists(...$value);
+            return count($value) === 2 && array_is_list($value) && method_exists(...$value);
         }
 
         return ! is_string($value);

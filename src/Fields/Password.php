@@ -8,6 +8,7 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Password extends Field
 {
+    use SupportsAutoCompletion;
     use SupportsDependentFields;
 
     /**
@@ -16,6 +17,21 @@ class Password extends Field
      * @var string
      */
     public $component = 'password-field';
+
+    /**
+     * Create a new field.
+     *
+     * @param  \Stringable|string  $name
+     * @param  string|callable|object|null  $attribute
+     * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
+     * @return void
+     */
+    public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
+    {
+        parent::__construct($name, $attribute, $resolveCallback);
+
+        $this->withoutAutoCompletion();
+    }
 
     /**
      * Resolve the given attribute from the given resource.
@@ -59,5 +75,13 @@ class Password extends Field
         if (! empty($request[$requestAttribute])) {
             $model->{$attribute} = Hash::make($request[$requestAttribute]);
         }
+    }
+
+    /**
+     * Get the default disabled autocomplete value.
+     */
+    protected function defaultDisabledAutoCompleteValue(): string
+    {
+        return 'new-password';
     }
 }

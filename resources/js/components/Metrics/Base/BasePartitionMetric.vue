@@ -96,20 +96,22 @@ export default {
   },
 
   mounted() {
+    let donutWidth = 10
+
     this.chartist = new PieChart(this.$refs.chart, this.formattedChartData, {
       donut: true,
-      donutWidth: 10,
+      donutWidth,
       startAngle: 270,
       showLabel: false,
     })
 
-    // this.chartist.on('draw', context => {
-    //   if (context.type === 'slice') {
-    //     context.element.attr({
-    //       style: `fill: ${context.meta.color} !important`,
-    //     })
-    //   }
-    // })
+    this.chartist.on('draw', context => {
+      if (context.type === 'slice') {
+        context.element.attr({
+          style: `stroke-width: ${donutWidth}px; stroke: ${context.meta.color} !important;`,
+        })
+      }
+    })
 
     this.resizeObserver.observe(this.$refs.chart)
   },

@@ -15,6 +15,8 @@
           :disabled="isReadonly"
           class="w-full form-control form-input form-control-bordered"
           :dusk="field.attribute"
+          autocomplete="off"
+          spellcheck="false"
         />
 
         <button
@@ -31,11 +33,15 @@
 </template>
 
 <script>
-import { FormField, HandlesValidationErrors } from '@/mixins'
+import {
+  FormField,
+  HandlesFieldPreviews,
+  HandlesValidationErrors,
+} from '@/mixins'
 import debounce from 'lodash/debounce'
 
 export default {
-  mixins: [HandlesValidationErrors, FormField],
+  mixins: [HandlesFieldPreviews, HandlesValidationErrors, FormField],
 
   data: () => ({
     isListeningToChanges: false,
@@ -53,17 +59,6 @@ export default {
   },
 
   methods: {
-    async fetchPreviewContent(value) {
-      const {
-        data: { preview },
-      } = await Nova.request().post(
-        `/nova-api/${this.resourceName}/field/${this.fieldAttribute}/preview`,
-        { value }
-      )
-
-      return preview
-    },
-
     registerChangeListener() {
       Nova.$on(this.eventName, debounce(this.handleChange, 250))
 

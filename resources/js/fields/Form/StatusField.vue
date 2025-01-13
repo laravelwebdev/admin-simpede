@@ -16,6 +16,7 @@
         class="w-full form-control form-input form-control-bordered"
         :class="errorClasses"
         :placeholder="placeholder"
+        :autocomplete="currentField.autocomplete"
       />
     </template>
   </DefaultField>

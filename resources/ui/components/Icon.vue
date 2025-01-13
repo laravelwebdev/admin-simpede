@@ -149,6 +149,10 @@ const aliases = {
 }
 
 const component = computed(function () {
+  if (!checkType(props.type)) {
+    throw new Error(`Invalid icon type: ${props.type}`)
+  }
+
   const name = startCase(camelCase(props.name)).replace(/ /g, '')
 
   if (aliases[name]) {
@@ -169,6 +173,10 @@ const classes = computed(() => {
 
   return 'w-6 h-6'
 })
+
+function checkType(type) {
+  return Object.keys(iconTypes).includes(type)
+}
 </script>
 
 <template>

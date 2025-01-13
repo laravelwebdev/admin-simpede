@@ -109,6 +109,7 @@ abstract class Partition extends Metric
      */
     protected function formatAggregateResult($result)
     {
+        /** @phpstan-ignore property.notFound */
         $key = $result->aggregate_group_by_label;
 
         if (! is_int($key) && ! is_bool($key)) {

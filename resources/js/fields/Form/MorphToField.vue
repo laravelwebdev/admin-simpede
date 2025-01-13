@@ -72,6 +72,7 @@
             "
             trackBy="value"
             :mode="mode"
+            :autocomplete="currentField.autocomplete"
             class="w-full"
             :dusk="`${field.attribute}-search-input`"
           >

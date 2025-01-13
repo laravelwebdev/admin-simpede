@@ -9,3 +9,4 @@ mix
   .vue({ version: 3 })
   .css('resources/css/tool.css', 'css')
   .nova('{{ name }}')
+  .version()

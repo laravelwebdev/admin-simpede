@@ -23,6 +23,7 @@
     "rap2hpoutre/fast-excel": "^5.4",
     "spatie/once": "^3.0",
     "symfony/console": "^6.4.14|^7.0.3",
+    "symfony/deprecation-contracts": "^2.5|^3.0",
     "symfony/finder": "^6.4.13|^7.0.3",
     "symfony/polyfill-intl-icu": "^1.31",
     "symfony/polyfill-php83": "^1.31",
@@ -66,6 +67,9 @@
     ]
   },
   "extra": {
+    "branch-alias": {
+      "dev-main": "5.x-dev"
+    },
     "laravel": {
       "providers": [
         "Laravel\\Nova\\NovaCoreServiceProvider"
@@ -157,5 +161,5 @@
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "version": "5.0.3"
+  "version": "5.1.3"
 }

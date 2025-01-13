@@ -13,6 +13,7 @@
         :disabled="currentlyIsReadonly"
         @input="handleChange"
         class="w-full form-control form-input form-control-bordered"
+        :autocomplete="currentField.autocomplete"
         :dusk="field.attribute"
       />
     </template>

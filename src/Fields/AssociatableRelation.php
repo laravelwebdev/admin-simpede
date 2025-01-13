@@ -4,12 +4,13 @@ namespace Laravel\Nova\Fields;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\TrashedStatus;
 
 trait AssociatableRelation
 {
-    use SupportsRelatableQuery;
-
     /**
      * The callback that should be run to associate relations.
      *
@@ -88,9 +89,74 @@ trait AssociatableRelation
             return;
         }
 
-        forward_static_call(
-            $this->relatableQueryCallable($request, $resourceClass, $model),
-            $request, $query, $this
-        );
+        forward_static_call($this->relatableQueryCallable($request, $model, $resourceClass), $request, $query, $this);
+    }
+
+    /**
+     * Get the relatableQuery callable.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
+     * @return array
+     */
+    protected function relatableQueryCallable(NovaRequest $request, $model, string $resourceClass)
+    {
+        return ($method = $this->relatableQueryMethod($request, $model))
+            ? [$request->resource(), $method]
+            : [$resourceClass, 'relatableQuery'];
+    }
+
+    /**
+     * Get the relatableQuery method name.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return string|null
+     */
+    protected function relatableQueryMethod(NovaRequest $request, $model)
+    {
+        $method = 'relatable'.Str::plural(class_basename($model));
+
+        return method_exists($request->resource(), $method) ? $method : null;
+    }
+
+    /**
+     * Build an associatable query for the field.
+     *
+     * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
+     */
+    public function searchAssociatableQuery(NovaRequest $request, string $resourceClass, bool $withTrashed = false): QueryBuilder
+    {
+        $model = $resourceClass::newModel();
+
+        $query = app()->make(QueryBuilder::class, [$resourceClass]);
+
+        $request->first === 'true'
+            ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
+            : $query->search(
+                $request, $model->newQuery(), $request->search,
+                [], [], TrashedStatus::fromBoolean($withTrashed)
+            );
+
+        return $query->tap(function (Builder $query) use ($request, $resourceClass, $model) {
+            $this->applyAssociatableCallbacks($query, $request, $resourceClass, $model);
+        });
+    }
+
+    /**
+     * Build an associatable query for the field.
+     *
+     * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
+     */
+    public function buildAssociatableQuery(NovaRequest $request, string $resourceClass, bool $withTrashed = false): QueryBuilder
+    {
+        $model = $resourceClass::newModel();
+
+        /** @var QueryBuilder $query */
+        $query = app()->make(QueryBuilder::class, [$resourceClass]);
+
+        return $query->search($request, $model->newQuery(), null, [], [], TrashedStatus::fromBoolean($withTrashed))
+                    ->tap(function (Builder $query) use ($request, $resourceClass, $model) {
+                        $this->applyAssociatableCallbacks($query, $request, $resourceClass, $model);
+                    });
     }
 }

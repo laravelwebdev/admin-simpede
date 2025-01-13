@@ -7,6 +7,8 @@ use Laravel\Nova\Util;
 
 trait Searchable
 {
+    use SupportsAutoCompletion;
+
     /**
      * Indicates if this relationship is searchable.
      *

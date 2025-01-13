@@ -16,6 +16,7 @@
             :debounce="field.debounce"
             :options="tags"
             placeholder="Search"
+            :autocomplete="currentField.autocomplete"
             trackBy="value"
             :disabled="currentlyIsReadonly"
             :loading="loading"

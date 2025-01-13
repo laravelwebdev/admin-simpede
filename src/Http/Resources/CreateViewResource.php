@@ -17,6 +17,10 @@ class CreateViewResource extends Resource
     {
         $resource = $this->newResourceWith($request);
 
+        $resourceClass = $request->resource();
+
+        $resourceClass::authorizeToCreate($request);
+
         $fields = $resource->creationFieldsWithinPanels($request)->applyDependsOnWithDefaultValues($request);
 
         return [
@@ -32,10 +36,6 @@ class CreateViewResource extends Resource
      */
     public function newResourceWith(ResourceCreateOrAttachRequest $request): NovaResource
     {
-        $resourceClass = $request->resource();
-
-        $resourceClass::authorizeToCreate($request);
-
         return $request->newResource();
     }
 }

@@ -22,6 +22,7 @@ trait PerformsValidation
      */
     public static function validateForCreation(NovaRequest $request): void
     {
+        /** @phpstan-ignore method.notFound */
         static::validatorForCreation($request)
             ->addCustomAttributes(self::attributeNamesForFields($request)->toArray())
             ->validate();
@@ -82,6 +83,7 @@ trait PerformsValidation
      */
     public static function validateForUpdate(NovaRequest $request, ?Resource $resource = null): void
     {
+        /** @phpstan-ignore method.notFound */
         static::validatorForUpdate($request, $resource)
             ->addCustomAttributes(self::attributeNamesForFields($request, $resource)->toArray())
             ->validate();

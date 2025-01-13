@@ -52,6 +52,8 @@ trait HandlesValidation
     /**
      * Set the validation rules for the field.
      *
+     * @no-named-arguments
+     *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(array|\Stringable|string|callable))|array|\Stringable|string  ...$rules
      * @return $this
      *
@@ -108,6 +110,8 @@ trait HandlesValidation
     /**
      * Set the creation validation rules for the field.
      *
+     * @no-named-arguments
+     *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(array|\Stringable|string|callable))|array|\Stringable|string  ...$rules
      * @return $this
      *
@@ -149,6 +153,8 @@ trait HandlesValidation
 
     /**
      * Set the creation validation rules for the field.
+     *
+     * @no-named-arguments
      *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(array|\Stringable|string|callable))|array|\Stringable|string  ...$rules
      * @return $this

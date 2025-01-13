@@ -75,6 +75,6 @@ trait QueriesResources
      */
     protected function trashed(): TrashedStatus
     {
-        return TrashedStatus::tryFrom($this->trashed) ?? TrashedStatus::DEFAULT;
+        return TrashedStatus::tryFrom((string) $this->trashed) ?? TrashedStatus::DEFAULT;
     }
 }

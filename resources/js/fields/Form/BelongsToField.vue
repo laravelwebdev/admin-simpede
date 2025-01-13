@@ -25,6 +25,7 @@
           "
           trackBy="value"
           :mode="mode"
+          :autocomplete="currentField.autocomplete"
           class="w-full"
           :dusk="`${field.resourceName}-search-input`"
         >

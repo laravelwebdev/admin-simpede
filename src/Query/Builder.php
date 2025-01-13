@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Contracts\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\LazyCollection;
@@ -98,7 +99,15 @@ class Builder implements QueryBuilder
                 $this->queryBuilder = $this->resourceClass::buildIndexQueryUsingScout($request, $search, $withTrashed);
                 $search = '';
 
-                if ($query instanceof MorphToMany || $query instanceof BelongsToMany) {
+                if ($query instanceof HasMany) {
+                    $this->tap(function ($queryBuilder) use ($query) {
+                        /** @var \Illuminate\Contracts\Database\Eloquent\Builder $queryBuilder */
+                        $queryBuilder->whereIn(
+                            $this->resourceClass::newModel()->getQualifiedKeyName(),
+                            $query->select($query->getModel()->getKeyName())
+                        );
+                    });
+                } elseif ($query instanceof MorphToMany || $query instanceof BelongsToMany) {
                     $this->tap(function ($queryBuilder) use ($query) {
                         /** @var \Illuminate\Contracts\Database\Eloquent\Builder $queryBuilder */
                         $queryBuilder->whereIn(

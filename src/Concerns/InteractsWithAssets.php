@@ -112,16 +112,30 @@ trait InteractsWithAssets
 
     /**
      * Register the given assets from `mix-manifest.json` file with Nova.
+     *
+     * @param  array<int, string>|null  $assets
      */
-    public static function mix(string $name, string $path): static
+    public static function mix(string $name, string $path, ?array $assets = null): static
     {
         $path = rtrim($path, '/');
-        $manifest = File::isDirectory($path) ? join_paths($path, 'mix-manifest.json') : $path;
+        $manifest = null;
+
+        if (File::isDirectory($path)) {
+            $manifest = join_paths($path, 'mix-manifest.json');
+        } else {
+            $manifest = $path;
+            $path = dirname($path);
+        }
 
         if (File::exists($manifest)) {
             collect(File::json($manifest))
-                ->filter(fn ($file, $filename) => Str::endsWith($filename, ['.js', '.css']))
-                ->each(function ($file, $filename) use ($name, $path) {
+                ->filter(function ($file, $filename) use ($assets) {
+                    if (empty($assets)) {
+                        return Str::endsWith($filename, ['.js', '.css']);
+                    }
+
+                    return in_array($filename, $assets);
+                })->each(function ($file, $filename) use ($name, $path) {
                     $key = sprintf('%s-%s', $name, hash('xxh128', $file));
 
                     if (str_ends_with($filename, '.js')) {

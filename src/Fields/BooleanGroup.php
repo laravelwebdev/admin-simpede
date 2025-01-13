@@ -70,8 +70,10 @@ class BooleanGroup extends Field implements FilterableField
         }
 
         $this->options = with(collect($options), function ($options) {
-            return $options->map(function ($label, $name) use ($options) {
-                return $options->isAssoc()
+            $isList = array_is_list($options->all());
+
+            return $options->map(function ($label, $name) use ($isList) {
+                return $isList === false
                     ? ['label' => $label, 'name' => $name]
                     : ['label' => $label, 'name' => $label];
             })->values()->all();

@@ -9,9 +9,18 @@
       @confirm="passwordConfirmed"
       @close="cancelConfirming"
     />
-    <span @click.stop="startConfirming">
+    <span
+      v-if="
+        (!confirmed && !$slots.unconfirmed) || (confirmed && !$slots.confirmed)
+      "
+      @click.stop="startConfirming"
+    >
       <slot />
     </span>
+    <span v-if="!confirmed" @click.stop="startConfirming">
+      <slot name="unconfirmed" />
+    </span>
+    <slot v-else name="confirmed" />
   </span>
 </template>
 
@@ -36,8 +45,13 @@ const props = defineProps({
   button: { type: [String, null], default: null },
 })
 
-const { confirming, confirmingPassword, passwordConfirmed, cancelConfirming } =
-  useConfirmsPassword(emitter)
+const {
+  confirming,
+  confirmed,
+  confirmingPassword,
+  passwordConfirmed,
+  cancelConfirming,
+} = useConfirmsPassword(emitter)
 
 const startConfirming = e => {
   confirmingPassword({

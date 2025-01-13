@@ -820,9 +820,13 @@ trait ResolvesFields
                     return;
                 }
 
-                $panels->first()->component !== 'tabs'
+                $firstPanel = $panels->first()->component !== 'tabs'
                     ? $panels->first()->withToolbar()
                     : $panels->where('component', 'tabs')->first();
+
+                if (property_exists($firstPanel, 'collapsable') && $firstPanel->collapsable === true) {
+                    trigger_deprecation('laravel/nova', '5.0', 'Using `collapsible()` on First Panel is not supported');
+                }
             });
     }
 

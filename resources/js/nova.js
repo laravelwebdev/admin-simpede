@@ -1,8 +1,9 @@
 import Localization from '@/mixins/Localization'
 import { Form } from '@/util/FormValidation'
-import { setupAxios } from '@/util/axios'
-import { setupNumbro } from '@/util/numbro'
-import { setupInertia } from '@/util/inertia'
+import { setupAxios } from '@/bootstrap/axios'
+import { setupCodeMirror } from '@/bootstrap/codemirror'
+import { setupInertia } from '@/bootstrap/inertia'
+import { setupNumbro } from '@/bootstrap/numbro'
 import url from '@/util/url'
 import { createApp, h } from 'vue'
 import { hideProgress, revealProgress } from '@inertiajs/core'
@@ -12,6 +13,7 @@ import { registerFields } from './fields'
 import Mousetrap from 'mousetrap'
 import { createNovaStore } from './store'
 import resourceStore from './store/resources'
+import NProgress from 'nprogress'
 import FloatingVue from 'floating-vue'
 import camelCase from 'lodash/camelCase'
 import fromPairs from 'lodash/fromPairs'
@@ -25,6 +27,8 @@ import { Settings } from 'luxon'
 import { ColorTranslator } from 'colortranslator'
 
 const { parseColor } = require('tailwindcss/lib/util/color')
+
+setupCodeMirror()
 
 const emitter = new Emitter()
 
@@ -94,10 +98,7 @@ export default class Nova {
     })
 
     /** @public */
-    this.$progress = {
-      start: force => revealProgress(force),
-      done: () => hideProgress(),
-    }
+    this.$progress = NProgress
 
     /** @public */
     this.$router = router
@@ -118,7 +119,7 @@ export default class Nova {
     this.__booted = false
 
     /** @private */
-    this.__deployed = false
+    this.__liftOff = false
   }
 
   /**
@@ -135,129 +136,17 @@ export default class Nova {
    * Execute all of the booting callbacks.
    */
   boot() {
+    if (!this.__started || !this.__liftOff || this.__booted) {
+      return
+    }
+
+    this.debug('engage thrusters')
+
     /** @type {VueStore} */
     this.store = createNovaStore()
 
     this.bootingCallbacks.forEach(callback => callback(this.app, this.store))
     this.bootingCallbacks = []
-
-    this.__booted = true
-  }
-
-  /**
-   * @param {BootingCallback} callback
-   */
-  booted(callback) {
-    callback(this.app, this.store)
-  }
-
-  async countdown() {
-    this.log('Initiating Nova countdown...')
-
-    const appName = this.config('appName')
-
-    await createInertiaApp({
-      title: title => (!title ? appName : `${title} - ${appName}`),
-      progress: {
-        delay: 250,
-        includeCSS: false,
-        showSpinner: false,
-      },
-      resolve: name => {
-        const page =
-          this.pages[name] != null
-            ? this.pages[name]
-            : require('@/pages/Error404').default
-
-        page.layout = page.layout || Layout
-
-        return page
-      },
-      setup: ({ el, App, props, plugin }) => {
-        this.debug('engine start')
-
-        /** @protected */
-        this.mountTo = el
-
-        /**
-         * @protected
-         * @type VueApp
-         */
-        this.app = createApp({ render: () => h(App, props) })
-
-        this.app.use(plugin)
-        this.app.use(FloatingVue, {
-          preventOverflow: true,
-          flip: true,
-          themes: {
-            Nova: {
-              $extend: 'tooltip',
-              triggers: ['click'],
-              autoHide: true,
-              placement: 'bottom',
-              html: true,
-            },
-          },
-        })
-
-        this.debug('engine ready')
-
-        this.__started = true
-
-        this.deploy()
-      },
-    })
-  }
-
-  /**
-   * Start the Nova app by calling each of the tool's callbacks and then creating
-   * the underlying Vue instance.
-   */
-  liftOff() {
-    this.log('We have lift off!')
-
-    let currentTheme = null
-
-    new MutationObserver(() => {
-      const element = document.documentElement.classList
-      const theme = element.contains('dark') ? 'dark' : 'light'
-
-      if (theme !== currentTheme) {
-        this.$emit('nova-theme-switched', {
-          theme,
-          element,
-        })
-
-        currentTheme = theme
-      }
-    }).observe(document.documentElement, {
-      attributes: true,
-      attributeOldValue: true,
-      attributeFilter: ['class'],
-    })
-
-    if (!this.__booted) {
-      this.boot()
-    }
-
-    if (this.config('notificationCenterEnabled')) {
-      /** @private */
-      this.notificationPollingInterval = setInterval(() => {
-        if (document.hasFocus()) {
-          this.$emit('refresh-notifications')
-        }
-      }, this.config('notificationPollingInterval'))
-    }
-
-    this.deploy()
-  }
-
-  deploy() {
-    if (!this.__started || !this.__booted || this.__deployed) {
-      return
-    }
-
-    this.debug('engage thrusters')
 
     this.registerStoreModules()
 
@@ -296,7 +185,109 @@ export default class Nova {
 
     this.log('All systems go...')
 
-    this.__deployed = true
+    this.__booted = true
+  }
+
+  /**
+   * @param {BootingCallback} callback
+   */
+  booted(callback) {
+    callback(this.app, this.store)
+  }
+
+  async countdown() {
+    this.log('Initiating Nova countdown...')
+
+    const appName = this.config('appName')
+
+    await createInertiaApp({
+      title: title => (!title ? appName : `${title} - ${appName}`),
+      progress: false,
+      resolve: name => {
+        const page =
+          this.pages[name] != null
+            ? this.pages[name]
+            : require('@/pages/Error404').default
+
+        page.layout = page.layout || Layout
+
+        return page
+      },
+      setup: ({ el, App, props, plugin }) => {
+        this.debug('engine start')
+
+        /** @protected */
+        this.mountTo = el
+
+        /**
+         * @protected
+         * @type VueApp
+         */
+        this.app = createApp({ render: () => h(App, props) })
+
+        this.app.use(plugin)
+        this.app.use(FloatingVue, {
+          preventOverflow: true,
+          flip: true,
+          themes: {
+            Nova: {
+              $extend: 'tooltip',
+              triggers: ['click'],
+              autoHide: true,
+              placement: 'bottom',
+              html: true,
+            },
+          },
+        })
+      },
+    }).then(() => {
+      this.__started = true
+
+      this.debug('engine ready')
+
+      this.boot()
+    })
+  }
+
+  /**
+   * Start the Nova app by calling each of the tool's callbacks and then creating
+   * the underlying Vue instance.
+   */
+  liftOff() {
+    this.log('We have lift off!')
+
+    let currentTheme = null
+
+    new MutationObserver(() => {
+      const element = document.documentElement.classList
+      const theme = element.contains('dark') ? 'dark' : 'light'
+
+      if (theme !== currentTheme) {
+        this.$emit('nova-theme-switched', {
+          theme,
+          element,
+        })
+
+        currentTheme = theme
+      }
+    }).observe(document.documentElement, {
+      attributes: true,
+      attributeOldValue: true,
+      attributeFilter: ['class'],
+    })
+
+    if (this.config('notificationCenterEnabled')) {
+      /** @private */
+      this.notificationPollingInterval = setInterval(() => {
+        if (document.hasFocus()) {
+          this.$emit('refresh-notifications')
+        }
+      }, this.config('notificationPollingInterval'))
+    }
+
+    this.__liftOff = true
+
+    this.boot()
   }
 
   /**

@@ -17,6 +17,7 @@
         tabindex="0"
         type="search"
         :placeholder="__(placeholder)"
+        :autocomplete="autocomplete"
         spellcheck="false"
         :aria-expanded="dropdownShown === true ? 'true' : 'false'"
       />
@@ -93,7 +94,8 @@ const emitter = defineEmits(['clear', 'input', 'selected'])
 
 // Props
 const props = defineProps({
-  dusk: {},
+  autocomplete: { type: String, required: false, default: null },
+  dusk: { type: String },
   error: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   placeholder: { type: String, default: 'Search' },
@@ -125,8 +127,16 @@ const selectedOptionIndex = ref(0)
 // Lifecycle Methods
 useEventListener(document, 'keydown', event => {
   // 'tab' or 'escape'
-  if (dropdownShown.value && (event.keyCode === 9 || event.keyCode === 27)) {
+  if (dropdownShown.value && [9, 27].includes(event.keyCode)) {
     setTimeout(() => close(), 50)
+
+    return
+  }
+
+  if (event.composed && [13, 229].includes(event.keyCode)) {
+    searchText.value = event.target.value
+
+    return
   }
 })
 

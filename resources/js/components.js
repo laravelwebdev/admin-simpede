@@ -25,7 +25,6 @@ export function registerViews(app) {
   app.component('ResourceDetail', ResourceDetail)
   app.component('AttachResource', Attach)
   app.component('UpdateAttachedResource', UpdateAttached)
-  // app.component('Lens', Lens)
 
   const requireComponent = require.context(
     './components',
