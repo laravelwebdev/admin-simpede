@@ -52,13 +52,6 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
     public $attribute;
 
     /**
-     * Indicates whether the field should be saved on action relation.
-     *
-     * @var bool
-     */
-    public $saveOnActionRelation = true;
-
-    /**
      * The field's resolved value.
      *
      * @var mixed
@@ -391,18 +384,6 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
     public function displayUsing(callable $displayCallback)
     {
         $this->displayCallback = $displayCallback;
-
-        return $this;
-    }
-    
-    /**
-     * Prevents the field from being saved when performing an action on a related model.
-     *
-     * @return $this
-     */
-    public function doNotSaveOnActionRelation()
-    {
-        $this->saveOnActionRelation = false;
 
         return $this;
     }
