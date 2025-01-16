@@ -21,7 +21,7 @@ class ActionCollection extends Collection
     public function authorizedToSeeOnIndex(NovaRequest $request)
     {
         return $this->filter->shownOnIndex()
-            ->filter(function ($action) use ($request) {
+            ->filter(static function ($action) use ($request) {
                 if ($action->sole === true) {
                     return ! $request->allResourcesSelected()
                         && $request->selectedResourceIds()->count() <= 1
@@ -62,9 +62,9 @@ class ActionCollection extends Collection
      */
     public function withAuthorizedToRun(NovaRequest $request, $model)
     {
-        return $this->each(
-            fn (Action $action) => $action->authorizedToRun($request, $model)
-        );
+        return $this->each(static function ($action) use ($request, $model) {
+            $action->authorizedToRun($request, $model);
+        });
     }
 
     /**

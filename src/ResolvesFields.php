@@ -780,8 +780,11 @@ trait ResolvesFields
                     $fields = $panel->meta['fields'];
 
                     $relationshipUnderTabs
-                        ->filter(fn ($relation) => $fields[0]->panel === $relation->meta['fields'][0]->panel)
-                        ->each(fn ($relation) => $fields[] = $relation->meta['fields'][0]);
+                        ->filter(static function ($relation) use ($fields) {
+                            return $fields[0]->panel === $relation->meta['fields'][0]->panel;
+                        })->each(static function ($relation) use ($fields) {
+                            $fields[] = $relation->meta['fields'][0];
+                        });
 
                     TabsGroup::hydrate($panel, $fields);
                 }

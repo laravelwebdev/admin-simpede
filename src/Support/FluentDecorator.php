@@ -14,6 +14,8 @@ use JsonSerializable;
  *
  * @implements \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @implements \ArrayAccess<TKey, TValue>
+ *
+ * @mixin \Illuminate\Support\Fluent
  */
 abstract class FluentDecorator implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
 {

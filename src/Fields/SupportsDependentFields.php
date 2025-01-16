@@ -20,7 +20,7 @@ trait SupportsDependentFields
      */
     public function dependsOn(Field|array|string $attributes, callable|string $mixin)
     {
-        array_push($this->fieldDependencies, new Dependent($attributes, $mixin));
+        $this->fieldDependencies[] = new Dependent($attributes, $mixin);
 
         return $this;
     }
@@ -34,7 +34,7 @@ trait SupportsDependentFields
      */
     public function dependsOnCreating(Field|array|string $attributes, callable|string $mixin)
     {
-        array_push($this->fieldDependencies, new Dependent($attributes, $mixin, 'create'));
+        $this->fieldDependencies[] = new Dependent($attributes, $mixin, 'create');
 
         return $this;
     }
@@ -48,7 +48,7 @@ trait SupportsDependentFields
      */
     public function dependsOnUpdating($attributes, $mixin)
     {
-        array_push($this->fieldDependencies, new Dependent($attributes, $mixin, 'update'));
+        $this->fieldDependencies[] = new Dependent($attributes, $mixin, 'update');
 
         return $this;
     }

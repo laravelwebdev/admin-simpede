@@ -451,7 +451,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
             ->mapWithKeys(fn ($field) => $field->getCreationRules($request))
             ->mapWithKeys(function ($field, $attribute) use ($replacements) {
                 if ($this->nullable === true) {
-                    array_push($field, 'sometimes');
+                    $field[] = 'sometimes';
                 }
 
                 return ["{$this->attribute}.{$attribute}" => collect($field)->transform(function ($rule) use ($replacements) {
@@ -487,7 +487,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
             ->mapWithKeys(fn ($field) => $field->getUpdateRules($request))
             ->mapWithKeys(function ($field, $attribute) use ($replacements) {
                 if ($this->nullable === true) {
-                    array_push($field, 'sometimes');
+                    $field[] = 'sometimes';
                 }
 
                 return ["{$this->attribute}.{$attribute}" => collect($field)->transform(function ($rule) use ($replacements) {

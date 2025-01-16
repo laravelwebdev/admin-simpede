@@ -144,7 +144,7 @@ trait ResolvesActions
     {
         $resource = Nova::resourceInstanceForKey($request->viaResource);
 
-        $field = $resource->availableFields($request)->first(function ($field) use ($request) {
+        $field = $resource->availableFields($request)->first(static function ($field) use ($request) {
             return isset($field->resourceName) &&
                    $field->resourceName == $request->resource &&
                    ($field instanceof BelongsToMany || $field instanceof MorphToMany) &&
