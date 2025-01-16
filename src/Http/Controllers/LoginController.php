@@ -49,7 +49,7 @@ class LoginController extends Controller
             return Inertia::location($loginPath);
         }
         
-        $initialYear = config('nova.initialyear', date('Y'));
+        $initialYear = config('app.initialyear', date('Y'));
         $currentYear = date('Y');
         $years = $initialYear <= $currentYear ? range($initialYear, $currentYear) : [];
         return Inertia::render('Nova.Login', [
