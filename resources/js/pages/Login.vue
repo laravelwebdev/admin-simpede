@@ -22,6 +22,7 @@
           :type="usernameInputType"
           :name="username"
           autofocus=""
+          autocomplete="username"
           required
         />
 
@@ -41,6 +42,7 @@
           id="password"
           type="password"
           name="password"
+          autocomplete="current-password"
           required
         />
 
@@ -95,10 +97,6 @@
   </div>
 </template>
 
-<script setup>
-defineProps({ years: Array })
-</script>
-
 <script>
 import Auth from '@/layouts/Auth'
 import { Button, Checkbox } from 'laravel-nova-ui'
@@ -116,6 +114,7 @@ export default {
   props: {
     username: { type: String, default: 'email' },
     email: { type: String, default: 'email' },
+    years: { type: Array, default: []},
   },
 
   data() {
