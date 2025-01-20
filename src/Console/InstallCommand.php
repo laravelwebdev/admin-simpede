@@ -5,11 +5,11 @@ namespace Laravel\Nova\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Configuration\ApplicationBuilder;
-use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Laravel\Nova\Util;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\confirm;
 
@@ -33,28 +33,113 @@ class InstallCommand extends Command
     protected $description = 'Install all of the Nova resources';
 
     /**
+     * Determine if Nova should be the default authentication routing.
+     */
+    protected ?bool $isDefaultAuthenticationRouting = null;
+
+    /** {@inheritDoc} */
+    #[\Override]
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+
+        $this->isDefaultAuthenticationRouting = (! $this->laravel['router']->has('login') || ! Util::isFortifyRoutesRegisteredForFrontend())
+                && confirm('Would you like to use Nova as the default login?', true);
+    }
+
+    /**
      * Execute the console command.
      *
      * @return void
      */
     public function handle(Filesystem $files)
     {
-        $this->components->task('Publishing Nova Assets / Resources...');
-        $this->callSilent('nova:publish', ['--fortify' => true]);
+        $appNamespace = $this->laravel->getNamespace();
 
-        $this->components->task('Publishing Nova Service Provider...');
-        $this->callSilent('vendor:publish', ['--tag' => 'nova-provider']);
+        $this->components->task('Publishing Nova Assets / Resources', task: function () {
+            $this->callSilent('nova:publish', ['--fortify' => true]);
+        });
 
-        $this->components->task('Generating Main Dashboard...');
-        $this->callSilent('nova:dashboard', ['name' => 'Main']);
-        copy($this->resolveStubPath('/stubs/nova/main-dashboard.stub'), app_path('Nova/Dashboards/Main.php'));
+        $this->components->task('Publishing Nova Service Provider', task: function () {
+            $this->callSilent('vendor:publish', ['--tag' => 'nova-provider']);
+        });
 
-        $this->installNovaServiceProvider($files);
+        $this->components->task('Generating Main Dashboard', task: function () use ($files) {
+            $this->callSilent('nova:dashboard', ['name' => 'Main']);
+            $files->copy($this->resolveStubPath('/stubs/nova/main-dashboard.stub'), app_path('Nova/Dashboards/Main.php'));
+        });
 
-        $this->components->task('Generating User Resource...');
-        $this->callSilent('nova:resource', ['name' => 'User']);
-        copy($this->resolveStubPath('/stubs/nova/user-resource.stub'), app_path('Nova/User.php'));
+        $this->components->task('Generating Nova\'s Service Provider', task: function () use ($appNamespace, $files) {
+            $this->installNovaServiceProvider($files, $appNamespace);
+        });
 
+        $this->components->task('Generating User Resource', task: function () use ($files) {
+            $this->callSilent('nova:resource', ['name' => 'User']);
+            $files->copy($this->resolveStubPath('/stubs/nova/user-resource.stub'), app_path('Nova/User.php'));
+        });
+
+        $this->components->task('Configures User Model', task: function () use ($files) {
+            $this->configuresUserModel($files);
+        });
+
+        $this->components->task('Configures Application Namespace', task: function () use ($appNamespace, $files) {
+            $this->configuresAppNamespace($files, $appNamespace);
+        });
+
+        $this->components->info('Nova scaffolding installed successfully.');
+    }
+
+    /**
+     * Install the Nova service providers in the application configuration file.
+     *
+     * @return void
+     */
+    protected function installNovaServiceProvider(Filesystem $files, string $appNamespace)
+    {
+        $appConfig = $files->get(config_path('app.php'), lock: false);
+
+        $eol = Util::eol($appConfig);
+
+        if (class_exists(ApplicationBuilder::class) && $files->exists(base_path('bootstrap/providers.php'))) {
+            /** @phpstan-ignore staticMethod.notFound */
+            ServiceProvider::addProviderToBootstrapFile("{$appNamespace}Providers\NovaServiceProvider");
+
+            if ($this->isDefaultAuthenticationRouting === true) {
+                $files->replaceInFile(
+                    $eol.'            ->withAuthenticationRoutes()'.$eol,
+                    $eol.'            ->withAuthenticationRoutes(default: true)'.$eol,
+                    app_path('Providers/NovaServiceProvider.php'),
+                );
+            }
+
+            return;
+        }
+
+        if (str_contains($appConfig, "{$appNamespace}Providers\\NovaServiceProvider::class")) {
+            return;
+        }
+
+        $files->replaceInFile(
+            "{$appNamespace}Providers\EventServiceProvider::class,".$eol,
+            "{$appNamespace}Providers\EventServiceProvider::class,".$eol."        {$appNamespace}Providers\NovaServiceProvider::class,".$eol,
+            config_path('app.php')
+        );
+    }
+
+    /**
+     * Set the proper application namespace on the installed files.
+     */
+    protected function configuresAppNamespace(Filesystem $files, string $appNamespace): void
+    {
+        $this->setAppNamespaceOn($files, app_path('Nova/User.php'), $appNamespace);
+        $this->setAppNamespaceOn($files, app_path('Providers/NovaServiceProvider.php'), $appNamespace);
+    }
+
+    /**
+     * Set the proper User's model on the installed files.
+     */
+    protected function configuresUserModel(Filesystem $files): void
+    {
         $namespacedUserModel = Util::userModel();
 
         if (is_null($namespacedUserModel) && ! file_exists(app_path('Models/User.php'))) {
@@ -70,6 +155,7 @@ class InstallCommand extends Command
             if ($baseUserModel !== 'User') {
                 $searches[] = 'use App\Models\User;';
                 $replacements[] = 'use '.$namespacedUserModel.' as UserModel;';
+
                 $searches[] = 'function (User $user)';
                 $replacements[] = 'function (UserModel $user)';
             } else {
@@ -77,107 +163,18 @@ class InstallCommand extends Command
                 $replacements[] = 'use '.$namespacedUserModel.';';
             }
 
-            file_put_contents(
-                app_path('Nova/User.php'),
-                str_replace(
-                    $searches,
-                    $replacements,
-                    file_get_contents(app_path('Nova/User.php'))
-                )
-            );
-
-            file_put_contents(
-                app_path('Providers/NovaServiceProvider.php'),
-                str_replace(
-                    $searches,
-                    $replacements,
-                    file_get_contents(app_path('Providers/NovaServiceProvider.php'))
-                )
-            );
+            $files->replaceInFile($searches, $replacements, app_path('Nova/User.php'));
+            $files->replaceInFile($searches, $replacements, app_path('Providers/NovaServiceProvider.php'));
         }
-
-        $this->setAppNamespace($files);
-
-        $this->components->info('Nova scaffolding installed successfully.');
-    }
-
-    /**
-     * Install the Nova service providers in the application configuration file.
-     *
-     * @return void
-     */
-    protected function installNovaServiceProvider(Filesystem $files)
-    {
-        $namespace = Str::replaceLast('\\', '', $this->laravel->getNamespace());
-
-        $appConfig = file_get_contents(config_path('app.php'));
-
-        $eol = Util::eol($appConfig);
-
-        if (class_exists(ApplicationBuilder::class) && $files->exists(base_path('bootstrap/providers.php'))) {
-            /** @phpstan-ignore staticMethod.notFound */
-            ServiceProvider::addProviderToBootstrapFile("{$namespace}\\Providers\\NovaServiceProvider");
-
-            $shouldEnablesFortifyRoutes = Collection::make([
-                'App\Providers\JetstreamServiceProvider',
-                'App\Providers\FortifyServiceProvider',
-            ])->reject(fn ($provider) => in_array($provider, $this->laravel->getLoadedProviders()))
-            ->isNotEmpty();
-
-            if (
-                (! $this->laravel['router']->has('login') || ! $shouldEnablesFortifyRoutes)
-                && confirm('Would you like to use Nova as the default login?', true)
-            ) {
-                $files->put(
-                    app_path('Providers/NovaServiceProvider.php'),
-                    str_replace(
-                        [$eol.'            ->withAuthenticationRoutes()'.$eol],
-                        [$eol.'            ->withAuthenticationRoutes(default: true)'.$eol],
-                        $files->get(app_path('Providers/NovaServiceProvider.php'))
-                    )
-                );
-            }
-
-            return;
-        }
-
-        if (Str::contains($appConfig, "{$namespace}\\Providers\\NovaServiceProvider::class")) {
-            return;
-        }
-
-        $files->put(config_path('app.php'), str_replace(
-            "{$namespace}\\Providers\EventServiceProvider::class,".$eol,
-            "{$namespace}\\Providers\EventServiceProvider::class,".$eol."        {$namespace}\Providers\NovaServiceProvider::class,".$eol,
-            $appConfig
-        ));
-    }
-
-    /**
-     * Set the proper application namespace on the installed files.
-     *
-     * @return void
-     */
-    protected function setAppNamespace(Filesystem $files)
-    {
-        $namespace = $this->laravel->getNamespace();
-
-        $this->setAppNamespaceOn($files, app_path('Nova/User.php'), $namespace);
-        $this->setAppNamespaceOn($files, app_path('Providers/NovaServiceProvider.php'), $namespace);
     }
 
     /**
      * Set the namespace on the given file.
-     *
-     * @param  string  $file
-     * @param  string  $namespace
-     * @return void
      */
-    protected function setAppNamespaceOn(Filesystem $files, $file, $namespace)
+    protected function setAppNamespaceOn(Filesystem $files, string $file, string $appNamespace): void
     {
-        $files->put($file, str_replace(
-            'App\\',
-            $namespace,
-            $files->get($file)
-        ));
+        if ($appNamespace !== 'App\\') {
+            $files->replaceInFile('App\\', $appNamespace, $file);
+        }
     }
 }

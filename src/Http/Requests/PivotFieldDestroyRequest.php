@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Laravel\Nova\Fields\File as FileField;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
+use Laravel\Nova\Util;
 
 class PivotFieldDestroyRequest extends NovaRequest
 {
@@ -26,18 +27,26 @@ class PivotFieldDestroyRequest extends NovaRequest
 
     /**
      * Get the pivot model for the relationship.
+     *
+     * @return (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot
+     *
+     * @throws \RuntimeException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function findPivotModel(): Pivot
+    public function findPivotModel(): Model|Pivot
     {
         $resource = $this->findResourceOrFail();
 
         abort_unless($resource->hasRelatableField($this, $this->viaRelationship), 404);
 
-        return once(function () use ($resource) {
-            return $this->findRelatedModel()->{
-                $resource->model()->{$this->viaRelationship}()->getPivotAccessor()
-            };
-        });
+        return Util::expectPivotModel(
+            once(function () use ($resource) {
+                return $this->findRelatedModel()->{
+                    $resource->model()->{$this->viaRelationship}()->getPivotAccessor()
+                };
+            }),
+        );
     }
 
     /**

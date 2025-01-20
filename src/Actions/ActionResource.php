@@ -78,7 +78,7 @@ class ActionResource extends Resource
             MorphToActionTarget::make(Nova::__('Action Target'), 'target')->showOnPreview(),
 
             Status::make(Nova::__('Action Status'), 'status', function ($value) {
-                return Nova::__(ucfirst($value));
+                return transform($value, static fn ($value) => Nova::__(ucfirst($value)));
             })->loadingWhen([Nova::__('Waiting'), Nova::__('Running')])->failedWhen([Nova::__('Failed')]),
 
             $this->when(isset($this->original), function () {

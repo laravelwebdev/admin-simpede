@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Nova\Actions\ActionEvent;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
+use Laravel\Nova\Util;
 use Throwable;
 
 class AttachedResourceUpdateController extends Controller
@@ -106,8 +108,12 @@ class AttachedResourceUpdateController extends Controller
      * Find the pivot model for the operation.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot
+     *
+     * @throws \RuntimeException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    protected function findPivot(NovaRequest $request, $model): Pivot
+    protected function findPivot(NovaRequest $request, $model): Model|Pivot
     {
         $relation = $model->{$request->viaRelationship}();
 
@@ -119,10 +125,12 @@ class AttachedResourceUpdateController extends Controller
 
         $accessor = $relation->getPivotAccessor();
 
-        return $relation
-            ->withoutGlobalScopes()
-            ->lockForUpdate()
-            ->findOrFail($request->relatedResourceId)->{$accessor};
+        return Util::expectPivotModel(
+            $relation
+                ->withoutGlobalScopes()
+                ->lockForUpdate()
+                ->findOrFail($request->relatedResourceId)->{$accessor}
+        );
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Laravel\Nova\Console;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Support\Str;
+use Laravel\Nova\Util;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -66,11 +67,11 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
     #[\Override]
     public function handle()
     {
-        parent::handle();
-
         $this->callSilent('nova:base-resource', [
             'name' => 'Resource',
         ]);
+
+        parent::handle();
     }
 
     /**
@@ -117,13 +118,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
             return $result;
         }
 
-        $lineEndingCount = [
-            "\r\n" => substr_count($result, "\r\n"),
-            "\r" => substr_count($result, "\r"),
-            "\n" => substr_count($result, "\n"),
-        ];
-
-        $eol = array_keys($lineEndingCount, max($lineEndingCount))[0];
+        $eol = Util::eol($result);
 
         return str_replace(
             'use Laravel\Nova\Http\Requests\NovaRequest;'.$eol,

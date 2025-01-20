@@ -3,8 +3,10 @@
 namespace Laravel\Nova\Http\Controllers;
 
 use DateTime;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Util;
 
 class MorphedResourceAttachController extends ResourceAttachController
 {
@@ -12,9 +14,13 @@ class MorphedResourceAttachController extends ResourceAttachController
      * Initialize a fresh pivot model for the relationship.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphToMany  $relationship
+     * @return (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot
+     *
+     * @throws \RuntimeException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     #[\Override]
-    protected function initializePivot(NovaRequest $request, $relationship): Pivot
+    protected function initializePivot(NovaRequest $request, $relationship): Model|Pivot
     {
         $model = tap($request->findResourceOrFail(), function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
@@ -35,7 +41,9 @@ class MorphedResourceAttachController extends ResourceAttachController
         }
 
         /** @phpstan-ignore method.notFound */
-        ($pivot = $relationship->newPivot($relationship->getDefaultPivotAttributes(), false))->forceFill([
+        $pivot = $relationship->newPivot($relationship->getDefaultPivotAttributes(), false);
+
+        Util::expectPivotModel($pivot)->forceFill([
             $relationship->getForeignPivotKeyName() => $parentKey,
             $relationship->getRelatedPivotKeyName() => $relatedKey,
             $relationship->getMorphType() => $model->{$request->viaRelationship}()->getMorphClass(),

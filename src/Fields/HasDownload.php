@@ -8,12 +8,19 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Resource;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * @phpstan-type TResourceModel \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|\stdClass
+ * @phpstan-type TDownloadResponse \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+ * @phpstan-type TDownloadResponseCallback (callable(\Laravel\Nova\Http\Requests\NovaRequest, TResourceModel, ?string, ?string):(TDownloadResponse))
+ */
 trait HasDownload
 {
     /**
      * The callback used to generate the download HTTP response.
      *
-     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Laravel\Nova\Resource, ?string, ?string):(mixed))|null
+     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest, object, ?string, ?string):(mixed))|null
+     *
+     * @phpstan-var TDownloadResponseCallback|null
      */
     public $downloadResponseCallback;
 
@@ -39,8 +46,10 @@ trait HasDownload
     /**
      * Specify the callback that should be used to create a download HTTP response.
      *
-     * @param  callable(\Laravel\Nova\Http\Requests\NovaRequest, \Laravel\Nova\Resource, ?string, ?string):mixed  $downloadResponseCallback
+     * @param  callable(\Laravel\Nova\Http\Requests\NovaRequest, object, ?string, ?string):mixed  $downloadResponseCallback
      * @return $this
+     *
+     * @phpstan-param TDownloadResponseCallback $downloadResponseCallback
      */
     public function download(callable $downloadResponseCallback)
     {

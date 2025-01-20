@@ -3,6 +3,7 @@
 namespace Laravel\Nova\Http\Controllers;
 
 use DateTime;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Nova\Actions\ActionEvent;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
+use Laravel\Nova\Util;
 use Throwable;
 
 class ResourceAttachController extends Controller
@@ -106,10 +108,12 @@ class ResourceAttachController extends Controller
      * Initialize a fresh pivot model for the relationship.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\BelongsToMany  $relationship
+     * @return (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot
      *
-     * @throws \Exception
+     * @throws \RuntimeException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    protected function initializePivot(NovaRequest $request, $relationship): Pivot
+    protected function initializePivot(NovaRequest $request, $relationship): Model|Pivot
     {
         $parentKey = $request->resourceId;
         $relatedKey = $request->input($request->relatedResource);
@@ -125,7 +129,9 @@ class ResourceAttachController extends Controller
             $relatedKey = $request->findRelatedModelOrFail()->{$relatedKeyName};
         }
 
-        ($pivot = $relationship->newPivot($relationship->getDefaultPivotAttributes(), false))->forceFill([
+        $pivot = $relationship->newPivot($relationship->getDefaultPivotAttributes(), false);
+
+        Util::expectPivotModel($pivot)->forceFill([
             $relationship->getForeignPivotKeyName() => $parentKey,
             $relationship->getRelatedPivotKeyName() => $relatedKey,
         ]);

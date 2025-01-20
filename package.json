@@ -45,7 +45,7 @@
     "@floating-ui/vue": "^1.1.4",
     "@headlessui/vue": "^1.7.22",
     "@heroicons/vue": "^2.1.5",
-    "@inertiajs/vue3": "^2.0.0",
+    "@inertiajs/vue3": "^2.0.2",
     "@popperjs/core": "^2.11.8",
     "@vue/compat": "^3.5.0",
     "@vueuse/core": "^10.11.1",
