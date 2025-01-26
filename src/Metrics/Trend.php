@@ -405,7 +405,9 @@ abstract class Trend extends RangedMetric
             $possibleDateResults,
             $results->mapWithKeys(fn ($result) => [
                 $this->formatAggregateResultDate(
-                    $result->date_result, $unit, $request->twelveHourTime === 'true'
+                    $result->date_result, // @phpstan-ignore property.notFound
+                    $unit,
+                    $request->twelveHourTime === 'true'
                 ) => round($result->aggregate ?? 0, $this->roundingPrecision, $this->roundingMode),
             ])->reject(fn ($value, $key) => ! in_array($key, $possibleDateKeys))
             ->all()

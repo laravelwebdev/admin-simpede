@@ -17,8 +17,9 @@
 }
 
 .form-control[data-disabled],
-.form-control:disabled {
-  @apply bg-gray-50 dark:bg-gray-800 text-gray-400 outline-none;
+.form-control:disabled,
+.form-control:read-only {
+  @apply bg-gray-50 dark:bg-gray-800 text-gray-400 outline-none focus:outline-none;
 }
 
 /* Form Inputs

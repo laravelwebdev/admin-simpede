@@ -7,6 +7,7 @@ use BadMethodCallException;
 use Carbon\CarbonInterval;
 use Closure;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Http\Client\Response as ClientResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -212,7 +213,7 @@ class Nova
 
             $version = $manifest['version'] ?? '4.x';
 
-            return $version;
+            return $version.' (Silver Surfer)';
         });
     }
 
@@ -409,21 +410,29 @@ class Nova
     {
         $namespace = app()->getNamespace();
 
+        /** @var array<int, class-string<\Laravel\Nova\Resource>> $resources */
         $resources = [];
 
+        $gate = app(GateContract::class);
+
         foreach ((new Finder)->in($directory)->files() as $resource) {
-            $resource = $namespace.str_replace(
+            /** @var class-string<\Laravel\Nova\Resource> $resourceClass */
+            $resourceClass = $namespace.str_replace(
                 ['/', '.php'],
                 ['\\', ''],
                 Str::after($resource->getPathname(), app_path().DIRECTORY_SEPARATOR)
             );
 
             if (
-                is_subclass_of($resource, Resource::class) &&
-                ! (new ReflectionClass($resource))->isAbstract() &&
-                ! is_subclass_of($resource, ActionResource::class)
+                is_subclass_of($resourceClass, Resource::class) &&
+                ! (new ReflectionClass($resourceClass))->isAbstract() &&
+                ! is_subclass_of($resourceClass, ActionResource::class)
             ) {
-                $resources[] = $resource;
+                $resources[] = $resourceClass;
+            }
+
+            if (property_exists($resourceClass, 'policy') && ! is_null($resourceClass::$policy)) {
+                $gate->policy($resourceClass, $resourceClass::$policy);
             }
         }
 

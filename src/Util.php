@@ -177,7 +177,7 @@ class Util
     }
 
     /**
-     * Resolve the model/resoruce for policy.
+     * Resolve the model/resource for policy.
      *
      * @param  \Laravel\Nova\Resource  $resource
      * @return \Laravel\Nova\Resource|\Illuminate\Database\Eloquent\Model

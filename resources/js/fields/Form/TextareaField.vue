@@ -15,6 +15,7 @@
           @input="handleChange"
           class="w-full h-auto py-3 block form-control form-input form-control-bordered"
           :dusk="field.attribute"
+          :disabled="currentlyIsReadonly"
         />
 
         <CharacterCounter
