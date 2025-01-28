@@ -871,26 +871,6 @@ class Nova
     }
 
     /**
-     * Check to see if Nova is valid for the configured license key.
-     */
-    public static function checkLicenseValidity(): bool
-    {
-        return Cache::remember('nova_valid_license_key', 3600, function () {
-            return rescue(function () {
-                return static::checkLicense();
-            }, false);
-        });
-    }
-
-    /**
-     * Check to see if Nova is valid for the configured license key.
-     */
-    public static function checkLicense(): bool
-    {
-        return true;
-    }
-
-    /**
      * Get the logo that is configured for the Nova admin.
      */
     public static function logo(): ?string

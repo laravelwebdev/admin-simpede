@@ -20,8 +20,6 @@
         >
           <AppLogo class="h-6" />
         </Link>
-
-        <LicenseWarning />
       </div>
 
       <div class="flex flex-1 px-4 sm:px-8 lg:px-12">
@@ -126,7 +124,6 @@
 
 <script setup>
 import { useStore } from 'vuex'
-import LicenseWarning from '@/components/LicenseWarning'
 import { Button } from 'laravel-nova-ui'
 import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
 import { computed, onBeforeUnmount, useTemplateRef, watch } from 'vue'

@@ -55,11 +55,6 @@ class HandleInertiaRequests extends Middleware
                     return ! is_null($user) ? UserResource::make($user)->toArray($request) : null;
                 });
             },
-            'validLicense' => function () use ($request) {
-                return with(Nova::user($request), function ($user) {
-                    return ! is_null($user) ? Nova::checkLicenseValidity() : Cache::get('nova_valid_license_key');
-                });
-            },
         ]);
     }
 
