@@ -13,7 +13,6 @@ export default {
     version: '5.x',
     mainMenuShown: false,
     canLeaveModal: true,
-    validLicense: true,
     queryStringParams: {},
     compiledQueryStringParams: '',
   }),
@@ -27,7 +26,6 @@ export default {
     breadcrumbs: s => s.breadcrumbs,
     mainMenuShown: s => s.mainMenuShown,
     canLeaveModal: s => s.canLeaveModal,
-    validLicense: s => s.validLicense,
     queryStringParams: s => s.queryStringParams,
   },
 
@@ -127,13 +125,11 @@ export default {
       let { resources, base, version, mainMenu, userMenu } = config
 
       let user = props.currentUser
-      let validLicense = props.validLicense
       let breadcrumbs = props.breadcrumbs
 
       Nova.appConfig = config
       state.breadcrumbs = breadcrumbs || []
       state.currentUser = user
-      state.validLicense = validLicense
       state.resources = resources
       state.baseUri = base
       state.version = version

@@ -79,7 +79,6 @@ class NovaServiceProvider extends ServiceProvider
             Console\FieldCommand::class,
             Console\InstallCommand::class,
             Console\LensCommand::class,
-            Console\CheckLicenseCommand::class,
             Console\PartitionCommand::class,
             Console\PolicyMakeCommand::class,
             Console\ProgressCommand::class,
