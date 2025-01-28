@@ -210,8 +210,12 @@ watch(dropdownShown, show => {
 
 // Lifecycle Methods
 useEventListener(document, 'keydown', event => {
+  if (dropdownShown.value !== true) {
+    return
+  }
+
   // 'tab' or 'escape'
-  if (dropdownShown.value && [9, 27].includes(event.keyCode)) {
+  if ([9, 27].includes(event.keyCode)) {
     setTimeout(() => close(), 50)
 
     return

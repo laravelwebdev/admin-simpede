@@ -8,9 +8,7 @@ use Laravel\Fortify\Http\Controllers\PasswordResetLinkController as Controller;
 
 class PasswordResetLinkController extends Controller
 {
-    /**
-     * Get the broker to be used during password reset.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function broker(): PasswordBroker
     {

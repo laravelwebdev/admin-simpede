@@ -82,7 +82,7 @@
           >
             {{
               __(
-                recovery ? 'Use a recovery code' : 'Use an authentication code'
+                !recovery ? 'Use a recovery code' : 'Use an authentication code'
               )
             }}
           </Button>

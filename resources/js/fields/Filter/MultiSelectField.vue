@@ -9,7 +9,7 @@
         :options="field.options"
         :dusk="filter.uniqueKey"
       >
-        <option value="" :selected="value === ''">&mdash;</option>
+        <option value="" :selected="!filledValue">&mdash;</option>
       </MultiSelectControl>
     </template>
   </FilterContainer>
@@ -17,6 +17,7 @@
 
 <script>
 import debounce from 'lodash/debounce'
+import filled from '@/util/filled'
 
 export default {
   emits: ['change'],
@@ -73,6 +74,10 @@ export default {
 
     field() {
       return this.filter.field
+    },
+
+    filledValue() {
+      return filled(this.value)
     },
   },
 }

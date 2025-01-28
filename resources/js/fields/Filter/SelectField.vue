@@ -40,7 +40,7 @@
         :options="field?.options ?? []"
         :dusk="filter.uniqueKey"
       >
-        <option value="" :selected="value === ''">&mdash;</option>
+        <option value="" :selected="!filledValue">&mdash;</option>
       </SelectControl>
     </template>
   </FilterContainer>
@@ -48,6 +48,7 @@
 
 <script>
 import debounce from 'lodash/debounce'
+import filled from '@/util/filled'
 
 export default {
   emits: ['change'],
@@ -118,6 +119,7 @@ export default {
 
     handleFilterReset() {
       if (this.filter.currentValue !== '') {
+        this.setCurrentFilterValue()
         return
       }
 
@@ -161,6 +163,10 @@ export default {
       return this.field.options.find(
         o => this.value === o.value || this.value === o.value.toString()
       )
+    },
+
+    filledValue() {
+      return filled(this.value)
     },
   },
 }

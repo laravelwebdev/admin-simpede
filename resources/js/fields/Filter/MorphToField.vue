@@ -9,7 +9,7 @@
         label="singularLabel"
         :dusk="filter.uniqueKey"
       >
-        <option value="" :selected="value === ''">&mdash;</option>
+        <option value="" :selected="!filledValue">&mdash;</option>
       </SelectControl>
     </template>
   </FilterContainer>
@@ -17,6 +17,7 @@
 
 <script>
 import debounce from 'lodash/debounce'
+import filled from '@/util/filled'
 
 export default {
   emits: ['change'],
@@ -91,6 +92,10 @@ export default {
 
     hasMorphToTypes() {
       return this.field.morphToTypes.length > 0
+    },
+
+    filledValue() {
+      return filled(this.value)
     },
   },
 }
