@@ -16,7 +16,7 @@ class Fluent extends \Illuminate\Support\Fluent
      * @param  array<string, mixed>  $attributes
      * @return $this
      */
-    public function fill(array $attributes)
+    public function fill($attributes)
     {
         foreach ($attributes as $key => $value) {
             $attribute = Str::replace('->', '.', $key);
@@ -35,7 +35,7 @@ class Fluent extends \Illuminate\Support\Fluent
      * @param  array<string, mixed>  $attributes
      * @return $this
      */
-    public function forceFill(array $attributes)
+    public function forceFill($attributes)
     {
         foreach ($attributes as $key => $value) {
             $attribute = Str::replace('->', '.', $key);
