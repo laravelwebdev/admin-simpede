@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -12,7 +13,7 @@ class FieldDownloadController extends Controller
     /**
      * Download the given field's contents.
      */
-    public function __invoke(NovaRequest $request): Response|StreamedResponse
+    public function __invoke(NovaRequest $request): Response|RedirectResponse|StreamedResponse
     {
         $resource = $request->findResourceOrFail();
 

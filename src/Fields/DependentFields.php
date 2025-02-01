@@ -77,9 +77,8 @@ trait DependentFields
     public function applyDependsOn(NovaRequest $request)
     {
         $this->fieldDependencies = collect($this->fieldDependencies ?? [])
-            ->map(function (Dependent $dependent) use ($request) {
-                return $dependent->handle($this, $request);
-            })->all();
+            ->map(fn (Dependent $dependent) => $dependent->handle($this, $request))
+            ->all();
 
         return $this;
     }
@@ -92,9 +91,9 @@ trait DependentFields
     protected function getDependentsAttributes(NovaRequest $request): ?array
     {
         /** @var \Illuminate\Support\Collection<string, mixed> $attributes */
-        $attributes = collect($this->fieldDependencies ?? [])->map(function (Dependent $dependent) {
-            return $dependent->getAttributes();
-        })->collapse();
+        $attributes = collect($this->fieldDependencies ?? [])
+            ->map(static fn (Dependent $dependent) => $dependent->getAttributes())
+            ->collapse();
 
         if ($attributes->isNotEmpty()) {
             return $attributes->all();

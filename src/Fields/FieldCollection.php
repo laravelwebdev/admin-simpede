@@ -300,7 +300,9 @@ class FieldCollection extends Collection
      */
     public function applyDependsOn(NovaRequest $request)
     {
-        $this->each->applyDependsOn($request);
+        $this->each(static function ($field) use ($request) {
+            $field->applyDependsOn($request);
+        });
 
         return $this;
     }
@@ -324,9 +326,9 @@ class FieldCollection extends Collection
             }
         });
 
-        $this->each->applyDependsOn(
-            NovaRequest::createFrom($request)->mergeIfMissing($payloads->all())
-        );
+        $this->each(static function ($field) use ($request, $payloads) {
+            $field->applyDependsOn(NovaRequest::createFrom($request)->mergeIfMissing($payloads->all()));
+        });
 
         return $this;
     }
