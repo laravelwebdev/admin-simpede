@@ -33,10 +33,10 @@
 
       <div class="mb-6">
         <label class="block mb-2" for="password">{{ __('Password') }}</label>
-            <div class="flex items-center">
+        <div class="relative">
             <input
               v-model="form.password"
-              class="w-full form-control form-input form-control-bordered"
+              class="w-full form-control form-input form-control-bordered pr-10"
               :class="{
               'form-control-bordered-error': form.errors.has('password'),
               }"
@@ -46,9 +46,13 @@
               autocomplete="current-password"
               required
             />
-            <Button variant="outline" :icon="showPassword ? 'eye-slash' : 'eye'" @click="togglePasswordVisibility" class="ml-1">
-            </Button>
-            </div>
+            <Icon 
+              type="outline" 
+              :name="showPassword ? 'eye-slash' : 'eye'" 
+              @click="togglePasswordVisibility"
+              class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+            />
+        </div>
         <HelpText class="mt-2 text-red-500" v-if="form.errors.has('password')">
           {{ form.errors.first('password') }}
         </HelpText>
@@ -102,7 +106,7 @@
 
 <script>
 import Auth from '@/layouts/Auth'
-import { Button, Checkbox } from 'laravel-nova-ui'
+import { Button, Checkbox, Icon } from 'laravel-nova-ui'
 
 export default {
   name: 'LoginPage',
@@ -112,6 +116,7 @@ export default {
   components: {
     Checkbox,
     Button,
+    Icon,
   },
 
   props: {
