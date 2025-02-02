@@ -33,19 +33,22 @@
 
       <div class="mb-6">
         <label class="block mb-2" for="password">{{ __('Password') }}</label>
-        <input
-          v-model="form.password"
-          class="w-full form-control form-input form-control-bordered"
-          :class="{
-            'form-control-bordered-error': form.errors.has('password'),
-          }"
-          id="password"
-          type="password"
-          name="password"
-          autocomplete="current-password"
-          required
-        />
-
+            <div class="flex items-center">
+            <input
+              v-model="form.password"
+              class="w-full form-control form-input form-control-bordered"
+              :class="{
+              'form-control-bordered-error': form.errors.has('password'),
+              }"
+              id="password"
+              :type="showPassword ? 'text' : 'password'"
+              name="password"
+              autocomplete="current-password"
+              required
+            />
+            <Button variant="outline" :icon="showPassword ? 'eye-slash' : 'eye'" @click="togglePasswordVisibility" class="ml-1">
+            </Button>
+            </div>
         <HelpText class="mt-2 text-red-500" v-if="form.errors.has('password')">
           {{ form.errors.first('password') }}
         </HelpText>
@@ -125,10 +128,16 @@ export default {
         year: new Date().getFullYear(),
         remember: false,
       }),
+        showPassword: false,
     }
   },
 
   methods: {
+
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword
+    },
+
     async attempt() {
       try {
         const { redirect, two_factor } = await this.form.post(
