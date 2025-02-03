@@ -40,9 +40,9 @@ class LensViewResource extends Resource
             'per_page_options' => $request->resource()::perPageOptions(),
             'softDeletes' => $request->resourceSoftDeletes(),
             'hasId' => $resources->pluck('id')
-                        ->reject(function ($field) {
-                            return is_null($field->value);
-                        })->isNotEmpty(),
+                ->reject(function ($field) {
+                    return is_null($field->value);
+                })->isNotEmpty(),
             'polling' => $lens::$polling,
             'pollingInterval' => $lens::$pollingInterval * 1000,
             'showPollingToggle' => $lens::$showPollingToggle,

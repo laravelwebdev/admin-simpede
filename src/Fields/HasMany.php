@@ -140,9 +140,9 @@ class HasMany extends Field implements ListableField, RelatableField
     public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
-                    ->withMeta([
-                        'prefixComponent' => true,
-                    ])->withComponent('relationship-panel');
+            ->withMeta([
+                'prefixComponent' => true,
+            ])->withComponent('relationship-panel');
     }
 
     /**

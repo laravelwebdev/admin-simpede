@@ -53,7 +53,7 @@ class NovaCoreServiceProvider extends ServiceProvider
         Route::middlewareGroup('nova:api', config('nova.api_middleware', []));
 
         $this->app->make(HttpKernel::class)
-                    ->pushMiddleware(ServeNova::class);
+            ->pushMiddleware(ServeNova::class);
 
         $this->app->afterResolving(NovaRequest::class, function ($request, $app) {
             if (! $app->bound(NovaRequest::class)) {

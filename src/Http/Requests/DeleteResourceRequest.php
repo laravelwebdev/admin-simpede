@@ -28,8 +28,8 @@ class DeleteResourceRequest extends DeletionRequest
     protected function deletableModels(Collection $models): Collection
     {
         return $models->mapInto($this->resource())
-                        ->filter->authorizedToDelete($this)
-                        ->map->model();
+            ->filter->authorizedToDelete($this)
+            ->map->model();
     }
 
     /**

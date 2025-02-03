@@ -21,8 +21,8 @@ class FieldDestroyController extends Controller
         $resource->authorizeToUpdate($request);
 
         $field = $resource->updateFields($request)
-                    ->whereInstanceOf(Downloadable::class)
-                    ->findFieldByAttributeOrFail($request->field);
+            ->whereInstanceOf(Downloadable::class)
+            ->findFieldByAttributeOrFail($request->field);
 
         DeleteField::forRequest(
             $request, $field, $resource->resource

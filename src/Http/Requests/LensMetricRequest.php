@@ -15,6 +15,6 @@ class LensMetricRequest extends MetricRequest
     public function availableMetrics(): Collection
     {
         return $this->lens()->availableCards($this)
-                ->whereInstanceOf(Metric::class);
+            ->whereInstanceOf(Metric::class);
     }
 }

@@ -181,9 +181,9 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
-                    ->withMeta([
-                        'prefixComponent' => true,
-                    ])->withComponent('relationship-panel');
+            ->withMeta([
+                'prefixComponent' => true,
+            ])->withComponent('relationship-panel');
     }
 
     /**

@@ -58,7 +58,7 @@ trait InteractsWithResourcesSelection
         }
 
         return $this->newQueryWithoutScopes()
-                    ->whereKey($resourceIds)
-                    ->get();
+            ->whereKey($resourceIds)
+            ->get();
     }
 }

@@ -20,7 +20,7 @@ class FieldDownloadController extends Controller
         $resource->authorizeToView($request);
 
         return $resource->downloadableFields($request)
-                    ->findFieldByAttributeOrFail($request->field)
-                    ->toDownloadResponse($request, $resource);
+            ->findFieldByAttributeOrFail($request->field)
+            ->toDownloadResponse($request, $resource);
     }
 }

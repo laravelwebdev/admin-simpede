@@ -120,16 +120,16 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
 
             if ($this->ofManyRelationship === false && $request->viaRelationship === $this->attribute && $request->viaResourceId) {
                 $parent = $parentResource::newModel()
-                            ->with($this->attribute)
-                            ->find($request->viaResourceId);
+                    ->with($this->attribute)
+                    ->find($request->viaResourceId);
 
                 return optional($parent->{$this->attribute})->exists === true;
             }
 
             return false;
         })->showOnCreating(fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
-        ->showOnUpdating(fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
-        ->nullable();
+            ->showOnUpdating(fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
+            ->nullable();
     }
 
     /**
@@ -236,11 +236,11 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
-                    ->withMeta([
-                        'prefixComponent' => true,
-                    ])
-                    ->help($this->getHelpText())
-                    ->withComponent('relationship-panel');
+            ->withMeta([
+                'prefixComponent' => true,
+            ])
+            ->help($this->getHelpText())
+            ->withComponent('relationship-panel');
     }
 
     /**

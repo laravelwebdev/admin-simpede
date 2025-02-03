@@ -194,13 +194,13 @@ class ActionRequest extends NovaRequest
             $fields = new Fluent;
 
             $results = FieldCollection::make($this->action()->fields($this))
-                            ->authorized($this)
-                            ->applyDependsOn($this)
-                            ->withoutReadonly($this)
-                            ->withoutUnfillable()
-                            ->mapWithKeys(fn ($field) => [
-                                $field->attribute => $field->fillForAction($this, $fields),
-                            ]);
+                ->authorized($this)
+                ->applyDependsOn($this)
+                ->withoutReadonly($this)
+                ->withoutUnfillable()
+                ->mapWithKeys(fn ($field) => [
+                    $field->attribute => $field->fillForAction($this, $fields),
+                ]);
 
             return new ActionFields(
                 collect($fields->getAttributes()),

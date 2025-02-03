@@ -134,10 +134,10 @@ trait InteractsWithResources
     public function findModelQuery($resourceId = null)
     {
         return app()->make(QueryBuilder::class, [$this->resource()])
-                    ->whereKey(
-                        $this->newQueryWithoutScopes(),
-                        $resourceId ?? $this->resourceId
-                    )->toBase();
+            ->whereKey(
+                $this->newQueryWithoutScopes(),
+                $resourceId ?? $this->resourceId
+            )->toBase();
     }
 
     /**

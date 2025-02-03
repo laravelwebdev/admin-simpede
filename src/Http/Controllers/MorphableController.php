@@ -19,10 +19,10 @@ class MorphableController extends Controller
         abort_if(is_null($relatedResource), 403);
 
         $field = $request->newResource()
-                        ->availableFieldsOnIndexOrDetail($request)
-                        ->whereInstanceOf(RelatableField::class)
-                        ->findFieldByAttributeOrFail($request->field)
-                        ->applyDependsOn($request);
+            ->availableFieldsOnIndexOrDetail($request)
+            ->whereInstanceOf(RelatableField::class)
+            ->findFieldByAttributeOrFail($request->field)
+            ->applyDependsOn($request);
 
         $withTrashed = $this->shouldIncludeTrashed(
             $request, $relatedResource
@@ -40,12 +40,12 @@ class MorphableController extends Controller
 
         return [
             'resources' => $query->take($limit)
-                                ->get()
-                                ->mapInto($relatedResource)
-                                ->filter->authorizedToAdd($request, $request->model())
-                                ->map(function ($resource) use ($request, $field, $relatedResource) {
-                                    return $field->formatMorphableResource($request, $resource, $relatedResource);
-                                })->when($shouldReorderAssociatableValues, function ($collection) {
+                ->get()
+                ->mapInto($relatedResource)
+                ->filter->authorizedToAdd($request, $request->model())
+                ->map(function ($resource) use ($request, $field, $relatedResource) {
+                    return $field->formatMorphableResource($request, $resource, $relatedResource);
+                })->when($shouldReorderAssociatableValues, function ($collection) {
                                     return $collection->sortBy('display');
                                 })->values(),
             'withTrashed' => $withTrashed,

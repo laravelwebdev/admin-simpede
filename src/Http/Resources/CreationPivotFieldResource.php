@@ -16,10 +16,10 @@ class CreationPivotFieldResource extends Resource
     public function toArray($request)
     {
         return $this->newResourceWith($request)
-                    ->creationPivotFields(
-                        $request,
-                        $request->relatedResource
-                    )->applyDependsOnWithDefaultValues($request)->all();
+            ->creationPivotFields(
+                $request,
+                $request->relatedResource
+            )->applyDependsOnWithDefaultValues($request)->all();
     }
 
     /**

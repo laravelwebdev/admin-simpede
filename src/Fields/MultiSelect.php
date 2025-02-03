@@ -158,8 +158,8 @@ class MultiSelect extends Field implements FilterableField
         if ($this->displayUsingLabel === true) {
             $this->displayUsing(function ($value) use ($options) {
                 return collect($options)
-                        ->where('value', $value)
-                        ->first()['label'] ?? $value;
+                    ->where('value', $value)
+                    ->first()['label'] ?? $value;
             });
         }
 

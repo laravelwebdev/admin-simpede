@@ -34,10 +34,10 @@ trait PerformsValidation
     public static function validatorForCreation(NovaRequest $request): ValidatorContract
     {
         return Validator::make($request->all(), static::rulesForCreation($request))
-                ->after(function ($validator) use ($request) {
-                    static::afterValidation($request, $validator);
-                    static::afterCreationValidation($request, $validator);
-                });
+            ->after(function ($validator) use ($request) {
+                static::afterValidation($request, $validator);
+                static::afterCreationValidation($request, $validator);
+            });
     }
 
     /**
@@ -97,10 +97,10 @@ trait PerformsValidation
     public static function validatorForUpdate(NovaRequest $request, ?Resource $resource = null): ValidatorContract
     {
         return Validator::make($request->all(), static::rulesForUpdate($request, $resource))
-                ->after(function ($validator) use ($request) {
-                    static::afterValidation($request, $validator);
-                    static::afterUpdateValidation($request, $validator);
-                });
+            ->after(function ($validator) use ($request) {
+                static::afterValidation($request, $validator);
+                static::afterUpdateValidation($request, $validator);
+            });
     }
 
     /**
@@ -116,11 +116,11 @@ trait PerformsValidation
         $resource ??= self::newResource();
 
         return static::formatRules($request, $resource->updateFields($request)
-                    ->applyDependsOn($request)
-                    ->withoutReadonly($request)
-                    ->withoutUnfillable()
-                    ->mapWithKeys(fn ($field) => $field->getUpdateRules($request))
-                    ->all());
+            ->applyDependsOn($request)
+            ->withoutReadonly($request)
+            ->withoutUnfillable()
+            ->mapWithKeys(fn ($field) => $field->getUpdateRules($request))
+            ->all());
     }
 
     /**
@@ -133,12 +133,12 @@ trait PerformsValidation
     public static function updateRulesFor(NovaRequest $request, string $field): array
     {
         return static::formatRules($request, self::newResource()
-                    ->availableFields($request)
-                    ->where('attribute', $field)
-                    ->applyDependsOn($request)
-                    ->withoutUnfillable()
-                    ->mapWithKeys(fn ($field) => $field->getUpdateRules($request))
-                    ->all());
+            ->availableFields($request)
+            ->where('attribute', $field)
+            ->applyDependsOn($request)
+            ->withoutUnfillable()
+            ->mapWithKeys(fn ($field) => $field->getUpdateRules($request))
+            ->all());
     }
 
     /**
@@ -169,9 +169,9 @@ trait PerformsValidation
     public static function rulesForAttachment(NovaRequest $request): array
     {
         return static::formatRules($request, self::newResource()
-                    ->creationPivotFields($request, $request->relatedResource)
-                    ->mapWithKeys(fn ($field) => $field->getCreationRules($request))
-                    ->all());
+            ->creationPivotFields($request, $request->relatedResource)
+            ->mapWithKeys(fn ($field) => $field->getCreationRules($request))
+            ->all());
     }
 
     /**
@@ -202,9 +202,9 @@ trait PerformsValidation
     public static function rulesForAttachmentUpdate(NovaRequest $request): array
     {
         return static::formatRules($request, self::newResource()
-                    ->updatePivotFields($request, $request->relatedResource)
-                    ->mapWithKeys(fn ($field) => $field->getUpdateRules($request))
-                    ->all());
+            ->updatePivotFields($request, $request->relatedResource)
+            ->mapWithKeys(fn ($field) => $field->getUpdateRules($request))
+            ->all());
     }
 
     /**
