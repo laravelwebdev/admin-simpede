@@ -14,6 +14,7 @@ use Laravel\Fortify\Contracts\ConfirmPasswordViewResponse as ConfirmPasswordView
 use Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse as FailedPasswordConfirmationResponseContract;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\LoginViewResponse as LoginViewResponseContract;
+use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 use Laravel\Fortify\Contracts\PasswordConfirmedResponse as PasswordConfirmedResponseContract;
 use Laravel\Fortify\Contracts\PasswordUpdateResponse as PasswordUpdateResponseContract;
 use Laravel\Fortify\Contracts\RequestPasswordResetLinkViewResponse as RequestPasswordResetLinkViewResponseContract;
@@ -30,6 +31,7 @@ use Laravel\Nova\Auth\Actions\ConfirmPasswordViewResponse;
 use Laravel\Nova\Auth\Actions\FailedPasswordConfirmationResponse;
 use Laravel\Nova\Auth\Actions\LoginResponse;
 use Laravel\Nova\Auth\Actions\LoginViewResponse;
+use Laravel\Nova\Auth\Actions\LogoutResponse;
 use Laravel\Nova\Auth\Actions\PasswordConfirmedResponse;
 use Laravel\Nova\Auth\Actions\PasswordUpdateResponse;
 use Laravel\Nova\Auth\Actions\RedirectAsIntendedForNova;
@@ -345,6 +347,7 @@ class PendingFortifyConfiguration
 
             $app->scoped(LoginViewResponseContract::class, LoginViewResponse::class);
             $app->scoped(LoginResponseContract::class, LoginResponse::class);
+            $app->scoped(LogoutResponseContract::class, LogoutResponse::class);
 
             $app->scoped(ResetPasswordViewResponseContract::class, ResetPasswordViewResponse::class);
             $app->scoped(RequestPasswordResetLinkViewResponseContract::class, RequestPasswordResetLinkViewResponse::class);
