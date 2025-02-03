@@ -1,0 +1,8 @@
+risky: false
+version: 8.3
+preset: laravel
+enabled:
+  - method_chaining_indentation
+finder:
+  not-name:
+    - index.php
