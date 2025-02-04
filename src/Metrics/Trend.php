@@ -392,12 +392,12 @@ abstract class Trend extends RangedMetric
         $wrappedColumn = $query->getQuery()->getGrammar()->wrap($column);
 
         $results = $query
-                ->select(DB::raw("{$expression} as date_result, {$function}({$wrappedColumn}) as aggregate"))
-                ->tap(fn ($query) => $this->applyFilterQuery($request, $query))
-                ->whereBetween($dateColumn, $this->formatQueryDateBetween([$startingDate, $endingDate]))
-                ->groupBy(DB::raw($expression))
-                ->orderBy('date_result')
-                ->get();
+            ->select(DB::raw("{$expression} as date_result, {$function}({$wrappedColumn}) as aggregate"))
+            ->tap(fn ($query) => $this->applyFilterQuery($request, $query))
+            ->whereBetween($dateColumn, $this->formatQueryDateBetween([$startingDate, $endingDate]))
+            ->groupBy(DB::raw($expression))
+            ->orderBy('date_result')
+            ->get();
 
         $possibleDateKeys = array_keys($possibleDateResults);
 
@@ -410,7 +410,7 @@ abstract class Trend extends RangedMetric
                     $request->twelveHourTime === 'true'
                 ) => round($result->aggregate ?? 0, $this->roundingPrecision, $this->roundingMode),
             ])->reject(static fn ($value, $key) => ! in_array($key, $possibleDateKeys))
-            ->all()
+                ->all()
         );
 
         return $this->result(Arr::last($results))->trend(

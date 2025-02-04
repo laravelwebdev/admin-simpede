@@ -92,8 +92,8 @@ class Util
             \App\Providers\FortifyServiceProvider::class, // @phpstan-ignore class.notFound
             \App\Providers\JetstreamServiceProvider::class, // @phpstan-ignore class.notFound
         ])->map(static fn ($provider) => app()->getProvider($provider))
-        ->filter()
-        ->isNotEmpty();
+            ->filter()
+            ->isNotEmpty();
     }
 
     /**
