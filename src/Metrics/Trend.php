@@ -409,7 +409,7 @@ abstract class Trend extends RangedMetric
                     $unit,
                     $request->twelveHourTime === 'true'
                 ) => round($result->aggregate ?? 0, $this->roundingPrecision, $this->roundingMode),
-            ])->reject(fn ($value, $key) => ! in_array($key, $possibleDateKeys))
+            ])->reject(static fn ($value, $key) => ! in_array($key, $possibleDateKeys))
             ->all()
         );
 
@@ -445,12 +445,12 @@ abstract class Trend extends RangedMetric
                 return $now->subDays($range - 1)->setTime(0, 0);
 
             case 'hour':
-                return with($now->subHours($range - 1), function ($now) {
+                return with($now->subHours($range - 1), static function ($now) {
                     return $now->setTimeFromTimeString($now->hour.':00');
                 });
 
             case 'minute':
-                return with($now->subMinutes($range - 1), function ($now) {
+                return with($now->subMinutes($range - 1), static function ($now) {
                     return $now->setTimeFromTimeString($now->hour.':'.$now->minute.':00');
                 });
 
@@ -480,12 +480,12 @@ abstract class Trend extends RangedMetric
                 return $this->formatAggregateWeekDate($result);
 
             case 'day':
-                return with(Carbon::createFromFormat('Y-m-d', $result), function ($date) {
+                return with(Carbon::createFromFormat('Y-m-d', $result), static function ($date) {
                     return Nova::__($date->format('F')).' '.$date->format('j').', '.$date->format('Y');
                 });
 
             case 'hour':
-                return with(Carbon::createFromFormat('Y-m-d H:00', $result), function ($date) use ($twelveHourTime) {
+                return with(Carbon::createFromFormat('Y-m-d H:00', $result), static function ($date) use ($twelveHourTime) {
                     return $twelveHourTime
                             ? Nova::__($date->format('F')).' '.$date->format('j').' - '.$date->format('g:00 A')
                             : Nova::__($date->format('F')).' '.$date->format('j').' - '.$date->format('G:00');
@@ -493,7 +493,7 @@ abstract class Trend extends RangedMetric
 
             case 'minute':
             default:
-                return with(Carbon::createFromFormat('Y-m-d H:i:00', $result), function ($date) use ($twelveHourTime) {
+                return with(Carbon::createFromFormat('Y-m-d H:i:00', $result), static function ($date) use ($twelveHourTime) {
                     return $twelveHourTime
                             ? Nova::__($date->format('F')).' '.$date->format('j').' - '.$date->format('g:i A')
                             : Nova::__($date->format('F')).' '.$date->format('j').' - '.$date->format('G:i');
@@ -511,7 +511,7 @@ abstract class Trend extends RangedMetric
     {
         [$year, $month] = explode('-', $result);
 
-        return with(Carbon::create((int) $year, (int) $month, 1), function ($date) {
+        return with(Carbon::create((int) $year, (int) $month, 1), static function ($date) {
             return Nova::__($date->format('F')).' '.$date->format('Y');
         });
     }

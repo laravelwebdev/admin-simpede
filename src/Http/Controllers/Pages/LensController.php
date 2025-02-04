@@ -25,6 +25,7 @@ class LensController extends Controller
             'resourceName' => $request->route('resource'),
             'lens' => $lens->uriKey(),
             'searchable' => $lens::searchable(),
+            'perPageOptions' => $lens::perPageOptions() ?? $request->resource()::perPageOptions(),
         ]);
     }
 

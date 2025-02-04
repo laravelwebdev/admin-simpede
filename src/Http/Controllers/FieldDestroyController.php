@@ -21,14 +21,14 @@ class FieldDestroyController extends Controller
         $resource->authorizeToUpdate($request);
 
         $field = $resource->updateFields($request)
-                    ->whereInstanceOf(Downloadable::class)
-                    ->findFieldByAttributeOrFail($request->field);
+            ->whereInstanceOf(Downloadable::class)
+            ->findFieldByAttributeOrFail($request->field);
 
         DeleteField::forRequest(
             $request, $field, $resource->resource
         )->save();
 
-        Nova::usingActionEvent(function ($actionEvent) use ($request, $resource) {
+        Nova::usingActionEvent(static function ($actionEvent) use ($request, $resource) {
             $actionEvent->forResourceUpdate(
                 Nova::user($request), $resource->resource
             )->save();

@@ -117,13 +117,11 @@ class Status extends Text implements Unfillable
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return Arr::only($field, [
-                'uniqueKey',
-                'name',
-                'attribute',
-                'options',
-            ]);
-        });
+        return transform($this->jsonSerialize(), static fn ($field) => Arr::only($field, [
+            'uniqueKey',
+            'name',
+            'attribute',
+            'options',
+        ]));
     }
 }

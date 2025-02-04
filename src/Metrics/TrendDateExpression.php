@@ -31,7 +31,7 @@ abstract class TrendDateExpression implements Stringable
      */
     public function offset()
     {
-        $timezoneOffset = function ($timezone) {
+        $timezoneOffset = static function ($timezone) {
             return (new DateTime(CarbonImmutable::now()->format('Y-m-d H:i:s'), new DateTimeZone($timezone)))->getOffset() / 60 / 60;
         };
 

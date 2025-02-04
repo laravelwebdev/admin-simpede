@@ -17,22 +17,18 @@ class ReplicateViewResource extends CreateViewResource
         //
     }
 
-    /**
-     * Get current resource for the request.
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
+    /** {@inheritDoc} */
+    #[\Override]
     public function newResourceWith(ResourceCreateOrAttachRequest $request): NovaResource
     {
         $query = $request->findModelQuery($this->fromResourceId);
 
-        $resource = $request->resource();
-        $resource::replicateQuery($request, $query);
+        $resourceClass = $request->resource();
 
-        $resource = $request->newResourceWith($query->firstOrFail());
+        $resourceClass::replicateQuery($request, $query);
 
-        $resource->authorizeToReplicate($request);
-
-        return $resource->replicate();
+        return tap($request->newResourceWith($query->firstOrFail()), static function (NovaResource $resource) use ($request) {
+            $resource->authorizeToReplicate($request);
+        })->replicate();
     }
 }

@@ -2,6 +2,7 @@ import Localization from '@/mixins/Localization'
 import { Form } from '@/util/FormValidation'
 import { setupAxios } from '@/bootstrap/axios'
 import { setupCodeMirror } from '@/bootstrap/codemirror'
+import { setupFloatingVue } from '@/bootstrap/floating-vue'
 import { setupInertia } from '@/bootstrap/inertia'
 import { setupNumbro } from '@/bootstrap/numbro'
 import url from '@/util/url'
@@ -14,7 +15,6 @@ import Mousetrap from 'mousetrap'
 import { createNovaStore } from './store'
 import resourceStore from './store/resources'
 import NProgress from 'nprogress'
-import FloatingVue from 'floating-vue'
 import camelCase from 'lodash/camelCase'
 import fromPairs from 'lodash/fromPairs'
 import isString from 'lodash/isString'
@@ -42,6 +42,7 @@ const emitter = new Emitter()
  * @typedef {Object<string, any>} AppConfig
  * @typedef {import('./util/FormValidation').Form} Form
  * @typedef {(app: VueApp, store: VueStore) => void} BootingCallback
+ * @typedef {(app: VueApp, store: VueStore) => void} BootedCallback
  */
 
 export default class Nova {
@@ -54,6 +55,12 @@ export default class Nova {
      * @type {Array<BootingCallback>}
      */
     this.bootingCallbacks = []
+
+    /**
+     * @protected
+     * @type {Array<BootedCallback>}
+     */
+    this.bootedCallbacks = []
 
     /** @readonly */
     this.appConfig = config
@@ -123,13 +130,31 @@ export default class Nova {
   }
 
   /**
-   * Register a callback to be called before Nova starts. This is used to bootstrap
+   * Register booting callback to be called before Nova starts. This is used to bootstrap
    * addons, tools, custom fields, or anything else Nova needs
    *
    * @param {BootingCallback} callback
    */
   booting(callback) {
-    this.bootingCallbacks.push(callback)
+    if (this.__booted === true) {
+      callback(this.app, this.store)
+    } else {
+      this.bootingCallbacks.push(callback)
+    }
+  }
+
+  /**
+   * Register booted callback to be called before Nova starts. This is used to bootstrap
+   * addons, tools, custom fields, or anything else Nova needs
+   *
+   * @param {BootedCallback} callback
+   */
+  booted(callback) {
+    if (this.__booted === true) {
+      callback(this.app, this.store)
+    } else {
+      this.bootedCallbacks.push(callback)
+    }
   }
 
   /**
@@ -186,21 +211,17 @@ export default class Nova {
     this.log('All systems go...')
 
     this.__booted = true
+
+    this.bootedCallbacks.forEach(callback => callback(this.app, this.store))
+    this.bootedCallbacks = []
   }
 
-  /**
-   * @param {BootingCallback} callback
-   */
-  booted(callback) {
-    callback(this.app, this.store)
-  }
-
-  async countdown() {
+  countdown() {
     this.log('Initiating Nova countdown...')
 
     const appName = this.config('appName')
 
-    await createInertiaApp({
+    createInertiaApp({
       title: title => (!title ? appName : `${title} - ${appName}`),
       progress: false,
       resolve: name => {
@@ -226,19 +247,7 @@ export default class Nova {
         this.app = createApp({ render: () => h(App, props) })
 
         this.app.use(plugin)
-        this.app.use(FloatingVue, {
-          preventOverflow: true,
-          flip: true,
-          themes: {
-            Nova: {
-              $extend: 'tooltip',
-              triggers: ['click'],
-              autoHide: true,
-              placement: 'bottom',
-              html: true,
-            },
-          },
-        })
+        setupFloatingVue(this)
       },
     }).then(() => {
       this.__started = true

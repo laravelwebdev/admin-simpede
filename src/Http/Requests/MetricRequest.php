@@ -42,19 +42,19 @@ class MetricRequest extends NovaRequest
         abort_unless($resource::authorizedToViewAny($this), 403);
 
         return $resource->availableCards($this)
-                ->whereInstanceOf(Metric::class)
-                ->map(function ($metric) use ($resource) {
-                    /** @var \Laravel\Nova\Metrics\Metric $metric */
-                    if ($metric->refreshWhenFiltersChange === true) {
-                        $request = isset($this->resourceId)
-                                        ? ResourceDetailRequest::createFromBase($this)
-                                        : ResourceIndexRequest::createFromBase($this);
+            ->whereInstanceOf(Metric::class)
+            ->map(function ($metric) use ($resource) {
+                /** @var \Laravel\Nova\Metrics\Metric $metric */
+                if ($metric->refreshWhenFiltersChange === true) {
+                    $request = isset($this->resourceId)
+                        ? ResourceDetailRequest::createFromBase($this)
+                        : ResourceIndexRequest::createFromBase($this);
 
-                        return $metric->setAvailableFilters($resource->availableFilters($request));
-                    }
+                    return $metric->setAvailableFilters($resource->availableFilters($request));
+                }
 
-                    return $metric;
-                });
+                return $metric;
+            });
     }
 
     /**
@@ -69,16 +69,16 @@ class MetricRequest extends NovaRequest
         abort_unless($resource::authorizedToViewAny($this), 403);
 
         return $resource->availableCardsForDetail($this)
-                ->whereInstanceOf(Metric::class)
-                ->map(function ($metric) use ($resource) {
-                    /** @var \Laravel\Nova\Metrics\Metric $metric */
-                    if ($metric->refreshWhenFiltersChange === true) {
-                        return $metric->setAvailableFilters(
-                            $resource->availableFilters(ResourceDetailRequest::createFromBase($this))
-                        );
-                    }
+            ->whereInstanceOf(Metric::class)
+            ->map(function ($metric) use ($resource) {
+                /** @var \Laravel\Nova\Metrics\Metric $metric */
+                if ($metric->refreshWhenFiltersChange === true) {
+                    return $metric->setAvailableFilters(
+                        $resource->availableFilters(ResourceDetailRequest::createFromBase($this))
+                    );
+                }
 
-                    return $metric;
-                });
+                return $metric;
+            });
     }
 }

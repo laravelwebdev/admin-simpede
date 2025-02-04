@@ -62,21 +62,15 @@ class ActionEvent extends Model
      */
     public function target()
     {
-        $queryWithTrashed = function ($query) {
-            return $query->withTrashed();
-        };
+        $queryWithTrashed = static fn ($query) => $query->withTrashed();
 
         return $this->morphTo('target', 'target_type', 'target_id')
                     ->constrain(
                         collect(Nova::$resources)
-                            ->filter(function ($resource) {
-                                return $resource::softDeletes();
-                            })->mapWithKeys(function ($resource) use ($queryWithTrashed) {
-                                return [$resource::$model => $queryWithTrashed];
-                            })->all()
-                    )->when(true, function ($query) use ($queryWithTrashed) {
-                        return $query->hasMacro('withTrashed') ? $queryWithTrashed($query) : $query;
-                    });
+                            ->filter(static fn ($resource) => $resource::softDeletes())
+                            ->mapWithKeys(static fn ($resource) => [$resource::$model => $queryWithTrashed])
+                            ->all()
+                    )->when(true, static fn ($query) => $query->hasMacro('withTrashed') ? $queryWithTrashed($query) : $query);
     }
 
     /**
@@ -224,26 +218,24 @@ class ActionEvent extends Model
     {
         $batchId = (string) Str::orderedUuid();
 
-        return $models->map(function ($model) use ($action, $user, $batchId) {
-            return new static([
-                'batch_id' => $batchId,
-                'user_id' => $user->getAuthIdentifier(),
-                'name' => $action,
-                'actionable_type' => $model->getMorphClass(),
-                'actionable_id' => $model->getKey(),
-                'target_type' => $model->getMorphClass(),
-                'target_id' => $model->getKey(),
-                'model_type' => $model->getMorphClass(),
-                'model_id' => $model->getKey(),
-                'fields' => '',
-                'original' => null,
-                'changes' => null,
-                'status' => 'finished',
-                'exception' => '',
-                'created_at' => new DateTime,
-                'updated_at' => new DateTime,
-            ]);
-        });
+        return $models->map(static fn ($model) => new static([
+            'batch_id' => $batchId,
+            'user_id' => $user->getAuthIdentifier(),
+            'name' => $action,
+            'actionable_type' => $model->getMorphClass(),
+            'actionable_id' => $model->getKey(),
+            'target_type' => $model->getMorphClass(),
+            'target_id' => $model->getKey(),
+            'model_type' => $model->getMorphClass(),
+            'model_id' => $model->getKey(),
+            'fields' => '',
+            'original' => null,
+            'changes' => null,
+            'status' => 'finished',
+            'exception' => '',
+            'created_at' => new DateTime,
+            'updated_at' => new DateTime,
+        ]));
     }
 
     /**
@@ -256,26 +248,24 @@ class ActionEvent extends Model
     {
         $batchId = (string) Str::orderedUuid();
 
-        return $models->map(function ($model) use ($user, $parent, $pivotClass, $batchId) {
-            return new static([
-                'batch_id' => $batchId,
-                'user_id' => $user->getAuthIdentifier(),
-                'name' => 'Detach',
-                'actionable_type' => $parent->getMorphClass(),
-                'actionable_id' => $parent->getKey(),
-                'target_type' => $model->getMorphClass(),
-                'target_id' => $model->getKey(),
-                'model_type' => $pivotClass,
-                'model_id' => null,
-                'fields' => '',
-                'original' => null,
-                'changes' => null,
-                'status' => 'finished',
-                'exception' => '',
-                'created_at' => new DateTime,
-                'updated_at' => new DateTime,
-            ]);
-        });
+        return $models->map(static fn ($model) => new static([
+            'batch_id' => $batchId,
+            'user_id' => $user->getAuthIdentifier(),
+            'name' => 'Detach',
+            'actionable_type' => $parent->getMorphClass(),
+            'actionable_id' => $parent->getKey(),
+            'target_type' => $model->getMorphClass(),
+            'target_id' => $model->getKey(),
+            'model_type' => $pivotClass,
+            'model_id' => null,
+            'fields' => '',
+            'original' => null,
+            'changes' => null,
+            'status' => 'finished',
+            'exception' => '',
+            'created_at' => new DateTime,
+            'updated_at' => new DateTime,
+        ]));
     }
 
     /**
@@ -288,18 +278,16 @@ class ActionEvent extends Model
         Collection $models,
         string $status = 'running'
     ): void {
-        $models = $models->map(function ($model) use ($request, $action, $batchId, $status) {
-            return array_merge(
-                static::defaultAttributes($request, $action, $batchId, $status),
-                [
-                    'actionable_id' => $request->actionableKey($model),
-                    'target_id' => $request->targetKey($model),
-                    'model_id' => $model->getKey(),
-                ]
-            );
-        });
+        $models = $models->map(static fn ($model) => array_merge(
+            static::defaultAttributes($request, $action, $batchId, $status),
+            [
+                'actionable_id' => $request->actionableKey($model),
+                'target_id' => $request->targetKey($model),
+                'model_id' => $model->getKey(),
+            ]
+        ));
 
-        $models->chunk(50)->each(function ($models) {
+        $models->chunk(50)->each(static function ($models) {
             static::insert($models->all());
         });
 
@@ -320,9 +308,10 @@ class ActionEvent extends Model
         if ($request->isPivotAction()) {
             $pivotClass = $request->pivotRelation()->getPivotClass();
 
-            $modelType = collect(Relation::$morphMap)->filter(function ($model) use ($pivotClass) {
-                return $model === $pivotClass;
-            })->keys()->first() ?? $pivotClass;
+            $modelType = collect(Relation::$morphMap)
+                ->filter(static fn ($model) => $model === $pivotClass)
+                ->keys()
+                ->first() ?? $pivotClass;
         } else {
             $modelType = $request->actionableModel()->getMorphClass();
         }
@@ -349,10 +338,10 @@ class ActionEvent extends Model
      */
     public static function prune(Collection $models, int $limit = 25): void
     {
-        $models->each(function ($model) use ($limit) {
+        $models->each(static function ($model) use ($limit) {
             static::where('actionable_id', $model['actionable_id'])
                 ->where('actionable_type', $model['actionable_type'])
-                ->whereNotIn('id', function ($query) use ($model, $limit) {
+                ->whereNotIn('id', static function ($query) use ($model, $limit) {
                     $query->select('id')->fromSub(
                         static::select('id')->orderBy('id', 'desc')
                                 ->where('actionable_id', $model['actionable_id'])
@@ -447,8 +436,7 @@ class ActionEvent extends Model
     protected static function hydrateChangesPayload(array $attributes): array
     {
         return collect($attributes)
-                ->transform(function ($value) {
-                    return Util::hydrate($value);
-                })->all();
+            ->transform(static fn ($value) => Util::hydrate($value))
+            ->all();
     }
 }

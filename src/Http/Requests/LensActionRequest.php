@@ -16,7 +16,7 @@ class LensActionRequest extends ActionRequest
     #[\Override]
     public function toQuery(): Builder
     {
-        return tap($this->lens()->query(LensRequest::createFrom($this), $this->newSearchQuery()), function ($query) {
+        return tap($this->lens()->query(LensRequest::createFrom($this), $this->newSearchQuery()), static function ($query) {
             if (! $query instanceof Builder) {
                 throw new LogicException('Lens must return an Eloquent query instance in order to apply actions.');
             }

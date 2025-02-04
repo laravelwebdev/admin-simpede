@@ -34,7 +34,7 @@ class FieldCollection extends Collection
      */
     public function assignDefaultPanel(Stringable|string $label)
     {
-        new Panel($label, $this->reject(fn ($field) => isset($field->panel)));
+        new Panel($label, $this->reject(static fn ($field) => isset($field->panel)));
 
         return $this;
     }
@@ -46,7 +46,7 @@ class FieldCollection extends Collection
      */
     public function flattenStackedFields()
     {
-        return $this->map(function ($field) {
+        return $this->map(static function ($field) {
             if ($field instanceof Stack) {
                 return $field->fields()->all();
             }
@@ -65,7 +65,7 @@ class FieldCollection extends Collection
      */
     public function findFieldByAttribute(string $attribute, mixed $default = null)
     {
-        return $this->first(function ($field) use ($attribute) {
+        return $this->first(static function ($field) use ($attribute) {
             return isset($field->attribute) &&
                 $field->attribute == $attribute;
         }, $default);
@@ -78,7 +78,7 @@ class FieldCollection extends Collection
      */
     public function findFieldByAttributeOrFail(string $attribute)
     {
-        return $this->first(function ($field) use ($attribute) {
+        return $this->first(static function ($field) use ($attribute) {
             return isset($field->attribute) &&
                 $field->attribute == $attribute;
         }, fn () => abort(404));
@@ -102,7 +102,7 @@ class FieldCollection extends Collection
      */
     public function resolve($resource)
     {
-        return $this->each(function ($field) use ($resource) {
+        return $this->each(static function ($field) use ($resource) {
             if ($field instanceof Resolvable) {
                 $field->resolve($resource);
             }
@@ -117,7 +117,7 @@ class FieldCollection extends Collection
      */
     public function resolveForDisplay($resource)
     {
-        return $this->each(function ($field) use ($resource) {
+        return $this->each(static function ($field) use ($resource) {
             if ($field instanceof ListableField || ! $field instanceof Resolvable) {
                 return;
             }
@@ -139,7 +139,7 @@ class FieldCollection extends Collection
     public function onlyCreateFields(NovaRequest $request, $resource)
     {
         /** @phpstan-ignore return.type */
-        return $this->reject(function ($field) use ($resource, $request) {
+        return $this->reject(static function ($field) use ($resource, $request) {
             return $field instanceof ListableField ||
                 ($field instanceof ResourceTool || $field instanceof ResourceToolElement) ||
                 $field->attribute === 'ComputedField' ||
@@ -157,7 +157,7 @@ class FieldCollection extends Collection
     public function onlyUpdateFields(NovaRequest $request, $resource)
     {
         /** @phpstan-ignore return.type */
-        return $this->reject(function ($field) use ($resource, $request) {
+        return $this->reject(static function ($field) use ($resource, $request) {
             return $field instanceof ListableField ||
                 ($field instanceof ResourceTool || $field instanceof ResourceToolElement) ||
                 $field->attribute === 'ComputedField' ||
@@ -231,7 +231,7 @@ class FieldCollection extends Collection
     public function withoutMissingValues()
     {
         /** @phpstan-ignore return.type */
-        return $this->reject(fn ($field) => $field instanceof MissingValue);
+        return $this->reject(static fn ($field) => $field instanceof MissingValue);
     }
 
     /**
@@ -242,7 +242,7 @@ class FieldCollection extends Collection
     public function withoutListableFields()
     {
         /** @phpstan-ignore return.type */
-        return $this->reject(fn ($field) => $field instanceof ListableField);
+        return $this->reject(static fn ($field) => $field instanceof ListableField);
     }
 
     /**
@@ -253,7 +253,7 @@ class FieldCollection extends Collection
     public function withoutUnfillable()
     {
         /** @phpstan-ignore return.type */
-        return $this->reject(fn ($field) => $field instanceof Unfillable);
+        return $this->reject(static fn ($field) => $field instanceof Unfillable);
     }
 
     /**
@@ -264,7 +264,7 @@ class FieldCollection extends Collection
     public function withoutResourceTools()
     {
         /** @phpstan-ignore return.type */
-        return $this->reject(fn ($field) => $field instanceof ResourceToolElement);
+        return $this->reject(static fn ($field) => $field instanceof ResourceToolElement);
     }
 
     /**
@@ -275,7 +275,7 @@ class FieldCollection extends Collection
     public function filterForManyToManyRelations()
     {
         /** @phpstan-ignore return.type */
-        return $this->filter(fn ($field) => $field instanceof PivotableField);
+        return $this->filter(static fn ($field) => $field instanceof PivotableField);
     }
 
     /**
@@ -287,7 +287,7 @@ class FieldCollection extends Collection
     {
         return $this->whereInstanceOf(Field::class)
             ->whereInstanceOf(FilterableField::class)
-            ->reject(function ($field) {
+            ->reject(static function ($field) {
                 /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\FilterableField $field */
                 return $field->isComputed() || is_null($field->filterableCallback);
             });

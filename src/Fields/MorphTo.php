@@ -393,14 +393,12 @@ class MorphTo extends Field implements FilterableField, RelatableField
      */
     public function types(array $types)
     {
-        $this->morphToTypes = collect($types)->map(function ($display, $key) {
-            return [
-                'type' => is_numeric($key) ? $display : $key,
-                'singularLabel' => is_numeric($key) ? $display::singularLabel() : $key::singularLabel(),
-                'display' => (is_string($display) && is_numeric($key)) ? $display::singularLabel() : $display,
-                'value' => is_numeric($key) ? $display::uriKey() : $key::uriKey(),
-            ];
-        })->values()->all();
+        $this->morphToTypes = collect($types)->map(static fn ($display, $key) => [
+            'type' => is_numeric($key) ? $display : $key,
+            'singularLabel' => is_numeric($key) ? $display::singularLabel() : $key::singularLabel(),
+            'display' => (is_string($display) && is_numeric($key)) ? $display::singularLabel() : $display,
+            'value' => is_numeric($key) ? $display::uriKey() : $key::uriKey(),
+        ])->values()->all();
 
         return $this;
     }
@@ -414,9 +412,9 @@ class MorphTo extends Field implements FilterableField, RelatableField
     public function display($display)
     {
         if (is_array($display)) {
-            $this->display = collect($display)->mapWithKeys(function ($display, $type) {
-                return [$type => $this->ensureDisplayerIsCallable($display)];
-            })->all();
+            $this->display = collect($display)->mapWithKeys(
+                fn ($display, $type) => [$type => $this->ensureDisplayerIsCallable($display)]
+            )->all();
         } else {
             $this->display = $this->ensureDisplayerIsCallable($display);
         }
@@ -536,11 +534,10 @@ class MorphTo extends Field implements FilterableField, RelatableField
     {
         $morphToTypes = collect($this->morphToTypes)
                             ->pluck('type')
-                            ->mapWithKeys(function ($type) {
-                                return [$type => $type::newModel()->getMorphClass()];
-                            })->all();
+                            ->mapWithKeys(static fn ($type) => [$type => $type::newModel()->getMorphClass()])
+                            ->all();
 
-        return function (NovaRequest $request, $query, $value, $attribute) use ($morphToTypes) {
+        return static function (NovaRequest $request, $query, $value, $attribute) use ($morphToTypes) {
             $query->whereHasMorph(
                 $attribute,
                 ! empty($value) && isset($morphToTypes[$value]) ? $morphToTypes[$value] : $morphToTypes
@@ -553,14 +550,12 @@ class MorphTo extends Field implements FilterableField, RelatableField
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return [
-                'resourceName' => $field['resourceName'],
-                'morphToTypes' => $field['morphToTypes'],
-                'uniqueKey' => $field['uniqueKey'],
-                'relationshipType' => $field['relationshipType'],
-            ];
-        });
+        return transform($this->jsonSerialize(), static fn ($field) => [
+            'resourceName' => $field['resourceName'],
+            'morphToTypes' => $field['morphToTypes'],
+            'uniqueKey' => $field['uniqueKey'],
+            'relationshipType' => $field['relationshipType'],
+        ]);
     }
 
     /**

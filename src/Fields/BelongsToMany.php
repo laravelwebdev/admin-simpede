@@ -103,8 +103,8 @@ class BelongsToMany extends Field implements DeletableContract, FilterableField,
         $this->manyToManyRelationship = $this->attribute = $attribute ?? ResourceRelationshipGuesser::guessRelation($name);
         $this->deleteCallback = $this->detachmentCallback();
 
-        $this->fieldsCallback = fn () => [];
-        $this->actionsCallback = fn () => [];
+        $this->fieldsCallback = static fn () => [];
+        $this->actionsCallback = static fn () => [];
 
         $this->noDuplicateRelations();
     }
@@ -276,11 +276,11 @@ class BelongsToMany extends Field implements DeletableContract, FilterableField,
         return function (NovaRequest $request, $query, $value, $attribute) {
             $viaRelationship = $request->viaRelationship() && $request->relationshipType === 'belongsToMany';
 
-            $query->when($viaRelationship, function ($query) use ($value) {
+            $query->when($viaRelationship, static function ($query) use ($value) {
                 $query->whereKey($value);
             }, function ($query) use ($request, $attribute, $value) {
                 if ($this->resourceClass::uriKey() !== $request->viaResource) {
-                    $query->whereHas($this->manyToManyRelationship, function ($query) use ($value) {
+                    $query->whereHas($this->manyToManyRelationship, static function ($query) use ($value) {
                         $query->whereKey($value);
                     });
                 } else {
@@ -295,17 +295,17 @@ class BelongsToMany extends Field implements DeletableContract, FilterableField,
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return [
-                'debounce' => $field['debounce'],
-                'displaysWithTrashed' => $field['displaysWithTrashed'],
-                'label' => $this->resourceClass::label(),
-                'resourceName' => $field['resourceName'],
-                'searchable' => $field['searchable'],
-                'withSubtitles' => $field['withSubtitles'],
-                'uniqueKey' => $field['uniqueKey'],
-            ];
-        });
+        $label = $this->resourceClass::label();
+
+        return transform($this->jsonSerialize(), static fn ($field) => [
+            'debounce' => $field['debounce'],
+            'displaysWithTrashed' => $field['displaysWithTrashed'],
+            'label' => $label,
+            'resourceName' => $field['resourceName'],
+            'searchable' => $field['searchable'],
+            'withSubtitles' => $field['withSubtitles'],
+            'uniqueKey' => $field['uniqueKey'],
+        ]);
     }
 
     /**
@@ -314,9 +314,9 @@ class BelongsToMany extends Field implements DeletableContract, FilterableField,
     public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
-                    ->withMeta([
-                        'prefixComponent' => true,
-                    ])->withComponent('relationship-panel');
+            ->withMeta([
+                'prefixComponent' => true,
+            ])->withComponent('relationship-panel');
     }
 
     /**
@@ -335,7 +335,7 @@ class BelongsToMany extends Field implements DeletableContract, FilterableField,
                 'relationshipType' => $this->relationshipType(),
                 'debounce' => $this->debounce,
                 'relatable' => true,
-                'perPage' => $this->resourceClass::$perPageViaRelationship,
+                'perPageOptions' => $this->resourceClass::perPageViaRelationshipOptions(),
                 'validationKey' => $this->validationKey(),
                 'resourceName' => $this->resourceName,
                 'searchable' => $this->isSearchable($request),

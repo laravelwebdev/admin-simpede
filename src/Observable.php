@@ -59,10 +59,10 @@ class Observable
      */
     protected function createCallbackForListenerOnServingNova(mixed $listener, string $method): Closure
     {
-        return function () use ($method, $listener) {
+        return static function () use ($method, $listener) {
             $payload = func_get_args();
 
-            return Nova::whenServing(fn () => app()->make($listener)->$method(...$payload));
+            return Nova::whenServing(static fn () => app()->make($listener)->$method(...$payload));
         };
     }
 

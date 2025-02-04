@@ -50,9 +50,10 @@ abstract class RangedMetric extends Metric
     {
         return array_merge(parent::jsonSerialize(), [
             'selectedRangeKey' => $this->selectedRangeKey,
-            'ranges' => collect($this->ranges())->map(function ($range, $key) {
-                return ['label' => $range, 'value' => $key];
-            })->values()->all(),
+            'ranges' => collect($this->ranges())
+                ->map(static fn ($range, $key) => ['label' => $range, 'value' => $key])
+                ->values()
+                ->all(),
         ]);
     }
 }

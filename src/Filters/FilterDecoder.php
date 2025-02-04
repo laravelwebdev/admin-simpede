@@ -38,7 +38,7 @@ class FilterDecoder
             $class = key($filter);
             $value = $filter[$class];
 
-            $matchingFilter = $this->availableFilters->first(function ($availableFilter) use ($class) {
+            $matchingFilter = $this->availableFilters->first(static function ($availableFilter) use ($class) {
                 return $class === $availableFilter->key();
             });
 
@@ -47,7 +47,7 @@ class FilterDecoder
             }
         })
             ->filter()
-            ->reject(function ($filter) {
+            ->reject(static function ($filter) {
                 if (is_array($filter['value'])) {
                     return count($filter['value']) < 1;
                 } elseif (is_string($filter['value'])) {
@@ -55,9 +55,8 @@ class FilterDecoder
                 }
 
                 return is_null($filter['value']);
-            })->map(function ($filter) {
-                return new ApplyFilter($filter['filter'], $filter['value']);
-            })->values();
+            })->map(static fn ($filter) => new ApplyFilter($filter['filter'], $filter['value']))
+            ->values();
     }
 
     /**

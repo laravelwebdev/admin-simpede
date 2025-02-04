@@ -3,6 +3,7 @@
     :resourceName="resourceName"
     :lens="lens"
     :searchable="searchable"
+    :per-page-options="perPageOptions"
   />
 </template>
 
@@ -17,6 +18,7 @@ defineOptions({
 defineProps({
   lens: { type: String, required: true },
   searchable: { type: Boolean, default: false },
+  perPageOptions: { type: Array, required: true },
   ...mapProps(['resourceName']),
 })
 </script>

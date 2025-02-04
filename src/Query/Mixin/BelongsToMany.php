@@ -12,7 +12,7 @@ class BelongsToMany
     public function getDefaultPivotAttributes(): callable
     {
         return function () {
-            return collect($this->pivotValues)->mapWithKeys(function ($pivot) {
+            return collect($this->pivotValues)->mapWithKeys(static function ($pivot) {
                 return [$pivot['column'] => $pivot['value']];
             })->all();
         };

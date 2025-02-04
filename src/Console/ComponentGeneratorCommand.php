@@ -4,10 +4,12 @@ namespace Laravel\Nova\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Laravel\Nova\Console\Concerns\AcceptsNameAndVendor;
 use Symfony\Component\Process\Process;
 
+use function Illuminate\Filesystem\join_paths;
 use function Laravel\Prompts\confirm;
 
 abstract class ComponentGeneratorCommand extends Command implements PromptsForMissingInput
@@ -19,12 +21,16 @@ abstract class ComponentGeneratorCommand extends Command implements PromptsForMi
      *
      * @return void
      */
-    protected function prepareComposerReplacements()
+    protected function prepareComposerReplacements(Filesystem $files)
     {
-        $composerJson = $this->componentPath().'/composer.json';
+        $composerJson = join_paths($this->componentPath(), 'composer.json');
 
-        $this->replace('{{ name }}', $this->component(), $composerJson);
-        $this->replace('{{ escapedNamespace }}', $this->escapedComponentNamespace(), $composerJson);
+        $files->replaceInFile('{{ name }}', $this->component(), $composerJson);
+        $files->replaceInFile('{{ escapedNamespace }}', $this->escapedComponentNamespace(), $composerJson);
+
+        if ($files->isFile(base_path('auth.json')) && confirm('Copy `auth.json` from skeleton?', default: true)) {
+            $files->copy(base_path('auth.json'), join_paths($this->componentPath(), 'auth.json'));
+        }
     }
 
     /**
@@ -195,7 +201,10 @@ abstract class ComponentGeneratorCommand extends Command implements PromptsForMi
      * @param  string|array  $replace
      * @param  string  $path
      * @return void
+     *
+     * @deprecated 5.2.0 Use `Illuminate\Filesystem\Filesystem::replaceInFile()` instead
      */
+    #[\Deprecated('Use `Illuminate\Filesystem\Filesystem::replaceInFile()` instead', since: '5.2.0')]
     protected function replace($search, $replace, $path)
     {
         file_put_contents($path, str_replace($search, $replace, file_get_contents($path)));
@@ -208,7 +217,7 @@ abstract class ComponentGeneratorCommand extends Command implements PromptsForMi
      */
     protected function componentPath()
     {
-        return base_path('nova-components/'.$this->componentClass());
+        return base_path(join_paths('nova-components', $this->componentClass()));
     }
 
     /**
@@ -218,7 +227,7 @@ abstract class ComponentGeneratorCommand extends Command implements PromptsForMi
      */
     protected function relativeComponentPath()
     {
-        return 'nova-components/'.$this->componentClass();
+        return implode('/', ['nova-components', $this->componentClass()]);
     }
 
     /**

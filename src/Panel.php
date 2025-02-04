@@ -128,7 +128,7 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
         }
 
         /** @phpstan-ignore return.type */
-        return tap($first->panel, function ($panel) use ($name, $fields) {
+        return tap($first->panel, static function ($panel) use ($name, $fields) {
             $panel->name = $name;
             $panel->withMeta(['fields' => $fields]);
         });
@@ -149,7 +149,7 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
         $fields = is_callable($fields) ? call_user_func($fields) : $fields;
 
         return collect($this->filter($fields instanceof Collection ? $fields->all() : $fields))
-            ->reject(fn ($field) => $field instanceof MissingValue)
+            ->reject(static fn ($field) => $field instanceof MissingValue)
             ->values()
             ->each(function ($field) {
                 $field->panel = $this;
@@ -207,7 +207,7 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
     {
         $field = $request->newViaResource()
             ->availableFields($request)
-            ->filter(function ($field) use ($request) {
+            ->filter(static function ($field) use ($request) {
                 return $field instanceof RelatableField
                     && $field->resourceName === $request->resource
                     && $field->relationshipName() === $request->viaRelationship;
@@ -225,7 +225,7 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
     public function each(callable $callback)
     {
         $this->data = Collection::make($this->data)
-            ->transform(function ($field, $key) use ($callback) {
+            ->transform(static function ($field, $key) use ($callback) {
                 /**
                  * @var \Laravel\Nova\Fields\Field $field
                  * @var int $key

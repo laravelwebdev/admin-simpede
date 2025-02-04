@@ -48,7 +48,7 @@ class MenuGroup implements \JsonSerializable
      */
     public function key(): string
     {
-        return md5($this->name.$this->items->reduce(function ($carry, $item) {
+        return md5($this->name.$this->items->reduce(static function ($carry, $item) {
             return $carry.'-'.$item->name;
         }, ''));
     }

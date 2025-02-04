@@ -38,12 +38,12 @@ class ResourceCreateController extends Controller
         $resourceClass = $request->resource();
 
         return Breadcrumbs::make(
-            collect([Breadcrumb::make(Nova::__('Resources'))])->when($request->viaRelationship(), function ($breadcrumbs) use ($request) {
+            collect([Breadcrumb::make(Nova::__('Resources'))])->when($request->viaRelationship(), static function ($breadcrumbs) use ($request) {
                 return $breadcrumbs->push(
                     Breadcrumb::resource($request->viaResource()),
                     Breadcrumb::resource($request->findParentResourceOrFail())
                 );
-            }, function ($breadcrumbs) use ($resourceClass) {
+            }, static function ($breadcrumbs) use ($resourceClass) {
                 return $breadcrumbs->push(Breadcrumb::resource($resourceClass));
             })->push(
                 Breadcrumb::make(Nova::__('Create :resource', ['resource' => $resourceClass::singularLabel()]))

@@ -108,7 +108,7 @@ class Util
         } elseif (is_object($value) && $value instanceof Stringable) {
             return (string) $value;
         } elseif (is_object($value) || is_array($value)) {
-            return rescue(fn () => json_encode($value), $value);
+            return rescue(static fn () => json_encode($value), $value);
         }
 
         return $value;
@@ -167,13 +167,15 @@ class Util
             $model = get_class($model);
         }
 
-        $provider = collect(config('auth.providers'))->reject(function ($provider) use ($model) {
-            return ! ($provider['driver'] === 'eloquent' && is_a($model, $provider['model'], true));
-        })->keys()->first();
+        $provider = collect(config('auth.providers'))
+            ->reject(static fn ($provider) => ! ($provider['driver'] === 'eloquent' && is_a($model, $provider['model'], true)))
+            ->keys()
+            ->first();
 
-        return collect(config('auth.guards'))->reject(function ($guard) use ($provider) {
-            return ! ($guard['driver'] === 'session' && $guard['provider'] === $provider);
-        })->keys()->first();
+        return collect(config('auth.guards'))
+            ->reject(static fn ($guard) => ! ($guard['driver'] === 'session' && $guard['provider'] === $provider))
+            ->keys()
+            ->first();
     }
 
     /**
@@ -228,7 +230,7 @@ class Util
             'ProhibitedUnless',
             'Prohibits',
             'Same',
-        ])->mapWithKeys(function ($rule) use ($attribute) {
+        ])->mapWithKeys(static function ($rule) use ($attribute) {
             $rule = Str::snake($rule);
 
             return ["{$rule}:" => "{$rule}:{$attribute}."];

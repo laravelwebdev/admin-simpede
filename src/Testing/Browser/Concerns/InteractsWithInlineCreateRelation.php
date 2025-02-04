@@ -14,9 +14,9 @@ trait InteractsWithInlineCreateRelation
      */
     public function showInlineCreate(Browser $browser, string $uriKey, callable $fieldCallback): void
     {
-        $browser->whenAvailable("@{$uriKey}-inline-create", function ($browser) use ($fieldCallback) {
+        $browser->whenAvailable("@{$uriKey}-inline-create", static function (Browser $browser) use ($fieldCallback) {
             $browser->click('')
-                ->elsewhereWhenAvailable(new CreateRelationModalComponent, function ($browser) use ($fieldCallback) {
+                ->elsewhereWhenAvailable(new CreateRelationModalComponent, static function (Browser $browser) use ($fieldCallback) {
                     $fieldCallback($browser);
                 });
         });
@@ -29,7 +29,7 @@ trait InteractsWithInlineCreateRelation
      */
     public function runInlineCreate(Browser $browser, string $uriKey, callable $fieldCallback): void
     {
-        $this->showInlineCreate($browser, $uriKey, function ($browser) use ($fieldCallback) {
+        $this->showInlineCreate($browser, $uriKey, static function (Browser $browser) use ($fieldCallback) {
             $fieldCallback($browser);
 
             $browser->click('@create-button')->pause(250);

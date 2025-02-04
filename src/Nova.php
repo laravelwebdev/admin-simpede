@@ -208,7 +208,7 @@ class Nova
      */
     public static function version(): string
     {
-        return once(function () {
+        return once(static function () {
             $manifest = File::json((string) realpath(join_paths(__DIR__, '..', 'composer.json')));
 
             $version = $manifest['version'] ?? '4.x';
@@ -294,8 +294,8 @@ class Nova
     public static function bootResources(): void
     {
         static::resourceCollection()
-            ->filter(fn ($resourceClass) => property_exists($resourceClass, 'policy') && ! is_null($resourceClass::$policy))
-            ->each(function ($resourceClass) {
+            ->filter(static fn ($resourceClass) => property_exists($resourceClass, 'policy') && ! is_null($resourceClass::$policy))
+            ->each(static function ($resourceClass) {
                 Gate::policy($resourceClass, $resourceClass::$policy);
             });
     }
@@ -338,7 +338,7 @@ class Nova
      */
     public static function sortResourcesWith(): callable
     {
-        return static::$sortCallback ?? function ($resource) {
+        return static::$sortCallback ?? static function ($resource) {
             return $resource::label();
         };
     }
@@ -361,7 +361,7 @@ class Nova
     public static function groups(Request $request): Collection
     {
         return collect(static::availableResources($request))
-            ->map(function ($resourceClass) {
+            ->map(static function ($resourceClass) {
                 /** @var class-string<\Laravel\Nova\Resource> $resourceClass */
                 return $resourceClass::group();
             })->unique()->values();
@@ -489,7 +489,7 @@ class Nova
         }
 
         $resource = static::resourceCollection()->first(
-            fn ($value) => $value::$model === $class
+            static fn ($value) => $value::$model === $class
         );
 
         return static::$resourcesByModel[$class] = $resource;
@@ -516,9 +516,9 @@ class Nova
      */
     public static function resourceForKey(?string $key): ?string
     {
-        return static::resourceCollection()->first(function ($value) use ($key) {
-            return $value::uriKey() === $key;
-        });
+        return static::resourceCollection()->first(
+            static fn ($value) => $value::uriKey() === $key
+        );
     }
 
     /**
@@ -544,8 +544,8 @@ class Nova
 
         return call_user_func(
             static::$createUserCallback,
-            ...array_map(function ($question) {
-                return with(value($question), function ($question) {
+            ...array_map(static function ($question) {
+                return with(value($question), static function ($question) {
                     return $question instanceof Prompt ? $question->prompt() : $question;
                 });
             }, call_user_func(static::$createUserCommandCallback, $command))
@@ -707,9 +707,9 @@ class Nova
     public static function dashboardForKey(string $dashboard, NovaRequest $request): ?Dashboard
     {
         return collect(static::$dashboards)
-            ->first(function ($dash) use ($dashboard, $request) {
-                return $dash->uriKey() === $dashboard && $dash->authorize($request);
-            });
+            ->first(
+                static fn ($dash) => $dash->uriKey() === $dashboard && $dash->authorize($request)
+            );
     }
 
     /**
@@ -717,7 +717,7 @@ class Nova
      */
     public static function availableDashboardCardsForDashboard(string $dashboard, NovaRequest $request): Collection
     {
-        return with(static::dashboardForKey($dashboard, $request), function ($dashboard) use ($request) {
+        return with(static::dashboardForKey($dashboard, $request), static function ($dashboard) use ($request) {
             if (is_null($dashboard)) {
                 return collect();
             }
@@ -763,7 +763,7 @@ class Nova
      */
     public static function jsonVariables(Request $request): array
     {
-        return collect(static::$jsonVariables)->map(function ($variable) use ($request) {
+        return collect(static::$jsonVariables)->map(static function ($variable) use ($request) {
             return is_object($variable) && is_callable($variable)
                 ? $variable($request)
                 : $variable;
@@ -827,41 +827,41 @@ class Nova
             $userId = Auth::guard(config('nova.guard'))->id() ?? null;
 
             static::$jsonVariables = [
-                'debug' => fn () => config('app.debug') || app()->environment('testing'),
+                'debug' => static fn () => config('app.debug') || app()->environment('testing'),
                 'logo' => static::logo(),
                 'brandColors' => static::brandColors(),
                 'brandColorsCSS' => static::brandColorsCSS(),
-                'rtlEnabled' => fn () => static::rtlEnabled(),
-                'breadcrumbsEnabled' => fn () => static::breadcrumbsEnabled(),
-                'globalSearchEnabled' => function () {
+                'rtlEnabled' => static fn () => static::rtlEnabled(),
+                'breadcrumbsEnabled' => static fn () => static::breadcrumbsEnabled(),
+                'globalSearchEnabled' => static function () {
                     return static::globalSearchIsEnabled() && static::hasGloballySearchableResources();
                 },
-                'notificationCenterEnabled' => fn () => static::$withNotificationCenter,
-                'hasGloballySearchableResources' => fn () => static::hasGloballySearchableResources(),
-                'themeSwitcherEnabled' => fn () => static::$withThemeSwitcher,
-                'showUnreadCountInNotificationCenter' => fn () => static::$showUnreadCountInNotificationCenter,
+                'notificationCenterEnabled' => static fn () => static::$withNotificationCenter,
+                'hasGloballySearchableResources' => static fn () => static::hasGloballySearchableResources(),
+                'themeSwitcherEnabled' => static fn () => static::$withThemeSwitcher,
+                'showUnreadCountInNotificationCenter' => static fn () => static::$showUnreadCountInNotificationCenter,
                 'withAuthentication' => static::routes()->withAuthentication,
                 'withPasswordReset' => static::routes()->withPasswordReset,
-                'customLoginPath' => fn () => static::routes()->loginPath ?? false,
-                'customLogoutPath' => fn () => static::routes()->logoutPath ?? false,
-                'forgotPasswordPath' => fn () => static::routes()->forgotPasswordPath ?? false,
-                'resetPasswordPath' => fn () => static::routes()->resetPasswordPath ?? false,
+                'customLoginPath' => static fn () => static::routes()->loginPath ?? false,
+                'customLogoutPath' => static fn () => static::routes()->logoutPath ?? false,
+                'forgotPasswordPath' => static fn () => static::routes()->forgotPasswordPath ?? false,
+                'resetPasswordPath' => static fn () => static::routes()->resetPasswordPath ?? false,
                 'debounce' => static::$debounce * 1000,
-                'initialPath' => fn ($request) => static::resolveInitialPath($request),
+                'initialPath' => static fn ($request) => static::resolveInitialPath($request),
                 'base' => static::path(),
                 'userId' => $userId,
-                'mainMenu' => function ($request) use ($userId) {
+                'mainMenu' => static function ($request) use ($userId) {
                     return ! is_null($userId) ? Menu::wrap(self::resolveMainMenu($request)) : [];
                 },
-                'userMenu' => function ($request) use ($userId) {
+                'userMenu' => static function ($request) use ($userId) {
                     return ! is_null($userId) ? Menu::wrap(self::resolveUserMenu($request)) : Menu::make();
                 },
                 'notificationPollingInterval' => static::$notificationPollingInterval * 1000,
-                'resources' => fn ($request) => static::resourceInformation($request),
-                'footer' => fn ($request) => self::resolveFooter($request),
-                'defaultAuthentication' => fn () => static::routes()->defaultAuthentication(),
-                'fortifyFeatures' => fn () => config('fortify.features', []),
-                'fortifyOptions' => fn () => config('fortify-options', []),
+                'resources' => static fn ($request) => static::resourceInformation($request),
+                'footer' => static fn ($request) => self::resolveFooter($request),
+                'defaultAuthentication' => static fn () => static::routes()->defaultAuthentication(),
+                'fortifyFeatures' => static fn () => config('fortify.features', []),
+                'fortifyOptions' => static fn () => config('fortify-options', []),
             ];
         }
 
@@ -956,10 +956,8 @@ class Nova
      */
     public static function defaultMainMenu(Request $request): Menu
     {
-        return Menu::make(with(collect(static::availableTools($request)), function ($tools) use ($request) {
-            return $tools->map(function ($tool) use ($request) {
-                return $tool->menu($request);
-            });
+        return Menu::make(with(collect(static::availableTools($request)), static function ($tools) use ($request) {
+            return $tools->map(static fn ($tool) => $tool->menu($request));
         })->filter()->values()->all());
     }
 
@@ -994,7 +992,7 @@ class Nova
      */
     public static function resourceInformation(Request $request): array
     {
-        return static::resourceCollection()->map(function ($resource) use ($request) {
+        return static::resourceCollection()->map(static function ($resource) use ($request) {
             /** @var class-string<\Laravel\Nova\Resource> $resource */
             return array_merge([
                 'uriKey' => $resource::uriKey(),
@@ -1004,11 +1002,13 @@ class Nova
                 'updateButtonLabel' => $resource::updateButtonLabel(),
                 'authorizedToCreate' => $resource::authorizedToCreate($request),
                 'searchable' => $resource::searchable(),
-                'perPageOptions' => $resource::perPageOptions(),
                 'tableStyle' => $resource::tableStyle(),
                 'showColumnBorders' => $resource::showColumnBorders(),
                 'debounce' => $resource::$debounce * 1000,
                 'clickAction' => $resource::clickAction(),
+
+                /** @deprecated */
+                'perPageOptions' => $resource::perPageOptions(),
             ], $resource::additionalInformation($request));
         })->values()->all();
     }
@@ -1184,9 +1184,9 @@ class Nova
      */
     public static function brandColors(): array
     {
-        return collect(config('nova.brand.colors'))->reject(function ($value, $key) {
-            return is_null($value);
-        })->all();
+        return collect(config('nova.brand.colors'))
+            ->reject(static fn ($value) => is_null($value))
+            ->all();
     }
 
     /**

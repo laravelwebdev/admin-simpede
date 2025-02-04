@@ -92,7 +92,7 @@ class ExportAsCsv extends Action
      */
     protected function dispatchRequestUsing(ActionRequest $request, Response $response, ActionFields $fields): Response
     {
-        $this->then(fn ($results) => $results->first());
+        $this->then(static fn ($results) => $results->first());
 
         $query = $request->toSelectedResourceQuery();
 
@@ -101,7 +101,7 @@ class ExportAsCsv extends Action
             fn ($query) => call_user_func($this->withQueryCallback, $query, $fields)
         );
 
-        $eloquentGenerator = function () use ($query) {
+        $eloquentGenerator = static function () use ($query) {
             foreach ($query->lazy() as $model) {
                 yield $model;
             }
@@ -124,7 +124,7 @@ class ExportAsCsv extends Action
         return $response->successful([
             tap(
                 (new FastExcel($eloquentGenerator()))->download($exportFilename, $this->withFormatCallback),
-                function ($response) use ($exportFilename) {
+                static function ($response) use ($exportFilename) {
                     if ($response instanceof StreamedResponse && ! $response->headers->has('Content-Disposition')) {
                         $response->headers->set(
                             'Content-Disposition',

@@ -21,10 +21,9 @@ class IndexViewResource extends Resource
         return [
             'label' => $resource::label(),
             'resources' => $paginator->getCollection()->mapInto($resource)->map->serializeForIndex($request),
-            'prev_page_url' => $paginator->previousPageUrl(),
-            'next_page_url' => $paginator->nextPageUrl(),
-            'per_page' => $paginator->perPage(),
-            'per_page_options' => $resource::perPageOptions(),
+            'prevPageUrl' => $paginator->previousPageUrl(),
+            'nextPageUrl' => $paginator->nextPageUrl(),
+            'perPage' => $paginator->perPage(),
             'total' => $total,
             'softDeletes' => $resource::softDeletes(),
             'polling' => $resource::$polling,
@@ -43,7 +42,7 @@ class IndexViewResource extends Resource
      */
     public function authorizedResourceForRequest(ResourceIndexRequest $request): string
     {
-        return tap($request->resource(), function ($resource) use ($request) {
+        return tap($request->resource(), static function ($resource) use ($request) {
             abort_unless($resource::authorizedToViewAny($request), 403);
         });
     }

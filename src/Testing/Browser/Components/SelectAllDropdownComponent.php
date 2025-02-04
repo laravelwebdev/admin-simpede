@@ -70,7 +70,7 @@ class SelectAllDropdownComponent extends Component
         $browser
             ->waitFor('@select-all-dropdown-trigger')
             ->click('@select-all-dropdown-trigger')
-            ->elsewhereWhenAvailable('@dropdown-menu', function (Browser $browser) {
+            ->elsewhereWhenAvailable('@dropdown-menu', static function (Browser $browser) {
                 $browser->assertAttribute('@select-all-matching-button', 'data-state', 'checked');
             })
             ->closeCurrentDropdown();
@@ -84,7 +84,7 @@ class SelectAllDropdownComponent extends Component
         $browser
             ->waitFor('@select-all-dropdown-trigger')
             ->click('@select-all-dropdown-trigger')
-            ->elsewhereWhenAvailable('@dropdown-menu', function (Browser $browser) {
+            ->elsewhereWhenAvailable('@dropdown-menu', static function (Browser $browser) {
                 $browser->assertAttribute('@select-all-matching-button', 'data-state', 'unchecked');
             })
             ->closeCurrentDropdown();
@@ -106,7 +106,7 @@ class SelectAllDropdownComponent extends Component
         $browser
             ->waitFor('@select-all-dropdown-trigger')
             ->click('@select-all-dropdown-trigger')
-            ->elsewhereWhenAvailable('@dropdown-menu', function (Browser $browser) use ($count) {
+            ->elsewhereWhenAvailable('@dropdown-menu', static function (Browser $browser) use ($count) {
                 $browser->assertSeeIn('@select-all-matching-count', $count);
             })
             ->closeCurrentDropdown();
@@ -120,7 +120,7 @@ class SelectAllDropdownComponent extends Component
         $browser
             ->waitFor('@select-all-dropdown-trigger')
             ->click('@select-all-dropdown-trigger')
-            ->elsewhereWhenAvailable('@dropdown-menu', function ($browser) {
+            ->elsewhereWhenAvailable('@dropdown-menu', static function (Browser $browser) {
                 $browser->click('@select-all-button');
             })
             ->closeCurrentDropdown();
@@ -143,7 +143,7 @@ class SelectAllDropdownComponent extends Component
         $browser
             ->waitFor('@select-all-dropdown-trigger')
             ->click('@select-all-dropdown-trigger')
-            ->elsewhereWhenAvailable('@dropdown-menu', function ($browser) {
+            ->elsewhereWhenAvailable('@dropdown-menu', static function (Browser $browser) {
                 $browser->click('@select-all-matching-button');
             })
             ->closeCurrentDropdown();
@@ -157,7 +157,7 @@ class SelectAllDropdownComponent extends Component
         $browser
             ->waitFor('@select-all-dropdown-trigger', 2)
             ->click('@select-all-dropdown-trigger')
-            ->elsewhereWhenAvailable('@dropdown-menu', function ($browser) {
+            ->elsewhereWhenAvailable('@dropdown-menu', static function (Browser $browser) {
                 $browser->click('@select-all-matching-button')->pause(250);
             }, 2);
     }
@@ -169,7 +169,7 @@ class SelectAllDropdownComponent extends Component
      */
     public function assert(Browser $browser): void
     {
-        tap($this->selector(), function ($selector) use ($browser) {
+        tap($this->selector(), static function (string $selector) use ($browser) {
             $browser->scrollIntoView($selector);
         });
     }

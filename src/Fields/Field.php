@@ -4,6 +4,7 @@ namespace Laravel\Nova\Fields;
 
 use Closure;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
@@ -23,6 +24,7 @@ use Stringable;
 #[\AllowDynamicProperties]
 abstract class Field extends FieldElement implements JsonSerializable, Resolvable
 {
+    use Conditionable;
     use DependentFields;
     use HandlesValidation;
     use HasHelpText;

@@ -20,7 +20,7 @@ class ActionDropdownComponent extends Component
     public function runWithConfirmation(Browser $browser, string $uriKey): void
     {
         $browser->click("button[data-action-id='{$uriKey}']")
-            ->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) {
+            ->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) {
                 $browser->confirm();
             });
     }
@@ -31,7 +31,7 @@ class ActionDropdownComponent extends Component
     public function runWithoutConfirmation(Browser $browser, string $uriKey): void
     {
         $browser->click("button[data-action-id='{$uriKey}']")
-            ->elsewhere('', function ($browser) {
+            ->elsewhere('', static function (Browser $browser) {
                 $browser->assertDontSee('@cancel-action-button');
             });
     }
@@ -42,8 +42,8 @@ class ActionDropdownComponent extends Component
     public function select(Browser $browser, string $uriKey, callable $fieldCallback): void
     {
         $browser->click("button[data-action-id='{$uriKey}']")
-            ->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) use ($fieldCallback) {
-                $fieldCallback($browser);
+            ->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) use ($fieldCallback) {
+                call_user_func($fieldCallback, $browser);
             });
     }
 
@@ -53,7 +53,7 @@ class ActionDropdownComponent extends Component
     public function cancel(Browser $browser, string $uriKey): void
     {
         $browser->click("button[data-action-id='{$uriKey}']")
-            ->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) {
+            ->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) {
                 $browser->cancel();
             });
     }

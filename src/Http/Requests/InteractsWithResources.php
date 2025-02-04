@@ -52,7 +52,7 @@ trait InteractsWithResources
     {
         return tap(once(function () {
             return Nova::resourceForKey($this->route('resource'));
-        }), function ($resource) {
+        }), static function ($resource) {
             abort_if(is_null($resource), 404);
         });
     }
@@ -134,10 +134,10 @@ trait InteractsWithResources
     public function findModelQuery($resourceId = null)
     {
         return app()->make(QueryBuilder::class, [$this->resource()])
-                    ->whereKey(
-                        $this->newQueryWithoutScopes(),
-                        $resourceId ?? $this->resourceId
-                    )->toBase();
+            ->whereKey(
+                $this->newQueryWithoutScopes(),
+                $resourceId ?? $this->resourceId
+            )->toBase();
     }
 
     /**

@@ -21,7 +21,7 @@ class ResourceCollection extends Collection
     public function authorized(Request $request)
     {
         return $this->filter(
-            fn ($resource) => $resource::authorizedToViewAny($request)
+            static fn ($resource) => $resource::authorizedToViewAny($request)
         );
     }
 
@@ -33,7 +33,7 @@ class ResourceCollection extends Collection
     public function availableForNavigation(Request $request)
     {
         return $this->filter(
-            fn ($resource) => $resource::availableForNavigation($request)
+            static fn ($resource) => $resource::availableForNavigation($request)
         );
     }
 
@@ -45,7 +45,7 @@ class ResourceCollection extends Collection
     public function searchable()
     {
         return $this->filter(
-            fn ($resource) => $resource::$globallySearchable
+            static fn ($resource) => $resource::$globallySearchable
         );
     }
 
@@ -57,7 +57,7 @@ class ResourceCollection extends Collection
     public function grouped()
     {
         return $this->groupBy(
-            fn ($resource, $key) => (string) $resource::group()
+            static fn ($resource, $key) => (string) $resource::group()
         )->toBase()->sortKeys();
     }
 

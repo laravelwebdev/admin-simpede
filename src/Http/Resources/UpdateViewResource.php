@@ -17,7 +17,7 @@ class UpdateViewResource extends Resource
     {
         $resource = $this->newResourceWith($request);
 
-        $resource->authorizeToUpdate($request);
+        $this->authorizedResourceForRequest($request, $resource);
 
         return [
             'title' => (string) $resource->title(),
@@ -29,17 +29,26 @@ class UpdateViewResource extends Resource
     /**
      * Get current resource for the request.
      *
-     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function newResourceWith(ResourceUpdateOrUpdateAttachedRequest $request): NovaResource
     {
         return $request->newResourceWith(
-            tap($request->findModelQuery(), function ($query) use ($request) {
+            tap($request->findModelQuery(), static function ($query) use ($request) {
                 $resource = $request->resource();
                 $resource::editQuery($request, $query);
             })->firstOrFail()
         );
+    }
+
+    /**
+     * Determine if resource is authorized for the request.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function authorizedResourceForRequest(ResourceUpdateOrUpdateAttachedRequest $request, NovaResource $resource): void
+    {
+        $resource->authorizeToUpdate($request);
     }
 }

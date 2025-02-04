@@ -51,8 +51,8 @@ class Boolean extends Field implements FilterableField
         $value = parent::resolveAttribute($resource, $attribute);
 
         return ! is_null($value)
-                    ? ($value == $this->trueValue ? true : false)
-                    : null;
+            ? ($value == $this->trueValue ? true : false)
+            : null;
     }
 
     /**
@@ -79,7 +79,8 @@ class Boolean extends Field implements FilterableField
     {
         if (isset($request[$requestAttribute])) {
             $model->{$attribute} = $request[$requestAttribute] == 1
-                    ? $this->trueValue : $this->falseValue;
+                ? $this->trueValue
+                : $this->falseValue;
         }
     }
 
@@ -132,8 +133,9 @@ class Boolean extends Field implements FilterableField
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return Arr::only($field, ['uniqueKey']);
-        });
+        return transform(
+            $this->jsonSerialize(),
+            static fn ($field) => Arr::only($field, ['uniqueKey'])
+        );
     }
 }

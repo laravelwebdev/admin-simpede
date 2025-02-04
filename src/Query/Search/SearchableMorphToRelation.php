@@ -46,8 +46,7 @@ class SearchableMorphToRelation extends SearchableRelation
         }
 
         return collect($this->types)
-            ->map(function ($resource) {
-                return $resource::$model ?? $resource;
-            })->all();
+            ->map(static fn ($resource) => $resource::$model ?? $resource)
+            ->all();
     }
 }

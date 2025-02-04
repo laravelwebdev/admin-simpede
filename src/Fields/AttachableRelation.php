@@ -104,11 +104,11 @@ trait AttachableRelation
         $query = app()->make(QueryBuilder::class, [$resourceClass]);
 
         $request->first === 'true'
-                        ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
-                        : $query->search(
-                            $request, $model->newQuery(), $request->search,
-                            [], [], TrashedStatus::fromBoolean($withTrashed)
-                        );
+            ? $query->whereKey($model->newQueryWithoutScopes(), $request->current)
+            : $query->search(
+                $request, $model->newQuery(), $request->search,
+                [], [], TrashedStatus::fromBoolean($withTrashed)
+            );
 
         return $query->tap(function ($query) use ($request, $model) {
             $this->applyAttachableCallbacks($query, $request, $this->resourceClass, $model);
@@ -124,8 +124,8 @@ trait AttachableRelation
     protected function attachableQueryCallable(NovaRequest $request, $model, string $resourceClass): callable
     {
         return ($method = $this->attachableQueryMethod($request, $model))
-                    ? [$request->resource(), $method]
-                    : [$resourceClass, 'relatableQuery'];
+            ? [$request->resource(), $method]
+            : [$resourceClass, 'relatableQuery'];
     }
 
     /**

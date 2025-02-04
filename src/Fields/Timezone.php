@@ -21,8 +21,10 @@ class Timezone extends Select
     {
         parent::__construct($name, $attribute, $resolveCallback);
 
-        $this->options(collect(DateTimeZone::listIdentifiers(DateTimeZone::ALL))->mapWithKeys(function ($timezone) {
-            return [$timezone => $timezone];
-        })->all());
+        $this->options(
+            collect(DateTimeZone::listIdentifiers(DateTimeZone::ALL))
+                ->mapWithKeys(static fn ($timezone) => [$timezone => $timezone])
+                ->all()
+        );
     }
 }

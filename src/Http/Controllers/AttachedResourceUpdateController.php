@@ -34,7 +34,7 @@ class AttachedResourceUpdateController extends Controller
 
         $model = $request->findModelOrFail();
 
-        tap(new $resource($model), function ($resource) use ($request) {
+        tap(new $resource($model), static function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
         });
 
@@ -118,7 +118,7 @@ class AttachedResourceUpdateController extends Controller
         $relation = $model->{$request->viaRelationship}();
 
         if ($request->viaPivotId) {
-            tap($relation->getPivotClass(), function ($pivotClass) use ($relation, $request) {
+            tap($relation->getPivotClass(), static function ($pivotClass) use ($relation, $request) {
                 $relation->wherePivot((new $pivotClass)->getKeyName(), $request->viaPivotId);
             });
         }

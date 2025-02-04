@@ -65,13 +65,11 @@ class Trix extends Field implements DeletableContract, FilterableField, Storable
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return Arr::only($field, [
-                'uniqueKey',
-                'name',
-                'attribute',
-            ]);
-        });
+        return transform($this->jsonSerialize(), static fn ($field) => Arr::only($field, [
+            'uniqueKey',
+            'name',
+            'attribute',
+        ]));
     }
 
     /**

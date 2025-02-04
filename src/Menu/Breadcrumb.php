@@ -42,13 +42,13 @@ class Breadcrumb implements JsonSerializable
                     'title' => $resourceClass->title(),
                 ])
             )->path('/resources/'.$resourceClass::uriKey().'/'.$resourceClass->getKey())
-            ->canSee(fn ($request) => $resourceClass->authorizedToView($request));
+            ->canSee(static fn ($request) => $resourceClass->authorizedToView($request));
         }
 
         return static::make(
             Nova::__($resourceClass::label())
         )->path('/resources/'.$resourceClass::uriKey())
-        ->canSee(fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
+        ->canSee(static fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
     }
 
     /**

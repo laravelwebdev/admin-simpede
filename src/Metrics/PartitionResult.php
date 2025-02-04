@@ -42,7 +42,7 @@ class PartitionResult implements JsonSerializable
      */
     public function label(Closure $callback)
     {
-        $this->labels = collect($this->value)->mapWithKeys(function ($value, $label) use ($callback) {
+        $this->labels = collect($this->value)->mapWithKeys(static function ($value, $label) use ($callback) {
             return [$label => $callback($label !== '' ? $label : null)];
         })->all();
 

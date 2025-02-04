@@ -19,8 +19,7 @@ class DetachAttachment
     public function __invoke(NovaRequest $request): void
     {
         static::$model::where('url', $request->attachmentUrl)
-                    ->get()
-                    ->each
-                    ->purge();
+            ->get()
+            ->each->purge();
     }
 }

@@ -34,8 +34,7 @@ trait ResolvesFilters
         if ($this->filters instanceof Collection) {
             (new FilterDecoder($request->filter, $this->filters))
                 ->filters()
-                ->each
-                ->__invoke($request, $query);
+                ->each->__invoke($request, $query);
         }
 
         return $query;

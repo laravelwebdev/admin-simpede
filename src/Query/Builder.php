@@ -66,7 +66,7 @@ class Builder implements QueryBuilder
     {
         $this->setOriginalQueryBuilder($this->queryBuilder = $query);
 
-        $this->tap(function ($query) use ($key) {
+        $this->tap(static function ($query) use ($key) {
             /** @var \Illuminate\Contracts\Database\Eloquent\Builder $query */
             $query->whereKey($key);
         });
@@ -172,7 +172,7 @@ class Builder implements QueryBuilder
      */
     public function limit(?int $limit)
     {
-        return $this->tap(function ($query) use ($limit) {
+        return $this->tap(static function ($query) use ($limit) {
             /** @var \Illuminate\Contracts\Database\Eloquent\Builder $query */
             $query->limit($limit);
         });
@@ -280,7 +280,7 @@ class Builder implements QueryBuilder
 
             $paginated->setCollection(
                 $paginated->getCollection()
-                    ->sortBy(fn ($model) => $objectIdPositions[$model->getScoutKey()], SORT_NUMERIC)
+                    ->sortBy(static fn ($model) => $objectIdPositions[$model->getScoutKey()], SORT_NUMERIC)
                     ->values()
             );
         }
@@ -341,7 +341,7 @@ class Builder implements QueryBuilder
             /** @var \Illuminate\Contracts\Database\Eloquent\Builder $query */
             collect($this->queryCallbacks)
                 ->filter()
-                ->each(function ($callback) use ($query) {
+                ->each(static function ($callback) use ($query) {
                     call_user_func($callback, $query);
                 });
         };

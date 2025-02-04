@@ -12,7 +12,7 @@ trait HasSearchable
      */
     public function searchInput(Browser $browser, string $attribute, string $search, int $pause = 500): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search, $pause) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) use ($search, $pause) {
             $browser->searchInput($search, $pause);
         });
     }
@@ -22,7 +22,7 @@ trait HasSearchable
      */
     public function resetSearchResult(Browser $browser, string $attribute): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) {
             $browser->resetSearchResult();
         });
     }
@@ -32,7 +32,7 @@ trait HasSearchable
      */
     public function selectSearchResult(Browser $browser, string $attribute, int $resultIndex): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($resultIndex) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) use ($resultIndex) {
             $browser->selectSearchResult($resultIndex);
         });
     }
@@ -50,7 +50,7 @@ trait HasSearchable
      */
     public function cancelSelectingSearchResult(Browser $browser, string $attribute): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) {
             $browser->cancelSelectingSearchResult();
         });
     }
@@ -60,7 +60,7 @@ trait HasSearchable
      */
     public function searchAndSelectResult(Browser $browser, string $attribute, string $search, int $resultIndex): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search, $resultIndex) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) use ($search, $resultIndex) {
             $browser->searchAndSelectResult($search, $resultIndex);
         });
     }
@@ -80,7 +80,7 @@ trait HasSearchable
      */
     public function assertSearchResult(Browser $browser, string $attribute, callable $fieldCallback): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($fieldCallback) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) use ($fieldCallback) {
             $browser->assertSearchResult($fieldCallback);
         });
     }
@@ -90,7 +90,7 @@ trait HasSearchable
      */
     public function assertSelectedSearchResult(Browser $browser, string $attribute, string $search): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) use ($search) {
             $browser->assertSelectedSearchResult($search);
         });
     }
@@ -100,7 +100,7 @@ trait HasSearchable
      */
     public function assertSelectedFirstSearchResult(Browser $browser, string $attribute, string $search): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) use ($search) {
             $browser->assertSelectedFirstSearchResult($search);
         });
     }
@@ -110,7 +110,7 @@ trait HasSearchable
      */
     public function assertEmptySearchResult(Browser $browser, string $attribute): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) {
             $browser->assertEmptySearchResult();
         });
     }
@@ -120,7 +120,7 @@ trait HasSearchable
      */
     public function assertSearchResultContains(Browser $browser, string $attribute, string|array $search): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) use ($search) {
             $browser->assertSearchResultContains($search);
         });
     }
@@ -130,7 +130,7 @@ trait HasSearchable
      */
     public function assertSearchResultDoesNotContains(Browser $browser, string $attribute, string|array $search): void
     {
-        $browser->whenAvailable(new SearchInputComponent($attribute), function ($browser) use ($search) {
+        $browser->whenAvailable(new SearchInputComponent($attribute), static function (Browser $browser) use ($search) {
             $browser->assertSearchResultDoesNotContains($search);
         });
     }

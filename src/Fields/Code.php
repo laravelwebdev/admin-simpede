@@ -70,8 +70,8 @@ class Code extends Field
     {
         if ($request->exists($requestAttribute)) {
             $model->{$attribute} = $this->json
-                        ? json_decode($request[$requestAttribute], true)
-                        : $request[$requestAttribute];
+                ? json_decode($request[$requestAttribute], true)
+                : $request[$requestAttribute];
         }
     }
 

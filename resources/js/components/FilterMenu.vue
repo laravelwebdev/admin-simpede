@@ -60,7 +60,10 @@
             </FilterContainer>
 
             <!-- Per Page -->
-            <FilterContainer v-if="!viaResource" dusk="filter-per-page">
+            <FilterContainer
+              v-if="perPageOptionsForFilter.length > 1"
+              dusk="filter-per-page"
+            >
               <span>{{ __('Per Page') }}</span>
 
               <template #filter>

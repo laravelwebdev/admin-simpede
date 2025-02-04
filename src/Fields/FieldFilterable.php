@@ -23,7 +23,7 @@ trait FieldFilterable
      */
     protected function defaultFilterableCallback()
     {
-        return function (NovaRequest $request, $query, $value, $attribute) {
+        return static function (NovaRequest $request, $query, $value, $attribute) {
             return $query->where($attribute, '=', $value);
         };
     }

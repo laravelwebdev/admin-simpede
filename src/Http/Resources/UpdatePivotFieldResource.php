@@ -45,7 +45,7 @@ class UpdatePivotFieldResource extends Resource
         $accessor = $relation->getPivotAccessor();
 
         if ($request->viaPivotId) {
-            tap($relation->getPivotClass(), function ($pivotClass) use ($relation, $request) {
+            tap($relation->getPivotClass(), static function ($pivotClass) use ($relation, $request) {
                 $relation->wherePivot((new $pivotClass)->getKeyName(), $request->viaPivotId);
             });
         }
@@ -59,15 +59,14 @@ class UpdatePivotFieldResource extends Resource
     }
 
     /**
-     * Get resource for the request.
-     *
+     * Determine if resource is authorized for the request.
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function authorizedResourceForRequest(ResourceUpdateOrUpdateAttachedRequest $request): NovaResource
     {
-        return tap($request->findResourceOrFail(), function ($resource) use ($request) {
+        return tap($request->findResourceOrFail(), static function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
         });
     }

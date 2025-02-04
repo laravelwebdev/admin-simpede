@@ -36,18 +36,11 @@ class ResourceIndexRequest extends NovaRequest
      */
     public function perPage(): int
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
 
-        if ($this->viaRelationship()) {
-            return (int) $resource::$perPageViaRelationship;
-        }
-
-        $perPageOptions = $resource::perPageOptions();
-
-        if (empty($perPageOptions)) {
-            $perPageOptions = [$resource::newModel()->getPerPage()];
-        }
-
-        return (int) in_array($this->perPage, $perPageOptions) ? $this->perPage : $perPageOptions[0];
+        return (int) transform(
+            $this->viaRelationship() ? $resourceClass::perPageViaRelationshipOptions() : $resourceClass::perPageOptions(),
+            fn ($perPageOptions) => in_array($this->perPage, $perPageOptions) ? $this->perPage : $perPageOptions[0],
+        );
     }
 }

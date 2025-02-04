@@ -34,15 +34,13 @@ class LensViewResource extends Resource
         return [
             'name' => $lens->name(),
             'resources' => $resources = $request->toResources($paginator->getCollection()), // @phpstan-ignore method.notFound
-            'prev_page_url' => $paginator->previousPageUrl(),
-            'next_page_url' => $paginator->nextPageUrl(),
-            'per_page' => $paginator->perPage(),
-            'per_page_options' => $request->resource()::perPageOptions(),
+            'prevPageUrl' => $paginator->previousPageUrl(),
+            'nextPageUrl' => $paginator->nextPageUrl(),
+            'perPage' => $paginator->perPage(),
             'softDeletes' => $request->resourceSoftDeletes(),
             'hasId' => $resources->pluck('id')
-                        ->reject(function ($field) {
-                            return is_null($field->value);
-                        })->isNotEmpty(),
+                ->reject(static fn ($field) => is_null($field->value))
+                ->isNotEmpty(),
             'polling' => $lens::$polling,
             'pollingInterval' => $lens::$pollingInterval * 1000,
             'showPollingToggle' => $lens::$showPollingToggle,

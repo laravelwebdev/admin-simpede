@@ -32,7 +32,7 @@ trait AuthorizesRequests
      */
     public static function check($request): bool
     {
-        return (static::$authUsing ?: function () {
+        return (static::$authUsing ?: static function () {
             return app()->environment('local');
         })($request);
     }

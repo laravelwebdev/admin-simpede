@@ -405,7 +405,7 @@ class BelongsTo extends Field implements FilterableField, RelatableField
      */
     protected function defaultFilterableCallback()
     {
-        return function (NovaRequest $request, $query, $value, $attribute) {
+        return static function (NovaRequest $request, $query, $value, $attribute) {
             $query->where($attribute, '=', $value);
         };
     }
@@ -416,18 +416,18 @@ class BelongsTo extends Field implements FilterableField, RelatableField
     #[\Override]
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return [
-                'attribute' => $field['attribute'],
-                'debounce' => $field['debounce'],
-                'displaysWithTrashed' => $field['displaysWithTrashed'],
-                'label' => $this->resourceClass::label(),
-                'resourceName' => $field['resourceName'],
-                'searchable' => $field['searchable'],
-                'withSubtitles' => $field['withSubtitles'],
-                'uniqueKey' => $field['uniqueKey'],
-            ];
-        });
+        $label = $this->resourceClass::label();
+
+        return transform($this->jsonSerialize(), static fn ($field) => [
+            'attribute' => $field['attribute'],
+            'debounce' => $field['debounce'],
+            'displaysWithTrashed' => $field['displaysWithTrashed'],
+            'label' => $label,
+            'resourceName' => $field['resourceName'],
+            'searchable' => $field['searchable'],
+            'withSubtitles' => $field['withSubtitles'],
+            'uniqueKey' => $field['uniqueKey'],
+        ]);
     }
 
     /**

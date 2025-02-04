@@ -10,7 +10,8 @@
         <input
           v-bind="extraAttributes"
           ref="theInput"
-          v-model="value"
+          :value="value"
+          @blur="handleChangesOnBlurEvent"
           :id="field.uniqueKey"
           :disabled="isReadonly"
           class="w-full form-control form-input form-control-bordered"
@@ -39,9 +40,10 @@ import {
   HandlesValidationErrors,
 } from '@/mixins'
 import debounce from 'lodash/debounce'
+import isNil from 'lodash/isNil'
 
 export default {
-  mixins: [HandlesFieldPreviews, HandlesValidationErrors, FormField],
+  mixins: [FormField, HandlesFieldPreviews, HandlesValidationErrors],
 
   data: () => ({
     isListeningToChanges: false,
@@ -49,9 +51,8 @@ export default {
   }),
 
   mounted() {
-    if (this.shouldRegisterInitialListener) {
-      this.registerChangeListener()
-    }
+    this.debouncedHandleChange = debounce(this.handleChange, 250)
+    this.registerChangeListener()
   },
 
   beforeUnmount() {
@@ -60,14 +61,28 @@ export default {
 
   methods: {
     registerChangeListener() {
-      Nova.$on(this.eventName, debounce(this.handleChange, 250))
+      if (this.shouldRegisterInitialListener === true) {
+        Nova.$on(this.eventName, this.debouncedHandleChange)
 
-      this.isListeningToChanges = true
+        this.isListeningToChanges = true
+      }
     },
 
     removeChangeListener() {
       if (this.isListeningToChanges === true) {
         Nova.$off(this.eventName)
+      }
+    },
+
+    async handleChangesOnBlurEvent(event) {
+      let value = event?.target?.value ?? event
+
+      if (this.isReadonly) {
+        return
+      }
+
+      if (isNil(this.field.from)) {
+        this.debouncedHandleChange(value)
       }
     },
 
@@ -94,7 +109,7 @@ export default {
 
   computed: {
     shouldRegisterInitialListener() {
-      return !this.field.updating
+      return this.field.shouldListenToFromChanges
     },
 
     eventName() {
@@ -102,6 +117,10 @@ export default {
     },
 
     placeholder() {
+      if (isNil(this.field.from)) {
+        return this.field.placeholder ?? this.field.name
+      }
+
       return this.field.placeholder ?? null
     },
 

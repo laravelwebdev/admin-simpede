@@ -17,7 +17,7 @@ class ScriptController extends Controller
     public function __invoke(NovaRequest $request): Script
     {
         $asset = collect(Nova::allScripts())
-            ->filter(fn ($asset) => $asset->name() === $request->script)
+            ->filter(static fn ($asset) => $asset->name() === $request->script)
             ->first();
 
         abort_if(is_null($asset), 404);

@@ -35,7 +35,7 @@ class ActionRequest extends NovaRequest
 
             return $this->availableActions()
                 ->filter(
-                    fn ($action) => $hasResources ? true : $action->isStandalone()
+                    static fn ($action) => $hasResources ? true : $action->isStandalone()
                 )->first(
                     fn ($action) => $action->uriKey() == $this->query('action')
                 ) ?: abort($this->actionExists() ? 403 : 404);
@@ -48,8 +48,8 @@ class ActionRequest extends NovaRequest
     protected function resolveActions(): Collection
     {
         return $this->isPivotAction()
-                    ? $this->newResource()->resolvePivotActions($this)
-                    : $this->newResource()->resolveActions($this);
+            ? $this->newResource()->resolvePivotActions($this)
+            : $this->newResource()->resolveActions($this);
     }
 
     /**
@@ -107,8 +107,8 @@ class ActionRequest extends NovaRequest
         }
 
         $query = $this->viaRelationship()
-                    ? $this->modelsViaRelationship()
-                    : $this->toQueryWithoutScopes()->whereKey(Arr::wrap($this->resources));
+            ? $this->modelsViaRelationship()
+            : $this->toQueryWithoutScopes()->whereKey(Arr::wrap($this->resources));
 
         return $query->tap(function ($query) {
             $query->latest($this->model()->getQualifiedKeyName());
@@ -180,7 +180,7 @@ class ActionRequest extends NovaRequest
      */
     public function resolveFieldsForStorage(): array
     {
-        return collect($this->resolveFields()->getAttributes())->map(function ($attribute) {
+        return collect($this->resolveFields()->getAttributes())->map(static function ($attribute) {
             return $attribute instanceof UploadedFile ? $attribute->hashName() : $attribute;
         })->all();
     }
@@ -194,17 +194,17 @@ class ActionRequest extends NovaRequest
             $fields = new Fluent;
 
             $results = FieldCollection::make($this->action()->fields($this))
-                            ->authorized($this)
-                            ->applyDependsOn($this)
-                            ->withoutReadonly($this)
-                            ->withoutUnfillable()
-                            ->mapWithKeys(fn ($field) => [
-                                $field->attribute => $field->fillForAction($this, $fields),
-                            ]);
+                ->authorized($this)
+                ->applyDependsOn($this)
+                ->withoutReadonly($this)
+                ->withoutUnfillable()
+                ->mapWithKeys(fn ($field) => [
+                    $field->attribute => $field->fillForAction($this, $fields),
+                ]);
 
             return new ActionFields(
                 collect($fields->getAttributes()),
-                $results->filter(fn ($field) => is_callable($field))
+                $results->filter(static fn ($field) => is_callable($field))
             );
         });
     }
@@ -219,8 +219,8 @@ class ActionRequest extends NovaRequest
     public function actionableKey($model): string|int
     {
         return $this->isPivotAction()
-                        ? $model->{$this->pivotRelation()->getForeignPivotKeyName()}
-                        : $model->getKey();
+            ? $model->{$this->pivotRelation()->getForeignPivotKeyName()}
+            : $model->getKey();
     }
 
     /**

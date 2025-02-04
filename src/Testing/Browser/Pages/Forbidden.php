@@ -19,7 +19,7 @@ class Forbidden extends Page
      */
     public function assert(Browser $browser): void
     {
-        $browser->whenAvailable('@403-error-page', function ($browser) {
+        $browser->whenAvailable('@403-error-page', static function (Browser $browser) {
             $browser->assertSee('403');
         });
     }

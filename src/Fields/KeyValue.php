@@ -162,7 +162,7 @@ class KeyValue extends Field
      */
     public function readonlyKeys(NovaRequest $request): bool
     {
-        return with($this->readonlyKeysCallback, function ($callback) use ($request) {
+        return with($this->readonlyKeysCallback, static function ($callback) use ($request) {
             return is_callable($callback) ? call_user_func($callback, $request) : ($callback === true);
         });
     }

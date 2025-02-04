@@ -3,8 +3,6 @@
 namespace Laravel\Nova;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 
 class NovaServiceProvider extends ServiceProvider
@@ -19,7 +17,6 @@ class NovaServiceProvider extends ServiceProvider
         }
 
         $this->registerResources();
-        $this->registerCollectionMacros();
         $this->registerRelationsMacros();
     }
 
@@ -94,16 +91,6 @@ class NovaServiceProvider extends ServiceProvider
             Console\UserCommand::class,
             Console\ValueCommand::class,
         ]);
-    }
-
-    /**
-     * Register Collection macros.
-     */
-    protected function registerCollectionMacros(): void
-    {
-        Collection::macro('isAssoc', function () {
-            return Arr::isAssoc($this->toBase()->all());
-        });
     }
 
     /**

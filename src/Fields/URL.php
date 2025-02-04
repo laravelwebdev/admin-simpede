@@ -52,7 +52,6 @@ class URL extends Text
     {
         return with(app(NovaRequest::class), function ($request) {
             $data = parent::jsonSerialize();
-            $displayedAs = $data['displayedAs'];
 
             if (is_null($data['displayedAs'])) {
                 $data['displayedAs'] = match (true) {

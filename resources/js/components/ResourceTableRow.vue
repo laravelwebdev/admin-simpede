@@ -159,17 +159,18 @@
 
         <DeleteResourceModal
           :mode="viaManyToMany ? 'detach' : 'delete'"
+          :resource-name="resourceName"
           :show="deleteModalOpen"
           @close="closeDeleteModal"
           @confirm="confirmDelete"
         />
 
         <RestoreResourceModal
+          :resource-name="resourceName"
           :show="restoreModalOpen"
           @close="closeRestoreModal"
           @confirm="confirmRestore"
         >
-          <ModalHeader v-text="__('Restore Resource')" />
           <ModalContent>
             <p class="leading-normal">
               {{ __('Are you sure you want to restore this resource?') }}

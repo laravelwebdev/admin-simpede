@@ -23,7 +23,7 @@ class RedirectIfTwoFactorAuthenticatable extends Action
             Fortify::$authenticateUsingCallback = null;
         }
 
-        return tap(parent::validateCredentials($request), function () use ($authenticateUsingCallback) {
+        return tap(parent::validateCredentials($request), static function () use ($authenticateUsingCallback) {
             Fortify::$authenticateUsingCallback = $authenticateUsingCallback;
         });
     }

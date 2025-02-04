@@ -26,7 +26,7 @@ class UpdateFieldController extends Controller
 
         return response()->json(
             $resource->updateFields($request)
-                ->filter(function ($field) use ($request) {
+                ->filter(static function ($field) use ($request) {
                     return $request->query('field') === $field->attribute &&
                             $request->query('component') === $field->dependentComponentKey();
                 })->each->syncDependsOn($request)

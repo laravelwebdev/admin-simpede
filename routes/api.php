@@ -77,7 +77,7 @@ Route::delete('impersonate', [ImpersonateController::class, 'stopImpersonating']
 // Fields...
 Route::get('/{resource}/field/{field}', FieldController::class);
 Route::middleware(ValidatePostSize::class)
-    ->group(function (Router $router) {
+    ->group(static function (Router $router) {
         $router->post('/{resource}/field/{field}/preview', [FieldPreviewController::class, 'create']);
         $router->post('/{resource}/{resourceId}/field/{field}/preview', [FieldPreviewController::class, 'update']);
         $router->post('/{resource}/field-attachment/{field}', [FieldAttachmentController::class, 'store']);
@@ -90,7 +90,7 @@ Route::get('/{resource}/{resourceId}/update-fields', UpdateFieldController::clas
 Route::get('/{resource}/{resourceId}/creation-pivot-fields/{relatedResource}', CreationPivotFieldController::class);
 Route::get('/{resource}/{resourceId}/update-pivot-fields/{relatedResource}/{relatedResourceId}', UpdatePivotFieldController::class);
 Route::middleware(ValidatePostSize::class)
-    ->group(function (Router $router) {
+    ->group(static function (Router $router) {
         $router->patch('/{resource}/creation-fields', CreationFieldSyncController::class);
         $router->patch('/{resource}/{resourceId}/update-fields', [UpdateFieldController::class, 'sync']);
         $router->patch('/{resource}/{resourceId}/creation-pivot-fields/{relatedResource}', [CreationPivotFieldController::class, 'sync']);
@@ -163,7 +163,7 @@ Route::get('/{resource}/{resourceId}', ResourceShowController::class);
 Route::get('/{resource}/{resourceId}/preview', ResourcePreviewController::class);
 Route::get('/{resource}/{resourceId}/peek', ResourcePeekController::class);
 Route::middleware(ValidatePostSize::class)
-    ->group(function (Router $router) {
+    ->group(static function (Router $router) {
         $router->post('/{resource}', ResourceStoreController::class);
         $router->put('/{resource}/{resourceId}', ResourceUpdateController::class);
     });
@@ -177,7 +177,7 @@ Route::get('/{resource}/morphable/{field}', MorphableController::class);
 
 // Resource Attachment...
 Route::middleware(ValidatePostSize::class)
-    ->group(function (Router $router) {
+    ->group(static function (Router $router) {
         $router->post('/{resource}/{resourceId}/attach/{relatedResource}', ResourceAttachController::class);
         $router->post('/{resource}/{resourceId}/update-attached/{relatedResource}/{relatedResourceId}', AttachedResourceUpdateController::class);
         $router->post('/{resource}/{resourceId}/attach-morphed/{relatedResource}', MorphedResourceAttachController::class);

@@ -79,6 +79,7 @@ class PendingTranslation implements JsonSerializable, Stringable
     /**
      * Get the translation as json.
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize(): string
     {
         return $this->value();

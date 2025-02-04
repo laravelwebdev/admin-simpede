@@ -4,6 +4,7 @@
     :shouldOverrideMeta="true"
     :shouldEnableShortcut="true"
     :collapsable="false"
+    :per-page-options="perPageOptions"
   />
 </template>
 
@@ -14,5 +15,8 @@ defineOptions({
   name: 'Index',
 })
 
-defineProps(mapProps(['resourceName']))
+defineProps({
+  perPageOptions: { type: Array, required: true },
+  ...mapProps(['resourceName']),
+})
 </script>

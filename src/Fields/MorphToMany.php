@@ -249,12 +249,12 @@ class MorphToMany extends Field implements DeletableContract, ListableField, Piv
                 'relatable' => true,
                 'morphToManyRelationship' => $this->manyToManyRelationship,
                 'relationshipType' => $this->relationshipType(),
-                'perPage' => $this->resourceClass::$perPageViaRelationship,
+                'perPageOptions' => $this->resourceClass::perPageViaRelationshipOptions(),
                 'resourceName' => $this->resourceName,
                 'searchable' => $this->isSearchable($request),
                 'withSubtitles' => $this->withSubtitles,
                 'singularLabel' => $this->singularLabel ?? $this->resourceClass::singularLabel(),
-                'showCreateRelationButton' => $this->createRelationShouldBeShown(app(NovaRequest::class)),
+                'showCreateRelationButton' => $this->createRelationShouldBeShown($request),
                 'displaysWithTrashed' => $this->displaysWithTrashed,
             ], parent::jsonSerialize());
         });

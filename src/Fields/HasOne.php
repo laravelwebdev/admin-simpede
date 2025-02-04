@@ -127,8 +127,8 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
             }
 
             return false;
-        })->showOnCreating(fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
-        ->showOnUpdating(fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
+        })->showOnCreating(static fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
+        ->showOnUpdating(static fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
         ->nullable();
     }
 
@@ -140,7 +140,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
      */
     public static function ofMany($name, ?string $attribute = null, ?string $resource = null): static
     {
-        return tap(new static($name, $attribute, $resource), function ($field) {
+        return tap(new static($name, $attribute, $resource), static function ($field) {
             $field->ofManyRelationship = true;
             $field->readonly();
             $field->onlyOnDetail();
@@ -206,9 +206,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
         }
 
         if ($value) {
-            $this->alreadyFilledWhen(function () use ($value) {
-                return optional($value)->exists;
-            });
+            $this->alreadyFilledWhen(static fn () => optional($value)->exists);
 
             $this->hasOneResource = new $this->resourceClass($value);
 
@@ -236,11 +234,11 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
-                    ->withMeta([
-                        'prefixComponent' => true,
-                    ])
-                    ->help($this->getHelpText())
-                    ->withComponent('relationship-panel');
+            ->withMeta([
+                'prefixComponent' => true,
+            ])
+            ->help($this->getHelpText())
+            ->withComponent('relationship-panel');
     }
 
     /**
@@ -253,7 +251,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     {
         return with(app(NovaRequest::class), function ($request) {
             if (! is_null($this->requiredCallback)) {
-                $this->nullable = ! with($this->requiredCallback, function ($callback) use ($request) {
+                $this->nullable = ! with($this->requiredCallback, static function ($callback) use ($request) {
                     return $callback === true || (is_callable($callback) && call_user_func($callback, $request));
                 });
             }
@@ -354,15 +352,15 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
         $resource = $resourceClass::make($relation);
 
         $callbacks = $resource->availableFields($request)
-            ->when($editMode === 'create', function (FieldCollection $fields) use ($request, $relation) {
+            ->when($editMode === 'create', static function (FieldCollection $fields) use ($request, $relation) {
                 return $fields->onlyCreateFields($request, $relation);
             })
-            ->when($editMode === 'update', function (FieldCollection $fields) use ($request, $relation) {
+            ->when($editMode === 'update', static function (FieldCollection $fields) use ($request, $relation) {
                 return $fields->onlyUpdateFields($request, $relation);
             })
             ->withoutReadonly($request)
             ->withoutUnfillable()
-            ->map(function (Field $field) use ($request, $relation, $attribute) {
+            ->map(static function (Field $field) use ($request, $relation, $attribute) {
                 return $field->fillInto($request, $relation, $field->attribute, "{$attribute}.{$field->attribute}");
             });
 
@@ -370,12 +368,12 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
             $callbacks->prepend(function () use ($request, $relation, $model) {
                 $model->{$this->hasOneRelationship}()->save($relation);
 
-                Nova::usingActionEvent(function ($actionEvent) use ($request, $relation) {
+                Nova::usingActionEvent(static function ($actionEvent) use ($request, $relation) {
                     $actionEvent->forResourceCreate(Nova::user($request), $relation)->save();
                 });
             });
         } else {
-            Nova::usingActionEvent(function ($actionEvent) use ($request, $relation) {
+            Nova::usingActionEvent(static function ($actionEvent) use ($request, $relation) {
                 $actionEvent->forResourceUpdate(Nova::user($request), $relation)->save();
             });
 
@@ -384,10 +382,9 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
 
         $model->setRelation($this->hasOneRelationship, $relation);
 
-        return function () use ($callbacks) {
-            $callbacks->filter(function ($callback) {
-                return is_callable($callback);
-            })->each->__invoke();
+        return static function () use ($callbacks) {
+            $callbacks->filter(static fn ($callback) => is_callable($callback))
+                ->each->__invoke();
         };
     }
 
@@ -432,8 +429,8 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
         $resource = $resourceClass::make($relation);
 
         return $relation->exists === false
-                    ? $this->getResourceCreationRules($request, $resource)
-                    : $this->getResourceUpdateRules($request, $resource);
+            ? $this->getResourceCreationRules($request, $resource)
+            : $this->getResourceUpdateRules($request, $resource);
     }
 
     /**
@@ -446,9 +443,9 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
         $replacements = Util::dependentRules($this->attribute);
 
         return $resource->creationFields($request)
-            ->reject(fn ($field) => $field instanceof BelongsTo && $field->resourceClass == Nova::resourceForKey($request->resource))
+            ->reject(static fn ($field) => $field instanceof BelongsTo && $field->resourceClass == Nova::resourceForKey($request->resource))
             ->applyDependsOn($request)
-            ->mapWithKeys(fn ($field) => $field->getCreationRules($request))
+            ->mapWithKeys(static fn ($field) => $field->getCreationRules($request))
             ->mapWithKeys(function ($field, $attribute) use ($replacements) {
                 if ($this->nullable === true) {
                     $field[] = 'sometimes';
@@ -484,7 +481,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
         return $resource->updateFields($request)
             ->reject($this->rejectRecursiveRelatedResourceFields($request))
             ->applyDependsOn($request)
-            ->mapWithKeys(fn ($field) => $field->getUpdateRules($request))
+            ->mapWithKeys(static fn ($field) => $field->getUpdateRules($request))
             ->mapWithKeys(function ($field, $attribute) use ($replacements) {
                 if ($this->nullable === true) {
                     $field[] = 'sometimes';
@@ -516,7 +513,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
 
         return $resource->updateFields($request)
             ->reject($this->rejectRecursiveRelatedResourceFields($request))
-            ->reject(fn ($field) => empty($field->name))
+            ->reject(static fn ($field) => empty($field->name))
             ->mapWithKeys(fn ($field) => ["{$this->attribute}.{$field->attribute}" => $field->name])
             ->all();
     }

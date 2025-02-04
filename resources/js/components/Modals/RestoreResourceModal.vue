@@ -5,8 +5,10 @@
       class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
       style="width: 460px"
     >
-      <slot>
-        <ModalHeader v-text="__('Restore Resource')" />
+      <slot name="header">
+        <ModalHeader v-text="modalTitle" />
+      </slot>
+      <slot name="content">
         <ModalContent>
           <p class="leading-normal">
             {{ __('Are you sure you want to restore the selected resources?') }}
@@ -40,42 +42,54 @@
   </Modal>
 </template>
 
-<script>
+<script setup>
+import { mapProps } from '@/mixins'
 import { Button } from 'laravel-nova-ui'
+import { computed, ref, watch } from 'vue'
+import { useLocalization } from '@/composables/useLocalization'
+import { useResourceInformation } from '@/composables/useResourceInformation'
+import isNull from 'lodash/isNull'
 
-export default {
-  components: {
-    Button,
-  },
+const { __ } = useLocalization()
+const { resourceInformation } = useResourceInformation()
 
-  emits: ['confirm', 'close'],
+const emitter = defineEmits(['confirm', 'close'])
 
-  props: {
-    show: { type: Boolean, default: false },
-  },
+const working = ref(false)
 
-  data: () => ({
-    working: false,
-  }),
+const props = defineProps({
+  ...mapProps(['resourceName']),
+  show: { type: Boolean, default: false },
+})
 
-  watch: {
-    show(showing) {
-      if (showing === false) {
-        this.working = false
-      }
-    },
-  },
+watch(
+  () => props.show,
+  showing => {
+    if (showing === false) {
+      working.value = false
+    }
+  }
+)
 
-  methods: {
-    handleClose() {
-      this.$emit('close')
-      this.working = false
-    },
+const modalTitle = computed(() => {
+  const resource = resourceInformation(props.resourceName)
 
-    handleConfirm() {
-      this.$emit('confirm')
-      this.working = true
-    },
-  },
+  if (isNull(resource)) {
+    return __('Restore Resource')
+  }
+
+  return __('Restore :resource', {
+    resource: resource.singularLabel,
+  })
+})
+
+function handleClose() {
+  emitter('close')
+  working.value = false
+}
+
+function handleConfirm() {
+  emitter('confirm')
+  working.value = true
 }
 </script>

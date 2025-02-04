@@ -24,7 +24,7 @@ class NovaExceptionHandler extends ExceptionHandler
         with(Nova::$reportCallback, function ($handler) {
             /** @var (callable(\Throwable):(void))|(\Closure(\Throwable):(void))|null $handler */
             if ($handler instanceof Closure || is_callable($handler)) {
-                $this->reportable(function (Throwable $e) use ($handler) {
+                $this->reportable(static function (Throwable $e) use ($handler) {
                     call_user_func($handler, $e);
                 })->stop();
             }

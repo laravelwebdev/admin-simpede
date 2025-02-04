@@ -35,7 +35,11 @@ class ResourceDetailController extends Controller
      */
     protected function breadcrumbs(ResourceDetailRequest $request): Breadcrumbs
     {
-        $resource = DetailViewResource::make()->authorizedResourceForRequest($request);
+        $resource = transform(DetailViewResource::make(), static function (DetailViewResource $detail) use ($request) {
+            $detail->authorizedResourceForRequest($request, $resource = $detail->newResourceWith($request));
+
+            return $resource;
+        });
 
         return Breadcrumbs::make([
             Breadcrumb::make(Nova::__('Resources')),

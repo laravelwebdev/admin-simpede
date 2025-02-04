@@ -18,8 +18,8 @@ class ResourceSearchRequest extends NovaRequest
         $model = $this->model();
 
         $limit = $resource::usesScout()
-                    ? $resource::$scoutSearchResults
-                    : $resource::$relatableSearchResults;
+            ? $resource::$scoutSearchResults
+            : $resource::$relatableSearchResults;
 
         $query = app()->make(QueryBuilder::class, [$resource]);
 

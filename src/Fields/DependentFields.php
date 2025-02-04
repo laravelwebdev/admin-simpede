@@ -42,9 +42,7 @@ trait DependentFields
     public function syncDependsOn(NovaRequest $request)
     {
         $this->value = new UndefinedValue;
-        $this->defaultCallback = function () {
-            return new UndefinedValue;
-        };
+        $this->defaultCallback = static fn () => new UndefinedValue;
 
         $this->applyDependsOn($request);
 

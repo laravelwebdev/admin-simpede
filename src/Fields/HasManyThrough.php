@@ -63,9 +63,9 @@ class HasManyThrough extends HasMany implements ListableField, RelatableField
     public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
-                    ->withMeta([
-                        'prefixComponent' => true,
-                    ])->withComponent('relationship-panel');
+            ->withMeta([
+                'prefixComponent' => true,
+            ])->withComponent('relationship-panel');
     }
 
     /**
@@ -81,7 +81,7 @@ class HasManyThrough extends HasMany implements ListableField, RelatableField
             'collapsedByDefault' => $this->collapsedByDefault,
             'hasManyThroughRelationship' => $this->hasManyThroughRelationship,
             'relatable' => true,
-            'perPage' => $this->resourceClass::$perPageViaRelationship,
+            'perPageOptions' => $this->resourceClass::perPageViaRelationshipOptions(),
             'resourceName' => $this->resourceName,
             'singularLabel' => $this->singularLabel ?? $this->resourceClass::singularLabel(),
         ], parent::jsonSerialize());

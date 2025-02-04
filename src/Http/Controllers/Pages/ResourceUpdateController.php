@@ -44,12 +44,12 @@ class ResourceUpdateController extends Controller
         $resource = UpdateViewResource::make()->newResourceWith($request);
 
         return Breadcrumbs::make(
-            collect([Breadcrumb::make(Nova::__('Resources'))])->when($request->viaRelationship(), function ($breadcrumbs) use ($request) {
+            collect([Breadcrumb::make(Nova::__('Resources'))])->when($request->viaRelationship(), static function ($breadcrumbs) use ($request) {
                 return $breadcrumbs->push(
                     Breadcrumb::resource($request->viaResource()),
                     Breadcrumb::resource($request->findParentResource())
                 );
-            }, function ($breadcrumbs) use ($resourceClass, $resource) {
+            }, static function ($breadcrumbs) use ($resourceClass, $resource) {
                 return $breadcrumbs->push(
                     Breadcrumb::resource($resourceClass),
                     Breadcrumb::resource($resource),

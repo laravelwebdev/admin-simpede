@@ -32,7 +32,7 @@ trait ResolvesActions
         }
 
         if (! is_null($resources = $request->selectedResources())) {
-            $resources->each(function ($resource) use ($request, $actions) {
+            $resources->each(static function ($resource) use ($request, $actions) {
                 $actions->withAuthorizedToRun($request, $resource);
             });
 
@@ -59,7 +59,7 @@ trait ResolvesActions
         }
 
         if (! is_null($resources = $request->selectedResources())) {
-            $resources->each(function ($resource) use ($request, $actions) {
+            $resources->each(static function ($resource) use ($request, $actions) {
                 $actions->withAuthorizedToRun($request, $resource);
             });
 

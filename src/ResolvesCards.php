@@ -15,8 +15,7 @@ trait ResolvesCards
     public function availableCards(NovaRequest $request): Collection
     {
         return $this->resolveCards($request)
-            ->reject(fn ($card) => $card->onlyOnDetail)
-            ->filter->authorize($request)
+            ->filter(static fn ($card) => $card->onlyOnDetail === false && $card->authorize($request))
             ->values();
     }
 
@@ -28,8 +27,7 @@ trait ResolvesCards
     public function availableCardsForDetail(NovaRequest $request): Collection
     {
         return $this->resolveCards($request)
-            ->filter(fn ($card) => $card->onlyOnDetail)
-            ->filter->authorize($request)
+            ->filter(static fn ($card) => $card->onlyOnDetail === true && $card->authorize($request))
             ->values();
     }
 

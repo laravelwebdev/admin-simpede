@@ -46,12 +46,9 @@ class JSON implements Preset
                 $fieldsCallbacks = $fields
                     ->withoutUnfillable()
                     ->withoutMissingValues()
-                    ->map(function (Field $field) use ($request, $requestAttribute, $data, $itemIndex) {
-                        return $field->fillInto($request, $data, $field->attribute, "{$requestAttribute}.{$itemIndex}.fields.{$field->attribute}");
-                    })
-                    ->filter(function ($callback) {
-                        return is_callable($callback);
-                    });
+                    ->map(
+                        static fn (Field $field) => $field->fillInto($request, $data, $field->attribute, "{$requestAttribute}.{$itemIndex}.fields.{$field->attribute}")
+                    )->filter(static fn ($callback) => is_callable($callback));
 
                 if ($uniqueField) {
                     $this->upsertData($existingItems, $data, $uniqueField);
@@ -63,12 +60,12 @@ class JSON implements Preset
                     $model->setAttribute("{$attribute}->{$itemIndex}->fields->{$k}", $v);
                 }
 
-                return function () use ($fieldsCallbacks) {
+                return static function () use ($fieldsCallbacks) {
                     $fieldsCallbacks->each->__invoke();
                 };
             });
 
-        return function () use ($callbacks) {
+        return static function () use ($callbacks) {
             $callbacks->each->__invoke();
         };
     }
@@ -81,9 +78,7 @@ class JSON implements Preset
     public function get(NovaRequest $request, $model, string $attribute, RepeatableCollection $repeatables): Collection
     {
         return RepeatableCollection::make($model->{$attribute})
-            ->map(function ($block) use ($repeatables) {
-                return $repeatables->newRepeatableByKey($block['type'], $block['fields']);
-            });
+            ->map(static fn ($block) => $repeatables->newRepeatableByKey($block['type'], $block['fields']));
     }
 
     /**
@@ -97,17 +92,15 @@ class JSON implements Preset
         $deletableIds = $existingItems
             ->whereNotIn(
                 "fields.{$uniqueField}",
-                $inputRepeaterItems->map(function ($item) use ($uniqueField) {
-                    return $item['fields'][$uniqueField] ?? null;
-                })
+                $inputRepeaterItems->map(static fn ($item) => $item['fields'][$uniqueField] ?? null)
                     ->filter()
                     ->all()
             );
 
         return $existingItems
-            ->reject(function ($item) use ($deletableIds, $uniqueField) {
-                return $deletableIds->contains("fields.$uniqueField", $item['fields'][$uniqueField]);
-            });
+            ->reject(
+                static fn ($item) => $deletableIds->contains("fields.$uniqueField", $item['fields'][$uniqueField])
+            );
     }
 
     /**
@@ -120,7 +113,7 @@ class JSON implements Preset
         }
 
         if (
-            $existingItem = $existingItems->first(function ($item) use ($data, $uniqueField) {
+            $existingItem = $existingItems->first(static function ($item) use ($data, $uniqueField) {
                 return $item['fields'][$uniqueField] === $data->value($uniqueField);
             })
         ) {

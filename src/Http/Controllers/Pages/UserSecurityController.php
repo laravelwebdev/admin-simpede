@@ -17,7 +17,7 @@ class UserSecurityController extends Controller
 
         return Inertia::render('Nova.UserSecurity', array_filter([
             'options' => config('fortify-options', []),
-            'user' => transform(Nova::user($request), fn ($user) => [
+            'user' => transform(Nova::user($request), static fn ($user) => [
                 'two_factor_enabled' => ! is_null($user->two_factor_secret), // @phpstan-ignore property.notFound
             ]),
         ]));

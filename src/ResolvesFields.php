@@ -132,7 +132,7 @@ trait ResolvesFields
         return $this->peekableFieldsCollection($request)
             ->authorized($request)
             ->resolveForDisplay($this->resource)
-            ->each(function (Field $field) {
+            ->each(static function (Field $field) {
                 if (property_exists($field, 'copyable')) {
                     $field->copyable = false;
                 }
@@ -158,9 +158,9 @@ trait ResolvesFields
     {
         return $this->availableFieldsOnIndexOrDetail($request)
             ->when($request->viaManyToMany(), $this->fieldResolverCallback($request))
-            ->reject(fn ($field) => $field instanceof Unfillable)
+            ->reject(static fn ($field) => $field instanceof Unfillable)
             ->whereInstanceOf(Deletable::class)
-            ->unique(function ($field) {
+            ->unique(static function ($field) {
                 /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Deletable $field */
                 return $field->attribute;
             })
@@ -178,7 +178,7 @@ trait ResolvesFields
         return $this->availableFieldsOnIndexOrDetail($request)
             ->when($request->viaManyToMany(), $this->fieldResolverCallback($request))
             ->whereInstanceOf(Downloadable::class)
-            ->unique(function ($field) {
+            ->unique(static function ($field) {
                 /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Downloadable $field */
                 return $field->attribute;
             })
@@ -205,7 +205,7 @@ trait ResolvesFields
             })
             ->flattenStackedFields()
             ->withOnlyFilterableFields()
-            ->unique(fn ($field) => $field->attribute)
+            ->unique(static fn ($field) => $field->attribute)
             ->authorized($request);
     }
 
@@ -219,7 +219,7 @@ trait ResolvesFields
             ->when($request->viaManyToMany(), $this->fieldResolverCallback($request))
             ->whereInstanceOf(RelatableField::class)
             ->when($this->shouldAddActionsField($request), fn ($fields) => $fields->push($this->actionEventsField()))
-            ->first(fn ($field) => $field->attribute === $attribute);
+            ->first(static fn ($field) => $field->attribute === $attribute);
     }
 
     /**
@@ -240,9 +240,9 @@ trait ResolvesFields
         return function ($fields) use ($request) {
             return with(
                 $this->actionEventsField(),
-                fn ($actionField) => in_array(Actionable::class, class_uses_recursive(static::newModel())) && $actionField->authorizedToSee($request)
+                static fn ($actionField) => in_array(Actionable::class, class_uses_recursive(static::newModel())) && $actionField->authorizedToSee($request)
             ) && $fields->whereInstanceOf(MorphMany::class)
-                ->filter(fn ($field) => $field->resourceClass === Nova::actionResource())
+                ->filter(static fn ($field) => $field->resourceClass === Nova::actionResource())
                 ->isEmpty();
         };
     }
@@ -253,9 +253,7 @@ trait ResolvesFields
     protected function actionEventsField(): MorphMany
     {
         return MorphMany::make(Nova::__('Action Events'), 'actions', Nova::actionResource())
-            ->canSee(function ($request) {
-                return Nova::actionResource()::authorizedToViewAny($request);
-            });
+            ->canSee(static fn ($request) => Nova::actionResource()::authorizedToViewAny($request));
     }
 
     /**
@@ -433,15 +431,12 @@ trait ResolvesFields
 
         $relatedResource = new $relatedResource($relatedResource::newModel());
 
-        return $relatedResource->availableFields($request)->reject(function ($f) use ($field) {
+        return $relatedResource->availableFields($request)->reject(static function ($relatedField) use ($field) {
             /** @phpstan-ignore isset.property, argument.type */
-            return isset($f->attribute) &&
+            return isset($relatedField->attribute) &&
                 isset($field->inverse) &&
-                $f->attribute !== $field->inverse;
-        })->filter(function ($field) use ($request) {
-            return isset($field->resourceClass) &&
-                $field->resourceClass == $request->resource();
-        });
+                $relatedField->attribute !== $field->inverse;
+        })->filter(static fn ($field) => isset($field->resourceClass) && $field->resourceClass == $request->resource());
     }
 
     /**
@@ -656,7 +651,7 @@ trait ResolvesFields
     protected function pivotFieldsFor(NovaRequest $request, string $relatedResource): FieldCollection
     {
         /** @var \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\BelongsToMany|\Laravel\Nova\Fields\MorphToMany> $fields */
-        $fields = $this->availableFields($request)->filter(function ($field) use ($relatedResource) {
+        $fields = $this->availableFields($request)->filter(static function ($field) use ($relatedResource) {
             return ($field instanceof BelongsToMany || $field instanceof MorphToMany) &&
                 isset($field->resourceName) && $field->resourceName == $relatedResource;
         });
@@ -673,7 +668,7 @@ trait ResolvesFields
 
             return FieldCollection::make(array_values(
                 $this->filter(call_user_func($field->fieldsCallback, $request, $this->resource))
-            ))->each(function ($field) use ($pivotAccessor, $pivotRelation) {
+            ))->each(static function ($field) use ($pivotAccessor, $pivotRelation) {
                 $field->pivot = true;
                 $field->pivotAccessor = $pivotAccessor;
                 $field->pivotRelation = $pivotRelation;
@@ -699,7 +694,7 @@ trait ResolvesFields
         /** @var \Laravel\Nova\Fields\BelongsToMany|\Laravel\Nova\Fields\MorphToMany|null $field */
         $field = $fields->count() === 1
             ? $fields->first()
-            : $fields->first(fn ($field) => $field->manyToManyRelationship === $request->viaRelationship);
+            : $fields->first(static fn ($field) => $field->manyToManyRelationship === $request->viaRelationship);
 
         if ($field && isset($field->fieldsCallback)) {
             $pivotRelation = $resource->model()->{$field->manyToManyRelationship}();
@@ -758,24 +753,24 @@ trait ResolvesFields
      */
     protected function resolvePanelsFromFields(NovaRequest $request, FieldCollection $fields, string $label): Collection
     {
-        [$defaultFields, $fieldsWithPanels] = $fields->each(function ($field) {
+        [$defaultFields, $fieldsWithPanels] = $fields->each(static function ($field) {
             if ($field instanceof BehavesAsPanel && ! $field->panel instanceof TabsGroup) {
                 $field->asPanel();
             }
-        })->partition(fn ($field) => ! isset($field->panel) || blank($field->panel->name));
+        })->partition(static fn ($field) => ! isset($field->panel) || blank($field->panel->name));
 
-        $panels = $fieldsWithPanels->groupBy(fn ($field) => (string) $field->panel)
-            ->transform(fn ($fields, $name) => match (true) {
+        $panels = $fieldsWithPanels->groupBy(static fn ($field) => (string) $field->panel)
+            ->transform(static fn ($fields, $name) => match (true) {
                 $fields[0]->panel instanceof TabsGroup => TabsGroup::mutate($name, $fields),
                 default => Panel::mutate($name, $fields),
             })->toBase();
 
         if ($panels->where('component', 'tabs')->isNotEmpty()) {
             [$relationshipUnderTabs, $panels] = $panels->partition(
-                fn ($panel) => $panel->component === 'relationship-panel' && $panel->meta['fields'][0]->panel instanceof TabsGroup
+                static fn ($panel) => $panel->component === 'relationship-panel' && $panel->meta['fields'][0]->panel instanceof TabsGroup
             );
 
-            $panels->transform(function ($panel, $key) use ($relationshipUnderTabs) {
+            $panels->transform(static function ($panel, $key) use ($relationshipUnderTabs) {
                 if ($panel->component === 'tabs') {
                     $fields = $panel->meta['fields'];
 
@@ -810,7 +805,7 @@ trait ResolvesFields
     protected function panelsWithDefaultLabel(Collection $panels, FieldCollection $fields, string $label): Collection
     {
         return $panels->values()
-            ->when($panels->where('name', $label)->isEmpty(), function ($panels) use ($label, $fields) {
+            ->when($panels->where('name', $label)->isEmpty(), static function ($panels) use ($label, $fields) {
                 if ($fields->isNotEmpty()) {
                     $panels->prepend(Panel::makeDefault($label, $fields));
                 } elseif ($panels->isNotEmpty() && in_array($panels->first()->component, ['tabs-panel'])) {
@@ -818,7 +813,7 @@ trait ResolvesFields
                 }
 
                 return $panels;
-            })->tap(function ($panels) {
+            })->tap(static function ($panels) {
                 if (! $panels->first()) {
                     return;
                 }

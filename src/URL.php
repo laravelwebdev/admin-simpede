@@ -63,9 +63,10 @@ class URL implements JsonSerializable, Stringable
      */
     public function active(): bool
     {
-        return with(ltrim($this->get(), '/'), function ($url) {
-            return request()->is($url, rtrim($url, '/').'/*');
-        });
+        return with(
+            ltrim($this->get(), '/'),
+            static fn ($url) => request()->is($url, rtrim($url, '/').'/*')
+        );
     }
 
     /**

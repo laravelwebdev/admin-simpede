@@ -15,6 +15,7 @@ class ResetUserPassword implements ResetsUserPasswords
     /**
      * Validate and reset the user's forgotten password.
      *
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword&\Illuminate\Database\Eloquent\Model  $user
      * @param  array<string, string>  $input
      */
     public function reset(CanResetPassword $user, array $input): void

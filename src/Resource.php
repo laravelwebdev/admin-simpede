@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -151,18 +152,27 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     public static $searchable = true;
 
     /**
-     * The per-page options used the resource index.
+     * The pagination per-page options used the resource index.
      *
-     * @var array
+     * @var int|array<int, int>|null
      */
     public static $perPageOptions = [25, 50, 100];
 
     /**
+     * The pagination per-page options used the resource via relationship.
+     *
+     * @var int|null
+     *
+     * @deprecated use `$perPageViaRelationshipOptions` instead.
+     */
+    public static $perPageViaRelationship = null;
+
+    /**
      * The number of resources to show per page via relationships.
      *
-     * @var int
+     * @var int|array<int, int>|null
      */
-    public static $perPageViaRelationship = 5;
+    public static $perPageViaRelationshipOptions = [5];
 
     /**
      * The cached soft deleting statuses for various resources.
@@ -252,7 +262,7 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
 
         return new static($model->replicate(
             $this->deletableFields(resolve(NovaRequest::class))
-                ->reject(function ($field) {
+                ->reject(static function ($field) {
                     $uses = trait_uses_recursive($field);
 
                     /** @phpstan-ignore property.notFound */
@@ -442,7 +452,25 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
      */
     public static function perPageOptions()
     {
-        return static::$perPageOptions;
+        return transform(
+            static::$perPageOptions,
+            static fn ($perPageOptions) => Arr::wrap($perPageOptions),
+            [static::newModel()->getPerPage()],
+        );
+    }
+
+    /**
+     * The pagination per-page options configured for this resource via relationship.
+     *
+     * @return array<int, int>
+     */
+    public static function perPageViaRelationshipOptions()
+    {
+        return transform(
+            static::$perPageViaRelationshipOptions ?? static::$perPageViaRelationship ?? null,
+            static fn ($perPageOptions) => Arr::wrap($perPageOptions),
+            [5],
+        );
     }
 
     /**

@@ -35,7 +35,7 @@ class HasMany implements Preset
                 $this->deleteMissingRelations($attribute, $model, $repeaterItems, $uniqueField);
             }
 
-            $repeaterItems->transform(function ($item, $blockKey) use ($request, $requestAttribute, $repeatables) {
+            $repeaterItems->transform(static function ($item, $blockKey) use ($request, $requestAttribute, $repeatables) {
                 $block = $repeatables->findByKey($item['type']);
                 $fields = FieldCollection::make($block->fields($request));
                 $data = Fluent::make();
@@ -43,12 +43,10 @@ class HasMany implements Preset
                 $callbacks = $fields
                     ->withoutUnfillable()
                     ->withoutMissingValues()
-                    ->map(function (Field $field) use ($request, $requestAttribute, $data, $blockKey) {
-                        return $field->fillInto($request, $data, $field->attribute, "{$requestAttribute}.{$blockKey}.fields.{$field->attribute}");
-                    })
-                    ->filter(function ($callback) {
-                        return is_callable($callback);
-                    })->toBase();
+                    ->map(
+                        static fn (Field $field) => $field->fillInto($request, $data, $field->attribute, "{$requestAttribute}.{$blockKey}.fields.{$field->attribute}")
+                    )->filter(static fn ($callback) => is_callable($callback))
+                    ->toBase();
 
                 return [$data, $callbacks, $item];
             })->each(function ($tuple) use ($model, $attribute, $uniqueField) {
@@ -73,9 +71,7 @@ class HasMany implements Preset
     public function get(NovaRequest $request, $model, string $attribute, RepeatableCollection $repeatables): Collection
     {
         return RepeatableCollection::make($model->{$attribute})
-            ->map(function ($block) use ($repeatables) {
-                return $repeatables->newRepeatableByModel($block);
-            });
+            ->map(static fn ($block) => $repeatables->newRepeatableByModel($block));
     }
 
     /**
@@ -88,14 +84,12 @@ class HasMany implements Preset
         /** @var \Illuminate\Database\Eloquent\Relations\HasMany $relation */
         $relation = $model->{$attribute}();
 
-        $availableItems = $repeaterItems->map(function ($item) use ($uniqueField) {
-            return $item['fields'][$uniqueField];
-        })->all();
+        $availableItems = $repeaterItems->map(
+            static fn ($item) => $item['fields'][$uniqueField]
+        )->all();
 
         $deletableIds = $relation->pluck($uniqueField)
-            ->reject(function ($id) use ($availableItems) {
-                return in_array($id, $availableItems);
-            });
+            ->reject(static fn ($id) => in_array($id, $availableItems));
 
         if ($deletableIds->isNotEmpty()) {
             $model->{$attribute}()->whereIn($uniqueField, $deletableIds)->delete();
@@ -109,7 +103,7 @@ class HasMany implements Preset
      */
     public function upsertRelation($model, Fluent $data, array $row, string|int|null $uniqueField, EloquentHasMany $relation): void
     {
-        $model->unguarded(function () use ($data, $row, $uniqueField, $relation) {
+        $model->unguarded(static function () use ($data, $row, $uniqueField, $relation) {
             $uniqueValue = $row['fields'][$uniqueField];
 
             $attributes = Arr::except($data->getAttributes(), $uniqueField);

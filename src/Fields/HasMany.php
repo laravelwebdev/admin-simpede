@@ -140,9 +140,9 @@ class HasMany extends Field implements ListableField, RelatableField
     public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
-                    ->withMeta([
-                        'prefixComponent' => true,
-                    ])->withComponent('relationship-panel');
+            ->withMeta([
+                'prefixComponent' => true,
+            ])->withComponent('relationship-panel');
     }
 
     /**
@@ -158,7 +158,7 @@ class HasMany extends Field implements ListableField, RelatableField
             'collapsedByDefault' => $this->collapsedByDefault,
             'hasManyRelationship' => $this->hasManyRelationship,
             'relatable' => true,
-            'perPage' => $this->resourceClass::$perPageViaRelationship,
+            'perPageOptions' => $this->resourceClass::perPageViaRelationshipOptions(),
             'resourceName' => $this->resourceName,
             'singularLabel' => $this->singularLabel ?? $this->resourceClass::singularLabel(),
         ], parent::jsonSerialize());

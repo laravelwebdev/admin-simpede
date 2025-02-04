@@ -19,7 +19,7 @@ class AttachableController extends Controller
     {
         $resourceClass = $request->resource();
 
-        $isPolymorphic = function ($query) {
+        $isPolymorphic = static function ($query) {
             return is_null($query) || in_array($query, [true, 1, '1']);
         };
 

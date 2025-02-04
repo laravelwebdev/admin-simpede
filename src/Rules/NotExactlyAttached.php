@@ -41,7 +41,7 @@ class NotExactlyAttached implements Rule
 
         $fields = $resource->resolvePivotFields($this->request, $this->request->relatedResource)
             ->reject(
-                fn ($field) => $field instanceof ResourceToolElement || $field->isComputed()
+                static fn ($field) => $field instanceof ResourceToolElement || $field->isComputed()
             );
 
         if ($fields->isEmpty()) {

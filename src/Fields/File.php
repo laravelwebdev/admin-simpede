@@ -96,8 +96,8 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
                     ]);
                 }
             )
-            ->thumbnail(fn () => null)
-            ->preview(fn () => null)
+            ->thumbnail(static fn () => null)
+            ->preview(static fn () => null)
             ->download(function ($request, $model) {
                 $name = $this->originalNameColumn ? $model->{$this->originalNameColumn} : null;
 

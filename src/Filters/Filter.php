@@ -102,7 +102,7 @@ abstract class Filter implements FilterContract, JsonSerializable
                 'name' => $name,
                 'uniqueKey' => sprintf('%s-%s', Str::slug($name), $component),
                 'component' => $component,
-                'options' => collect($this->options($request))->map(function ($value, $label) {
+                'options' => collect($this->options($request))->map(static function ($value, $label) {
                     if (is_array($value)) {
                         return array_merge(['label' => $label], $value);
                     } elseif (is_string($label)) {

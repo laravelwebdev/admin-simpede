@@ -267,8 +267,8 @@ class Repeater extends Field
             return $rules;
         }
 
-        return collect($rules)->map(function ($rules) use ($replacements) {
-            return collect($rules)->map(function ($rule) use ($replacements) {
+        return collect($rules)->map(static function ($rules) use ($replacements) {
+            return collect($rules)->map(static function ($rule) use ($replacements) {
                 return is_string($rule)
                     ? str_replace(array_keys($replacements), array_values($replacements), $rule)
                     : $rule;

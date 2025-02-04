@@ -9,70 +9,83 @@ use Stringable;
 
 class ActionResponse implements ArrayAccess, JsonSerializable
 {
-    private ?string $danger = null;
+    private ?Responses\Message $message = null;
+
+    private ?Responses\Message $danger = null;
+
+    private ?Responses\DownloadFile $download = null;
+
+    private ?Responses\Redirect $redirect = null;
+
+    private ?Responses\Visit $visit = null;
+
+    private ?Responses\Modal $modal = null;
 
     private ?bool $deleted = null;
 
-    private ?string $download = null;
-
-    private Stringable|string|null $message = null;
-
-    private Stringable|string|null $name = null;
-
-    private bool $openInNewTab = false;
-
-    private ?string $redirect = null;
-
     /**
-     * @var array{path: string, options: array<string, mixed>}|null
-     */
-    private ?array $visit = null;
-
-    private ?string $modal = null;
-
-    private array $data = [];
-
-    /**
+     * Create a new response using `message`.
+     *
      * @return static
      */
     public static function message(Stringable|string $message)
     {
-        return tap(new static, function ($response) use ($message) {
+        return tap(new static, static function ($response) use ($message) {
             $response->withMessage($message);
         });
     }
 
     /**
+     * Includes `message` to the current response.
+     *
      * @return $this
      */
     public function withMessage(Stringable|string $message)
     {
-        $this->message = $message;
+        $this->message = new Responses\Message($message);
 
         return $this;
     }
 
     /**
+     * Create a new response using `danger`.
+     *
      * @return static
      */
     public static function danger(Stringable|string $message)
     {
-        return tap(new static, function ($response) use ($message) {
+        return tap(new static, static function ($response) use ($message) {
             $response->withDangerMessage($message);
         });
     }
 
     /**
+     * Includes `danger` to the current response.
+     *
      * @return $this
      */
     public function withDangerMessage(Stringable|string $message)
     {
-        $this->danger = $message;
+        $this->danger = new Responses\Message($message);
 
         return $this;
     }
 
     /**
+     * Create a new response using `deleted`.
+     *
+     * @return static
+     */
+    public static function deleted()
+    {
+        return tap(new static, static function ($response) {
+            $response->withDeleted();
+        });
+    }
+
+    /**
+     * Includes `deleted` to the current response.
+     *
      * @return $this
      */
     public function withDeleted()
@@ -83,116 +96,123 @@ class ActionResponse implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Create a new response using `redirect`.
+     *
      * @return static
      */
-    public static function deleted()
+    public static function redirect(string $url, bool $openInNewTab = false)
     {
-        return tap(new static, function ($response) {
-            $response->withDeleted();
+        return tap(new static, static function ($response) use ($url, $openInNewTab) {
+            $response->withRedirect($url, $openInNewTab);
         });
     }
 
     /**
-     * @return static
-     */
-    public static function redirect(string $url)
-    {
-        return tap(new static, function ($response) use ($url) {
-            $response->withRedirect($url);
-        });
-    }
-
-    /**
-     * @return $this
-     */
-    public function withRedirect(string $url)
-    {
-        $this->redirect = $url;
-
-        return $this;
-    }
-
-    /**
+     * Create a new response using `openInNewTab`.
+     *
      * @return static
      */
     public static function openInNewTab(string $url)
     {
-        return static::redirect($url)->usingNewTab();
+        return static::redirect($url, openInNewTab: true);
     }
 
     /**
+     * Includes `redirect` to the current response.
+     *
      * @return $this
      */
-    public function usingNewTab()
+    public function withRedirect(string $url, bool $openInNewTab = false)
     {
-        $this->openInNewTab = true;
+        $this->redirect = new Responses\Redirect($url, $openInNewTab);
 
         return $this;
     }
 
     /**
+     * Indicate redirect to be loaded using a new tab.
+     *
+     * @return $this
+     */
+    public function usingNewTab()
+    {
+        if (! is_null($this->redirect)) {
+            $this->redirect->usingNewTab();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Create a new response using `visit`.
+     *
      * @param  array<string, mixed>  $options
      * @return static
      */
     public static function visit(URL|string $path, array $options = [])
     {
-        return tap(new static, function ($response) use ($path, $options) {
+        return tap(new static, static function ($response) use ($path, $options) {
             $response->withVisitOptions($path, $options);
         });
     }
 
     /**
+     * Includes `visit` to the current response.
+     *
      * @param  array<string, mixed>  $options
      * @return $this
      */
     public function withVisitOptions(URL|string $path, array $options = [])
     {
-        $this->visit = [
-            'path' => '/'.ltrim($path, '/'),
-            'options' => $options,
-        ];
+        $this->visit = new Responses\Visit($path, $options);
 
         return $this;
     }
 
     /**
+     * Create a new response using `download`.
+     *
      * @return static
      */
     public static function download(Stringable|string $name, string $url)
     {
-        return tap(new static, function ($response) use ($name, $url) {
+        return tap(new static, static function ($response) use ($name, $url) {
             $response->withDownload($name, $url);
         });
     }
 
     /**
+     * Includes `download` to the current response.
+     *
      * @return $this
      */
     public function withDownload(Stringable|string $name, string $url)
     {
-        $this->name = $name;
-        $this->download = $url;
+        $this->download = new Responses\DownloadFile($url, $name);
 
         return $this;
     }
 
     /**
+     * Create a new response using `modal`.
+     *
      * @return static
      */
     public static function modal(string $modal, array $data)
     {
-        return tap(new static, function ($response) use ($data, $modal) {
+        return tap(new static, static function ($response) use ($data, $modal) {
             $response->withModal($modal, $data);
         });
     }
 
     /**
+     * Includes `modal` to the current response.
+     *
      * @return $this
      */
     public function withModal(string $modal, array $data = [])
     {
-        $this->modal = $modal;
-        $this->data = $data;
+        $this->modal = new Responses\Modal(component: $modal, payload: $data);
 
         return $this;
     }
@@ -247,16 +267,14 @@ class ActionResponse implements ArrayAccess, JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return array_filter(array_merge([
+        return array_filter([
             'danger' => $this->danger,
             'deleted' => $this->deleted,
             'download' => $this->download,
             'modal' => $this->modal,
             'message' => $this->message,
-            'name' => $this->name,
-            'openInNewTab' => $this->openInNewTab,
             'redirect' => $this->redirect,
             'visit' => $this->visit,
-        ], $this->data));
+        ]);
     }
 }

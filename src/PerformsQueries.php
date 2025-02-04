@@ -27,7 +27,7 @@ trait PerformsQueries
     ) {
         return static::applyOrderings(static::applyFilters(
             $request, static::initializeQuery($request, $query, (string) $search, $withTrashed), $filters
-        ), $orderings)->tap(function ($query) use ($request) {
+        ), $orderings)->tap(static function ($query) use ($request) {
             static::indexQuery($request, $query->with(static::$with));
         });
     }
@@ -57,7 +57,7 @@ trait PerformsQueries
 
         /** @phpstan-ignore nullCoalesce.expr */
         $searchColumns = collect(static::searchableColumns() ?? [])
-                            ->transform(function ($column) use ($modelKeyName) {
+                            ->transform(static function ($column) use ($modelKeyName) {
                                 if ($column === $modelKeyName) {
                                     return new PrimaryKey($column, static::maxPrimaryKeySize());
                                 }
@@ -101,7 +101,7 @@ trait PerformsQueries
     ): ScoutBuilder {
         return tap(static::applySoftDeleteConstraint(
             static::newModel()->search($search), $withTrashed
-        ), function ($scoutBuilder) use ($request) {
+        ), static function ($scoutBuilder) use ($request) {
             static::scoutQuery($request, $scoutBuilder);
         })->take(static::$scoutSearchResults);
     }

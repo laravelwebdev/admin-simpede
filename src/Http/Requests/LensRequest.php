@@ -64,9 +64,7 @@ class LensRequest extends NovaRequest
                     ? $this->getRelationForeignKeyName($model->{$field->attribute}())
                     : $field->attribute ?? null;
             })->filter()
-            ->first(function ($attribute) {
-                return $attribute == $this->orderBy;
-            });
+            ->first(fn ($attribute) => $attribute == $this->orderBy);
 
         if ($fieldExists) {
             return $query->orderBy(
@@ -115,7 +113,7 @@ class LensRequest extends NovaRequest
 
                 $payload['actions'] = collect(
                     $hasId === true ? array_values($lensResource->actions($this)) : []
-                )->filter(fn ($action) => $action->shownOnIndex() || $action->shownOnTableRow())
+                )->filter(static fn ($action) => $action->shownOnIndex() || $action->shownOnTableRow())
                 ->filter->authorizedToSee($this)
                 ->filter->authorizedToRun($this, $model)
                 ->values();
@@ -140,13 +138,9 @@ class LensRequest extends NovaRequest
      */
     public function perPage(): int
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
 
-        $perPageOptions = $resource::perPageOptions();
-
-        if (empty($perPageOptions)) {
-            $perPageOptions = [$resource::newModel()->getPerPage()];
-        }
+        $perPageOptions = $this->lens()::perPageOptions() ?? $resourceClass::perPageOptions();
 
         return (int) in_array($this->perPage, $perPageOptions) ? $this->perPage : $perPageOptions[0];
     }

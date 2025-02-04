@@ -24,9 +24,9 @@ class LensResourceDeletionRequest extends NovaRequest
     {
         $this->toSelectedResourceQuery()->when(! $this->allResourcesSelected(), function ($query) {
             $query->whereKey($this->resources);
-        })->tap(function ($query) {
+        })->tap(static function ($query) {
             $query->getQuery()->orders = [];
-        })->chunkById($count, function ($models) use ($callback, $authCallback) {
+        })->chunkById($count, static function ($models) use ($callback, $authCallback) {
             $models = $authCallback($models);
 
             if ($models->isNotEmpty()) {
@@ -52,7 +52,7 @@ class LensResourceDeletionRequest extends NovaRequest
      */
     public function toQuery(): Builder
     {
-        return tap($this->lens()->query(LensRequest::createFrom($this), $this->newSearchQuery()), function ($query) {
+        return tap($this->lens()->query(LensRequest::createFrom($this), $this->newSearchQuery()), static function ($query) {
             if (! $query instanceof Builder) {
                 throw new LogicException('Lens must return an Eloquent query instance in order to perform this action.');
             }

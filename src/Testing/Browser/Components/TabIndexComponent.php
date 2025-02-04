@@ -38,7 +38,7 @@ class TabIndexComponent extends IndexComponent
     public function assert(Browser $browser): void
     {
         $browser->pause(500)
-            ->whenAvailable("@{$this->tabSlug}-tab-trigger", function ($browser) {
+            ->whenAvailable("@{$this->tabSlug}-tab-trigger", static function (Browser $browser) {
                 $browser->click('');
             });
 

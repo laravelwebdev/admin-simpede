@@ -23,7 +23,7 @@ class Transaction
 
             $actionBatchId = (string) Str::orderedUuid();
 
-            return tap($callback($actionBatchId), function ($response) use ($finished, $actionBatchId) {
+            return tap($callback($actionBatchId), static function ($response) use ($finished, $actionBatchId) {
                 if ($finished) {
                     $finished($actionBatchId);
                 }

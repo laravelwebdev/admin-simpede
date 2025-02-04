@@ -71,7 +71,7 @@ class DetachResources
 
         $pivot->delete();
 
-        Nova::usingActionEvent(function ($actionEvent) use ($pivot, $model, $parent, $request) {
+        Nova::usingActionEvent(static function ($actionEvent) use ($pivot, $model, $parent, $request) {
             $actionEvent->insert(
                 $actionEvent->forResourceDetach(
                     Nova::user($request), $parent, collect([$model]), $pivot->getMorphClass()
@@ -90,7 +90,7 @@ class DetachResources
         $resource->resolvePivotFields($request, $request->viaResource)
             ->whereInstanceOf(Deletable::class)
             ->filter->isPrunable()
-            ->each(function ($field) use ($request, $pivot) {
+            ->each(static function ($field) use ($request, $pivot) {
                 /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Deletable $field */
                 DeleteField::forRequest($request, $field, $pivot)->save();
             });

@@ -100,15 +100,13 @@ class Select extends Field implements FilterableField
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return Arr::only($field, [
-                'uniqueKey',
-                'name',
-                'attribute',
-                'options',
-                'searchable',
-            ]);
-        });
+        return transform($this->jsonSerialize(), static fn ($field) => Arr::only($field, [
+            'uniqueKey',
+            'name',
+            'attribute',
+            'options',
+            'searchable',
+        ]));
     }
 
     /**
@@ -126,7 +124,7 @@ class Select extends Field implements FilterableField
         if (is_string($options) && enum_exists($options)) {
             /** @var class-string<\BackedEnum> $options */
             return collect($options::cases())
-                ->map(fn ($option) => [
+                ->map(static fn ($option) => [
                     'label' => Nova::humanize($option),
                     'value' => $option->value,
                 ])->all();
@@ -136,7 +134,7 @@ class Select extends Field implements FilterableField
             $options = $options();
         }
 
-        return collect($options ?? [])->map(function ($label, $value) use ($searchable) {
+        return collect($options ?? [])->map(static function ($label, $value) use ($searchable) {
             $label = $label instanceof Stringable ? (string) $label : $label;
             $value = Util::safeInt($value);
 

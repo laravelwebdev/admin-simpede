@@ -41,7 +41,7 @@ class Detail extends Page
     public function runAction(Browser $browser, string $uriKey): void
     {
         $browser->openControlSelector()
-            ->elsewhereWhenAvailable(new ActionDropdownComponent, function ($browser) use ($uriKey) {
+            ->elsewhereWhenAvailable(new ActionDropdownComponent, static function (Browser $browser) use ($uriKey) {
                 $browser->runWithConfirmation($uriKey);
             });
     }
@@ -54,7 +54,7 @@ class Detail extends Page
     public function runInstantAction(Browser $browser, string $uriKey): void
     {
         $browser->openControlSelector()
-            ->elsewhereWhenAvailable(new ActionDropdownComponent, function ($browser) use ($uriKey) {
+            ->elsewhereWhenAvailable(new ActionDropdownComponent, static function (Browser $browser) use ($uriKey) {
                 $browser->runWithoutConfirmation($uriKey);
             });
     }
@@ -67,7 +67,7 @@ class Detail extends Page
     public function cancelAction(Browser $browser, string $uriKey): void
     {
         $browser->openControlSelector()
-            ->elsewhereWhenAvailable(new ActionDropdownComponent, function ($browser) use ($uriKey) {
+            ->elsewhereWhenAvailable(new ActionDropdownComponent, static function (Browser $browser) use ($uriKey) {
                 $browser->cancel($uriKey);
             });
     }
@@ -90,7 +90,7 @@ class Detail extends Page
      */
     public function runCreateRelation(Browser $browser, string $relatedResourceName): void
     {
-        $browser->within(new IndexComponent($relatedResourceName), function ($browser) {
+        $browser->within(new IndexComponent($relatedResourceName), static function (Browser $browser) {
             $browser->waitFor('@create-button')->click('@create-button');
         })->on(new Create($relatedResourceName));
     }
@@ -102,7 +102,7 @@ class Detail extends Page
      */
     public function runAttachRelation(Browser $browser, string $relatedResourceName, ?string $viaRelationship = null): void
     {
-        $browser->within(new IndexComponent($relatedResourceName, $viaRelationship), function ($browser) {
+        $browser->within(new IndexComponent($relatedResourceName, $viaRelationship), static function (Browser $browser) {
             $browser->waitFor('@attach-button')->click('@attach-button');
         })->on(new Attach($this->resourceName, $this->resourceId, $relatedResourceName, $viaRelationship));
     }
@@ -114,7 +114,7 @@ class Detail extends Page
      */
     public function openControlSelector(Browser $browser): void
     {
-        $browser->whenAvailable("@{$this->resourceId}-control-selector", function ($browser) {
+        $browser->whenAvailable("@{$this->resourceId}-control-selector", static function (Browser $browser) {
             $browser->click('');
         })->pause(100);
     }
@@ -127,7 +127,7 @@ class Detail extends Page
     public function replicate(Browser $browser): void
     {
         $browser->openControlSelector()
-            ->whenAvailable("@{$this->resourceId}-replicate-button", function ($browser) {
+            ->whenAvailable("@{$this->resourceId}-replicate-button", static function (Browser $browser) {
                 $browser->click('');
             });
     }
@@ -140,10 +140,10 @@ class Detail extends Page
     public function delete(Browser $browser): void
     {
         $browser->openControlSelector()
-            ->whenAvailable('@open-delete-modal-button', function ($browser) {
+            ->whenAvailable('@open-delete-modal-button', static function (Browser $browser) {
                 $browser->click('');
             })
-            ->elsewhereWhenAvailable(new DeleteResourceModalComponent, function ($browser) {
+            ->elsewhereWhenAvailable(new DeleteResourceModalComponent, static function (Browser $browser) {
                 $browser->confirm();
             })->pause(1000);
     }
@@ -156,10 +156,10 @@ class Detail extends Page
     public function restore(Browser $browser): void
     {
         $browser->openControlSelector()
-            ->whenAvailable('@open-restore-modal-button', function ($browser) {
+            ->whenAvailable('@open-restore-modal-button', static function (Browser $browser) {
                 $browser->click('');
             })
-            ->elsewhereWhenAvailable(new RestoreResourceModalComponent, function ($browser) {
+            ->elsewhereWhenAvailable(new RestoreResourceModalComponent, static function (Browser $browser) {
                 $browser->confirm();
             })->pause(1000);
     }
@@ -172,10 +172,10 @@ class Detail extends Page
     public function forceDelete(Browser $browser): void
     {
         $browser->openControlSelector()
-            ->whenAvailable('@open-force-delete-modal-button', function ($browser) {
+            ->whenAvailable('@open-force-delete-modal-button', static function (Browser $browser) {
                 $browser->click('');
             })
-            ->elsewhereWhenAvailable(new DeleteResourceModalComponent, function ($browser) {
+            ->elsewhereWhenAvailable(new DeleteResourceModalComponent, static function (Browser $browser) {
                 $browser->confirm();
             })->pause(1000);
     }

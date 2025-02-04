@@ -51,7 +51,7 @@ abstract class FieldElement extends Element
      */
     public function hideFromIndex(callable|bool $callback = true)
     {
-        $this->showOnIndex = is_callable($callback) ? function () use ($callback) {
+        $this->showOnIndex = is_callable($callback) ? static function () use ($callback) {
             return ! call_user_func_array($callback, func_get_args());
         }
         : ! $callback;
@@ -67,7 +67,7 @@ abstract class FieldElement extends Element
      */
     public function hideFromDetail(callable|bool $callback = true)
     {
-        $this->showOnDetail = is_callable($callback) ? function () use ($callback) {
+        $this->showOnDetail = is_callable($callback) ? static function () use ($callback) {
             return ! call_user_func_array($callback, func_get_args());
         }
         : ! $callback;
@@ -83,7 +83,7 @@ abstract class FieldElement extends Element
      */
     public function hideWhenCreating(callable|bool $callback = true)
     {
-        $this->showOnCreation = is_callable($callback) ? function () use ($callback) {
+        $this->showOnCreation = is_callable($callback) ? static function () use ($callback) {
             return ! call_user_func_array($callback, func_get_args());
         }
         : ! $callback;
@@ -99,7 +99,7 @@ abstract class FieldElement extends Element
      */
     public function hideWhenUpdating(callable|bool $callback = true)
     {
-        $this->showOnUpdate = is_callable($callback) ? function () use ($callback) {
+        $this->showOnUpdate = is_callable($callback) ? static function () use ($callback) {
             return ! call_user_func_array($callback, func_get_args());
         }
         : ! $callback;

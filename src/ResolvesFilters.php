@@ -37,7 +37,7 @@ trait ResolvesFilters
     {
         return collect(array_values($this->filter(
             $this->filterableFields($request)
-                ->transform(fn ($field) => $field->resolveFilter($request)) /** @phpstan-ignore argument.type */
+                ->transform(static fn ($field) => $field->resolveFilter($request)) /** @phpstan-ignore argument.type */
                 ->filter()
                 ->all()
         )));

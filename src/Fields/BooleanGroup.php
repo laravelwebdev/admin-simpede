@@ -69,10 +69,10 @@ class BooleanGroup extends Field implements FilterableField
             $options = call_user_func($options);
         }
 
-        $this->options = with(collect($options), function ($options) {
+        $this->options = with(collect($options), static function ($options) {
             $isList = array_is_list($options->all());
 
-            return $options->map(function ($label, $name) use ($isList) {
+            return $options->map(static function ($label, $name) use ($isList) {
                 return $isList === false
                     ? ['label' => $label, 'name' => $name]
                     : ['label' => $label, 'name' => $label];
@@ -150,12 +150,12 @@ class BooleanGroup extends Field implements FilterableField
      */
     protected function defaultFilterableCallback()
     {
-        return function (NovaRequest $request, $query, $value, $attribute) {
-            $value = collect($value)->reject(function ($value) {
-                return is_null($value);
-            })->all();
+        return static function (NovaRequest $request, $query, $value, $attribute) {
+            $value = collect($value)
+                ->reject(static fn ($value) => is_null($value))
+                ->all();
 
-            $query->when(! empty($value), function ($query) use ($value, $attribute) {
+            $query->when(! empty($value), static function ($query) use ($value, $attribute) {
                 return $query->whereJsonContains($attribute, $value);
             });
         };
@@ -166,13 +166,12 @@ class BooleanGroup extends Field implements FilterableField
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            $field['options'] = collect($field['options'])->transform(function ($option) {
-                return [
+        return transform($this->jsonSerialize(), static function ($field) {
+            $field['options'] = collect($field['options'])
+                ->transform(static fn ($option) => [
                     'label' => $option['label'],
                     'value' => $option['name'],
-                ];
-            });
+                ]);
 
             return Arr::only($field, ['uniqueKey', 'options']);
         });

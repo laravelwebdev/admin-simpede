@@ -78,7 +78,7 @@ class Stack extends Field
 
         $request = app(NovaRequest::class);
 
-        $this->lines = $this->lines->filter(function ($field) use ($request, $resource) {
+        $this->lines = $this->lines->filter(static function ($field) use ($request, $resource) {
             /** @var \Laravel\Nova\Fields\Field $field */
             if ($request->isResourceIndexRequest()) {
                 return $field->isShownOnIndex($request, $resource);
@@ -101,7 +101,7 @@ class Stack extends Field
      */
     protected function ensureLinesAreResolveable(): void
     {
-        $this->lines = $this->lines->map(function ($line) {
+        $this->lines = $this->lines->map(static function ($line) {
             if (is_callable($line)) {
                 return Line::make('Anonymous', $line);
             }

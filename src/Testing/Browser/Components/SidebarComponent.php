@@ -34,7 +34,7 @@ class SidebarComponent extends Component
      */
     public function assert(Browser $browser): void
     {
-        tap($this->selector(), function ($selector) use ($browser) {
+        tap($this->selector(), static function (string $selector) use ($browser) {
             $browser->scrollIntoView($selector);
         });
     }

@@ -31,10 +31,10 @@
   <component
     v-if="responseModalVisible"
     :show="responseModalVisible"
-    :is="actionResponseData?.modal"
+    :is="actionModalReponseData?.component"
     @confirm="closeResponseModal"
     @close="closeResponseModal"
-    :data="actionResponseData"
+    :data="actionModalReponseData?.payload ?? {}"
   />
 </template>
 
@@ -83,7 +83,7 @@ const {
   executeAction,
   availableActions,
   availablePivotActions,
-  actionResponseData,
+  actionModalReponseData,
 } = useActions(props, emitter, store)
 
 watch(actionSelectionInput, value => {

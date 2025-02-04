@@ -78,11 +78,11 @@ class MenuSection implements JsonSerializable
      */
     public static function dashboard(string $dashboard)
     {
-        return with(new $dashboard, function ($dashboard) {
+        return with(new $dashboard, static function ($dashboard) {
             return static::make(
                 $dashboard->label()
             )->path('/dashboards/'.$dashboard->uriKey())
-            ->canSee(fn ($request) => $dashboard->authorizedToSee($request));
+            ->canSee(static fn ($request) => $dashboard->authorizedToSee($request));
         });
     }
 
@@ -97,7 +97,7 @@ class MenuSection implements JsonSerializable
         return static::make(
             $resourceClass::label()
         )->path('/resources/'.$resourceClass::uriKey())
-        ->canSee(fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
+        ->canSee(static fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
     }
 
     /**
@@ -109,10 +109,10 @@ class MenuSection implements JsonSerializable
      */
     public static function lens(string $resourceClass, string $lensClass)
     {
-        return with(new $lensClass, function ($lens) use ($resourceClass) {
+        return with(new $lensClass, static function ($lens) use ($resourceClass) {
             return static::make($lens->name())
                 ->path('/resources/'.$resourceClass::uriKey().'/lens/'.$lens->uriKey())
-                ->canSee(fn ($request) => $lens->authorizedToSee($request));
+                ->canSee(static fn ($request) => $lens->authorizedToSee($request));
         });
     }
 

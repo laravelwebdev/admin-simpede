@@ -62,7 +62,7 @@ class DateTime extends Field implements FilterableField
      */
     public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
-        parent::__construct($name, $attribute, $resolveCallback ?? function ($value, $request) {
+        parent::__construct($name, $attribute, $resolveCallback ?? static function ($value, $request) {
             if (! is_null($value)) {
                 if ($value instanceof DateTimeInterface) {
                     return $value instanceof CarbonInterface
@@ -176,7 +176,7 @@ class DateTime extends Field implements FilterableField
      */
     protected function defaultFilterableCallback()
     {
-        return function (NovaRequest $request, $query, $value, $attribute) {
+        return static function (NovaRequest $request, $query, $value, $attribute) {
             [$min, $max] = $value;
 
             if (! is_null($min) && ! is_null($max)) {
@@ -194,16 +194,14 @@ class DateTime extends Field implements FilterableField
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return Arr::only($field, [
-                'uniqueKey',
-                'name',
-                'attribute',
-                'type',
-                'placeholder',
-                'extraAttributes',
-            ]);
-        });
+        return transform($this->jsonSerialize(), static fn ($field) => Arr::only($field, [
+            'uniqueKey',
+            'name',
+            'attribute',
+            'type',
+            'placeholder',
+            'extraAttributes',
+        ]));
     }
 
     /**

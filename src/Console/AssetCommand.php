@@ -42,19 +42,19 @@ class AssetCommand extends ComponentGeneratorCommand
         );
 
         // AssetServiceProvider.php replacements...
-        $this->replace('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/AssetServiceProvider.stub');
-        $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/AssetServiceProvider.stub');
-        $this->replace('{{ name }}', $this->componentName(), $this->componentPath().'/src/AssetServiceProvider.stub');
+        $files->replaceInFile('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/AssetServiceProvider.stub');
+        $files->replaceInFile('{{ component }}', $this->componentName(), $this->componentPath().'/src/AssetServiceProvider.stub');
+        $files->replaceInFile('{{ name }}', $this->componentName(), $this->componentPath().'/src/AssetServiceProvider.stub');
 
         // asset.js replacements...
-        $this->replace('{{ class }}', $this->componentClass(), $this->componentPath().'/resources/js/asset.js');
-        $this->replace('{{ name }}', $this->componentName(), $this->componentPath().'/resources/js/asset.js');
+        $files->replaceInFile('{{ class }}', $this->componentClass(), $this->componentPath().'/resources/js/asset.js');
+        $files->replaceInFile('{{ name }}', $this->componentName(), $this->componentPath().'/resources/js/asset.js');
 
         // webpack.mix.js replacements...
-        $this->replace('{{ name }}', $this->component(), $this->componentPath().'/webpack.mix.js');
+        $files->replaceInFile('{{ name }}', $this->component(), $this->componentPath().'/webpack.mix.js');
 
         // Asset composer.json replacements...
-        $this->prepareComposerReplacements();
+        $this->prepareComposerReplacements($files);
 
         // Rename the stubs with the proper file extensions...
         $this->renameStubs();

@@ -55,9 +55,7 @@ class MetricTableRow implements JsonSerializable, Serializable
      */
     public function __construct()
     {
-        $this->actionCallback = function () {
-            return [];
-        };
+        $this->actionCallback = static fn () => [];
     }
 
     /**

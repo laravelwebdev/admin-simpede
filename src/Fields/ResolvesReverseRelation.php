@@ -43,35 +43,34 @@ trait ResolvesReverseRelation
             $resource = $request->newResource();
 
             $this->reverseRelation = $viaResource->availableFields($request)
-                    ->filter(function ($field) use ($viaModel, $resource) {
-                        if (! isset($field->resourceName) || $field->resourceName !== $resource::uriKey()) {
-                            return false;
-                        }
+                ->filter(function ($field) use ($viaModel, $resource) {
+                    if (! isset($field->resourceName) || $field->resourceName !== $resource::uriKey()) {
+                        return false;
+                    }
 
-                        if (! $field instanceof MorphMany
-                            && ! $field instanceof HasMany
-                            && ! $field instanceof HasOne) {
-                            return false;
-                        }
+                    if (! $field instanceof MorphMany
+                        && ! $field instanceof HasMany
+                        && ! $field instanceof HasOne) {
+                        return false;
+                    }
 
-                        if ($field instanceof HasOne && $field->ofManyRelationship()) {
-                            return false;
-                        }
+                    if ($field instanceof HasOne && $field->ofManyRelationship()) {
+                        return false;
+                    }
 
-                        $model = $resource->model();
+                    $model = $resource->model();
 
-                        if (! method_exists($viaModel, $field->attribute) || ! method_exists($model, $this->attribute)) {
-                            return false;
-                        }
+                    if (! method_exists($viaModel, $field->attribute) || ! method_exists($model, $this->attribute)) {
+                        return false;
+                    }
 
-                        $relation = $viaModel->{$field->attribute}();
+                    $relation = $viaModel->{$field->attribute}();
 
-                        return $this->getRelationForeignKeyName($relation) === $this->getRelationForeignKeyName(
-                            $resource->model()->{$this->attribute}()
-                        );
-                    })->first(function ($field) use ($request) {
-                        return $field->attribute === $request->viaRelationship;
-                    })->attribute ?? '';
+                    return $this->getRelationForeignKeyName($relation) === $this->getRelationForeignKeyName(
+                        $resource->model()->{$this->attribute}()
+                    );
+                })->first(static fn ($field) => $field->attribute === $request->viaRelationship)
+                ->attribute ?? '';
         }
 
         return $this->reverseRelation;

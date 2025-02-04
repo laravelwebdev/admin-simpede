@@ -32,7 +32,7 @@ trait HasThumbnail
     public function resolveThumbnailUrl()
     {
         return is_callable($this->thumbnailUrlCallback)
-                    ? call_user_func($this->thumbnailUrlCallback, $this->value, $this->getStorageDisk(), $this->resource)
-                    : null;
+            ? call_user_func($this->thumbnailUrlCallback, $this->value, $this->getStorageDisk(), $this->resource)
+            : null;
     }
 }

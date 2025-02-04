@@ -95,8 +95,12 @@ trait FillsFields
      */
     protected static function fillFields(NovaRequest $request, $model, Collection $fields): array
     {
-        return [$model, $fields->map->fill($request, $model)->filter(function ($callback) {
-            return is_callable($callback);
-        })->values()->all()];
+        return [
+            $model,
+            $fields->map->fill($request, $model)
+                ->filter(static fn ($callback) => is_callable($callback))
+                ->values()
+                ->all(),
+        ];
     }
 }

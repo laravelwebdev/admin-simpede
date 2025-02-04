@@ -129,6 +129,11 @@ class PendingFortifyConfiguration
     protected bool $cached = false;
 
     /**
+     * Determine whether Foritfy is configured to load authentication routes for frontend.
+     */
+    protected ?bool $withFrontendRoutes = null;
+
+    /**
      * Construct a new instance.
      */
     public function __construct()
@@ -235,7 +240,7 @@ class PendingFortifyConfiguration
     }
 
     /**
-     * Register a callback that is responsible for confirming existing user passwords as valid.
+     * Register a callback responsible for confirming existing user passwords as valid.
      *
      * @param  callable(mixed, ?string):bool  $callback
      * @return $this
@@ -248,7 +253,7 @@ class PendingFortifyConfiguration
     }
 
     /**
-     * Determine if Laravel Fortify using the same auth guard as Nova.
+     * Determine if Laravel Fortify uses the same auth guard as Nova.
      */
     public function usingIdenticalGuardOrModel(): bool
     {
@@ -329,20 +334,29 @@ class PendingFortifyConfiguration
         if ($routes === false) {
             Fortify::ignoreRoutes();
         }
+
+        $this->withFrontendRoutes = $routes;
     }
 
     /**
      * Bootstrap the registered Nova routes.
      */
-    public function bootstrap(Application $app): void
+    public function bootstrap(): void
     {
+        /** @var \Laravel\Nova\PendingRouteRegistration $routes */
+        $routes = Nova::routes();
+
+        if ($this->withFrontendRoutes === true && $routes->withAuthentication === false && $routes->withPasswordReset === false) {
+            return;
+        }
+
         Nova::serving(function (ServingNova $event) {
             $this->sync();
 
             /** @var \Illuminate\Contracts\Foundation\Application $app */
             $app = $event->app;
 
-            $app->scoped(StatefulGuard::class, fn () => Auth::guard(Util::userGuard()));
+            $app->scoped(StatefulGuard::class, static fn () => Auth::guard(Util::userGuard()));
             $app->scoped(RedirectAsIntended::class, RedirectAsIntendedForNova::class);
 
             $app->scoped(LoginViewResponseContract::class, LoginViewResponse::class);
@@ -367,7 +381,7 @@ class PendingFortifyConfiguration
 
             $app->scoped(FortifyRedirectIfTwoFactorAuthenticatable::class, RedirectIfTwoFactorAuthenticatable::class);
 
-            ResetPassword::toMailUsing(function ($notifiable, $token) {
+            ResetPassword::toMailUsing(static function ($notifiable, $token) {
                 return (new MailMessage)
                     ->subject(Nova::__('Reset Password Notification'))
                     ->line(Nova::__('You are receiving this email because we received a password reset request for your account.'))

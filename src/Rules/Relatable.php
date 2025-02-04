@@ -35,8 +35,8 @@ class Relatable implements Rule
      */
     public function passes($attribute, $value)
     {
-        $model = $this->query->tap(function ($query) {
-            tap($query->getQuery(), function ($builder) {
+        $model = $this->query->tap(static function ($query) {
+            tap($query->getQuery(), static function ($builder) {
                 /** @var \Illuminate\Database\Query\Builder $builder */
                 $builder->orders = [];
 
@@ -67,7 +67,7 @@ class Relatable implements Rule
     protected function relationshipIsFull(Model $model, string $attribute, mixed $value): bool
     {
         $inverseRelation = $this->request->newResource()
-                    ->resolveInverseFieldsForAttribute($this->request, $attribute)->first(function ($field) {
+                    ->resolveInverseFieldsForAttribute($this->request, $attribute)->first(static function ($field) {
                         return ($field instanceof MorphOne || $field instanceof HasOne) && ! $field->ofManyRelationship();
                     });
 

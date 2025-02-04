@@ -19,7 +19,7 @@ class NotFound extends Page
      */
     public function assert(Browser $browser): void
     {
-        $browser->whenAvailable('@404-error-page', function ($browser) {
+        $browser->whenAvailable('@404-error-page', static function (Browser $browser) {
             $browser->assertSee('404');
         });
     }

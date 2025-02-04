@@ -27,12 +27,12 @@ class Index extends Page
      */
     public function runCreate(Browser $browser, ?callable $fieldCallback = null): void
     {
-        $browser->within(new IndexComponent($this->resourceName), function ($browser) {
+        $browser->within(new IndexComponent($this->resourceName), static function (Browser $browser) {
             $browser->waitFor('@create-button')->click('@create-button');
         })->on(new Create($this->resourceName));
 
         if (! is_null($fieldCallback)) {
-            $browser->within(new FormComponent, function ($browser) use ($fieldCallback) {
+            $browser->within(new FormComponent, static function (Browser $browser) use ($fieldCallback) {
                 call_user_func($fieldCallback, $browser);
             });
         }

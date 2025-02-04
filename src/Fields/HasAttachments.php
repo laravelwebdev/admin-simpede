@@ -152,7 +152,7 @@ trait HasAttachments
         }
 
         if (count($callbacks)) {
-            return function () use ($callbacks) {
+            return static function () use ($callbacks) {
                 collect($callbacks)->each->__invoke();
             };
         }

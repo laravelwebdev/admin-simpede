@@ -65,7 +65,7 @@ class Tab implements JsonSerializable
      */
     public static function mutate(self $tab, iterable $fields)
     {
-        return tap(new static($tab->name, $fields), function ($newTab) use ($tab) {
+        return tap(new static($tab->name, $fields), static function ($newTab) use ($tab) {
             /** @var \Laravel\Nova\Tabs\Tab $newTab */
             $newTab->withAttribute($tab->attribute);
         });

@@ -288,8 +288,8 @@ class Action implements JsonSerializable
             return (new static)
                 ->withName($name)
                 ->noop()
-                ->tap(function ($action) use ($url) {
-                    $action->handleUsing(function ($fields, $models) use ($action, $url) {
+                ->tap(static function ($action) use ($url) {
+                    $action->handleUsing(static function ($fields, $models) use ($action, $url) {
                         if ($action->sole === true) {
                             return ActionResponse::redirect(value($url, $models->first()));
                         }
@@ -297,7 +297,7 @@ class Action implements JsonSerializable
                         return ActionResponse::redirect(value($url));
                     });
                 })
-                ->then(fn ($response) => $response->first());
+                ->then(static fn ($response) => $response->first());
         }
 
         return ActionResponse::redirect($name);
@@ -370,7 +370,7 @@ class Action implements JsonSerializable
                     return ActionResponse::visit(value($path), $options);
                 });
             })
-            ->then(fn ($response) => $response->first());
+            ->then(static fn ($response) => $response->first());
     }
 
     /**
@@ -395,7 +395,7 @@ class Action implements JsonSerializable
                         return ActionResponse::openInNewTab(value($url));
                     });
                 })
-                ->then(fn ($response) => $response->first());
+                ->then(static fn ($response) => $response->first());
         }
 
         return ActionResponse::openInNewTab($name);
@@ -420,7 +420,7 @@ class Action implements JsonSerializable
                     return ActionResponse::download($name, value($url));
                 });
             })
-            ->then(fn ($response) => $response->first());
+            ->then(static fn ($response) => $response->first());
     }
 
     /**
@@ -457,7 +457,7 @@ class Action implements JsonSerializable
                         return ActionResponse::modal($modal, value($data));
                     });
                 })
-                ->then(fn ($response) => $response->first());
+                ->then(static fn ($response) => $response->first());
         }
 
         return ActionResponse::modal($name, $modal);
@@ -535,9 +535,10 @@ class Action implements JsonSerializable
         $dispatcher = new DispatchAction($request, $this, $fields);
 
         if (method_exists($this, 'dispatchRequestUsing')) {
-            $dispatcher->handleUsing($request, function ($request, $response, $fields) {
-                return $this->dispatchRequestUsing($request, $response, $fields);
-            });
+            $dispatcher->handleUsing(
+                $request,
+                fn ($request, $response, $fields) => $this->dispatchRequestUsing($request, $response, $fields)
+            );
         } else {
             $method = ActionMethod::determine($this, $request->targetModel());
 
@@ -574,7 +575,7 @@ class Action implements JsonSerializable
             return (new static)
                 ->withName($name)
                 ->noop()
-                ->then(fn () => ActionResponse::danger($message));
+                ->then(static fn () => ActionResponse::danger($message));
         }
 
         return ActionResponse::danger($name);
@@ -600,6 +601,7 @@ class Action implements JsonSerializable
      */
     public function validateFields(ActionRequest $request): array
     {
+        /** @var \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field> $fields */
         $fields = FieldCollection::make($this->fields($request))
             ->authorized($request)
             ->applyDependsOn($request)
@@ -608,16 +610,11 @@ class Action implements JsonSerializable
 
         return Validator::make(
             $request->all(),
-            $fields->mapWithKeys(function ($field) use ($request) {
-                return $field->getCreationRules($request);
-            })->all(),
+            $fields->mapWithKeys(static fn ($field) => $field->getCreationRules($request))->all(),
             [],
-            $fields->reject(function ($field) {
-                return empty($field->name);
-            })->mapWithKeys(function ($field) {
-                /** @var \Laravel\Nova\Fields\Field $field */
-                return [$field->attribute => $field->name];
-            })->all()
+            $fields->reject(static fn ($field) => empty($field->name))
+                ->mapWithKeys(static fn ($field) => [$field->attribute => $field->name])
+                ->all()
         )->after(function ($validator) use ($request) {
             $this->afterValidation($request, $validator);
         })->validate();
@@ -1035,8 +1032,8 @@ class Action implements JsonSerializable
     {
         $properties = (new ReflectionClass($this))->getProperties();
 
-        return array_values(array_filter(array_map(function ($p) {
-            return ($p->isStatic() || in_array($name = $p->getName(),
+        return array_values(array_filter(array_map(static function ($property) {
+            return ($property->isStatic() || in_array($name = $property->getName(),
                 ['runCallback', 'seeCallback', 'thenCallback'])) ? null : $name;
         }, $properties)));
     }

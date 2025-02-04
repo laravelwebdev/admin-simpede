@@ -80,7 +80,7 @@ class ResourceStoreController extends Controller
             return $model->save();
         }
 
-        $relation = tap($request->findParentResourceOrFail(), function ($resource) use ($request) {
+        $relation = tap($request->findParentResourceOrFail(), static function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
         })->model()->{$request->viaRelationship}();
 

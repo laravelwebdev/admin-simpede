@@ -16,7 +16,7 @@ trait InteractsWithRelations
      */
     public function selectRelation(Browser $browser, string $attribute, ?string $value = null): void
     {
-        $browser->whenAvailable(new RelationSelectControlComponent($attribute), function (Browser $browser) use ($value) {
+        $browser->whenAvailable(new RelationSelectControlComponent($attribute), static function (Browser $browser) use ($value) {
             $browser->assertSelectHasOption('', $value)->select('', $value);
         });
     }
@@ -68,7 +68,7 @@ trait InteractsWithRelations
     {
         $browser->waitForTrashedRelation($resourceName)->click('')->with(
             "@{$resourceName}-with-trashed-checkbox",
-            function (Browser $browser) {
+            static function (Browser $browser) {
                 $browser->waitFor('input[type="checkbox"]')
                     ->check('input[type="checkbox"]')
                     ->pause(250);

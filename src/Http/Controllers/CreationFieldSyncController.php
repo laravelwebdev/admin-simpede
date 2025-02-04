@@ -18,12 +18,12 @@ class CreationFieldSyncController extends Controller
     public function __invoke(ResourceCreateOrAttachRequest $request): JsonResponse
     {
         $resource = $request->has('fromResourceId')
-                        ? ReplicateViewResource::make($request->fromResourceId)->newResourceWith($request)
-                        : CreateViewResource::make()->newResourceWith($request);
+            ? ReplicateViewResource::make($request->fromResourceId)->newResourceWith($request)
+            : CreateViewResource::make()->newResourceWith($request);
 
         return response()->json(
             $resource->creationFields($request)
-                ->filter(function ($field) use ($request) {
+                ->filter(static function ($field) use ($request) {
                     return $request->query('field') === $field->attribute &&
                             $request->query('component') === $field->dependentComponentKey();
                 })->each->syncDependsOn($request)

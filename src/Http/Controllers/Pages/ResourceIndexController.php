@@ -23,6 +23,7 @@ class ResourceIndexController extends Controller
         return Inertia::render('Nova.Index', [
             'breadcrumbs' => $this->breadcrumbs($request),
             'resourceName' => $resourceClass::uriKey(),
+            'perPageOptions' => $resourceClass::perPageOptions(),
         ]);
     }
 

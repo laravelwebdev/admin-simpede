@@ -22,7 +22,7 @@ class PivotFieldDestroyController extends Controller
             $pivot = $request->findPivotModel()
         )->save();
 
-        Nova::usingActionEvent(function ($actionEvent) use ($request, $pivot) {
+        Nova::usingActionEvent(static function ($actionEvent) use ($request, $pivot) {
             $actionEvent->forAttachedResourceUpdate(
                 $request, $request->findModelOrFail(), $pivot
             )->save();

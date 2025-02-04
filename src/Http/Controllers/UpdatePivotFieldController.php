@@ -27,7 +27,7 @@ class UpdatePivotFieldController extends Controller
         return response()->json(
             $resource->updatePivotFields(
                 $request, $request->relatedResource
-            )->filter(function ($field) use ($request) {
+            )->filter(static function ($field) use ($request) {
                 return $request->query('field') === $field->attribute &&
                         $request->query('component') === $field->dependentComponentKey();
             })->applyDependsOn($request)

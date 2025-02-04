@@ -17,8 +17,8 @@ class FieldController extends Controller
         $resource = $request->newResource();
 
         $fields = $request->relatable
-                        ? $resource->availableFieldsOnIndexOrDetail($request)->whereInstanceOf(RelatableField::class)
-                        : $resource->availableFields($request);
+            ? $resource->availableFieldsOnIndexOrDetail($request)->whereInstanceOf(RelatableField::class)
+            : $resource->availableFields($request);
 
         return response()->json(
             $fields->findFieldByAttributeOrFail($request->field)

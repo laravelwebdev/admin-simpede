@@ -26,7 +26,7 @@ class LensActionController extends Controller
                 'actions' => $lens->availablePivotActions($request),
             ],
             'counts' => $lens->resolveActions($request)->countsByTypeOnIndex(),
-        ], function ($payload) use ($lens, $request) {
+        ], static function ($payload) use ($lens, $request) {
             $actionCounts = $lens->resolveActions($request)->countsByTypeOnIndex();
             $pivotActionCounts = ActionCollection::make($payload['pivotActions']['actions'])->countsByTypeOnIndex();
 
@@ -56,15 +56,13 @@ class LensActionController extends Controller
     public function sync(LensActionRequest $request): JsonResponse
     {
         $action = $request->lens()->availableActions($request)
-            ->first(function ($action) use ($request) {
-                return $action->uriKey() === $request->query('action');
-            });
+            ->first(static fn ($action) => $action->uriKey() === $request->query('action'));
 
         abort_unless($action instanceof Action, 404);
 
         return response()->json(
             collect($action->fields($request))
-                ->filter(function ($field) use ($request) {
+                ->filter(static function ($field) use ($request) {
                     return $request->query('field') === $field->attribute &&
                         $request->query('component') === $field->dependentComponentKey();
                 })->each->syncDependsOn($request)

@@ -96,9 +96,7 @@ class Menu implements JsonSerializable
         $request = app(NovaRequest::class);
 
         return $this->items->flatten()
-                ->reject(function ($item) use ($request) {
-                    return method_exists($item, 'authorizedToSee') && ! $item->authorizedToSee($request);
-                })
+                ->reject(static fn ($item) => method_exists($item, 'authorizedToSee') && ! $item->authorizedToSee($request))
                 ->values()
                 ->jsonSerialize();
     }

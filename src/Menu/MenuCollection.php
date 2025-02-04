@@ -21,7 +21,7 @@ class MenuCollection extends Collection
      */
     public function authorized(Request $request)
     {
-        return $this->reject(function ($menu) use ($request) {
+        return $this->reject(static function ($menu) use ($request) {
             return method_exists($menu, 'authorizedToSee') && ! $menu->authorizedToSee($request);
         })->values();
     }
@@ -33,7 +33,7 @@ class MenuCollection extends Collection
      */
     public function withoutEmptyItems()
     {
-        return $this->transform(function ($menu) {
+        return $this->transform(static function ($menu) {
             if ($menu instanceof JsonSerializable) {
                 $payload = $menu->jsonSerialize();
 

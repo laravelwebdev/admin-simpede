@@ -129,13 +129,13 @@ trait InteractsWithAssets
 
         if (File::exists($manifest)) {
             collect(File::json($manifest))
-                ->filter(function ($file, $filename) use ($assets) {
+                ->filter(static function ($file, $filename) use ($assets) {
                     if (empty($assets)) {
                         return Str::endsWith($filename, ['.js', '.css']);
                     }
 
                     return in_array($filename, $assets);
-                })->each(function ($file, $filename) use ($name, $path) {
+                })->each(static function ($file, $filename) use ($name, $path) {
                     $key = sprintf('%s-%s', $name, hash('xxh128', $file));
 
                     if (str_ends_with($filename, '.js')) {

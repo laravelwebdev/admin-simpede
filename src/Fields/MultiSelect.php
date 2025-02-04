@@ -100,7 +100,7 @@ class MultiSelect extends Field implements FilterableField
      */
     protected function defaultFilterableCallback()
     {
-        return function (NovaRequest $request, $query, $value, $attribute) {
+        return static function (NovaRequest $request, $query, $value, $attribute) {
             return $query->whereJsonContains($attribute, $value);
         };
     }
@@ -110,14 +110,12 @@ class MultiSelect extends Field implements FilterableField
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return Arr::only($field, [
-                'uniqueKey',
-                'name',
-                'attribute',
-                'options',
-            ]);
-        });
+        return transform($this->jsonSerialize(), static fn ($field) => Arr::only($field, [
+            'uniqueKey',
+            'name',
+            'attribute',
+            'options',
+        ]));
     }
 
     /**
@@ -136,7 +134,7 @@ class MultiSelect extends Field implements FilterableField
             $options = $options();
         }
 
-        return collect($options ?? [])->map(function ($label, $value) {
+        return collect($options ?? [])->map(static function ($label, $value) {
             $value = Util::safeInt($value);
 
             return is_array($label) ? $label + ['value' => $value] : ['label' => $label, 'value' => $value];
@@ -156,10 +154,10 @@ class MultiSelect extends Field implements FilterableField
         ]);
 
         if ($this->displayUsingLabel === true) {
-            $this->displayUsing(function ($value) use ($options) {
+            $this->displayUsing(static function ($value) use ($options) {
                 return collect($options)
-                        ->where('value', $value)
-                        ->first()['label'] ?? $value;
+                    ->where('value', $value)
+                    ->first()['label'] ?? $value;
             });
         }
 

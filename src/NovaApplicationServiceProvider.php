@@ -35,7 +35,7 @@ class NovaApplicationServiceProvider extends ServiceProvider
     {
         $this->gate();
 
-        Nova::fortify()->bootstrap($this->app);
+        Nova::fortify()->bootstrap();
     }
 
     /**
@@ -84,7 +84,7 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     protected function authorization()
     {
-        Nova::auth(function ($request) {
+        Nova::auth(static function ($request) {
             return app()->environment('local') ||
                    Gate::check('viewNova', [Nova::user($request)]);
         });
@@ -99,7 +99,7 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     protected function gate()
     {
-        Gate::define('viewNova', fn ($user) => in_array($user->email, [
+        Gate::define('viewNova', static fn ($user) => in_array($user->email, [
             //
         ]));
     }

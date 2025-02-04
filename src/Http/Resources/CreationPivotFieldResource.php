@@ -16,10 +16,10 @@ class CreationPivotFieldResource extends Resource
     public function toArray($request)
     {
         return $this->newResourceWith($request)
-                    ->creationPivotFields(
-                        $request,
-                        $request->relatedResource
-                    )->applyDependsOnWithDefaultValues($request)->all();
+            ->creationPivotFields(
+                $request,
+                $request->relatedResource
+            )->applyDependsOnWithDefaultValues($request)->all();
     }
 
     /**
@@ -29,7 +29,7 @@ class CreationPivotFieldResource extends Resource
      */
     public function newResourceWith(ResourceCreateOrAttachRequest $request): NovaResource
     {
-        return tap($request->newResourceWith($request->findModel() ?? $request->model()), function ($resource) use ($request) {
+        return tap($request->newResourceWith($request->findModel() ?? $request->model()), static function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
         });
     }

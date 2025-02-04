@@ -81,6 +81,7 @@
           v-if="shouldShowDeleteMenu"
           dusk="delete-menu"
           :soft-deletes="softDeletes"
+          :resource-name="resourceName"
           :resources="resources"
           :selected-resources="selectedResources"
           :via-many-to-many="viaManyToMany"
@@ -223,9 +224,7 @@ export default {
     },
 
     filterPerPageOptions() {
-      if (this.resourceInformation) {
-        return this.perPageOptions || this.resourceInformation.perPageOptions
-      }
+      return this.perPageOptions
     },
   },
 }

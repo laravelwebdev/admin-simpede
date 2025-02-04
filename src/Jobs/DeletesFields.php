@@ -31,7 +31,7 @@ trait DeletesFields
         $request->newResourceWith($model)
                     ->deletableFields($request)
                     ->filter->isPrunable()
-                    ->each(function ($field) use ($request, $model) {
+                    ->each(static function ($field) use ($request, $model) {
                         DeleteField::forRequest($request, $field, $model);
                     });
     }

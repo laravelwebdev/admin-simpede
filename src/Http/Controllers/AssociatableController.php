@@ -14,18 +14,18 @@ class AssociatableController extends Controller
     public function __invoke(NovaRequest $request): array
     {
         $field = $request->newResource()
-                    ->availableFields($request)
-                    ->whereInstanceOf(RelatableField::class)
-                    ->findFieldByAttributeOrFail($request->field)
-                    ->applyDependsOn($request);
+            ->availableFields($request)
+            ->whereInstanceOf(RelatableField::class)
+            ->findFieldByAttributeOrFail($request->field)
+            ->applyDependsOn($request);
 
         $withTrashed = $this->shouldIncludeTrashed(
             $request, $associatedResource = $field->resourceClass
         );
 
         $limit = $associatedResource::usesScout()
-                    ? $associatedResource::$scoutSearchResults
-                    : $associatedResource::$relatableSearchResults;
+            ? $associatedResource::$scoutSearchResults
+            : $associatedResource::$relatableSearchResults;
 
         $shouldReorderAssociatableValues = $field->shouldReorderAssociatableValues($request) && ! $associatedResource::usesScout();
 
@@ -35,14 +35,14 @@ class AssociatableController extends Controller
 
         return [
             'resources' => $query->take($limit)
-                        ->get()
-                        ->mapInto($associatedResource)
-                        ->when(
-                            $request->isCreateOrAttachRequest() || $request->isUpdateOrUpdateAttachedRequest(),
-                            fn ($resources) => $resources->filter->authorizedToAdd($request, $request->model())
-                        )->map(fn ($resource) => $field->formatAssociatableResource($request, $resource))
-                        ->when($shouldReorderAssociatableValues, fn ($collection) => $collection->sortBy('display'))
-                        ->values(),
+                ->get()
+                ->mapInto($associatedResource)
+                ->when(
+                    $request->isCreateOrAttachRequest() || $request->isUpdateOrUpdateAttachedRequest(),
+                    static fn ($resources) => $resources->filter->authorizedToAdd($request, $request->model())
+                )->map(static fn ($resource) => $field->formatAssociatableResource($request, $resource))
+                ->when($shouldReorderAssociatableValues, static fn ($collection) => $collection->sortBy('display'))
+                ->values(),
             'softDeletes' => $associatedResource::softDeletes(),
             'withTrashed' => $withTrashed,
         ];

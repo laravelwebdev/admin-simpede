@@ -39,12 +39,12 @@ class FieldCommand extends ComponentGeneratorCommand
         );
 
         // Field.js replacements...
-        $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/resources/js/field.js');
+        $files->replaceInFile('{{ component }}', $this->componentName(), $this->componentPath().'/resources/js/field.js');
 
         // Field.php replacements...
-        $this->replace('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/Field.stub');
-        $this->replace('{{ class }}', $this->componentClass(), $this->componentPath().'/src/Field.stub');
-        $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/Field.stub');
+        $files->replaceInFile('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/Field.stub');
+        $files->replaceInFile('{{ class }}', $this->componentClass(), $this->componentPath().'/src/Field.stub');
+        $files->replaceInFile('{{ component }}', $this->componentName(), $this->componentPath().'/src/Field.stub');
 
         $files->move(
             $this->componentPath().'/src/Field.stub',
@@ -52,11 +52,11 @@ class FieldCommand extends ComponentGeneratorCommand
         );
 
         // FieldServiceProvider.php replacements...
-        $this->replace('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/FieldServiceProvider.stub');
-        $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/FieldServiceProvider.stub');
+        $files->replaceInFile('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/FieldServiceProvider.stub');
+        $files->replaceInFile('{{ component }}', $this->componentName(), $this->componentPath().'/src/FieldServiceProvider.stub');
 
         // webpack.mix.js replacements...
-        $this->replace('{{ name }}', $this->component(), $this->componentPath().'/webpack.mix.js');
+        $files->replaceInFile('{{ name }}', $this->component(), $this->componentPath().'/webpack.mix.js');
 
         $files->move(
             $this->componentPath().'/src/FieldServiceProvider.stub',
@@ -64,7 +64,7 @@ class FieldCommand extends ComponentGeneratorCommand
         );
 
         // Field composer.json replacements...
-        $this->prepareComposerReplacements();
+        $this->prepareComposerReplacements($files);
 
         // Register the field...
         $this->buildComponent('field');

@@ -22,7 +22,7 @@ class HeaderComponent extends Component
      */
     public function assert(Browser $browser): void
     {
-        tap($this->selector(), function ($selector) use ($browser) {
+        tap($this->selector(), static function (string $selector) use ($browser) {
             $browser->scrollIntoView($selector);
         });
     }
@@ -34,7 +34,7 @@ class HeaderComponent extends Component
     {
         $browser
             ->click('@notifications-dropdown')
-            ->elsewhereWhenAvailable('@notifications-content', $notificationCallback ?? function ($browser) {
+            ->elsewhereWhenAvailable('@notifications-content', $notificationCallback ?? static function (Browser $browser) {
                 //
             });
     }

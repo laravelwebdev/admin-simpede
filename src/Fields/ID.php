@@ -67,8 +67,8 @@ class ID extends Field
             $resource->availableFieldsOnIndexOrDetail(app(NovaRequest::class))
                     ->whereInstanceOf(self::class)
                     ->first(),
-            fn ($field) => tap($field)->resolve($model),
-            fn () => ! is_null($model) && $model->exists ? static::forModel($model) : null,
+            static fn ($field) => tap($field)->resolve($model),
+            static fn () => ! is_null($model) && $model->exists ? static::forModel($model) : null,
         );
 
         if ($field instanceof static) {
@@ -85,7 +85,7 @@ class ID extends Field
      */
     public static function forModel($model): static
     {
-        return tap(static::make('ID', $model->getKeyName()), function ($field) use ($model) {
+        return tap(static::make('ID', $model->getKeyName()), static function ($field) use ($model) {
             $value = $model->getKey();
 
             if (is_int($value) && $value >= 9007199254740991) {
@@ -128,9 +128,7 @@ class ID extends Field
      */
     public function asBigInt()
     {
-        $this->resolveCallback = function ($id) {
-            return (string) $id;
-        };
+        $this->resolveCallback = static fn ($id) => (string) $id;
 
         return $this;
     }

@@ -78,7 +78,7 @@ class ActionCollection extends Collection
             ->partition->isStandalone();
 
         [$sole, $resource] = $actions->partition(
-            fn ($action) => $action->sole === true
+            static fn ($action) => $action->sole === true
         );
 
         return [

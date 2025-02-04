@@ -88,7 +88,7 @@ class Attach extends Page
      */
     public function searchAttachable(Browser $browser, string|int $id): void
     {
-        $browser->within(new SearchInputComponent($this->relation), function ($browser) use ($id) {
+        $browser->within(new SearchInputComponent($this->relation), static function (Browser $browser) use ($id) {
             $browser->searchFirstRelation((string) $id);
         });
     }

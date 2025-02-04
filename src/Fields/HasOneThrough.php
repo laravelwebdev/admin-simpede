@@ -151,9 +151,7 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
         }
 
         if ($value) {
-            $this->alreadyFilledWhen(function () use ($value) {
-                return optional($value)->exists;
-            });
+            $this->alreadyFilledWhen(static fn () => optional($value)->exists);
 
             $this->hasOneThroughResource = new $this->resourceClass($value);
 
@@ -181,9 +179,9 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     public function asPanel(): Panel
     {
         return Panel::make($this->name, [$this])
-                    ->withMeta([
-                        'prefixComponent' => true,
-                    ])->withComponent('relationship-panel');
+            ->withMeta([
+                'prefixComponent' => true,
+            ])->withComponent('relationship-panel');
     }
 
     /**

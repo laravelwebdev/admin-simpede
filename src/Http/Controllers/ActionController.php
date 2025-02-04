@@ -18,7 +18,7 @@ class ActionController extends Controller
      */
     public function index(NovaRequest $request): JsonResponse
     {
-        $resourceId = with($request->input('resources'), function ($resourceIds) {
+        $resourceId = with($request->input('resources'), static function ($resourceIds) {
             return is_array($resourceIds) && count($resourceIds) === 1 ? $resourceIds[0] : null;
         });
 
@@ -32,7 +32,7 @@ class ActionController extends Controller
                 'name' => Nova::humanize($request->pivotName()),
                 'actions' => $resource->availablePivotActions($request),
             ],
-        ], function ($payload) use ($resource, $request) {
+        ], static function ($payload) use ($resource, $request) {
             $actionCounts = ($request->display !== 'detail' ? $payload['actions'] : $resource->resolveActions($request))->countsByTypeOnIndex();
             $pivotActionCounts = ActionCollection::make($payload['pivotActions']['actions'])->countsByTypeOnIndex();
 
@@ -62,15 +62,13 @@ class ActionController extends Controller
     public function sync(ActionRequest $request): JsonResponse
     {
         $action = $this->availableActions($request, $request->newResource())
-            ->first(function ($action) use ($request) {
-                return $action->uriKey() === $request->query('action');
-            });
+            ->first(static fn ($action) => $action->uriKey() === $request->query('action'));
 
         abort_unless($action instanceof Action, 404);
 
         return response()->json(
             collect($action->fields($request))
-                ->filter(function ($field) use ($request) {
+                ->filter(static function ($field) use ($request) {
                     return $request->query('field') === $field->attribute &&
                         $request->query('component') === $field->dependentComponentKey();
                 })->each->syncDependsOn($request)

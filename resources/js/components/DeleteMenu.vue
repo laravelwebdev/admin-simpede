@@ -52,29 +52,35 @@
 
     <DeleteResourceModal
       :mode="viaManyToMany ? 'detach' : 'delete'"
+      :resource-name="resourceName"
       :show="selectedResources.length > 0 && deleteSelectedModalOpen"
       @close="closeDeleteSelectedModal"
       @confirm="deleteSelectedResources"
     />
 
     <DeleteResourceModal
-      :show="selectedResources.length > 0 && forceDeleteSelectedModalOpen"
       mode="delete"
+      :resource-name="resourceName"
+      :show="selectedResources.length > 0 && forceDeleteSelectedModalOpen"
       @close="closeForceDeleteSelectedModal"
       @confirm="forceDeleteSelectedResources"
     >
-      <ModalHeader v-text="__('Force Delete Resource')" />
-      <ModalContent>
-        <p
-          class="leading-normal"
-          v-text="
-            __('Are you sure you want to force delete the selected resources?')
-          "
-        />
-      </ModalContent>
+      <template #content>
+        <ModalContent>
+          <p
+            class="leading-normal"
+            v-text="
+              __(
+                'Are you sure you want to force delete the selected resources?'
+              )
+            "
+          />
+        </ModalContent>
+      </template>
     </DeleteResourceModal>
 
     <RestoreResourceModal
+      :resource-name="resourceName"
       :show="selectedResources.length > 0 && restoreModalOpen"
       @close="closeRestoreModal"
       @confirm="restoreSelectedResources"
@@ -84,7 +90,10 @@
 
 <script>
 import { Button } from 'laravel-nova-ui'
-import { InteractsWithQueryString } from '@/mixins'
+import {
+  InteractsWithQueryString,
+  InteractsWithResourceInformation,
+} from '@/mixins'
 
 export default {
   components: {
@@ -101,7 +110,7 @@ export default {
     'restoreSelected',
   ],
 
-  mixins: [InteractsWithQueryString],
+  mixins: [InteractsWithQueryString, InteractsWithResourceInformation],
 
   props: [
     'allMatchingResourceCount',
@@ -113,6 +122,7 @@ export default {
     'authorizedToRestoreAnyResources',
     'authorizedToRestoreSelectedResources',
     'resources',
+    'resourceName',
     'selectedResources',
     'show',
     'softDeletes',

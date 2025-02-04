@@ -24,9 +24,9 @@ class ResourceSearchController extends Controller
 
         return response()->json([
             'resources' => $request->searchIndex()
-                        ->mapInto($resource)
-                        ->map(fn ($resource) => $this->transformResult($request, $resource))
-                        ->values(),
+                ->mapInto($resource)
+                ->map(fn ($resource) => $this->transformResult($request, $resource))
+                ->values(),
             'softDeletes' => $resource::softDeletes(),
             'withTrashed' => $withTrashed,
         ]);

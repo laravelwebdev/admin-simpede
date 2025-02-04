@@ -23,7 +23,7 @@ trait Metable
         $request = app(NovaRequest::class);
 
         return collect($this->meta)
-            ->map(fn ($value) => value($value, $request))
+            ->map(static fn ($value) => value($value, $request))
             ->all();
     }
 

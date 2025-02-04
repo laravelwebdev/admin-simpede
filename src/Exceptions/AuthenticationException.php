@@ -51,7 +51,7 @@ class AuthenticationException extends BaseAuthenticationException
      */
     protected function redirectForInertia($request)
     {
-        tap(redirect(), function ($redirect) use ($request) {
+        tap(redirect(), static function ($redirect) use ($request) {
             $url = $redirect->getUrlGenerator();
 
             $intended = $request->method() === 'GET' && $request->route() && ! $request->expectsJson()

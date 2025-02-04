@@ -13,12 +13,11 @@ class LensFilterController extends Controller
      */
     public function index(NovaRequest $request): JsonResponse
     {
-        $lenses = $request->newResource()->availableLenses($request);
-
-        $lens = $lenses->first(function ($lens) use ($request) {
-            return $lens->uriKey() === $request->lens;
-        });
-
-        return response()->json($lens->availableFilters($request));
+        return response()->json(
+            $request->newResource()
+                ->availableLenses($request)
+                ->first(static fn ($lens) => $lens->uriKey() === $request->lens)
+                ->availableFilters($request)
+        );
     }
 }

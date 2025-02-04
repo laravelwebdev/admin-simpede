@@ -47,7 +47,7 @@ class Dependent
     ) {
         $this->context = Arr::wrap($context ?? $this->context);
 
-        $this->attributes = collect(Arr::wrap($attributes))->map(function ($item) {
+        $this->attributes = collect(Arr::wrap($attributes))->map(static function ($item) {
             /** @var string|\Laravel\Nova\Fields\Field $item */
             if ($item instanceof MorphTo) {
                 return [$item->attribute, "{$item->attribute}_type"];

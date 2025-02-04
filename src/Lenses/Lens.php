@@ -8,6 +8,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Laravel\Nova\AuthorizedToSee;
@@ -56,6 +57,13 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
      * @var array
      */
     public static $search = [];
+
+    /**
+     * The pagination per-page options used for this lens.
+     *
+     * @var int|array<int, int>|null
+     */
+    public static $perPageOptions = null;
 
     /**
      * Execute the query for the lens.
@@ -149,9 +157,9 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
     public function filterableFields(NovaRequest $request)
     {
         return $this->availableFields($request)
-                    ->flattenStackedFields()
-                    ->withOnlyFilterableFields()
-                    ->authorized($request);
+            ->flattenStackedFields()
+            ->withOnlyFilterableFields()
+            ->authorized($request);
     }
 
     /**
@@ -182,6 +190,20 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
     public static function searchableColumns()
     {
         return static::$search;
+    }
+
+    /**
+     * The pagination per-page options configured for this lens.
+     *
+     * @return array<int, int>|null
+     */
+    public static function perPageOptions()
+    {
+        return transform(
+            static::$perPageOptions,
+            static fn ($perPageOptions) => Arr::wrap($perPageOptions),
+            null,
+        );
     }
 
     /**

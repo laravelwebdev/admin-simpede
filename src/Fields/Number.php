@@ -101,7 +101,7 @@ class Number extends Text
      */
     protected function defaultFilterableCallback()
     {
-        return function (NovaRequest $request, $query, $value, $attribute) {
+        return static function (NovaRequest $request, $query, $value, $attribute) {
             [$min, $max] = $value;
 
             if (! is_null($min) && ! is_null($max)) {
@@ -119,20 +119,18 @@ class Number extends Text
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return Arr::only($field, [
-                'uniqueKey',
-                'name',
-                'attribute',
-                'type',
-                'min',
-                'max',
-                'step',
-                'pattern',
-                'placeholder',
-                'extraAttributes',
-            ]);
-        });
+        return transform($this->jsonSerialize(), static fn ($field) => Arr::only($field, [
+            'uniqueKey',
+            'name',
+            'attribute',
+            'type',
+            'min',
+            'max',
+            'step',
+            'pattern',
+            'placeholder',
+            'extraAttributes',
+        ]));
     }
 
     /**
@@ -146,8 +144,7 @@ class Number extends Text
             'min' => $this->min,
             'max' => $this->max,
             'step' => $this->step,
-        ])->reject(function ($value) {
-            return is_null($value) || (empty($value) && $value !== 0);
-        })->all());
+        ])->reject(static fn ($value) => is_null($value) || (empty($value) && $value !== 0))
+        ->all());
     }
 }

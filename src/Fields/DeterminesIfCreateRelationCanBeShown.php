@@ -60,7 +60,7 @@ trait DeterminesIfCreateRelationCanBeShown
      */
     public function createRelationShouldBeShown(NovaRequest $request): bool
     {
-        return with($this->showCreateRelationButtonCallback, function ($callback) use ($request) {
+        return with($this->showCreateRelationButtonCallback, static function ($callback) use ($request) {
             if ($callback === true || (is_callable($callback) && call_user_func($callback, $request))) {
                 return true;
             }

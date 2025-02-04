@@ -19,10 +19,10 @@ class DetachPendingAttachment
     public function __invoke(Request $request): void
     {
         static::$model::where('draft_id', $request->draftId)
-            ->when($request->has('attachment'), function ($query) use ($request) {
-                return $query->where('attachment', $request->attachment);
-            })->get()
-            ->each
-            ->purge();
+            ->when(
+                $request->has('attachment'),
+                static fn ($query) => $query->where('attachment', $request->attachment)
+            )->get()
+            ->each->purge();
     }
 }

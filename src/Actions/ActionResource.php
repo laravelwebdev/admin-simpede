@@ -67,9 +67,7 @@ class ActionResource extends Resource
     {
         return [
             ID::make(Nova::__('ID'), 'id')->showOnPreview(),
-            Text::make(Nova::__('Action Name'), 'name', function ($value) {
-                return Nova::__($value);
-            })->showOnPreview(),
+            Text::make(Nova::__('Action Name'), 'name', static fn ($value) => Nova::__($value))->showOnPreview(),
 
             Text::make(Nova::__('Action Initiated By'), function () {
                 return $this->user->name ?? $this->user->email ?? __('Nova User');
@@ -77,15 +75,15 @@ class ActionResource extends Resource
 
             MorphToActionTarget::make(Nova::__('Action Target'), 'target')->showOnPreview(),
 
-            Status::make(Nova::__('Action Status'), 'status', function ($value) {
+            Status::make(Nova::__('Action Status'), 'status', static function ($value) {
                 return transform($value, static fn ($value) => Nova::__(ucfirst($value)));
             })->loadingWhen([Nova::__('Waiting'), Nova::__('Running')])->failedWhen([Nova::__('Failed')]),
 
-            $this->when(isset($this->original), function () {
+            $this->when(isset($this->original), static function () {
                 return KeyValue::make(Nova::__('Original'), 'original')->showOnPreview();
             }),
 
-            $this->when(isset($this->changes), function () {
+            $this->when(isset($this->changes), static function () {
                 return KeyValue::make(Nova::__('Changes'), 'changes')->showOnPreview();
             }),
 

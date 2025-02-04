@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Testing\Browser\Components;
 
-use Closure;
 use Illuminate\Support\Str;
 use Laravel\Dusk\Browser;
 
@@ -49,7 +48,7 @@ class IndexComponent extends Component
     public function waitForTable(Browser $browser, ?int $seconds = null): void
     {
         $browser->waitUntilMissing('@loading-view')
-            ->whenAvailable('@resource-table', function ($browser) use ($seconds) {
+            ->whenAvailable('@resource-table', static function (Browser $browser) use ($seconds) {
                 $browser->waitFor('tbody', $seconds);
             }, $seconds);
     }
@@ -120,7 +119,7 @@ class IndexComponent extends Component
      */
     public function unselectAllOnCurrentPage(Browser $browser): void
     {
-        $browser->within(new SelectAllDropdownComponent, function ($browser) {
+        $browser->within(new SelectAllDropdownComponent, static function (Browser $browser) {
             $browser->unselectAllOnCurrentPage();
         });
     }
@@ -130,7 +129,7 @@ class IndexComponent extends Component
      */
     public function selectAllMatching(Browser $browser): void
     {
-        $browser->within(new SelectAllDropdownComponent, function ($browser) {
+        $browser->within(new SelectAllDropdownComponent, static function (Browser $browser) {
             $browser->selectAllMatching();
         });
     }
@@ -140,7 +139,7 @@ class IndexComponent extends Component
      */
     public function unselectAllMatching(Browser $browser): void
     {
-        $browser->within(new SelectAllDropdownComponent, function ($browser) {
+        $browser->within(new SelectAllDropdownComponent, static function (Browser $browser) {
             $browser->unselectAllMatching();
         });
     }
@@ -150,7 +149,7 @@ class IndexComponent extends Component
      */
     public function assertSelectAllMatchingCount(Browser $browser, int $count): void
     {
-        $browser->within(new SelectAllDropdownComponent, function ($browser) use ($count) {
+        $browser->within(new SelectAllDropdownComponent, static function (Browser $browser) use ($count) {
             $browser->assertSelectAllMatchingCount($count);
         });
     }
@@ -158,20 +157,22 @@ class IndexComponent extends Component
     /**
      * Set the given filter and filter value for the index.
      *
-     * @param  \Closure|bool|null  $postCallback
+     * @param  (\callable(\Laravel\Dusk\Browser):(void))|false|null  $postCallback
      */
-    public function runFilter(Browser $browser, ?Closure $fieldCallback = null, $postCallback = null): void
+    public function runFilter(Browser $browser, ?callable $fieldCallback = null, callable|false|null $postCallback = null): void
     {
         $browser->openFilterSelector();
 
         if (is_callable($fieldCallback)) {
             $browser->elsewhereWhenAvailable('@filter-menu', function (Browser $browser) use ($fieldCallback) {
-                $fieldCallback($browser);
+                if ($fieldCallback) {
+                    call_user_func($fieldCallback, $browser);
+                }
             });
         }
 
         if ($postCallback !== false) {
-            call_user_func($postCallback ?? function ($browser) {
+            call_user_func($postCallback ?? static function (Browser $browser) {
                 $browser->closeCurrentDropdown();
             }, $browser);
         }
@@ -182,7 +183,7 @@ class IndexComponent extends Component
      */
     public function resetFilter(Browser $browser): void
     {
-        $this->runFilter($browser, function ($browser) {
+        $this->runFilter($browser, static function (Browser $browser) {
             $browser->press(Str::upper(__('Reset Filters')));
         });
     }
@@ -192,7 +193,7 @@ class IndexComponent extends Component
      */
     public function assertFilterCount(Browser $browser, int $count): void
     {
-        $browser->within('@filter-selector-button', function ($browser) use ($count) {
+        $browser->within('@filter-selector-button', static function (Browser $browser) use ($count) {
             if ($count <= 0) {
                 $browser->assertDontSee($count);
             } else {
@@ -206,8 +207,8 @@ class IndexComponent extends Component
      */
     public function setPerPage(Browser $browser, int $value): void
     {
-        $this->runFilter($browser, function ($browser) use ($value) {
-            $browser->whenAvailable('select[dusk="per-page-select"]', function ($browser) use ($value) {
+        $this->runFilter($browser, static function (Browser $browser) use ($value) {
+            $browser->whenAvailable('select[dusk="per-page-select"]', static function (Browser $browser) use ($value) {
                 $browser->select('', $value);
             });
         });
@@ -218,8 +219,8 @@ class IndexComponent extends Component
      */
     public function selectFilter(Browser $browser, string $name, mixed $value): void
     {
-        $this->runFilter($browser, function ($browser) use ($name, $value) {
-            $browser->whenAvailable('select[dusk="'.Str::slug($name).'-select-filter"]', function ($browser) use ($value) {
+        $this->runFilter($browser, static function (Browser $browser) use ($name, $value) {
+            $browser->whenAvailable('select[dusk="'.Str::slug($name).'-select-filter"]', static function (Browser $browser) use ($value) {
                 $browser->select('', $value)->pause(1000);
             });
         });
@@ -230,8 +231,8 @@ class IndexComponent extends Component
      */
     public function withoutTrashed(Browser $browser): void
     {
-        $this->runFilter($browser, function ($browser) {
-            $browser->whenAvailable('[dusk="filter-soft-deletes"]', function ($browser) {
+        $this->runFilter($browser, static function (Browser $browser) {
+            $browser->whenAvailable('[dusk="filter-soft-deletes"]', static function (Browser $browser) {
                 $browser->select('select[dusk="trashed-select"]', '')->pause(1000);
             });
         });
@@ -242,8 +243,8 @@ class IndexComponent extends Component
      */
     public function onlyTrashed(Browser $browser): void
     {
-        $this->runFilter($browser, function ($browser) {
-            $browser->whenAvailable('[dusk="filter-soft-deletes"]', function ($browser) {
+        $this->runFilter($browser, static function (Browser $browser) {
+            $browser->whenAvailable('[dusk="filter-soft-deletes"]', static function (Browser $browser) {
                 $browser->select('select[dusk="trashed-select"]', 'only')->pause(1000);
             });
         });
@@ -254,8 +255,8 @@ class IndexComponent extends Component
      */
     public function withTrashed(Browser $browser): void
     {
-        $this->runFilter($browser, function ($browser) {
-            $browser->whenAvailable('[dusk="filter-soft-deletes"]', function ($browser) {
+        $this->runFilter($browser, static function (Browser $browser) {
+            $browser->whenAvailable('[dusk="filter-soft-deletes"]', static function (Browser $browser) {
                 $browser->select('select[dusk="trashed-select"]', 'with');
             });
         });
@@ -268,7 +269,7 @@ class IndexComponent extends Component
      */
     public function openActionSelector(Browser $browser): void
     {
-        $browser->whenAvailable('@nova-index-action-select', function ($browser) {
+        $browser->whenAvailable('@nova-index-action-select', static function (Browser $browser) {
             $browser->click('')->pause(100);
         });
     }
@@ -282,7 +283,7 @@ class IndexComponent extends Component
      */
     public function openStandaloneActionSelector(Browser $browser)
     {
-        $browser->whenAvailable('@index-standalone-action-dropdown', function ($browser) {
+        $browser->whenAvailable('@index-standalone-action-dropdown', static function (Browser $browser) {
             $browser->click('')->pause(100);
         });
     }
@@ -294,7 +295,7 @@ class IndexComponent extends Component
      */
     public function openFilterSelector(Browser $browser): void
     {
-        $browser->whenAvailable('@filter-selector', function ($browser) {
+        $browser->whenAvailable('@filter-selector', static function (Browser $browser) {
             $browser->click('')->pause(100);
         });
     }
@@ -306,10 +307,9 @@ class IndexComponent extends Component
      */
     public function openControlSelectorById(Browser $browser, string|int $id): void
     {
-        $browser
-            ->whenAvailable("@{$id}-control-selector", function ($browser) {
-                $browser->click('')->pause(300);
-            });
+        $browser->whenAvailable("@{$id}-control-selector", static function (Browser $browser) {
+            $browser->click('')->pause(300);
+        });
     }
 
     /**
@@ -341,13 +341,13 @@ class IndexComponent extends Component
      */
     public function selectAction(Browser $browser, string $uriKey, callable $fieldCallback): void
     {
-        $browser->whenAvailable('@nova-index-action-select', function ($browser) use ($uriKey) {
+        $browser->whenAvailable('@nova-index-action-select', static function (Browser $browser) use ($uriKey) {
             $browser->select('', $uriKey)
                 ->pause(100)
                 ->assertSelected('', '');
         });
 
-        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) use ($fieldCallback) {
+        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) use ($fieldCallback) {
             $fieldCallback($browser);
         });
     }
@@ -361,16 +361,16 @@ class IndexComponent extends Component
      *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function selectStandaloneAction(Browser $browser, $uriKey, $fieldCallback)
+    public function selectStandaloneAction(Browser $browser, string $uriKey, callable $fieldCallback)
     {
-        $browser->whenAvailable('@index-standalone-action-dropdown', function ($browser) {
+        $browser->whenAvailable('@index-standalone-action-dropdown', static function (Browser $browser) {
             $browser->click('');
-        })->elseWhereWhenAvailable('div[data-menu-open="true"]', function ($browser) use ($uriKey) {
+        })->elseWhereWhenAvailable('div[data-menu-open="true"]', static function (Browser $browser) use ($uriKey) {
             $browser->click("button[data-action-id='{$uriKey}']");
         });
 
-        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) use ($fieldCallback) {
-            $fieldCallback($browser);
+        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) use ($fieldCallback) {
+            call_user_func($fieldCallback, $browser);
         });
     }
 
@@ -381,9 +381,9 @@ class IndexComponent extends Component
      */
     public function runAction(Browser $browser, string $uriKey, ?callable $fieldCallback = null): void
     {
-        $this->selectAction($browser, $uriKey, function ($browser) use ($fieldCallback) {
+        $this->selectAction($browser, $uriKey, static function (Browser $browser) use ($fieldCallback) {
             if ($fieldCallback) {
-                $fieldCallback($browser);
+                call_user_func($fieldCallback, $browser);
             }
 
             $browser->waitForText('Run Action')->click('@confirm-action-button')->pause(250);
@@ -399,13 +399,13 @@ class IndexComponent extends Component
      *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
      */
-    public function runStandaloneAction(Browser $browser, $uriKey, $fieldCallback = null)
+    public function runStandaloneAction(Browser $browser, string $uriKey, ?callable $fieldCallback = null)
     {
-        $this->selectStandaloneAction($browser, $uriKey, function ($browser) use ($fieldCallback) {
+        $this->selectStandaloneAction($browser, $uriKey, static function (Browser $browser) use ($fieldCallback) {
             $browser->pause(2000);
 
             if ($fieldCallback) {
-                $fieldCallback($browser);
+                call_user_func($fieldCallback, $browser);
             }
 
             $browser->waitForText('Run Action')->click('@confirm-action-button')->pause(250);
@@ -418,12 +418,12 @@ class IndexComponent extends Component
     public function selectInlineAction(Browser $browser, string|int $id, string $uriKey, callable $fieldCallback): void
     {
         $browser->openControlSelectorById($id)
-            ->elseWhereWhenAvailable('div[data-menu-open="true"]', function ($browser) use ($uriKey) {
+            ->elseWhereWhenAvailable('div[data-menu-open="true"]', static function (Browser $browser) use ($uriKey) {
                 $browser->click("button[data-action-id='{$uriKey}']");
             })->pause(500);
 
-        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, function ($browser) use ($fieldCallback) {
-            $fieldCallback($browser);
+        $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) use ($fieldCallback) {
+            call_user_func($fieldCallback, $browser);
         });
     }
 
@@ -432,9 +432,9 @@ class IndexComponent extends Component
      */
     public function runInlineAction(Browser $browser, string|int $id, string $uriKey, ?callable $fieldCallback = null): void
     {
-        $this->selectInlineAction($browser, $id, $uriKey, function ($browser) use ($fieldCallback) {
+        $this->selectInlineAction($browser, $id, $uriKey, static function (Browser $browser) use ($fieldCallback) {
             if ($fieldCallback) {
-                $fieldCallback($browser);
+                call_user_func($fieldCallback, $browser);
             }
 
             $browser->click('@confirm-action-button')->pause(250);
@@ -465,7 +465,7 @@ class IndexComponent extends Component
     public function replicateResourceById(Browser $browser, string|int $id): void
     {
         $browser->openControlSelectorById($id)
-            ->elsewhereWhenAvailable("@{$id}-replicate-button", function ($browser) {
+            ->elsewhereWhenAvailable("@{$id}-replicate-button", static function (Browser $browser) {
                 $browser->click('');
             })->pause(500);
     }
@@ -476,7 +476,7 @@ class IndexComponent extends Component
     public function previewResourceById(Browser $browser, string|int $id): void
     {
         $browser->openControlSelectorById($id)
-            ->elsewhereWhenAvailable("@{$id}-preview-button", function ($browser) {
+            ->elsewhereWhenAvailable("@{$id}-preview-button", static function (Browser $browser) {
                 $browser->click('');
             })->pause(500);
     }
@@ -487,7 +487,7 @@ class IndexComponent extends Component
     public function deleteResourceById(Browser $browser, string|int $id): void
     {
         $browser->click("@{$id}-delete-button")
-            ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, function ($browser) {
+            ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, static function (Browser $browser) {
                 $browser->confirm();
             })->pause(500);
     }
@@ -498,7 +498,7 @@ class IndexComponent extends Component
     public function restoreResourceById(Browser $browser, string|int $id): void
     {
         $browser->click("@{$id}-restore-button")
-            ->elsewhereWhenAvailable(new Modals\RestoreResourceModalComponent, function ($browser) {
+            ->elsewhereWhenAvailable(new Modals\RestoreResourceModalComponent, static function (Browser $browser) {
                 $browser->confirm();
             })->pause(500);
     }
@@ -532,9 +532,9 @@ class IndexComponent extends Component
     {
         $browser->click('@delete-menu')
             ->pause(300)
-            ->elsewhere('', function ($browser) {
+            ->elsewhere('', static function (Browser $browser) {
                 $browser->click('[dusk="delete-selected-button"]')
-                    ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, function ($browser) {
+                    ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, static function (Browser $browser) {
                         $browser->confirm();
                     });
             })->pause(1000);
@@ -547,9 +547,9 @@ class IndexComponent extends Component
     {
         $browser->click('@delete-menu')
             ->pause(300)
-            ->elsewhere('', function ($browser) {
+            ->elsewhere('', static function (Browser $browser) {
                 $browser->click('[dusk="restore-selected-button"]')
-                    ->elsewhereWhenAvailable(new Modals\RestoreResourceModalComponent, function ($browser) {
+                    ->elsewhereWhenAvailable(new Modals\RestoreResourceModalComponent, static function (Browser $browser) {
                         $browser->confirm();
                     });
             })->pause(1000);
@@ -562,9 +562,9 @@ class IndexComponent extends Component
     {
         $browser->click('@delete-menu')
             ->pause(300)
-            ->elsewhere('', function ($browser) {
+            ->elsewhere('', static function (Browser $browser) {
                 $browser->click('[dusk="force-delete-selected-button"]')
-                    ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, function ($browser) {
+                    ->elsewhereWhenAvailable(new Modals\DeleteResourceModalComponent, static function (Browser $browser) {
                         $browser->confirm();
                     });
             })->pause(1000);
@@ -579,7 +579,7 @@ class IndexComponent extends Component
     {
         $browser->pause(500);
 
-        tap($this->selector(), function ($selector) use ($browser) {
+        tap($this->selector(), static function (string $selector) use ($browser) {
             $browser->waitFor($selector)
                 ->assertVisible($selector)
                 ->scrollIntoView($selector);

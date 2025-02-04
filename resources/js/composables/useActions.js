@@ -16,7 +16,7 @@ export function useActions(props, emitter, store) {
     responseModalVisible: false,
     selectedActionKey: '',
     endpoint: props.endpoint || `/nova-api/${props.resourceName}/action`,
-    actionResponseData: null,
+    actionModalReponseData: null,
   })
 
   const selectedResources = computed(() => props.selectedResources)
@@ -249,7 +249,7 @@ export function useActions(props, emitter, store) {
     }
 
     if (data.modal) {
-      state.actionResponseData = data
+      state.actionModalReponseData = data.modal
 
       showActionResponseMessage(data)
 
@@ -262,8 +262,8 @@ export function useActions(props, emitter, store) {
 
         await nextTick(() => {
           let link = document.createElement('a')
-          link.href = data.download
-          link.download = data.name
+          link.href = data.download.url
+          link.download = data.download.name
           document.body.appendChild(link)
           link.click()
           document.body.removeChild(link)
@@ -276,10 +276,12 @@ export function useActions(props, emitter, store) {
     }
 
     if (data.redirect) {
-      if (data.openInNewTab) {
-        return emitResponseCallback(() => window.open(data.redirect, '_blank'))
+      if (data.redirect.openInNewTab) {
+        return emitResponseCallback(() =>
+          window.open(data.redirect.url, '_blank')
+        )
       } else {
-        window.location = data.redirect
+        window.location = data.redirect.url
       }
     }
 
@@ -322,6 +324,6 @@ export function useActions(props, emitter, store) {
     availableActions,
     availablePivotActions,
     executeAction,
-    actionResponseData: computed(() => state.actionResponseData),
+    actionModalReponseData: computed(() => state.actionModalReponseData),
   }
 }

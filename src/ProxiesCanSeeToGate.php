@@ -21,8 +21,8 @@ trait ProxiesCanSeeToGate
             $arguments[0] = $arguments[0]->resource;
         }
 
-        return $this->canSee(function ($request) use ($ability, $arguments) {
-            return Nova::user($request)->can($ability, $arguments);
-        });
+        return $this->canSee(
+            static fn ($request) => Nova::user($request)->can($ability, $arguments)
+        );
     }
 }

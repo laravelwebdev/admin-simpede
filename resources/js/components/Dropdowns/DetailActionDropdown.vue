@@ -66,7 +66,11 @@
             dusk="open-delete-modal-button"
             @click.prevent="openDeleteModal"
           >
-            {{ __('Delete Resource') }}
+            {{
+              __('Delete :resource', {
+                resource: resourceInformation.singularLabel,
+              })
+            }}
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -75,7 +79,11 @@
             dusk="open-restore-modal-button"
             @click.prevent="openRestoreModal"
           >
-            {{ __('Restore Resource') }}
+            {{
+              __('Restore :resource', {
+                resource: resourceInformation.singularLabel,
+              })
+            }}
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -84,7 +92,11 @@
             dusk="open-force-delete-modal-button"
             @click.prevent="openForceDeleteModal"
           >
-            {{ __('Force Delete Resource') }}
+            {{
+              __('Force Delete :resource', {
+                resource: resourceInformation.singularLabel,
+              })
+            }}
           </DropdownMenuItem>
         </div>
       </div>
@@ -92,21 +104,24 @@
   </ActionDropdown>
 
   <DeleteResourceModal
-    :show="deleteModalOpen"
     mode="delete"
+    :resource-name="resourceName"
+    :show="deleteModalOpen"
     @close="closeDeleteModal"
     @confirm="confirmDelete"
   />
 
   <RestoreResourceModal
+    :resource-name="resourceName"
     :show="restoreModalOpen"
     @close="closeRestoreModal"
     @confirm="confirmRestore"
   />
 
   <DeleteResourceModal
-    :show="forceDeleteModalOpen"
     mode="force delete"
+    :resource-name="resourceName"
+    :show="forceDeleteModalOpen"
     @close="closeForceDeleteModal"
     @confirm="confirmForceDelete"
   />

@@ -207,14 +207,14 @@ class PendingRouteRegistration
         $this->bootstrapTwoFactorAuthenticationRoutes($app, $apiMiddlewares);
 
         Nova::router()
-            ->group(function (Router $router) {
+            ->group(static function (Router $router) {
                 $router->get('/403', Error403Controller::class)->name('nova.pages.403');
                 $router->get('/404', Error404Controller::class)->name('nova.pages.404');
             });
 
         Nova::router(middleware: $apiMiddlewares)
             ->as('nova.pages.')
-            ->group(function (Router $router) {
+            ->group(static function (Router $router) {
                 $router->get('/', HomeController::class)->name('home');
                 $router->redirect('dashboard', Nova::url('/'))->name('dashboard');
                 $router->get('dashboards/{name}', DashboardController::class)->name('dashboard.custom');
@@ -248,7 +248,7 @@ class PendingRouteRegistration
             }
 
             Nova::router(middleware: $this->authenticationMiddlewares)
-                ->group(function (Router $router) use ($limiter) {
+                ->group(static function (Router $router) use ($limiter) {
                     $router->get('/login', [AuthenticatedSessionController::class, 'create'])->name('nova.pages.login');
                     $router->post('/login', [AuthenticatedSessionController::class, 'store'])
                         ->middleware(array_filter([$limiter ? 'throttle:'.$limiter : null]))
@@ -256,7 +256,7 @@ class PendingRouteRegistration
                 });
 
             Nova::router()
-                ->group(function (Router $router) {
+                ->group(static function (Router $router) {
                     $router->post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('nova.logout');
                 });
         } elseif (! empty($this->loginPath)) {
@@ -268,7 +268,7 @@ class PendingRouteRegistration
 
         if ($this->withPasswordReset === true || Nova::fortify()->enabled(Features::resetPasswords())) {
             Nova::router(middleware: $this->passwordResetMiddlewares)
-                ->group(function (Router $router) {
+                ->group(static function (Router $router) {
                     $router->get('/password/reset', [PasswordResetLinkController::class, 'create'])->name('nova.pages.password.email');
                     $router->post('/password/email', [PasswordResetLinkController::class, 'store'])->name('nova.password.email');
 
@@ -297,7 +297,7 @@ class PendingRouteRegistration
             ->name('nova.pages.verification.notice');
 
         Nova::router(middleware: $middlewaresWithLimiter)
-            ->group(function (Router $router) use ($hasVerifyRoute) {
+            ->group(static function (Router $router) use ($hasVerifyRoute) {
                 if (! $hasVerifyRoute) {
                     $router->get('/email/verify/{id}/{hash}', VerifyEmailController::class)
                         ->name('verification.verify');
@@ -317,7 +317,7 @@ class PendingRouteRegistration
     {
         if (Features::hasSecurityFeatures()) {
             Nova::router(middleware: $apiMiddlewares)
-                ->group(function (Router $router) {
+                ->group(static function (Router $router) {
                     $router->get('/user-security', [UserSecurityController::class, 'show'])
                         ->name('nova.pages.user-security');
                 });
@@ -325,7 +325,7 @@ class PendingRouteRegistration
 
         if (Nova::fortify()->enabled(Features::updatePasswords())) {
             Nova::router(middleware: $apiMiddlewares)
-                ->group(function (Router $router) {
+                ->group(static function (Router $router) {
                     $router->put('/user-security/password', [PasswordController::class, 'update']);
                 });
         }
@@ -339,7 +339,7 @@ class PendingRouteRegistration
     protected function bootstrapConfirmPasswordRoutes(Application $app, array $apiMiddlewares): void
     {
         Nova::router(middleware: $apiMiddlewares)
-            ->group(function (Router $router) {
+            ->group(static function (Router $router) {
                 $router->get('/user-security/confirm-password', [ConfirmablePasswordController::class, 'show'])
                     ->name('nova.pages.password.verify');
                 $router->get('/user-security/confirmed-password-status', [ConfirmedPasswordStatusController::class, 'show'])
@@ -374,13 +374,13 @@ class PendingRouteRegistration
         ]);
 
         Nova::router(middleware: $middlewaresWithLimiter)
-            ->group(function (Router $router) {
+            ->group(static function (Router $router) {
                 $router->get('/user-security/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'create'])->name('nova.two-factor.login');
                 $router->post('/user-security/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store']);
             });
 
         Nova::router(middleware: $twoFactorMiddlewares)
-            ->group(function (Router $router) {
+            ->group(static function (Router $router) {
                 $router->post('/user-security/two-factor-authentication', [TwoFactorAuthenticationController::class, 'store']);
                 $router->post('/user-security/confirmed-two-factor-authentication', [ConfirmedTwoFactorAuthenticationController::class, 'store']);
                 $router->delete('/user-security/two-factor-authentication', [TwoFactorAuthenticationController::class, 'destroy']);

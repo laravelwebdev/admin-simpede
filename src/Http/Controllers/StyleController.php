@@ -17,7 +17,7 @@ class StyleController extends Controller
     public function __invoke(NovaRequest $request): Style
     {
         $asset = collect(Nova::allStyles())
-            ->filter(fn ($asset) => $asset->name() === $request->style)
+            ->filter(static fn ($asset) => $asset->name() === $request->style)
             ->first();
 
         abort_if(is_null($asset), 404);

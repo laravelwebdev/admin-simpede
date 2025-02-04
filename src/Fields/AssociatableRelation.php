@@ -155,8 +155,8 @@ trait AssociatableRelation
         $query = app()->make(QueryBuilder::class, [$resourceClass]);
 
         return $query->search($request, $model->newQuery(), null, [], [], TrashedStatus::fromBoolean($withTrashed))
-                    ->tap(function (Builder $query) use ($request, $resourceClass, $model) {
-                        $this->applyAssociatableCallbacks($query, $request, $resourceClass, $model);
-                    });
+            ->tap(function (Builder $query) use ($request, $resourceClass, $model) {
+                $this->applyAssociatableCallbacks($query, $request, $resourceClass, $model);
+            });
     }
 }

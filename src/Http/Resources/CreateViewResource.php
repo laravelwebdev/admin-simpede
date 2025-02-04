@@ -17,9 +17,7 @@ class CreateViewResource extends Resource
     {
         $resource = $this->newResourceWith($request);
 
-        $resourceClass = $request->resource();
-
-        $resourceClass::authorizeToCreate($request);
+        $this->authorizedResourceForRequest($request);
 
         $fields = $resource->creationFieldsWithinPanels($request)->applyDependsOnWithDefaultValues($request);
 
@@ -37,5 +35,17 @@ class CreateViewResource extends Resource
     public function newResourceWith(ResourceCreateOrAttachRequest $request): NovaResource
     {
         return $request->newResource();
+    }
+
+    /**
+     * Determine if resource is authorized for the request.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function authorizedResourceForRequest(ResourceCreateOrAttachRequest $request): void
+    {
+        $resourceClass = $request->resource();
+
+        $resourceClass::authorizeToCreate($request);
     }
 }

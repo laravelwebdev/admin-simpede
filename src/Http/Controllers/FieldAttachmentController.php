@@ -17,9 +17,9 @@ class FieldAttachmentController extends Controller
     {
         /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Storable $field */
         $field = $request->newResource()
-                        ->availableFields($request)
-                        ->filter(fn ($field) => optional($field)->withFiles === true)
-                        ->findFieldByAttributeOrFail($request->field);
+            ->availableFields($request)
+            ->filter(static fn ($field) => optional($field)->withFiles === true)
+            ->findFieldByAttributeOrFail($request->field);
 
         /** @phpstan-ignore property.notFound */
         $payload = call_user_func($field->attachCallback, $request);
@@ -34,9 +34,9 @@ class FieldAttachmentController extends Controller
     {
         /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Storable $field */
         $field = $request->newResource()
-                        ->availableFields($request)
-                        ->filter(fn ($field) => optional($field)->withFiles === true)
-                        ->findFieldByAttributeOrFail($request->field);
+            ->availableFields($request)
+            ->filter(static fn ($field) => optional($field)->withFiles === true)
+            ->findFieldByAttributeOrFail($request->field);
 
         /** @phpstan-ignore property.notFound */
         call_user_func($field->detachCallback, $request);
@@ -51,9 +51,9 @@ class FieldAttachmentController extends Controller
     {
         /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Storable $field */
         $field = $request->newResource()
-                        ->availableFields($request)
-                        ->filter(fn ($field) => optional($field)->withFiles === true)
-                        ->findFieldByAttributeOrFail($request->field);
+            ->availableFields($request)
+            ->filter(static fn ($field) => optional($field)->withFiles === true)
+            ->findFieldByAttributeOrFail($request->field);
 
         /** @phpstan-ignore property.notFound */
         call_user_func($field->discardCallback, $request);

@@ -26,9 +26,9 @@ class RestoreResourceRequest extends DeletionRequest
     protected function restorableModels(Collection $models): Collection
     {
         return $models->mapInto($this->resource())
-                        ->filter->isSoftDeleted()
-                        ->filter->authorizedToRestore($this)
-                        ->map->model();
+            ->filter->isSoftDeleted()
+            ->filter->authorizedToRestore($this)
+            ->map->model();
     }
 
     /**

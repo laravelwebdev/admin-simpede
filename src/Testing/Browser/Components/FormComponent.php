@@ -46,7 +46,7 @@ class FormComponent extends Component
      */
     public function assert(Browser $browser): void
     {
-        tap($this->selector(), function ($selector) use ($browser) {
+        tap($this->selector(), function (string $selector) use ($browser) {
             $browser->pause(100)
                 ->waitFor($selector)
                 ->assertVisible($selector)

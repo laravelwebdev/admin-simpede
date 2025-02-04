@@ -34,8 +34,6 @@ trait TransformsResults
      */
     public function resolveTransformedValue($value)
     {
-        return transform($value, $this->transformCallback ?? function ($value) {
-            return $value;
-        });
+        return transform($value, $this->transformCallback ?? static fn ($value) => $value);
     }
 }

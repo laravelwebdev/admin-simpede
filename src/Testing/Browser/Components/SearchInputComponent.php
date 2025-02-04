@@ -39,7 +39,7 @@ class SearchInputComponent extends Component
     {
         $this->showSearchDropdown($browser);
 
-        $browser->elsewhereWhenAvailable("{$this->selector()}-dropdown", function ($browser) use ($search) {
+        $browser->elsewhereWhenAvailable("{$this->selector()}-dropdown", static function (Browser $browser) use ($search) {
             $browser->type('input[type="search"]', $search);
         });
 
@@ -77,8 +77,10 @@ class SearchInputComponent extends Component
      */
     public function selectSearchResult(Browser $browser, int $resultIndex): void
     {
-        $browser->elseWhereWhenAvailable("{$this->selector()}-dropdown", function ($browser) use ($resultIndex) {
-            $browser->whenAvailable("{$this->selector()}-result-{$resultIndex}", function ($browser) {
+        $selector = $this->selector();
+
+        $browser->elseWhereWhenAvailable("{$selector}-dropdown", static function (Browser $browser) use ($selector, $resultIndex) {
+            $browser->whenAvailable("{$selector}-result-{$resultIndex}", static function (Browser $browser) {
                 $browser->click('')->pause(300);
             });
         });
@@ -128,8 +130,10 @@ class SearchInputComponent extends Component
     {
         $this->showSearchDropdown($browser);
 
-        $browser->elsewhereWhenAvailable("{$this->selector()}-dropdown", function ($browser) use ($fieldCallback) {
-            $fieldCallback($browser, $this->selector());
+        $selector = $this->selector();
+
+        $browser->elsewhereWhenAvailable("{$selector}-dropdown", function (Browser $browser) use ($selector, $fieldCallback) {
+            call_user_func($fieldCallback, $browser, $selector);
 
             $this->cancelSelectingSearchResult($browser);
         });
@@ -150,7 +154,7 @@ class SearchInputComponent extends Component
     {
         $this->assertSelectedSearchResult($browser, $search);
 
-        $this->assertSearchResult($browser, function ($browser, $attribute) use ($search) {
+        $this->assertSearchResult($browser, static function (Browser $browser, $attribute) use ($search) {
             $browser->assertSeeIn("{$attribute}-result-0", $search)
                 ->assertNotPresent("{$attribute}-result-1")
                 ->assertNotPresent("{$attribute}-result-2")
@@ -164,7 +168,7 @@ class SearchInputComponent extends Component
      */
     public function assertEmptySearchResult(Browser $browser): void
     {
-        $this->assertSearchResult($browser, function ($browser, $attribute) {
+        $this->assertSearchResult($browser, static function (Browser $browser, $attribute) {
             $browser->assertNotPresent("{$attribute}-result-0")
                 ->assertNotPresent("{$attribute}-result-1")
                 ->assertNotPresent("{$attribute}-result-2")
@@ -178,7 +182,7 @@ class SearchInputComponent extends Component
      */
     public function assertSearchResultContains(Browser $browser, string|array $search): void
     {
-        $this->assertSearchResult($browser, function ($browser, $attribute) use ($search) {
+        $this->assertSearchResult($browser, static function (Browser $browser, $attribute) use ($search) {
             foreach (Arr::wrap($search) as $keyword) {
                 $browser->assertSeeIn("{$attribute}-results", $keyword);
             }
@@ -192,7 +196,7 @@ class SearchInputComponent extends Component
      */
     public function assertSearchResultDoesNotContains(Browser $browser, string $search): void
     {
-        $this->assertSearchResult($browser, function ($browser, $attribute) use ($search) {
+        $this->assertSearchResult($browser, static function (Browser $browser, $attribute) use ($search) {
             foreach (Arr::wrap($search) as $keyword) {
                 $browser->assertDontSeeIn("{$attribute}-results", $keyword);
             }

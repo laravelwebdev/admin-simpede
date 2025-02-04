@@ -20,8 +20,9 @@ abstract class BooleanFilter extends Filter
      */
     public function default()
     {
-        return collect($this->options(app(NovaRequest::class)))->values()->mapWithKeys(function ($option) {
-            return [$option => false];
-        })->all();
+        return collect($this->options(app(NovaRequest::class)))
+            ->values()
+            ->mapWithKeys(static fn ($option) => [$option => false])
+            ->all();
     }
 }

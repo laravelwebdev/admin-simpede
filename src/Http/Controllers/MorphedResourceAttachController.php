@@ -22,7 +22,7 @@ class MorphedResourceAttachController extends ResourceAttachController
     #[\Override]
     protected function initializePivot(NovaRequest $request, $relationship): Model|Pivot
     {
-        $model = tap($request->findResourceOrFail(), function ($resource) use ($request) {
+        $model = tap($request->findResourceOrFail(), static function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
         })->model();
 

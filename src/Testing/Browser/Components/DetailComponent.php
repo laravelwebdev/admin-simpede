@@ -33,7 +33,7 @@ class DetailComponent extends Component
      */
     public function openControlSelector(Browser $browser): void
     {
-        $browser->whenAvailable("@{$this->resourceId}-control-selector", function ($browser) {
+        $browser->whenAvailable("@{$this->resourceId}-control-selector", static function (Browser $browser) {
             $browser->click('');
         })->pause(100);
     }
@@ -51,7 +51,7 @@ class DetailComponent extends Component
      */
     public function assert(Browser $browser): void
     {
-        tap($this->selector(), function ($selector) use ($browser) {
+        tap($this->selector(), static function (string $selector) use ($browser) {
             $browser->pause(100)
                 ->waitFor($selector)
                 ->assertVisible($selector);

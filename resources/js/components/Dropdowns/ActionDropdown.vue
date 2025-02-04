@@ -18,10 +18,10 @@
     <component
       v-if="responseModalVisible"
       :show="responseModalVisible"
-      :is="actionResponseData?.modal"
+      :is="actionModalReponseData?.component"
       @confirm="handleResponseModalConfirm"
       @close="handleResponseModalClose"
-      :data="actionResponseData"
+      :data="actionModalReponseData?.payload ?? {}"
     />
 
     <Dropdown>
@@ -108,7 +108,7 @@ const {
   selectedAction,
   working,
   executeAction,
-  actionResponseData,
+  actionModalReponseData,
 } = useActions(props, emitter, store)
 
 const runAction = () => executeAction(() => emitter('actionExecuted'))

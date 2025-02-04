@@ -42,12 +42,12 @@ class CustomFilterCommand extends ComponentGeneratorCommand
         );
 
         // Filter.js replacements...
-        $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/resources/js/filter.js');
+        $files->replaceInFile('{{ component }}', $this->componentName(), $this->componentPath().'/resources/js/filter.js');
 
         // Filter.php replacements...
-        $this->replace('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/Filter.stub');
-        $this->replace('{{ class }}', $this->componentClass(), $this->componentPath().'/src/Filter.stub');
-        $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/Filter.stub');
+        $files->replaceInFile('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/Filter.stub');
+        $files->replaceInFile('{{ class }}', $this->componentClass(), $this->componentPath().'/src/Filter.stub');
+        $files->replaceInFile('{{ component }}', $this->componentName(), $this->componentPath().'/src/Filter.stub');
 
         $files->move(
             $this->componentPath().'/src/Filter.stub',
@@ -55,14 +55,14 @@ class CustomFilterCommand extends ComponentGeneratorCommand
         );
 
         // FilterServiceProvider.php replacements...
-        $this->replace('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/FilterServiceProvider.stub');
-        $this->replace('{{ component }}', $this->componentName(), $this->componentPath().'/src/FilterServiceProvider.stub');
+        $files->replaceInFile('{{ namespace }}', $this->componentNamespace(), $this->componentPath().'/src/FilterServiceProvider.stub');
+        $files->replaceInFile('{{ component }}', $this->componentName(), $this->componentPath().'/src/FilterServiceProvider.stub');
 
         // webpack.mix.js replacements...
-        $this->replace('{{ name }}', $this->component(), $this->componentPath().'/webpack.mix.js');
+        $files->replaceInFile('{{ name }}', $this->component(), $this->componentPath().'/webpack.mix.js');
 
         // Filter composer.json replacements...
-        $this->prepareComposerReplacements();
+        $this->prepareComposerReplacements($files);
 
         // Rename the stubs with the proper file extensions...
         $this->renameStubs();

@@ -17,7 +17,7 @@ class NotificationDeleteAllController extends Controller
     {
         $userId = Nova::user($request)->getKey();
 
-        dispatch(function () use ($userId) {
+        dispatch(static function () use ($userId) {
             Notification::whereNotifiableId($userId)->delete();
         })->afterResponse();
 

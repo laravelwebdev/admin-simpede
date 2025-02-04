@@ -53,7 +53,7 @@ trait Expandable
         }
 
         return isset($this->expandableCallback)
-                        ? call_user_func($this->expandableCallback)
-                        : false;
+            ? call_user_func($this->expandableCallback)
+            : false;
     }
 }

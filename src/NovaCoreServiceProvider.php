@@ -53,9 +53,9 @@ class NovaCoreServiceProvider extends ServiceProvider
         Route::middlewareGroup('nova:api', config('nova.api_middleware', []));
 
         $this->app->make(HttpKernel::class)
-                    ->pushMiddleware(ServeNova::class);
+            ->pushMiddleware(ServeNova::class);
 
-        $this->app->afterResolving(NovaRequest::class, function ($request, $app) {
+        $this->app->afterResolving(NovaRequest::class, static function ($request, $app) {
             if (! $app->bound(NovaRequest::class)) {
                 $app->instance(NovaRequest::class, $request);
             }
@@ -77,7 +77,7 @@ class NovaCoreServiceProvider extends ServiceProvider
 
         $this->app->singleton(ImpersonatesUsers::class, SessionImpersonator::class);
 
-        $this->app->bind(QueryBuilder::class, fn ($app, $parameters) => new Builder(...$parameters));
+        $this->app->bind(QueryBuilder::class, static fn ($app, $parameters) => new Builder(...$parameters));
 
         $this->registerAboutCommand();
     }
@@ -87,8 +87,8 @@ class NovaCoreServiceProvider extends ServiceProvider
      */
     protected function registerAboutCommand(): void
     {
-        AboutCommand::add('Nova', function () {
-            $formatEnabledStatus = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
+        AboutCommand::add('Nova', static function () {
+            $formatEnabledStatus = static fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
 
             return [
                 'Version' => fn () => Nova::version(),
@@ -97,21 +97,21 @@ class NovaCoreServiceProvider extends ServiceProvider
 
                 'Theme Switcher' => AboutCommand::format(Nova::$withThemeSwitcher, console: $formatEnabledStatus),
                 'RTL Enabled' => AboutCommand::format(Nova::rtlEnabled(), console: $formatEnabledStatus),
-                'Pagination' => fn () => config('nova.pagination'),
-                'Storage Disk' => fn () => config('nova.storage_disk'),
-                'Currency' => fn () => config('nova.currency'),
+                'Pagination' => static fn () => config('nova.pagination'),
+                'Storage Disk' => static fn () => config('nova.storage_disk'),
+                'Currency' => static fn () => config('nova.currency'),
 
                 'Notification Center' => AboutCommand::format(Nova::$withNotificationCenter, console: $formatEnabledStatus),
-                'Notification Polling' => AboutCommand::format(Nova::$notificationPollingInterval, console: fn ($value) => "{$value}s"),
+                'Notification Polling' => AboutCommand::format(Nova::$notificationPollingInterval, console: static fn ($value) => "{$value}s"),
 
                 'Authentication' => AboutCommand::format(Nova::routes()->withAuthentication, console: $formatEnabledStatus),
-                'Authentication Guard' => AboutCommand::format(config('nova.guard'), console: fn ($value) => $value ?? 'null'),
+                'Authentication Guard' => AboutCommand::format(config('nova.guard'), console: static fn ($value) => $value ?? 'null'),
 
                 'Password Reset' => AboutCommand::format(Nova::routes()->withPasswordReset, console: $formatEnabledStatus),
-                'Password Reset Broker' => AboutCommand::format(config('nova.passwords'), console: fn ($value) => $value ?? 'null'),
+                'Password Reset Broker' => AboutCommand::format(config('nova.passwords'), console: static fn ($value) => $value ?? 'null'),
 
                 'Global Search' => AboutCommand::format(Nova::$withGlobalSearch, console: $formatEnabledStatus),
-                'Global Debounce' => AboutCOmmand::format(Nova::$debounce, console: fn ($value) => "{$value}s"),
+                'Global Debounce' => AboutCOmmand::format(Nova::$debounce, console: static fn ($value) => "{$value}s"),
             ];
         });
     }
@@ -121,17 +121,17 @@ class NovaCoreServiceProvider extends ServiceProvider
      */
     protected function registerEvents(): void
     {
-        tap($this->app['events'], function ($event) {
-            $event->listen(Attempting::class, function () {
+        tap($this->app['events'], static function ($event) {
+            $event->listen(Attempting::class, static function () {
                 app(ImpersonatesUsers::class)->flushImpersonationData(request());
             });
 
-            $event->listen(Logout::class, function () {
+            $event->listen(Logout::class, static function () {
                 app(ImpersonatesUsers::class)->flushImpersonationData(request());
             });
 
             /** @phpstan-ignore class.notFound */
-            $event->listen(RequestReceived::class, function ($event) {
+            $event->listen(RequestReceived::class, static function ($event) {
                 Nova::flushState();
                 /** @phpstan-ignore class.notFound */
                 if (class_exists(Cache::class)) {
@@ -141,7 +141,7 @@ class NovaCoreServiceProvider extends ServiceProvider
                 $event->sandbox->forgetInstance(ImpersonatesUsers::class);
             });
 
-            $event->listen(RequestHandled::class, function ($event) {
+            $event->listen(RequestHandled::class, static function ($event) {
                 Container::getInstance()->forgetInstance(NovaRequest::class);
             });
         });
@@ -193,17 +193,17 @@ class NovaCoreServiceProvider extends ServiceProvider
      */
     protected function registerJsonVariables(): void
     {
-        Nova::serving(function (ServingNova $event) {
+        Nova::serving(static function (ServingNova $event) {
             // Load the default Nova translations.
             Nova::translations(
-                lang_path('vendor/nova/'.app()->getLocale().'.json')
+                lang_path("vendor/nova/{$event->app->getLocale()}.json")
             );
 
             Nova::provideToScript([
                 'appName' => Nova::name() ?? config('app.name', 'Laravel Nova'), /** @phpstan-ignore nullCoalesce.expr */
                 'timezone' => config('app.timezone', 'UTC'),
-                'translations' => fn () => Nova::allTranslations(),
-                'userTimezone' => fn ($request) => Nova::resolveUserTimezone($request),
+                'translations' => static fn () => Nova::allTranslations(),
+                'userTimezone' => static fn ($request) => Nova::resolveUserTimezone($request),
                 'pagination' => config('nova.pagination', 'links'),
                 'locale' => config('app.locale', 'en'),
                 'algoliaAppId' => config('services.algolia.appId'),

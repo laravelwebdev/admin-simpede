@@ -60,7 +60,7 @@ class ResourceUpdateController extends Controller
                 return [$model, $resource];
             });
 
-            tap(Nova::user($request), function ($user) use ($model) {
+            tap(Nova::user($request), static function ($user) use ($model) {
                 if (get_class($model) === Util::userModel() && $model->is($user)) {
                     $user->refresh();
                 }

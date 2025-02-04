@@ -76,7 +76,7 @@ class TabsGroup extends Panel
     {
         $panel->name = $fields[0]->panel;
 
-        tap($fields[0]->panel, function ($original) use ($panel) {
+        tap($fields[0]->panel, static function ($original) use ($panel) {
             $panel->showTitle = $original->showTitle;
             $panel->showToolbar = $original->showToolbar;
             $panel->attribute = $original->attribute;

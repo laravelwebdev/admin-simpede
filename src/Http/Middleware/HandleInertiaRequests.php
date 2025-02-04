@@ -47,11 +47,9 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request)
     {
         return array_merge(parent::share($request), [
-            'novaConfig' => function () use ($request) {
-                return Nova::jsonVariables($request);
-            },
-            'currentUser' => function () use ($request) {
-                return with(Nova::user($request), function ($user) use ($request) {
+            'novaConfig' => static fn () => Nova::jsonVariables($request),
+            'currentUser' => static function () use ($request) {
+                return with(Nova::user($request), static function ($user) use ($request) {
                     return ! is_null($user) ? UserResource::make($user)->toArray($request) : null;
                 });
             },

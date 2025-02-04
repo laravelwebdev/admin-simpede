@@ -22,12 +22,14 @@ class DetailViewResource extends Resource
      */
     public function toArray($request)
     {
-        $resource = $this->authorizedResourceForRequest($request);
+        $resource = $this->newResourceWith($request);
 
-        $payload = with($resource->serializeForDetail($request, $resource), function ($detail) use ($request) {
+        $this->authorizedResourceForRequest($request, $resource);
+
+        $payload = with($resource->serializeForDetail($request, $resource), static function ($detail) use ($request) {
             $detail['fields'] = collect($detail['fields'])
-                ->when($request->viaResource, function ($fields) use ($request) {
-                    return $fields->reject(function ($field) use ($request) {
+                ->when($request->viaResource, static function ($fields) use ($request) {
+                    return $fields->reject(static function ($field) use ($request) {
                         /** @var \Laravel\Nova\Fields\Field $field */
                         if ($field instanceof ListableField) {
                             return true;
@@ -55,18 +57,27 @@ class DetailViewResource extends Resource
     }
 
     /**
-     * Get authorized resource for the request.
+     * Get current resource for the request.
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function authorizedResourceForRequest(ResourceDetailRequest $request): NovaResource
+    public function newResourceWith(ResourceDetailRequest $request): NovaResource
     {
-        return tap($request->newResourceWith(
-            tap($request->findModelQuery(), function ($query) use ($request) {
+        return $request->newResourceWith(
+            tap($request->findModelQuery(), static function ($query) use ($request) {
                 $resource = $request->resource();
                 $resource::detailQuery($request, $query);
             })->firstOrFail()
-        ))->authorizeToView($request);
+        );
+    }
+
+    /**
+     * Determine if resource is authorized for the request.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function authorizedResourceForRequest(ResourceDetailRequest $request, NovaResource $resource): void
+    {
+        $resource->authorizeToView($request);
     }
 }

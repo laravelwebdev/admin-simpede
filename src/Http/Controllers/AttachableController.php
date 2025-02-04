@@ -16,10 +16,10 @@ class AttachableController extends Controller
         $field = $request->newResource()
                     ->availableFields($request)
                     ->filterForManyToManyRelations()
-                    ->filter(function ($field) use ($request) {
+                    ->filter(static function ($field) use ($request) {
                         return $field->resourceName === $request->field && // @phpstan-ignore property.notFound
-                                    $field->component === $request->component &&
-                                    $field->attribute === $request->viaRelationship;
+                            $field->component === $request->component &&
+                            $field->attribute === $request->viaRelationship;
                     })->first();
 
         abort_if(is_null($field), 404);
@@ -38,9 +38,9 @@ class AttachableController extends Controller
                 ->get()
                 ->mapInto($field->resourceClass)  // @phpstan-ignore property.notFound
                 ->filter->authorizedToAttach($request, $model)
-                ->map(fn ($resource) => $field->formatAttachableResource($request, $resource))
+                ->map(static fn ($resource) => $field->formatAttachableResource($request, $resource))
                 ->when(
-                    $shouldReorderAttachableValues, fn ($collection) => $collection->sortBy('display', SORT_NATURAL | SORT_FLAG_CASE)
+                    $shouldReorderAttachableValues, static fn ($collection) => $collection->sortBy('display', SORT_NATURAL | SORT_FLAG_CASE)
                 )->values(),
             'withTrashed' => $withTrashed,
             'softDeletes' => $associatedResource::softDeletes(),
@@ -78,7 +78,7 @@ class AttachableController extends Controller
      */
     protected function getAttachableQueryResolver(NovaRequest $request, PivotableField $field)
     {
-        return function ($query) use ($request, $field) {
+        return static function ($query) use ($request, $field) {
             if (
                 $request->first === 'true'
                 || $field->allowDuplicateRelations /** @phpstan-ignore property.notFound */
@@ -87,7 +87,7 @@ class AttachableController extends Controller
                 return;
             }
 
-            $query->whereNotExists(function ($query) use ($field, $relatedModel) {
+            $query->whereNotExists(static function ($query) use ($field, $relatedModel) {
                 /** @phpstan-ignore property.notFound */
                 $relation = $relatedModel->{$field->manyToManyRelationship}();
 

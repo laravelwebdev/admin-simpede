@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Console;
 
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Laravel\Nova\Events\NovaServiceProviderRegistered;
 use Laravel\Nova\Events\ServingNova;
@@ -187,7 +188,10 @@ class PolicyMakeCommand extends \Illuminate\Foundation\Console\PolicyMakeCommand
             return;
         }
 
-        ServingNova::dispatch(NovaRequest::create('/', 'OPTIONS'));
+        /** @var \Illuminate\Contracts\Foundation\Application $app */
+        $app = Container::getInstance();
+
+        ServingNova::dispatch($app, NovaRequest::create('/', 'OPTIONS'));
         NovaServiceProviderRegistered::dispatch();
 
         $resourceClass = suggest(

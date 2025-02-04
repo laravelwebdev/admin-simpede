@@ -115,8 +115,8 @@ class MenuItem implements JsonSerializable
         return static::make($resourceClass::label())
             ->forResource($resourceClass)
             ->path('/resources/'.$resourceClass::uriKey())
-            ->activeWhen(fn ($request, $url) => ! $request->routeIs('nova.pages.lens') ? $url->active() : false)
-            ->canSee(fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
+            ->activeWhen(static fn ($request, $url) => ! $request->routeIs('nova.pages.lens') ? $url->active() : false)
+            ->canSee(static fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
     }
 
     /**
@@ -128,10 +128,10 @@ class MenuItem implements JsonSerializable
      */
     public static function lens(string $resourceClass, string $lensClass)
     {
-        return with(new $lensClass, function ($lens) use ($resourceClass) {
+        return with(new $lensClass, static function ($lens) use ($resourceClass) {
             return static::make($lens->name())
                 ->path('/resources/'.$resourceClass::uriKey().'/lens/'.$lens->uriKey())
-                ->canSee(fn ($request) => $lens->authorizedToSee($request));
+                ->canSee(static fn ($request) => $lens->authorizedToSee($request));
         });
     }
 
@@ -151,8 +151,8 @@ class MenuItem implements JsonSerializable
             $item->applies($filter, $value);
         }
 
-        return $item->activeWhen(fn ($request, $url) => "/{$request->path()}?{$request->getQueryString()}" === (string) $url)
-            ->canSee(fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
+        return $item->activeWhen(static fn ($request, $url) => "/{$request->path()}?{$request->getQueryString()}" === (string) $url)
+            ->canSee(static fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
     }
 
     /**
@@ -229,11 +229,11 @@ class MenuItem implements JsonSerializable
      */
     public static function dashboard(string $dashboard)
     {
-        return with(new $dashboard, function ($dashboard) {
+        return with(new $dashboard, static function ($dashboard) {
             return static::make(
                 $dashboard->label(),
                 '/dashboards/'.$dashboard->uriKey()
-            )->canSee(fn ($request) => $dashboard->authorizedToSee($request));
+            )->canSee(static fn ($request) => $dashboard->authorizedToSee($request));
         });
     }
 
@@ -374,7 +374,7 @@ class MenuItem implements JsonSerializable
      */
     public function activeUnless(callable|bool $activeMenuCallback)
     {
-        $this->activeMenuCallback = function ($request, $url) use ($activeMenuCallback) {
+        $this->activeMenuCallback = static function ($request, $url) use ($activeMenuCallback) {
             return value($activeMenuCallback, $request, $url) === false;
         };
 
@@ -390,9 +390,7 @@ class MenuItem implements JsonSerializable
     {
         $url = URL::make($this->path, $this->external);
 
-        $activeMenuCallback = $this->activeMenuCallback ?? function ($request, $url) {
-            return $url->active();
-        };
+        $activeMenuCallback = $this->activeMenuCallback ?? static fn ($request, $url) => $url->active();
 
         return [
             'name' => Nova::__($this->name),

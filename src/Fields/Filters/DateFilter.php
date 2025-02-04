@@ -22,8 +22,8 @@ class DateFilter extends Filter
      */
     public function apply(NovaRequest $request, Builder $query, mixed $value)
     {
-        $value = collect($value)->transform(function ($value) {
-            return ! empty($value) ? rescue(function () use ($value) {
+        $value = collect($value)->transform(static function ($value) {
+            return ! empty($value) ? rescue(static function () use ($value) {
                 return CarbonImmutable::createFromFormat('Y-m-d', $value);
             }, null) : null;
         });

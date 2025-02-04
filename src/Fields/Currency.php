@@ -32,9 +32,14 @@ class Currency extends Number
     /**
      * The currency of the value.
      *
-     * @var string
+     * @var string|null
      */
-    public $currency;
+    public $currency = null;
+
+    /**
+     * The default currency for Nova.
+     */
+    public string $defaultCurrency;
 
     /**
      * The symbol used by the currency.
@@ -70,16 +75,18 @@ class Currency extends Number
         parent::__construct($name, $attribute, $resolveCallback);
 
         $this->locale = config('app.locale', 'en');
-        $this->currency = config('nova.currency', 'USD');
+        $this->defaultCurrency = config('nova.currency', 'USD');
 
         $this->step($this->getStepValue())
             ->fillUsing(function ($request, $model, $attribute, $requestAttribute) {
                 $value = $request->$requestAttribute;
 
                 if ($this->minorUnits && ! $this->isValidNullValue($value)) {
+                    $currency = $this->currency ?? $this->defaultCurrency;
+
                     $model->$attribute = $this->toMoneyInstance(
-                        $value * (10 ** Currencies::getFractionDigits($this->currency)),
-                        $this->currency
+                        $value * (10 ** Currencies::getFractionDigits($currency)),
+                        $currency
                     )->getMinorAmount()->toInt();
                 } else {
                     $model->$attribute = $value;
@@ -102,7 +109,7 @@ class Currency extends Number
      */
     public function toMoneyInstance(mixed $value, ?string $currency = null): Money
     {
-        $currency ??= $this->currency;
+        $currency ??= ($this->currency ?? $this->defaultCurrency);
         $method = $this->minorUnits ? 'ofMinor' : 'of';
 
         $context = $this->context ?? new CustomContext(Currencies::getFractionDigits($currency));
@@ -136,11 +143,15 @@ class Currency extends Number
      *
      * @return $this
      */
-    public function currency(string $currency)
+    public function currency(?string $currency)
     {
-        $this->currency = strtoupper($currency);
+        if (! empty($currency)) {
+            $this->currency = strtoupper($currency);
 
-        $this->step($this->getStepValue());
+            $this->step($this->getStepValue());
+        } else {
+            $this->currency = null;
+        }
 
         return $this;
     }
@@ -198,11 +209,17 @@ class Currency extends Number
      */
     public function resolveCurrencySymbol(): string
     {
-        if ($this->currencySymbol) {
+        if (! is_null($this->currencySymbol)) {
             return $this->currencySymbol;
         }
 
-        return Currencies::getSymbol($this->currency);
+        $currency = $this->currency ?? $this->defaultCurrency;
+
+        return tap(Currencies::getSymbol($currency), function (?string $symbol) use ($currency) {
+            if (is_null($symbol)) {
+                trigger_deprecation('laravel/nova', '5.2.0', 'Unable to retrieve currency symbol for "%s" currency', $currency);
+            }
+        }) ?? '';
     }
 
     /**
@@ -235,7 +252,9 @@ class Currency extends Number
      */
     protected function getStepValue(): string
     {
-        return (string) 0.1 ** Currencies::getFractionDigits($this->currency);
+        $currency = $this->currency ?? $this->defaultCurrency;
+
+        return (string) 0.1 ** Currencies::getFractionDigits($currency);
     }
 
     /**

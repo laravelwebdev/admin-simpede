@@ -23,7 +23,7 @@ trait InteractsWithElements
     public function closeCurrentDropdown(Browser $browser, bool $throwIfMissing = false): void
     {
         try {
-            $browser->elseWhereWhenAvailable('@dropdown-teleported', function (Browser $browser) {
+            $browser->elseWhereWhenAvailable('@dropdown-teleported', static function (Browser $browser) {
                 $element = $browser->element('@dropdown-overlay');
 
                 if (! is_null($element) && $element->isDisplayed()) {
@@ -99,7 +99,7 @@ trait InteractsWithElements
     {
         $date = explode($separator, $date);
 
-        array_map(function ($group) use ($date, $browser, $selector) {
+        array_map(static function (string $group) use ($date, $browser, $selector) {
             if (strtolower($group) === 'am') {
                 $browser->type($selector, 'a');
             } elseif (strtolower($group) === 'pm') {

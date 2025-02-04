@@ -46,7 +46,7 @@ class Email extends Text implements FilterableField
      */
     protected function makeFilter(NovaRequest $request)
     {
-        return tap(new TextFilter($this), function ($filter) {
+        return tap(new TextFilter($this), static function ($filter) {
             $filter->component = 'email-field';
         });
     }
@@ -56,19 +56,17 @@ class Email extends Text implements FilterableField
      */
     public function serializeForFilter(): array
     {
-        return transform($this->jsonSerialize(), function ($field) {
-            return Arr::only($field, [
-                'uniqueKey',
-                'name',
-                'attribute',
-                'type',
-                'min',
-                'max',
-                'step',
-                'pattern',
-                'placeholder',
-                'extraAttributes',
-            ]);
-        });
+        return transform($this->jsonSerialize(), static fn ($field) => Arr::only($field, [
+            'uniqueKey',
+            'name',
+            'attribute',
+            'type',
+            'min',
+            'max',
+            'step',
+            'pattern',
+            'placeholder',
+            'extraAttributes',
+        ]));
     }
 }

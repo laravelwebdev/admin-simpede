@@ -30,8 +30,8 @@ trait Filterable
         }
 
         $this->filterableCallback = ! is_null($filterableCallback)
-                                        ? $filterableCallback
-                                        : $this->defaultFilterableCallback();
+            ? $filterableCallback
+            : $this->defaultFilterableCallback();
 
         return $this;
     }

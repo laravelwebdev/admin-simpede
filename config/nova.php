@@ -2,6 +2,7 @@
 
 use Laravel\Nova\Actions\ActionResource;
 use Laravel\Nova\Http\Middleware\Authenticate;
+use Laravel\Nova\Http\Middleware\AuthenticateSession;
 use Laravel\Nova\Http\Middleware\Authorize;
 use Laravel\Nova\Http\Middleware\BootTools;
 use Laravel\Nova\Http\Middleware\DispatchServingNovaEvent;
@@ -96,6 +97,7 @@ return [
     'api_middleware' => [
         'nova',
         Authenticate::class,
+        // AuthenticateSession::class,
         // EnsureEmailIsVerified::class,
         Authorize::class,
     ],

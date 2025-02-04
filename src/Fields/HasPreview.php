@@ -30,7 +30,7 @@ trait HasPreview
     public function resolvePreviewUrl(): ?string
     {
         return is_callable($this->previewUrlCallback)
-                    ? call_user_func($this->previewUrlCallback, $this->value, $this->getStorageDisk(), $this->resource)
-                    : null;
+            ? call_user_func($this->previewUrlCallback, $this->value, $this->getStorageDisk(), $this->resource)
+            : null;
     }
 }
