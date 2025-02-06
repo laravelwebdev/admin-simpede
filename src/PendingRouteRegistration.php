@@ -188,7 +188,7 @@ class PendingRouteRegistration
      */
     public function register()
     {
-        Nova::fortify();
+        Nova::fortify()->bootstrap();
 
         return $this;
     }

@@ -161,18 +161,18 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     /**
      * The pagination per-page options used the resource via relationship.
      *
-     * @var int|null
+     * @var int
      *
      * @deprecated use `$perPageViaRelationshipOptions` instead.
      */
-    public static $perPageViaRelationship = null;
+    public static $perPageViaRelationship = 5;
 
     /**
      * The number of resources to show per page via relationships.
      *
      * @var int|array<int, int>|null
      */
-    public static $perPageViaRelationshipOptions = [5];
+    public static $perPageViaRelationshipOptions = null;
 
     /**
      * The cached soft deleting statuses for various resources.
@@ -466,8 +466,12 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
      */
     public static function perPageViaRelationshipOptions()
     {
+        if (is_null(static::$perPageViaRelationshipOptions) && is_int(static::$perPageViaRelationship)) {
+            static::$perPageViaRelationshipOptions = [static::$perPageViaRelationship];
+        }
+
         return transform(
-            static::$perPageViaRelationshipOptions ?? static::$perPageViaRelationship ?? null,
+            static::$perPageViaRelationshipOptions,
             static fn ($perPageOptions) => Arr::wrap($perPageOptions),
             [5],
         );

@@ -33,9 +33,7 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     protected function bootAuthentication()
     {
-        $this->gate();
-
-        Nova::fortify()->bootstrap();
+        //
     }
 
     /**
@@ -154,6 +152,7 @@ class NovaApplicationServiceProvider extends ServiceProvider
         $this->fortify();
 
         $this->booted(function () {
+            $this->gate();
             $this->bootAuthentication();
             $this->bootRoutes();
         });
