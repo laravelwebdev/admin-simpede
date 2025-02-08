@@ -142,6 +142,7 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
      */
     public function resolveFields(NovaRequest $request)
     {
+        /** @phpstan-ignore return.type */
         return $this->availableFields($request)
             ->filterForIndex($request, $this->resource)
             ->withoutListableFields()

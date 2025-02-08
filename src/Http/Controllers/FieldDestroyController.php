@@ -4,7 +4,7 @@ namespace Laravel\Nova\Http\Controllers;
 
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Laravel\Nova\Contracts\Downloadable;
+use Laravel\Nova\Contracts\Deletable;
 use Laravel\Nova\DeleteField;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
@@ -20,8 +20,9 @@ class FieldDestroyController extends Controller
 
         $resource->authorizeToUpdate($request);
 
+        /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Deletable $field */
         $field = $resource->updateFields($request)
-            ->whereInstanceOf(Downloadable::class)
+            ->whereInstanceOf(Deletable::class)
             ->findFieldByAttributeOrFail($request->field);
 
         DeleteField::forRequest(

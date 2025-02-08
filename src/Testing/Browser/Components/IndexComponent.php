@@ -355,8 +355,6 @@ class IndexComponent extends Component
     /**
      * Select the standalone action with the given URI key.
      *
-     * @param  string  $uriKey
-     * @param  callable  $fieldCallback
      * @return void
      *
      * @throws \Facebook\WebDriver\Exception\TimeOutException
@@ -393,8 +391,6 @@ class IndexComponent extends Component
     /**
      * Run the standalone action with the given URI key.
      *
-     * @param  string  $uriKey
-     * @param  callable|null  $fieldCallback
      * @return void
      *
      * @throws \Facebook\WebDriver\Exception\TimeOutException

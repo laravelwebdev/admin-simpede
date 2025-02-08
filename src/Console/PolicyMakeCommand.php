@@ -26,13 +26,6 @@ class PolicyMakeCommand extends \Illuminate\Foundation\Console\PolicyMakeCommand
      */
     protected $name = 'nova:policy';
 
-    /** {@inheritDoc} */
-    #[\Override]
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        parent::initialize($input, $output);
-    }
-
     /**
      * Build the class with the given name.
      *

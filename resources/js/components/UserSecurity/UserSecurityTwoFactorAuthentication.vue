@@ -122,7 +122,7 @@
           <div class="col-span-full sm:col-span-4">
             <template v-if="!twoFactorEnabled">
               <ConfirmsPassword
-                :mode="requiresConfirmPassword ? 'always' : 'timeout'"
+                :required="requiresConfirmPassword"
                 @confirmed="enableTwoFactorAuthentication"
               >
                 <Button
@@ -143,7 +143,10 @@
                 class="inline-flex items-center me-3"
               />
 
-              <ConfirmsPassword @confirmed="regenerateRecoveryCodes">
+              <ConfirmsPassword
+                :required="requiresConfirmPassword"
+                @confirmed="regenerateRecoveryCodes"
+              >
                 <Button
                   v-if="recoveryCodes.length > 0 && !confirming"
                   variant="outline"
@@ -152,7 +155,10 @@
                 />
               </ConfirmsPassword>
 
-              <ConfirmsPassword @confirmed="showRecoveryCodes">
+              <ConfirmsPassword
+                :required="requiresConfirmPassword"
+                @confirmed="showRecoveryCodes"
+              >
                 <Button
                   v-if="recoveryCodes.length === 0 && !confirming"
                   variant="outline"
@@ -172,7 +178,7 @@
               />
 
               <ConfirmsPassword
-                :mode="requiresConfirmPassword ? 'always' : 'timeout'"
+                :required="requiresConfirmPassword"
                 @confirmed="disableTwoFactorAuthentication"
               >
                 <Button
@@ -194,6 +200,7 @@
 
 <script>
 import { Button } from 'laravel-nova-ui'
+import isNil from 'lodash/isNil'
 
 export default {
   name: 'UserSecurityTwoFactorAuthentication',
@@ -221,27 +228,36 @@ export default {
     }
   },
 
+  watch: {
+    twoFactorEnabled(newValue) {
+      if (!newValue) {
+        confirmationForm.reset()
+        confirmationForm.errors.clear()
+      }
+    },
+  },
+
   methods: {
     enableTwoFactorAuthentication() {
       this.enabling = true
 
-      Nova.request()
-        .post(Nova.url('/user-security/two-factor-authentication'))
-        .then(() => {
-          Nova.$router.reload({
-            only: ['user'],
-            onSuccess: () =>
-              Promise.all([
-                this.showQrCode(),
-                this.showSetupKey(),
-                this.showRecoveryCodes(),
-              ]),
-          })
-        })
-        .finally(() => {
-          this.enabling = false
-          this.confirming = this.requiresConfirmation
-        })
+      Nova.$router.post(
+        Nova.url('/user-security/two-factor-authentication'),
+        {},
+        {
+          preserveScroll: true,
+          onSuccess: () =>
+            Promise.all([
+              this.showQrCode(),
+              this.showSetupKey(),
+              this.showRecoveryCodes(),
+            ]),
+          onFinish: () => {
+            this.enabling = false
+            this.confirming = this.requiresConfirmation
+          },
+        }
+      )
     },
 
     showQrCode() {
@@ -287,14 +303,16 @@ export default {
     disableTwoFactorAuthentication() {
       this.disabling = true
 
-      Nova.request()
-        .delete(Nova.url('/user-security/two-factor-authentication'))
-        .then(() => {
-          this.disabling = false
-          this.confirming = false
-
-          Nova.$router.reload({ only: ['user'] })
-        })
+      Nova.$router.delete(
+        Nova.url('/user-security/two-factor-authentication'),
+        {
+          preserveScroll: true,
+          onSuccess: () => {
+            this.disabling = false
+            this.confirming = false
+          },
+        }
+      )
     },
   },
 

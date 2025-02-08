@@ -16,12 +16,15 @@ class ActionModelCollection extends EloquentCollection
 {
     /**
      * Remove models the user does not have permission to execute the action against.
+     *
+     * @return static<TKey, TModel>
      */
     public function filterForExecution(ActionRequest $request): static
     {
         $action = $request->action();
         $isPivotAction = $request->isPivotAction();
 
+        /** @phpstan-ignore return.type */
         return new static($this->filter(function ($model) use ($request, $action, $isPivotAction) {
             if ($isPivotAction || $action->runCallback) {
                 return $action->authorizedToRun($request, $model);

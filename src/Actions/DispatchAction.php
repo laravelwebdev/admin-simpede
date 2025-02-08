@@ -70,7 +70,7 @@ class DispatchAction
     public function dispatch(): Response
     {
         if ($this->action instanceof ShouldQueue) {
-            return tap(new Response, function ($response) {
+            return tap(new Response, function (Response $response) {
                 with($response, $this->dispatchableCallback);
 
                 if (! is_null($this->batchJob)) {
@@ -186,7 +186,7 @@ class DispatchAction
      */
     protected function dispatchSynchronouslyForCollection(string $method, Collection $models): mixed
     {
-        return Transaction::run(function ($batchId) use ($method, $models) {
+        return Transaction::run(function (string $batchId) use ($method, $models) {
             Nova::usingActionEvent(function ($actionEvent) use ($batchId, $models) {
                 if (! $this->action->withoutActionEvents) {
                     $actionEvent->createForModels(
@@ -212,7 +212,7 @@ class DispatchAction
      */
     protected function addQueuedActionJob(string $method, Collection $models): mixed
     {
-        return Transaction::run(function ($batchId) use ($method, $models) {
+        return Transaction::run(function (string $batchId) use ($method, $models) {
             Nova::usingActionEvent(function ($actionEvent) use ($batchId, $models) {
                 if (! $this->action->withoutActionEvents) {
                     $actionEvent->createForModels(

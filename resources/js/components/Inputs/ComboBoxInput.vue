@@ -133,14 +133,16 @@ useEventListener(document, 'keydown', event => {
   // 'tab' or 'escape'
   if ([9, 27].includes(event.keyCode)) {
     setTimeout(() => close(), 50)
+  }
+})
 
+useEventListener(searchInputRef, 'keydown', event => {
+  if (dropdownShown.value !== true) {
     return
   }
 
   if (event.composed && [13, 229].includes(event.keyCode)) {
     searchText.value = event.target.value
-
-    return
   }
 })
 

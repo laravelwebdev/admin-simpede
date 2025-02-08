@@ -35,6 +35,7 @@ trait ResolvesFields
      */
     public function indexFields(NovaRequest $request): FieldCollection
     {
+        /** @phpstan-ignore return.type */
         return $this->availableFields($request)
             ->when($request->viaManyToMany(), $this->relatedFieldResolverCallback($request))
             ->filterForIndex($request, $this->resource)
@@ -50,6 +51,7 @@ trait ResolvesFields
      */
     public function detailFields(NovaRequest $request): FieldCollection
     {
+        /** @phpstan-ignore return.type */
         return $this->availableFields($request)
             ->when($request->viaManyToMany(), $this->fieldResolverCallback($request))
             ->when($this->shouldAddActionsField($request), fn ($fields) => $fields->push($this->actionEventsField()))
@@ -156,6 +158,7 @@ trait ResolvesFields
      */
     public function deletableFields(NovaRequest $request): FieldCollection
     {
+        /** @phpstan-ignore return.type */
         return $this->availableFieldsOnIndexOrDetail($request)
             ->when($request->viaManyToMany(), $this->fieldResolverCallback($request))
             ->reject(static fn ($field) => $field instanceof Unfillable)
@@ -175,6 +178,7 @@ trait ResolvesFields
      */
     public function downloadableFields(NovaRequest $request): FieldCollection
     {
+        /** @phpstan-ignore return.type */
         return $this->availableFieldsOnIndexOrDetail($request)
             ->when($request->viaManyToMany(), $this->fieldResolverCallback($request))
             ->whereInstanceOf(Downloadable::class)

@@ -42,9 +42,7 @@ trait WithBadge
         }
 
         if (is_string($badgeCallback)) {
-            $this->badgeCallback = function () use ($badgeCallback, $type) {
-                return Badge::make($badgeCallback, $type);
-            };
+            $this->badgeCallback = static fn () => Badge::make($badgeCallback, $type);
         }
 
         return $this;

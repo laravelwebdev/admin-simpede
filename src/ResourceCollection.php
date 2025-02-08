@@ -20,6 +20,7 @@ class ResourceCollection extends Collection
      */
     public function authorized(Request $request)
     {
+        /** @phpstan-ignore return.type */
         return $this->filter(
             static fn ($resource) => $resource::authorizedToViewAny($request)
         );
@@ -32,6 +33,7 @@ class ResourceCollection extends Collection
      */
     public function availableForNavigation(Request $request)
     {
+        /** @phpstan-ignore return.type */
         return $this->filter(
             static fn ($resource) => $resource::availableForNavigation($request)
         );
@@ -44,6 +46,7 @@ class ResourceCollection extends Collection
      */
     public function searchable()
     {
+        /** @phpstan-ignore return.type */
         return $this->filter(
             static fn ($resource) => $resource::$globallySearchable
         );
@@ -56,6 +59,7 @@ class ResourceCollection extends Collection
      */
     public function grouped()
     {
+        /** @phpstan-ignore return.type */
         return $this->groupBy(
             static fn ($resource, $key) => (string) $resource::group()
         )->toBase()->sortKeys();

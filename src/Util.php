@@ -35,14 +35,14 @@ class Util
             $uri = parse_url($domain);
 
             return isset($uri['port'])
-                        ? rtrim($request->getHttpHost(), '/') === $uri['host'].':'.$uri['port']
-                        : rtrim($request->getHttpHost(), '/') === $uri['host'];
+                ? rtrim($request->getHttpHost(), '/') === $uri['host'].':'.$uri['port']
+                : rtrim($request->getHttpHost(), '/') === $uri['host'];
         }
 
         return $request->is($path) ||
-               $request->is(trim($path.'/*', '/')) ||
-               $request->is('nova-api/*') ||
-               $request->is('nova-vendor/*');
+            $request->is(trim($path.'/*', '/')) ||
+            $request->is('nova-api/*') ||
+            $request->is('nova-vendor/*');
     }
 
     /**

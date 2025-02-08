@@ -78,6 +78,7 @@ class ResourceTool extends Panel
      * @param  array<string, mixed>  $meta
      * @return $this
      */
+    #[\Override]
     public function withMeta(array $meta)
     {
         parent::withMeta($meta);

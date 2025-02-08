@@ -33,14 +33,10 @@ export function useConfirmsPassword(emitter) {
       confirmedUsing = () => passwordConfirmed()
     }
 
-    if (mode === 'always') {
-      confirming.value = true
-      if (isFunction(verifyUsing)) verifyUsing()
-
-      return
-    }
-
-    if (required === false || confirmed.value === true) {
+    if (
+      mode === 'timeout' &&
+      (required === false || confirmed.value === true)
+    ) {
       confirming.value = false
       if (isFunction(confirmedUsing)) confirmedUsing()
 

@@ -36,6 +36,7 @@ class FieldCollection extends Collection
     {
         new Panel($label, $this->reject(static fn ($field) => isset($field->panel)));
 
+        /** @phpstan-ignore return.type */
         return $this;
     }
 
@@ -102,6 +103,7 @@ class FieldCollection extends Collection
      */
     public function resolve($resource)
     {
+        /** @phpstan-ignore return.type */
         return $this->each(static function ($field) use ($resource) {
             if ($field instanceof Resolvable) {
                 $field->resolve($resource);
@@ -117,6 +119,7 @@ class FieldCollection extends Collection
      */
     public function resolveForDisplay($resource)
     {
+        /** @phpstan-ignore return.type */
         return $this->each(static function ($field) use ($resource) {
             if ($field instanceof ListableField || ! $field instanceof Resolvable) {
                 return;
@@ -285,6 +288,7 @@ class FieldCollection extends Collection
      */
     public function withOnlyFilterableFields()
     {
+        /** @phpstan-ignore return.type */
         return $this->whereInstanceOf(Field::class)
             ->whereInstanceOf(FilterableField::class)
             ->reject(static function ($field) {

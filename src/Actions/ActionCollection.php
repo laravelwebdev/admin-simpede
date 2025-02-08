@@ -20,6 +20,7 @@ class ActionCollection extends Collection
      */
     public function authorizedToSeeOnIndex(NovaRequest $request)
     {
+        /** @phpstan-ignore return.type */
         return $this->filter->shownOnIndex()
             ->filter(static function ($action) use ($request) {
                 if ($action->sole === true) {
@@ -39,6 +40,7 @@ class ActionCollection extends Collection
      */
     public function authorizedToSeeOnDetail(NovaRequest $request)
     {
+        /** @phpstan-ignore return.type */
         return $this->filter->shownOnDetail()
             ->filter->authorizedToSee($request);
     }
@@ -50,6 +52,7 @@ class ActionCollection extends Collection
      */
     public function authorizedToSeeOnTableRow(NovaRequest $request)
     {
+        /** @phpstan-ignore return.type */
         return $this->filter->shownOnTableRow()
             ->filter->authorizedToSee($request);
     }
