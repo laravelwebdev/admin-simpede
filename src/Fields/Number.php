@@ -145,6 +145,6 @@ class Number extends Text
             'max' => $this->max,
             'step' => $this->step,
         ])->reject(static fn ($value) => is_null($value) || (empty($value) && $value !== 0))
-        ->all());
+            ->all());
     }
 }
