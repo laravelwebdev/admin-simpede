@@ -16,9 +16,12 @@ class EnsureNovaRequestBoundToContainer
     {
         $boundedByMiddleware = false;
 
-        if (optional($job)->request instanceof NovaRequest) {
+        /** @var \Laravel\Nova\Http\Requests\NovaRequest|null $request */
+        $request = optional($job)->request ?? null;
+
+        if ($request instanceof NovaRequest) {
             if (! app()->bound(NovaRequest::class)) {
-                app()->instance(NovaRequest::class, $job->request);
+                app()->instance(NovaRequest::class, $request);
                 $boundedByMiddleware = true;
             }
         }

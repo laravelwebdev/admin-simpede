@@ -232,21 +232,42 @@ class Repeater extends Field
             return [];
         }
 
-        return collect($request->{$this->validationKey()})
-            ->map(function ($item) {
-                return $this->repeatables->findByKey($item['type']);
-            })
-            ->flatMap(function (Repeatable $repeatable, $index) use ($request) {
-                return FieldCollection::make($repeatable->fields($request))
-                    ->mapWithKeys(function (Field $field) use ($index) {
-                        $key = "{$this->validationKey()}.{$index}.fields";
+        $validationKey = $this->validationKey();
 
-                        return [
-                            "{$key}.{$field->attribute}" => $this->replaceRulesPlaceholder($field->rules, $key),
-                        ];
-                    });
+        return collect($request->{$this->validationKey()})
+            ->map(fn ($item) => $this->repeatables->findByKey($item['type']))
+            ->flatMap(function (Repeatable $repeatable, $index) use ($request, $validationKey) {
+                $key = "{$validationKey}.{$index}.fields";
+
+                return FieldCollection::make($repeatable->fields($request))
+                    ->mapWithKeys(fn (Field $field) => [
+                        "{$key}.{$field->attribute}" => $this->replaceRulesPlaceholder($field->rules, $key),
+                    ]);
             })
             ->all();
+    }
+
+    /**
+     * Get the validation attribute names for the field.
+     *
+     * @return array<string, string>
+     */
+    public function getValidationAttributeNames(NovaRequest $request): array
+    {
+        if ($request->method() === 'GET') {
+            return [];
+        }
+
+        $validationKey = $this->validationKey();
+
+        return collect($request->{$this->validationKey()})
+            ->map(fn ($item) => $this->repeatables->findByKey($item['type']))
+            ->flatMap(function (Repeatable $repeatable, $index) use ($request, $validationKey) {
+                return FieldCollection::make($repeatable->fields($request))
+                    ->mapWithKeys(static fn (Field $field) => [
+                        "{$validationKey}.{$index}.fields.{$field->attribute}" => $field->name,
+                    ]);
+            })->all();
     }
 
     /**

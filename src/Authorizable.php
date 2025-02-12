@@ -45,9 +45,11 @@ trait Authorizable
      */
     public function authorizeToViewAny(Request $request)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return;
         }
+
+        $gate = static::authorizationGate();
 
         if (is_callable([$gate, 'viewAny'])) {
             $this->authorizeTo($request, 'viewAny');
@@ -61,14 +63,16 @@ trait Authorizable
      */
     public static function authorizedToViewAny(Request $request)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
+
+        $gate = static::authorizationGate();
 
         $resource = Util::resolveResourceOrModelForAuthorization(new static(static::newModel()));
 
         return is_callable([$gate, 'viewAny'])
-            ? Gate::forUser(Nova::user($request))->check('viewAny', $resource)
+            ? Gate::forUser(Nova::user($request))->check('viewAny', $resource::class)
             : true;
     }
 
@@ -116,7 +120,7 @@ trait Authorizable
         if (static::authorizable()) {
             $resource = Util::resolveResourceOrModelForAuthorization(new static(static::newModel()));
 
-            return Gate::forUser(Nova::user($request))->check('create', $resource);
+            return Gate::forUser(Nova::user($request))->check('create', $resource::class);
         }
 
         return true;
@@ -153,9 +157,11 @@ trait Authorizable
      */
     public function authorizeToReplicate(Request $request)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return;
         }
+
+        $gate = static::authorizationGate();
 
         if (is_callable([$gate, 'replicate'])) {
             $this->authorizeTo($request, 'replicate');
@@ -174,9 +180,11 @@ trait Authorizable
      */
     public function authorizedToReplicate(Request $request)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
+
+        $gate = static::authorizationGate();
 
         $resource = Util::resolveResourceOrModelForAuthorization($this);
 
@@ -235,9 +243,11 @@ trait Authorizable
      */
     public function authorizedToAdd(NovaRequest $request, $model)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
+
+        $gate = static::authorizationGate();
 
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'add'.class_basename($model);
@@ -255,9 +265,11 @@ trait Authorizable
      */
     public function authorizedToAttachAny(NovaRequest $request, $model)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
+
+        $gate = static::authorizationGate();
 
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'attachAny'.Str::singular(class_basename($model));
@@ -275,9 +287,11 @@ trait Authorizable
      */
     public function authorizedToAttach(NovaRequest $request, $model)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
+
+        $gate = static::authorizationGate();
 
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'attach'.Str::singular(class_basename($model));
@@ -296,9 +310,11 @@ trait Authorizable
      */
     public function authorizedToDetach(NovaRequest $request, $model, $relationship)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
+
+        $gate = static::authorizationGate();
 
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'detach'.Str::singular(class_basename($model));
@@ -319,9 +335,11 @@ trait Authorizable
             return $this->authorizedToRunDestructiveAction($request, $action);
         }
 
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
+
+        $gate = static::authorizationGate();
 
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'runAction';
@@ -338,9 +356,11 @@ trait Authorizable
      */
     public function authorizedToRunDestructiveAction(NovaRequest $request, DestructiveAction $action)
     {
-        if (is_null($gate = static::authorizationGate())) {
+        if (! static::authorizable()) {
             return true;
         }
+
+        $gate = static::authorizationGate();
 
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'runDestructiveAction';
