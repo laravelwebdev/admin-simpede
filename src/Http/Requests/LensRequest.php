@@ -114,9 +114,9 @@ class LensRequest extends NovaRequest
                 $payload['actions'] = collect(
                     $hasId === true ? array_values($lensResource->actions($this)) : []
                 )->filter(static fn ($action) => $action->shownOnIndex() || $action->shownOnTableRow())
-                ->filter->authorizedToSee($this)
-                ->filter->authorizedToRun($this, $model)
-                ->values();
+                    ->filter->authorizedToSee($this)
+                    ->filter->authorizedToRun($this, $model)
+                    ->values();
 
                 return $payload;
             });
