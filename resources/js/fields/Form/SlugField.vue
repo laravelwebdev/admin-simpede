@@ -12,8 +12,11 @@
           ref="theInput"
           :value="value"
           @blur="handleChangesOnBlurEvent"
+          @keyup.enter="handleChangeOnPressingEnterEvent"
+          @keydown.enter="handleChangeOnPressingEnterEvent"
           :id="field.uniqueKey"
-          :disabled="isReadonly"
+          :disabled="isImmutable"
+          :readonly="isImmutable"
           class="w-full form-control form-input form-control-bordered"
           :dusk="field.attribute"
           autocomplete="off"
@@ -21,10 +24,11 @@
         />
 
         <button
-          class="rounded inline-flex text-sm ml-3 link-default"
           v-if="field.showCustomizeButton"
           type="button"
           @click="toggleCustomizeClick"
+          :dusk="`${field.attribute}-slug-field-edit-button`"
+          class="rounded inline-flex text-sm ml-3 link-default"
         >
           {{ __('Customize') }}
         </button>
@@ -40,6 +44,7 @@ import {
   HandlesValidationErrors,
 } from '@/mixins'
 import debounce from 'lodash/debounce'
+import get from 'lodash/get'
 import isNil from 'lodash/isNil'
 
 export default {
@@ -47,6 +52,7 @@ export default {
 
   data: () => ({
     isListeningToChanges: false,
+    isCustomisingValue: false,
     debouncedHandleChange: null,
   }),
 
@@ -74,10 +80,24 @@ export default {
       }
     },
 
-    async handleChangesOnBlurEvent(event) {
-      let value = event?.target?.value ?? event
+    handleChangeOnPressingEnterEvent(event) {
+      event.preventDefault()
+      event.stopPropagation()
 
-      if (this.isReadonly) {
+      this.listenToValueChanges(event?.target?.value ?? event)
+    },
+
+    handleChangesOnBlurEvent(event) {
+      this.listenToValueChanges(event?.target?.value ?? event)
+    },
+
+    listenToValueChanges(value) {
+      if (this.isImmutable === true) {
+        return
+      }
+
+      if (this.isCustomisingValue === true) {
+        this.value = value
         return
       }
 
@@ -91,18 +111,20 @@ export default {
     },
 
     toggleCustomizeClick() {
-      if (this.field.readonly) {
+      if (this.field.extraAttributes.readonly === true) {
+        this.isCustomisingValue = true
         this.removeChangeListener()
         this.isListeningToChanges = false
-        this.field.readonly = false
+        this.field.writable = true
         this.field.extraAttributes.readonly = false
         this.field.showCustomizeButton = false
         this.$refs.theInput.focus()
         return
       }
 
+      this.isCustomisingValue = false
       this.registerChangeListener()
-      this.field.readonly = true
+      this.field.writable = false
       this.field.extraAttributes.readonly = true
     },
   },
@@ -110,6 +132,14 @@ export default {
   computed: {
     shouldRegisterInitialListener() {
       return this.field.shouldListenToFromChanges
+    },
+
+    isImmutable() {
+      return Boolean(
+        this.field.readonly === false &&
+          this.field.writable === true &&
+          get(this.field, 'extraAttributes.readonly') === true
+      )
     },
 
     eventName() {

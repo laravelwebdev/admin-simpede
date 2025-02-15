@@ -257,7 +257,8 @@ trait ResolvesFields
     protected function actionEventsField(): MorphMany
     {
         return MorphMany::make(Nova::__('Action Events'), 'actions', Nova::actionResource())
-            ->canSee(static fn ($request) => Nova::actionResource()::authorizedToViewAny($request));
+            ->canSee(static fn ($request) => Nova::actionResource()::authorizedToViewAny($request))
+            ->collapsable();
     }
 
     /**

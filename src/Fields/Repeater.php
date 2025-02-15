@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Fields;
 
+use Illuminate\Support\Arr;
 use Laravel\Nova\Exceptions\NovaException;
 use Laravel\Nova\Fields\Repeater\Presets\HasMany;
 use Laravel\Nova\Fields\Repeater\Presets\JSON;
@@ -288,8 +289,8 @@ class Repeater extends Field
             return $rules;
         }
 
-        return collect($rules)->map(static function ($rules) use ($replacements) {
-            return collect($rules)->map(static function ($rule) use ($replacements) {
+        return collect($rules)->map(static function ($fieldRules) use ($replacements) {
+            return collect(Arr::wrap($fieldRules))->map(static function ($rule) use ($replacements) {
                 return is_string($rule)
                     ? str_replace(array_keys($replacements), array_values($replacements), $rule)
                     : $rule;

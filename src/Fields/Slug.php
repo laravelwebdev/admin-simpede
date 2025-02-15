@@ -101,7 +101,7 @@ class Slug extends Field implements Previewable
         };
 
         if (! is_null($from) && $request->isUpdateOrUpdateAttachedRequest()) {
-            $this->readonly();
+            $this->immutable();
             $this->showCustomizeButton = true;
         }
 

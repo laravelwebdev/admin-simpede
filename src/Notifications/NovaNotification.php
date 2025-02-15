@@ -2,6 +2,8 @@
 
 namespace Laravel\Nova\Notifications;
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Notifications\Notification as LaravelNotification;
 use Laravel\Nova\Exceptions\HelperNotSupported;
 use Laravel\Nova\Makeable;
 use Laravel\Nova\Nova;
@@ -9,7 +11,7 @@ use Laravel\Nova\URL;
 use Laravel\Nova\WithComponent;
 use Stringable;
 
-class NovaNotification extends \Illuminate\Notifications\Notification
+class NovaNotification extends LaravelNotification implements Arrayable
 {
     use Makeable;
     use WithComponent;
@@ -167,16 +169,7 @@ class NovaNotification extends \Illuminate\Notifications\Notification
      */
     public function toNova()
     {
-        return [
-            'component' => $this->component(),
-            'icon' => $this->icon,
-            'message' => $this->message,
-            'actionText' => Nova::__($this->actionText),
-            'actionUrl' => $this->actionUrl,
-            'openInNewTab' => $this->openInNewTab,
-            'type' => $this->type,
-            'iconClass' => static::$types[$this->type],
-        ];
+        return $this->toArray();
     }
 
     /**
@@ -188,5 +181,20 @@ class NovaNotification extends \Illuminate\Notifications\Notification
     public function via($notifiable)
     {
         return [NovaChannel::class];
+    }
+
+    /** {@inheritDoc} */
+    public function toArray()
+    {
+        return [
+            'component' => $this->component(),
+            'icon' => $this->icon,
+            'message' => $this->message,
+            'actionText' => Nova::__($this->actionText),
+            'actionUrl' => $this->actionUrl,
+            'openInNewTab' => $this->openInNewTab,
+            'type' => $this->type,
+            'iconClass' => static::$types[$this->type],
+        ];
     }
 }

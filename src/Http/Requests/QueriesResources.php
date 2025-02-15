@@ -73,8 +73,5 @@ trait QueriesResources
     /**
      * Get the trashed status of the request.
      */
-    protected function trashed(): TrashedStatus
-    {
-        return TrashedStatus::tryFrom((string) $this->trashed) ?? TrashedStatus::DEFAULT;
-    }
+    abstract public function trashed(): TrashedStatus;
 }

@@ -5,6 +5,7 @@ namespace Laravel\Nova\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Laravel\Nova\TrashedStatus;
 use Mockery as m;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -148,6 +149,18 @@ class NovaRequest extends FormRequest
         return $this->isResourceIndexRequest()
             || $this->isResourceDetailRequest()
             || $this->isLensRequest();
+    }
+
+    /**
+     * Get the trashed status of the request.
+     */
+    public function trashed(): TrashedStatus
+    {
+        if (is_null($trashed = $this->trashed)) {
+            return TrashedStatus::DEFAULT;
+        }
+
+        return TrashedStatus::tryFrom((string) $trashed) ?? TrashedStatus::DEFAULT;
     }
 
     /**

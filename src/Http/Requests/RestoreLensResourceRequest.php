@@ -34,7 +34,7 @@ class RestoreLensResourceRequest extends LensResourceDeletionRequest
     /**
      * Get the trashed status of the request.
      */
-    protected function trashed(): TrashedStatus
+    public function trashed(): TrashedStatus
     {
         return TrashedStatus::WITH;
     }

@@ -5,7 +5,6 @@ namespace Laravel\Nova\Http\Resources;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Laravel\Nova\Http\Requests\LensRequest;
 use Laravel\Nova\Lenses\Lens;
-use Laravel\Nova\TrashedStatus;
 
 class LensViewResource extends Resource
 {
@@ -22,7 +21,7 @@ class LensViewResource extends Resource
         $query = $request->newSearchQuery();
 
         if ($request->resourceSoftDeletes()) {
-            (TrashedStatus::tryFrom($request->trashed) ?? TrashedStatus::DEFAULT)->applySoftDeleteConstraint($query);
+            $request->trashed()->applySoftDeleteConstraint($query);
         }
 
         $paginator = $lens->query($request, $query);
