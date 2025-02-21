@@ -534,9 +534,9 @@ class MorphTo extends Field implements FilterableField, RelatableField
     protected function defaultFilterableCallback()
     {
         $morphToTypes = collect($this->morphToTypes)
-                            ->pluck('type')
-                            ->mapWithKeys(static fn ($type) => [$type => $type::newModel()->getMorphClass()])
-                            ->all();
+            ->pluck('type')
+            ->mapWithKeys(static fn ($type) => [$type => $type::newModel()->getMorphClass()])
+            ->all();
 
         return static function (NovaRequest $request, $query, $value, $attribute) use ($morphToTypes) {
             $query->whereHasMorph(
