@@ -155,9 +155,10 @@ class MorphToMany extends Field implements DeletableContract, ListableField, Piv
         $withTrashed = $request->{$this->attribute.'_trashed'} === 'true';
 
         return array_merge_recursive(parent::getRules($request), [
-            $this->attribute => array_filter([
-                'required', new RelatableAttachment($request, $this->buildAttachableQuery($request, $withTrashed)->toBase(), $this),
-            ]),
+            $this->attribute => [
+                'required',
+                new RelatableAttachment($request, $this->buildAttachableQuery($request, $withTrashed)->toBase(), $this),
+            ],
         ]);
     }
 

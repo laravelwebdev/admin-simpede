@@ -292,7 +292,11 @@ class FieldCollection extends Collection
         return $this->whereInstanceOf(Field::class)
             ->whereInstanceOf(FilterableField::class)
             ->reject(static function ($field) {
-                /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\FilterableField $field */
+                /**
+                 * @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\FilterableField $field
+                 *
+                 * @phpstan-ignore varTag.nativeType
+                 */
                 return $field->isComputed() || is_null($field->filterableCallback);
             });
     }

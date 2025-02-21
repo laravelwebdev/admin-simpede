@@ -393,12 +393,13 @@ class MorphTo extends Field implements FilterableField, RelatableField
      */
     public function types(array $types)
     {
-        $this->morphToTypes = collect($types)->map(static fn ($display, $key) => [
-            'type' => is_numeric($key) ? $display : $key,
-            'singularLabel' => is_numeric($key) ? $display::singularLabel() : $key::singularLabel(),
-            'display' => (is_string($display) && is_numeric($key)) ? $display::singularLabel() : $display,
-            'value' => is_numeric($key) ? $display::uriKey() : $key::uriKey(),
-        ])->values()->all();
+        $this->morphToTypes = collect($types)
+            ->map(static fn ($display, $key) => [ // @phpstan-ignore argument.unresolvableType
+                'type' => is_numeric($key) ? $display : $key,
+                'singularLabel' => is_numeric($key) ? $display::singularLabel() : $key::singularLabel(),
+                'display' => (is_string($display) && is_numeric($key)) ? $display::singularLabel() : $display,
+                'value' => is_numeric($key) ? $display::uriKey() : $key::uriKey(),
+            ])->values()->all();
 
         return $this;
     }

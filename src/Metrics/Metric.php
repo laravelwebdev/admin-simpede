@@ -110,7 +110,7 @@ abstract class Metric extends Card
      */
     public function cacheFor()
     {
-        //
+        return null;
     }
 
     /**

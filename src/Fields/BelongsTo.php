@@ -216,10 +216,10 @@ class BelongsTo extends Field implements FilterableField, RelatableField
         )->toBase();
 
         return array_merge_recursive(parent::getRules($request), [
-            $this->attribute => array_filter([
+            $this->attribute => [
                 $this->nullable ? 'nullable' : 'required',
                 new Relatable($request, $query, $this),
-            ]),
+            ],
         ]);
     }
 

@@ -88,8 +88,6 @@ class DispatchAction
      * Dispatch the given action.
      *
      * @return $this
-     *
-     * @throws \Throwable
      */
     public function handleStandalone(string $method)
     {
@@ -112,8 +110,6 @@ class DispatchAction
      * Dispatch the given action.
      *
      * @return $this
-     *
-     * @throws \Throwable
      */
     public function handleRequest(ActionRequest $request, string $method, int $chunkCount)
     {

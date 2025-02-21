@@ -25,28 +25,28 @@ trait HasAttachments
     /**
      * The callback that should be executed to store file attachments.
      *
-     * @var callable(\Illuminate\Http\Request):array{path: string, url: string}
+     * @var callable(\Laravel\Nova\Http\Requests\NovaRequest):array{path: string, url: string}
      */
     public $attachCallback;
 
     /**
      * The callback that should be executed to delete persisted file attachments.
      *
-     * @var callable(\Illuminate\Http\Request):void
+     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest):void)|\Laravel\Nova\Fields\Attachments\DetachAnyAttachment
      */
     public $detachCallback;
 
     /**
      * The callback that should be executed to discard file attachments.
      *
-     * @var callable(\Illuminate\Http\Request):void
+     * @var callable(\Laravel\Nova\Http\Requests\NovaRequest):void
      */
     public $discardCallback;
 
     /**
      * Specify the callback that should be used to store file attachments.
      *
-     * @param  callable(\Illuminate\Http\Request):array{path: string, url: string}  $callback
+     * @param  callable(\Laravel\Nova\Http\Requests\NovaRequest):array{path: string, url: string}  $callback
      * @return $this
      */
     public function attach(callable $callback)
@@ -61,7 +61,7 @@ trait HasAttachments
     /**
      * Specify the callback that should be used to delete a single, persisted file attachment.
      *
-     * @param  callable(\Illuminate\Http\Request):void  $callback
+     * @param  callable(\Laravel\Nova\Http\Requests\NovaRequest):void  $callback
      * @return $this
      */
     public function detach(callable $callback)

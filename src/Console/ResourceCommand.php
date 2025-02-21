@@ -71,7 +71,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
             'name' => 'Resource',
         ]);
 
-        parent::handle();
+        return parent::handle();
     }
 
     /**

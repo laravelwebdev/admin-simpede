@@ -76,7 +76,7 @@ class Textarea extends Field implements FilterableField
      * @param  (callable():(bool))|bool  $callback
      * @return never
      *
-     * @throws \Laravel\Nova\Exceptions\NovaException
+     * @throws \Laravel\Nova\Exceptions\HelperNotSupported
      */
     public function showOnIndex($callback = true)
     {

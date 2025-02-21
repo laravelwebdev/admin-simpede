@@ -6,6 +6,9 @@ use Laravel\Nova\Element;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
 
+/**
+ * @phpstan-type TMixedResource \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|object|array
+ */
 abstract class FieldElement extends Element
 {
     /**
@@ -18,14 +21,18 @@ abstract class FieldElement extends Element
     /**
      * Indicates if the element should be shown on the index view.
      *
-     * @var (callable():(bool))|bool
+     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest, mixed):(bool))|bool
+     *
+     * @phpstan-var (callable(\Laravel\Nova\Http\Requests\NovaRequest, TMixedResource):(bool))|bool
      */
     public $showOnIndex = true;
 
     /**
      * Indicates if the element should be shown on the detail view.
      *
-     * @var (callable():(bool))|bool
+     * @var (callable(\Laravel\Nova\Http\Requests\NovaRequest, mixed):(bool))|bool
+     *
+     * @phpstan-var (callable(\Laravel\Nova\Http\Requests\NovaRequest, TMixedResource):(bool))|bool
      */
     public $showOnDetail = true;
 
@@ -110,8 +117,10 @@ abstract class FieldElement extends Element
     /**
      * Specify that the element should be visible on the index view.
      *
-     * @param  (callable():(bool))|bool  $callback
+     * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, mixed):(bool))|bool  $callback
      * @return $this
+     *
+     * @phpstan-param (callable(\Laravel\Nova\Http\Requests\NovaRequest, TMixedResource):(bool))|bool  $callback
      */
     public function showOnIndex(callable|bool $callback = true)
     {
@@ -125,6 +134,8 @@ abstract class FieldElement extends Element
      *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, mixed):(bool))|bool  $callback
      * @return $this
+     *
+     * @phpstan-param (callable(\Laravel\Nova\Http\Requests\NovaRequest, TMixedResource):(bool))|bool  $callback
      */
     public function showOnDetail(callable|bool $callback = true)
     {

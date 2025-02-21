@@ -209,13 +209,13 @@ class Badge extends Field implements FilterableField, Unfillable
     /**
      * Resolve the display label for the Badge.
      */
-    protected function resolveLabelFor(string|int $value): Stringable|string
+    protected function resolveLabelFor(string|int|null $value): Stringable|string
     {
         if (isset($this->labelCallback)) {
             return call_user_func($this->labelCallback, $value);
         }
 
-        return $this->labels[$value] ?? $value;
+        return $this->labels[$value] ?? $value ?? '';
     }
 
     /**
