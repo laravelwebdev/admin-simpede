@@ -313,11 +313,15 @@ class MorphTo extends Field implements FilterableField, RelatableField
 
         $foreignKey = $this->getRelationForeignKeyName($model->{$this->attribute}());
 
+        parent::fillInto($request, $model, $foreignKey);
+
+        if (is_null($model->{$this->attribute.'_type'})) {
+            $model->{$this->attribute.'_id'} = null;
+        }
+
         if ($model->isDirty([$morphType, $foreignKey])) {
             $model->unsetRelation($this->attribute);
         }
-
-        parent::fillInto($request, $model, $foreignKey);
     }
 
     /**

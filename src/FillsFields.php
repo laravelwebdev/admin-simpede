@@ -20,6 +20,7 @@ trait FillsFields
             (new static($model))
                 ->creationFields($request)
                 ->applyDependsOn($request)
+                ->withoutComputed($request)
                 ->withoutReadonly($request)
                 ->withoutUnfillable()
         );
@@ -38,6 +39,7 @@ trait FillsFields
             (new static($model))
                 ->updateFields($request)
                 ->applyDependsOn($request)
+                ->withoutComputed($request)
                 ->withoutReadonly($request)
                 ->withoutUnfillable()
         );

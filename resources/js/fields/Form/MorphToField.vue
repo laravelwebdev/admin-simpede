@@ -311,7 +311,7 @@ export default {
     },
 
     onSyncedField() {
-      if (this.resourceType !== this.currentField.morphToType) {
+      if (this.resourceType !== this.currentField.resourceName) {
         this.refreshResourcesForTypeChange(this.currentField.morphToType)
       }
     },

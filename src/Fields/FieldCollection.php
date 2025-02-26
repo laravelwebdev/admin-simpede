@@ -217,13 +217,25 @@ class FieldCollection extends Collection
     }
 
     /**
+     * Reject if the field is computed.
+     *
+     * @return static<int, TValue>
+     */
+    public function withoutComputed(NovaRequest $request)
+    {
+        /** @phpstan-ignore return.type */
+        return $this->reject(static fn ($field) => $field->isComputed() || $field->attribute === 'ComputedField');
+    }
+
+    /**
      * Reject if the field is readonly.
      *
      * @return static<int, TValue>
      */
     public function withoutReadonly(NovaRequest $request)
     {
-        return $this->reject->isReadonly($request);
+        /** @phpstan-ignore return.type */
+        return $this->reject(static fn ($field) => $field->isReadonly($request));
     }
 
     /**
