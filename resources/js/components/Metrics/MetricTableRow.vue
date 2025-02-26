@@ -20,10 +20,10 @@
         'pr-6': !row.editUrl || !row.viewUrl,
       }"
     >
-      <h2 class="text-base text-gray-500 truncate">
+      <h2 class="text-base text-gray-500">
         {{ row.title }}
       </h2>
-      <p class="text-gray-400 text-xs truncate">{{ row.subtitle }}</p>
+      <p class="text-gray-400 text-xs">{{ row.subtitle }}</p>
     </td>
 
     <td
