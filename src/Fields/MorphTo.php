@@ -305,22 +305,25 @@ class MorphTo extends Field implements FilterableField, RelatableField
     {
         $instance = Nova::modelInstanceForKey($request->{$this->attribute.'_type'});
 
-        $morphType = $model->{$this->attribute}()->getMorphType();
+        $relationship = $model->{$this->attribute}();
 
-        $model->{$morphType} = ! is_null($instance)
-            ? $this->getMorphAliasForClass(get_class($instance))
-            : null;
+        $morphType = $relationship->getMorphType();
 
-        $foreignKey = $this->getRelationForeignKeyName($model->{$this->attribute}());
+        $model->setAttribute(
+            $morphType,
+            ! is_null($instance) ? $this->getMorphAliasForClass($instance::class) : null
+        );
+
+        $foreignKey = $this->getRelationForeignKeyName($relationship);
+
+        parent::fillInto($request, $model, $foreignKey);
+
+        if (is_null($model->getAttribute($morphType))) {
+            $model->setAttribute($foreignKey, null);
+        }
 
         if ($model->isDirty([$morphType, $foreignKey])) {
             $model->unsetRelation($this->attribute);
-        }
-        
-        parent::fillInto($request, $model, $foreignKey);
-
-        if (is_null($model->{$this->attribute.'_type'})) {
-            $model->{$this->attribute.'_id'} = null;
         }
     }
 
