@@ -27,7 +27,7 @@ class SearchableJson extends Column
         $path = $query->getGrammar()->wrap($this->jsonSelectorPath);
         $likeOperator = $connectionType == 'pgsql' ? 'ilike' : 'like';
 
-        if (in_array($connectionType, ['pgsql', 'sqlite'])) {
+        if (\in_array($connectionType, ['pgsql', 'sqlite'])) {
             return $query->{$whereOperator}($this->jsonSelectorPath, $likeOperator, "%{$search}%");
         }
 

@@ -53,7 +53,7 @@ class PendingTranslation implements JsonSerializable, Stringable
 
         return (string) with(Str::of(
             transform(__($this->key, $this->replace, $locale), function ($translation) {
-                return is_string($translation) ? $translation : $this->key;
+                return \is_string($translation) ? $translation : $this->key;
             }) ?? ''
         ), $this->transformCallback);
     }

@@ -23,7 +23,7 @@ class IndexComponent extends Component
         public string $resourceName,
         ?string $viaRelationship = null
     ) {
-        if (! is_null($viaRelationship) && $resourceName !== $viaRelationship) {
+        if (! \is_null($viaRelationship) && $resourceName !== $viaRelationship) {
             $this->viaRelationship = $viaRelationship;
         }
     }
@@ -35,8 +35,8 @@ class IndexComponent extends Component
     {
         $selector = '[dusk="'.$this->resourceName.'-index-component"]';
 
-        return sprintf(
-            ! is_null($this->viaRelationship) ? '%s[data-relationship="%s"]' : '%s', $selector, $this->viaRelationship
+        return \sprintf(
+            ! \is_null($this->viaRelationship) ? '%s[data-relationship="%s"]' : '%s', $selector, $this->viaRelationship
         );
     }
 
@@ -163,16 +163,16 @@ class IndexComponent extends Component
     {
         $browser->openFilterSelector();
 
-        if (is_callable($fieldCallback)) {
+        if (\is_callable($fieldCallback)) {
             $browser->elsewhereWhenAvailable('@filter-menu', function (Browser $browser) use ($fieldCallback) {
                 if ($fieldCallback) {
-                    call_user_func($fieldCallback, $browser);
+                    \call_user_func($fieldCallback, $browser);
                 }
             });
         }
 
         if ($postCallback !== false) {
-            call_user_func($postCallback ?? static function (Browser $browser) {
+            \call_user_func($postCallback ?? static function (Browser $browser) {
                 $browser->closeCurrentDropdown();
             }, $browser);
         }
@@ -368,7 +368,7 @@ class IndexComponent extends Component
         });
 
         $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) use ($fieldCallback) {
-            call_user_func($fieldCallback, $browser);
+            \call_user_func($fieldCallback, $browser);
         });
     }
 
@@ -381,7 +381,7 @@ class IndexComponent extends Component
     {
         $this->selectAction($browser, $uriKey, static function (Browser $browser) use ($fieldCallback) {
             if ($fieldCallback) {
-                call_user_func($fieldCallback, $browser);
+                \call_user_func($fieldCallback, $browser);
             }
 
             $browser->waitForText('Run Action')->click('@confirm-action-button')->pause(250);
@@ -401,7 +401,7 @@ class IndexComponent extends Component
             $browser->pause(2000);
 
             if ($fieldCallback) {
-                call_user_func($fieldCallback, $browser);
+                \call_user_func($fieldCallback, $browser);
             }
 
             $browser->waitForText('Run Action')->click('@confirm-action-button')->pause(250);
@@ -419,7 +419,7 @@ class IndexComponent extends Component
             })->pause(500);
 
         $browser->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) use ($fieldCallback) {
-            call_user_func($fieldCallback, $browser);
+            \call_user_func($fieldCallback, $browser);
         });
     }
 
@@ -430,7 +430,7 @@ class IndexComponent extends Component
     {
         $this->selectInlineAction($browser, $id, $uriKey, static function (Browser $browser) use ($fieldCallback) {
             if ($fieldCallback) {
-                call_user_func($fieldCallback, $browser);
+                \call_user_func($fieldCallback, $browser);
             }
 
             $browser->click('@confirm-action-button')->pause(250);
@@ -446,7 +446,7 @@ class IndexComponent extends Component
      */
     public function clickCheckboxForId(Browser $browser, $id, $pivotId = null)
     {
-        if (! is_null($pivotId)) {
+        if (! \is_null($pivotId)) {
             $browser->click('[data-pivot-id="'.$pivotId.'"][dusk="'.$id.'-row"] [role="checkbox"]');
         } else {
             $browser->click('[dusk="'.$id.'-checkbox"]');
@@ -587,7 +587,7 @@ class IndexComponent extends Component
      */
     public function assertSeeResource(Browser $browser, string|int $id, string|int|null $pivotId = null): void
     {
-        if (! is_null($pivotId)) {
+        if (! \is_null($pivotId)) {
             $browser->assertVisible('[dusk="'.$id.'-row"][data-pivot-id="'.$pivotId.'"]');
         } else {
             $browser->assertVisible("@{$id}-row");
@@ -602,7 +602,7 @@ class IndexComponent extends Component
      */
     public function assertDontSeeResource(Browser $browser, mixed $id, mixed $pivotId = null): void
     {
-        if (! is_null($pivotId)) {
+        if (! \is_null($pivotId)) {
             $browser->assertMissing('[dusk="'.$id.'-row"][data-pivot-id="'.$pivotId.'"]');
         } else {
             $browser->assertMissing("@{$id}-row");

@@ -22,7 +22,7 @@ class AttachableController extends Controller
                             $field->attribute === $request->viaRelationship;
                     })->first();
 
-        abort_if(is_null($field), 404);
+        abort_if(\is_null($field), 404);
 
         $withTrashed = $this->shouldIncludeTrashed(
             $request, $associatedResource = $field->resourceClass // @phpstan-ignore property.notFound
@@ -82,7 +82,7 @@ class AttachableController extends Controller
             if (
                 $request->first === 'true'
                 || $field->allowDuplicateRelations /** @phpstan-ignore property.notFound */
-                || is_null($relatedModel = $request->findModel())
+                || \is_null($relatedModel = $request->findModel())
             ) {
                 return;
             }

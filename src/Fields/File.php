@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Laravel\Nova\Contracts\Deletable as DeletableContract;
 use Laravel\Nova\Contracts\Downloadable as DownloadableContract;
 use Laravel\Nova\Contracts\Storable as StorableContract;
@@ -126,7 +125,7 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
 
         return $file->storeAs(
             $this->getStorageDir(),
-            call_user_func($this->storeAsCallback, $request, $model, $attribute, $request, $this->getStorageDir(), $this->getStorageDisk()),
+            \call_user_func($this->storeAsCallback, $request, $model, $attribute, $request, $this->getStorageDir(), $this->getStorageDisk()),
             $this->getStorageDisk()
         );
     }
@@ -272,13 +271,13 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
      */
     protected function fillAttribute(NovaRequest $request, string $requestAttribute, object $model, string $attribute): mixed
     {
-        if (is_null($file = $this->retrieveFileFromRequest($request, $requestAttribute))) {
+        if (\is_null($file = $this->retrieveFileFromRequest($request, $requestAttribute))) {
             return null;
         }
 
-        $hasExistingFile = ! is_null($this->getStoragePath());
+        $hasExistingFile = ! \is_null($this->getStoragePath());
 
-        $result = call_user_func(
+        $result = \call_user_func(
             $this->storageCallback,
             $request,
             $model,
@@ -296,7 +295,7 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
             return $result;
         }
 
-        if (! is_array($result)) {
+        if (! \is_array($result)) {
             return $model->{$attribute} = $result;
         }
 
@@ -306,7 +305,7 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
 
         if ($this->isPrunable() && $hasExistingFile) {
             return function () use ($model, $request) {
-                call_user_func(
+                \call_user_func(
                     $this->deleteCallback,
                     $request,
                     $model,
@@ -351,10 +350,10 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
      */
     protected function retrieveFileFromRequest(Request $request, string $requestAttribute): ?UploadedFile
     {
-        $file = Str::contains($requestAttribute, '.') && $request->filled($requestAttribute)
+        $file = str_contains($requestAttribute, '.') && $request->filled($requestAttribute)
             ? data_get($request->all(), $requestAttribute)
             : $request->file($requestAttribute);
 
-        return ! is_null($file) && $file->isValid() ? $file : null;
+        return ! \is_null($file) && $file->isValid() ? $file : null;
     }
 }

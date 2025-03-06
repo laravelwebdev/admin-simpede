@@ -204,7 +204,7 @@ class ActionRequest extends NovaRequest
 
             return new ActionFields(
                 collect($fields->getAttributes()),
-                $results->filter(static fn ($field) => is_callable($field))
+                $results->filter(static fn ($field) => \is_callable($field))
             );
         });
     }

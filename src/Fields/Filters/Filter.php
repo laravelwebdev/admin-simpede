@@ -72,7 +72,7 @@ abstract class Filter extends BaseFilter
         $component = $this->component();
 
         return array_merge(parent::jsonSerialize(), [
-            'uniqueKey' => sprintf('%s-%s-filter', $this->field->attribute, $component),
+            'uniqueKey' => \sprintf('%s-%s-filter', $this->field->attribute, $component),
             'component' => "filter-{$component}",
             'field' => $this->serializeField(),
         ]);

@@ -35,7 +35,7 @@ class Gravatar extends Avatar implements Unfillable
 
         $this->preview($callback)->thumbnail($callback);
 
-        return call_user_func($callback);
+        return \call_user_func($callback);
     }
 
     /**

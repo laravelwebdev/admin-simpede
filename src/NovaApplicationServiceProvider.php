@@ -97,7 +97,7 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     protected function gate()
     {
-        Gate::define('viewNova', static fn ($user) => in_array($user->email, [
+        Gate::define('viewNova', static fn ($user) => \in_array($user->email, [
             //
         ]));
     }

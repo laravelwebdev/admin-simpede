@@ -50,11 +50,11 @@ class DispatchAction
         $this->batchJob = tap(Bus::batch([]), function (PendingBatch $batch) use ($action, $fields) {
             $batch->name($action->name());
 
-            if (! is_null($connection = $this->connection())) {
+            if (! \is_null($connection = $this->connection())) {
                 $batch->onConnection($connection);
             }
 
-            if (! is_null($queue = $this->queue())) {
+            if (! \is_null($queue = $this->queue())) {
                 $batch->onQueue($queue);
             }
 
@@ -73,7 +73,7 @@ class DispatchAction
             return tap(new Response, function (Response $response) {
                 with($response, $this->dispatchableCallback);
 
-                if (! is_null($this->batchJob)) {
+                if (! \is_null($this->batchJob)) {
                     $this->batchJob->dispatch();
                 }
 
@@ -126,7 +126,7 @@ class DispatchAction
                 $chunkCount, function ($models) use ($request, $method, &$wasExecuted) {
                     $models = $models->filterForExecution($request);
 
-                    if (count($models) > 0) {
+                    if (\count($models) > 0) {
                         $wasExecuted = true;
                     }
 
@@ -148,7 +148,7 @@ class DispatchAction
      */
     public function handleUsing(ActionRequest $request, Closure $callback)
     {
-        $this->dispatchableCallback = fn (Response $response) => call_user_func($callback, $request, $response, $this->fields);
+        $this->dispatchableCallback = fn (Response $response) => \call_user_func($callback, $request, $response, $this->fields);
 
         return $this;
     }

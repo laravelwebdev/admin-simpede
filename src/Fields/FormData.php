@@ -37,15 +37,15 @@ class FormData extends FluentDecorator
      */
     public static function make(NovaRequest $request, array $fields)
     {
-        if (! is_null($request->resource) && ! is_null($request->resourceId)) {
+        if (! \is_null($request->resource) && ! \is_null($request->resourceId)) {
             $fields["resource:{$request->resource}"] = $request->resourceId;
         }
 
-        if (! is_null($request->viaResource) && ! is_null($request->viaResourceId)) {
+        if (! \is_null($request->viaResource) && ! \is_null($request->viaResourceId)) {
             $fields["resource:{$request->viaResource}"] = $request->viaResourceId;
         }
 
-        if (! is_null($request->relatedResource) && ! is_null($request->relatedResourceId)) {
+        if (! \is_null($request->relatedResource) && ! \is_null($request->relatedResourceId)) {
             $fields["resource:{$request->relatedResource}"] = $request->relatedResourceId;
         }
 
@@ -60,7 +60,7 @@ class FormData extends FluentDecorator
      */
     public static function onlyFrom(NovaRequest $request, array $onlyAttributes)
     {
-        $fields = $request->method() === 'GET' && ! is_null($dependsOn = $request->query('dependsOn'))
+        $fields = $request->method() === 'GET' && ! \is_null($dependsOn = $request->query('dependsOn'))
             ? Arr::only(json_decode(base64_decode($dependsOn), true), $onlyAttributes)
             : $request->only($onlyAttributes);
 
@@ -110,7 +110,7 @@ class FormData extends FluentDecorator
     {
         $value = $this->fluent->get($key, $default);
 
-        return is_string($value) ? json_decode($value, true) : $value;
+        return \is_string($value) ? json_decode($value, true) : $value;
     }
 
     /**
@@ -128,7 +128,7 @@ class FormData extends FluentDecorator
      */
     public function integer(string $key, int $default = 0): int
     {
-        return intval($this->fluent->get($key, $default));
+        return \intval($this->fluent->get($key, $default));
     }
 
     /**
@@ -136,7 +136,7 @@ class FormData extends FluentDecorator
      */
     public function float(string $key, float $default = 0.0): float
     {
-        return floatval($this->fluent->get($key, $default));
+        return \floatval($this->fluent->get($key, $default));
     }
 
     /**
@@ -152,7 +152,7 @@ class FormData extends FluentDecorator
             return null;
         }
 
-        if (is_null($format)) {
+        if (\is_null($format)) {
             return Date::parse($value, $tz);
         }
 

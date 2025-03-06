@@ -41,7 +41,7 @@ trait WithBadge
             $this->badgeCallback = $badgeCallback;
         }
 
-        if (is_string($badgeCallback)) {
+        if (\is_string($badgeCallback)) {
             $this->badgeCallback = static fn () => Badge::make($badgeCallback, $type);
         }
 
@@ -70,11 +70,11 @@ trait WithBadge
     public function resolveBadge(): ?Badge
     {
         if (value($this->badgeCondition)) {
-            if (is_callable($this->badgeCallback)) {
+            if (\is_callable($this->badgeCallback)) {
                 /** @var \Laravel\Nova\Badge|string|null $result */
-                $result = call_user_func($this->badgeCallback);
+                $result = \call_user_func($this->badgeCallback);
 
-                if (is_null($result)) {
+                if (\is_null($result)) {
                     throw new \Exception('A menu item badge must always have a value.');
                 }
 

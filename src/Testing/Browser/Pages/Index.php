@@ -31,9 +31,9 @@ class Index extends Page
             $browser->waitFor('@create-button')->click('@create-button');
         })->on(new Create($this->resourceName));
 
-        if (! is_null($fieldCallback)) {
+        if (! \is_null($fieldCallback)) {
             $browser->within(new FormComponent, static function (Browser $browser) use ($fieldCallback) {
-                call_user_func($fieldCallback, $browser);
+                \call_user_func($fieldCallback, $browser);
             });
         }
     }

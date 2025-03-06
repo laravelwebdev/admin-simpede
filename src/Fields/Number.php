@@ -104,9 +104,9 @@ class Number extends Text
         return static function (NovaRequest $request, $query, $value, $attribute) {
             [$min, $max] = $value;
 
-            if (! is_null($min) && ! is_null($max)) {
+            if (! \is_null($min) && ! \is_null($max)) {
                 return $query->whereBetween($attribute, [$min, $max]);
-            } elseif (! is_null($min)) {
+            } elseif (! \is_null($min)) {
                 return $query->where($attribute, '>=', $min);
             }
 
@@ -144,7 +144,7 @@ class Number extends Text
             'min' => $this->min,
             'max' => $this->max,
             'step' => $this->step,
-        ])->reject(static fn ($value) => is_null($value) || (empty($value) && $value !== 0))
+        ])->reject(static fn ($value) => \is_null($value) || (empty($value) && $value !== 0))
         ->all());
     }
 }

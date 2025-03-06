@@ -20,7 +20,7 @@ class StyleController extends Controller
             ->filter(static fn ($asset) => $asset->name() === $request->style)
             ->first();
 
-        abort_if(is_null($asset), 404);
+        abort_if(\is_null($asset), 404);
 
         return $asset;
     }

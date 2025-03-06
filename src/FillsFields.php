@@ -100,7 +100,7 @@ trait FillsFields
         return [
             $model,
             $fields->map->fill($request, $model)
-                ->filter(static fn ($callback) => is_callable($callback))
+                ->filter(static fn ($callback) => \is_callable($callback))
                 ->values()
                 ->all(),
         ];

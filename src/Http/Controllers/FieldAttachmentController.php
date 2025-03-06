@@ -22,7 +22,7 @@ class FieldAttachmentController extends Controller
             ->findFieldByAttributeOrFail($request->field);
 
         /** @phpstan-ignore property.notFound */
-        $payload = call_user_func($field->attachCallback, $request);
+        $payload = \call_user_func($field->attachCallback, $request);
 
         return response()->json($payload);
     }
@@ -39,7 +39,7 @@ class FieldAttachmentController extends Controller
             ->findFieldByAttributeOrFail($request->field);
 
         /** @phpstan-ignore property.notFound */
-        call_user_func($field->detachCallback, $request);
+        \call_user_func($field->detachCallback, $request);
 
         return response()->noContent(200);
     }
@@ -56,7 +56,7 @@ class FieldAttachmentController extends Controller
             ->findFieldByAttributeOrFail($request->field);
 
         /** @phpstan-ignore property.notFound */
-        call_user_func($field->discardCallback, $request);
+        \call_user_func($field->discardCallback, $request);
 
         return response()->noContent(200);
     }

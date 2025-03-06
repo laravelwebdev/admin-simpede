@@ -4,23 +4,53 @@ namespace Laravel\Nova\Actions;
 
 use ArrayAccess;
 use JsonSerializable;
+use Laravel\Nova\Exceptions\HelperNotSupported;
+use Laravel\Nova\Makeable;
 use Laravel\Nova\URL;
 use Stringable;
 
 class ActionResponse implements ArrayAccess, JsonSerializable
 {
+    use Makeable;
+
+    /**
+     * The `message` response object.
+     */
     private ?Responses\Message $message = null;
 
+    /**
+     * The `danger` response object.
+     */
     private ?Responses\Message $danger = null;
 
+    /**
+     * The `download` response object.
+     */
     private ?Responses\DownloadFile $download = null;
 
+    /**
+     * The `event` response object.
+     */
+    private ?Responses\Event $event = null;
+
+    /**
+     * The `redirect` response object.
+     */
     private ?Responses\Redirect $redirect = null;
 
+    /**
+     * The `visit` response object.
+     */
     private ?Responses\Visit $visit = null;
 
+    /**
+     * The `modal` response object.
+     */
     private ?Responses\Modal $modal = null;
 
+    /**
+     * Indicate response are for deleted action.
+     */
     private ?bool $deleted = null;
 
     /**
@@ -96,6 +126,32 @@ class ActionResponse implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Create a new response using `emit`.
+     *
+     * @param  array<string, mixed>  $data
+     * @return static
+     */
+    public static function emit(string $event, array $data = [])
+    {
+        return tap(new static, static function ($response) use ($event, $data) {
+            $response->withEvent($event, $data);
+        });
+    }
+
+    /**
+     * Includes `event` to the current response.
+     *
+     * @param  array<string, mixed>  $data
+     * @return $this
+     */
+    public function withEvent(string $event, array $data = [])
+    {
+        $this->event = new Responses\Event(key: $event, payload: $data);
+
+        return $this;
+    }
+
+    /**
      * Create a new response using `redirect`.
      *
      * @return static
@@ -133,11 +189,17 @@ class ActionResponse implements ArrayAccess, JsonSerializable
      * Indicate redirect to be loaded using a new tab.
      *
      * @return $this
+     *
+     * @throws \Laravel\Nova\Exceptions\HelperNotSupported
      */
     public function usingNewTab()
     {
-        if (! is_null($this->redirect)) {
+        if (! \is_null($this->redirect)) {
             $this->redirect->usingNewTab();
+        } else {
+            return throw new HelperNotSupported(
+                \sprintf('The %s helper method is only available in %s class for redirection response', __METHOD__, __CLASS__)
+            );
         }
 
         return $this;
@@ -271,6 +333,7 @@ class ActionResponse implements ArrayAccess, JsonSerializable
             'danger' => $this->danger,
             'deleted' => $this->deleted,
             'download' => $this->download,
+            'event' => $this->event,
             'modal' => $this->modal,
             'message' => $this->message,
             'redirect' => $this->redirect,

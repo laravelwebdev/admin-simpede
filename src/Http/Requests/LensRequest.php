@@ -109,7 +109,7 @@ class LensRequest extends NovaRequest
             return transform((new $resource($model))->serializeForIndex(
                 $this, $lensResource->resolveFields($this)
             ), function ($payload) use ($model, $lensResource) {
-                $hasId = ! is_null($payload['id']->value);
+                $hasId = ! \is_null($payload['id']->value);
 
                 $payload['actions'] = collect(
                     $hasId === true ? array_values($lensResource->actions($this)) : []
@@ -142,7 +142,7 @@ class LensRequest extends NovaRequest
 
         $perPageOptions = $this->lens()::perPageOptions() ?? $resourceClass::perPageOptions();
 
-        return (int) in_array($this->perPage, $perPageOptions) ? $this->perPage : $perPageOptions[0];
+        return (int) \in_array($this->perPage, $perPageOptions) ? $this->perPage : $perPageOptions[0];
     }
 
     /**

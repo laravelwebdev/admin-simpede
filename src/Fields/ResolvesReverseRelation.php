@@ -33,7 +33,7 @@ trait ResolvesReverseRelation
      */
     public function getReverseRelation(NovaRequest $request): string
     {
-        if (is_null($this->reverseRelation)) {
+        if (\is_null($this->reverseRelation)) {
             $viaModel = forward_static_call(
                 [$resourceClass = $request->viaResource(), 'newModel']
             );

@@ -131,7 +131,7 @@ class MorphToMany extends Field implements DeletableContract, ListableField, Piv
     #[\Override]
     public function authorize(Request $request)
     {
-        return call_user_func(
+        return \call_user_func(
             [$this->resourceClass, 'authorizedToViewAny'], $request
         ) && parent::authorize($request);
     }

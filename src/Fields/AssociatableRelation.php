@@ -30,8 +30,8 @@ trait AssociatableRelation
      */
     public function shouldReorderAssociatableValues(NovaRequest $request): bool
     {
-        if (is_callable($this->reordersOnAssociatableCallback)) {
-            return call_user_func($this->reordersOnAssociatableCallback, $request);
+        if (\is_callable($this->reordersOnAssociatableCallback)) {
+            return \call_user_func($this->reordersOnAssociatableCallback, $request);
         }
 
         return $this->reordersOnAssociatableCallback;
@@ -83,8 +83,8 @@ trait AssociatableRelation
      */
     protected function applyAssociatableCallbacks(Builder $query, NovaRequest $request, string $resourceClass, Model $model)
     {
-        if (is_callable($this->relatableQueryCallback)) {
-            call_user_func($this->relatableQueryCallback, $request, $query);
+        if (\is_callable($this->relatableQueryCallback)) {
+            \call_user_func($this->relatableQueryCallback, $request, $query);
 
             return;
         }

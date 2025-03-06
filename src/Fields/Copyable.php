@@ -23,7 +23,7 @@ trait Copyable
     public function copyable()
     {
         if ($this->asHtml) {
-            throw new HelperNotSupported(sprintf("The `%s::%s` option is not available on fields displayed as HTML. Please remove the `asHtml` method from the {$this->name} field to enable `copyable`.",
+            throw new HelperNotSupported(\sprintf("The `%s::%s` option is not available on fields displayed as HTML. Please remove the `asHtml` method from the {$this->name} field to enable `copyable`.",
                 __CLASS__, 'copyable'));
         }
 

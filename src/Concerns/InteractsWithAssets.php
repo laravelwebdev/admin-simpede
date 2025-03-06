@@ -43,7 +43,7 @@ trait InteractsWithAssets
      */
     public static function availableScripts(Request $request): array
     {
-        if (is_null(static::user($request))) {
+        if (\is_null(static::user($request))) {
             return [];
         }
 
@@ -67,7 +67,7 @@ trait InteractsWithAssets
      */
     public static function availableStyles(Request $request): array
     {
-        if (is_null(static::user($request))) {
+        if (\is_null(static::user($request))) {
             return [];
         }
 
@@ -124,7 +124,7 @@ trait InteractsWithAssets
             $manifest = join_paths($path, 'mix-manifest.json');
         } else {
             $manifest = $path;
-            $path = dirname($path);
+            $path = \dirname($path);
         }
 
         if (File::exists($manifest)) {
@@ -134,9 +134,9 @@ trait InteractsWithAssets
                         return Str::endsWith($filename, ['.js', '.css']);
                     }
 
-                    return in_array($filename, $assets);
+                    return \in_array($filename, $assets);
                 })->each(static function ($file, $filename) use ($name, $path) {
-                    $key = sprintf('%s-%s', $name, hash('xxh128', $file));
+                    $key = \sprintf('%s-%s', $name, hash('xxh128', $file));
 
                     if (str_ends_with($filename, '.js')) {
                         static::script($key, join_paths($path, $filename));

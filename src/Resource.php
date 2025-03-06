@@ -304,7 +304,7 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
             return static::$softDeletes[static::$model];
         }
 
-        return static::$softDeletes[static::$model] = in_array(
+        return static::$softDeletes[static::$model] = \in_array(
             SoftDeletes::class,
             class_uses_recursive(static::newModel())
         );
@@ -337,7 +337,7 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
      */
     public static function usesScout()
     {
-        return in_array(Searchable::class, class_uses_recursive(static::newModel()));
+        return \in_array(Searchable::class, class_uses_recursive(static::newModel()));
     }
 
     /**
@@ -359,7 +359,7 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
      */
     public static function label()
     {
-        return Str::plural(Str::title(Str::snake(class_basename(get_called_class()), ' ')));
+        return Str::plural(Str::title(Str::snake(class_basename(\get_called_class()), ' ')));
     }
 
     /**
@@ -422,7 +422,17 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
         /** @var TModel $model */
         $model = static::$model;
 
-        return new $model;
+        return new $model(static::defaultAttributes());
+    }
+
+    /**
+     * Get the default attributes for the model represented by the resource.
+     *
+     * @return array<string, mixed>
+     */
+    public static function defaultAttributes()
+    {
+        return [];
     }
 
     /**
@@ -432,11 +442,11 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
      */
     public static function uriKey()
     {
-        return Str::plural(Str::kebab(class_basename(get_called_class())));
+        return Str::plural(Str::kebab(class_basename(\get_called_class())));
     }
 
     /**
-     * Get meta information about this resource for client side consumption.
+     * Get meta-information about this resource for client-side consumption.
      *
      * @return array<string, mixed>
      */
@@ -446,7 +456,7 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     }
 
     /**
-     * The pagination per-page options configured for this resource.
+     * The pagination per-page options are configured for this resource.
      *
      * @return array<int, int>
      */
@@ -460,13 +470,13 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     }
 
     /**
-     * The pagination per-page options configured for this resource via relationship.
+     * The pagination per-page options are configured for this resource via relationship.
      *
      * @return array<int, int>
      */
     public static function perPageViaRelationshipOptions()
     {
-        if (is_null(static::$perPageViaRelationshipOptions) && is_int(static::$perPageViaRelationship)) {
+        if (\is_null(static::$perPageViaRelationshipOptions) && \is_int(static::$perPageViaRelationship)) {
             static::$perPageViaRelationshipOptions = [static::$perPageViaRelationship];
         }
 
@@ -644,7 +654,7 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     }
 
     /**
-     * Return the location to redirect the user after update.
+     * Return the location to redirect the user after an update.
      *
      * @param  \Laravel\Nova\Resource  $resource
      * @return \Laravel\Nova\URL|string

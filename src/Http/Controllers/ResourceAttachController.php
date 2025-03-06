@@ -29,19 +29,19 @@ class ResourceAttachController extends Controller
      */
     public function __invoke(NovaRequest $request): Response
     {
-        $resource = $request->resource();
+        $resourceClass = $request->resource();
 
         $model = $request->findModelOrFail();
 
-        tap(new $resource($model), static function ($resource) use ($request) {
+        tap(new $resourceClass($model), static function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
         });
 
-        $this->validate($request, $model, $resource);
+        $this->validate($request, $model, $resourceClass);
 
         try {
-            DB::connection($model->getConnectionName())->transaction(function () use ($request, $resource, $model) {
-                [$pivot, $callbacks] = $resource::fillPivot(
+            DB::connection($model->getConnectionName())->transaction(function () use ($request, $resourceClass, $model) {
+                [$pivot, $callbacks] = $resourceClass::fillPivot(
                     $request,
                     $model,
                     $this->initializePivot(
@@ -83,6 +83,10 @@ class ResourceAttachController extends Controller
             Validator::make($request->all(), $rules, [], $this->customRulesKeys($request, $attribute))->validate();
 
             $resourceClass::validateForAttachment($request);
+        });
+
+        tap(new $resourceClass($model), static function ($resource) use ($request) {
+            abort_unless($resource->authorizedToAttach($request, $request->findRelatedModelOrFail()), 401);
         });
     }
 

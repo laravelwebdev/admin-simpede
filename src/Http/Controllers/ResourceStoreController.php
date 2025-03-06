@@ -28,17 +28,16 @@ class ResourceStoreController extends Controller
      */
     public function __invoke(CreateResourceRequest $request): JsonResponse
     {
-        /** @var \Laravel\Nova\Resource $resource */
-        $resource = $request->resource();
+        $resourceClass = $request->resource();
 
-        $resource::authorizeToCreate($request);
+        $resourceClass::authorizeToCreate($request);
 
-        $resource::validateForCreation($request);
+        $resourceClass::validateForCreation($request);
 
         try {
-            $model = DB::connection($resource::newModel()->getConnectionName())->transaction(function () use ($request, $resource) {
-                [$model, $callbacks] = $resource::fill(
-                    $request, $resource::newModel()
+            $model = DB::connection($resourceClass::newModel()->getConnectionName())->transaction(function () use ($request, $resourceClass) {
+                [$model, $callbacks] = $resourceClass::fill(
+                    $request, $resourceClass::newModel()
                 );
 
                 if ($this->storeResource($request, $model) === false) {
@@ -54,14 +53,14 @@ class ResourceStoreController extends Controller
 
                 collect($callbacks)->each->__invoke();
 
-                $resource::afterCreate($request, $model);
+                $resourceClass::afterCreate($request, $model);
 
                 return $model;
             });
 
             return response()->json([
                 'id' => $model->getKey(),
-                'redirect' => URL::make($resource::redirectAfterCreate($request, $request->newResourceWith($model))),
+                'redirect' => URL::make($resourceClass::redirectAfterCreate($request, $request->newResourceWith($model))),
             ], 201);
         } catch (Throwable $e) {
             optional($this->actionEvent)->delete();
@@ -80,8 +79,9 @@ class ResourceStoreController extends Controller
             return $model->save();
         }
 
-        $relation = tap($request->findParentResourceOrFail(), static function ($resource) use ($request) {
-            abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
+        $relation = tap($request->findParentResourceOrFail(), static function ($relatedResource) use ($request, $model) {
+            abort_unless($relatedResource->hasRelatableField($request, $request->viaRelationship), 404);
+            abort_unless($relatedResource->authorizedToAdd($request, $model), 401);
         })->model()->{$request->viaRelationship}();
 
         if ($relation instanceof HasManyThrough) {

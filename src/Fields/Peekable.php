@@ -44,8 +44,8 @@ trait Peekable
      */
     public function isPeekable(NovaRequest $request): bool
     {
-        if (is_callable($this->peekable)) {
-            $this->peekable = call_user_func($this->peekable, $request);
+        if (\is_callable($this->peekable)) {
+            $this->peekable = \call_user_func($this->peekable, $request);
         }
 
         return $this->peekable;
@@ -60,7 +60,7 @@ trait Peekable
             return false;
         }
 
-        if (is_null($relatedResource = $this->relatedResource())) {
+        if (\is_null($relatedResource = $this->relatedResource())) {
             return false;
         }
 

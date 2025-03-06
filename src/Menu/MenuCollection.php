@@ -39,7 +39,7 @@ class MenuCollection extends Collection
             if ($menu instanceof JsonSerializable) {
                 $payload = $menu->jsonSerialize();
 
-                if (($menu instanceof MenuGroup || $menu instanceof MenuList) && count($payload['items']) === 0) {
+                if (($menu instanceof MenuGroup || $menu instanceof MenuList) && \count($payload['items']) === 0) {
                     return null;
                 }
 

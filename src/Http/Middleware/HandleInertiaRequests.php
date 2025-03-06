@@ -33,7 +33,7 @@ class HandleInertiaRequests extends Middleware
     #[\Override]
     public function version(Request $request)
     {
-        return sprintf('%s:%s', $this->rootView, parent::version($request));
+        return \sprintf('%s:%s', $this->rootView, parent::version($request));
     }
 
     /**
@@ -50,7 +50,7 @@ class HandleInertiaRequests extends Middleware
             'novaConfig' => static fn () => Nova::jsonVariables($request),
             'currentUser' => static function () use ($request) {
                 return with(Nova::user($request), static function ($user) use ($request) {
-                    return ! is_null($user) ? UserResource::make($user)->toArray($request) : null;
+                    return ! \is_null($user) ? UserResource::make($user)->toArray($request) : null;
                 });
             },
         ]);

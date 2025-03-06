@@ -26,7 +26,7 @@ trait InteractsWithElements
             $browser->elseWhereWhenAvailable('@dropdown-teleported', static function (Browser $browser) {
                 $element = $browser->element('@dropdown-overlay');
 
-                if (! is_null($element) && $element->isDisplayed()) {
+                if (! \is_null($element) && $element->isDisplayed()) {
                     $browser->click('@dropdown-overlay')->waitUntilMissing('@dropdown-overlay');
                 }
             });

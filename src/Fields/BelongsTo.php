@@ -239,8 +239,8 @@ class BelongsTo extends Field implements FilterableField, RelatableField
             $model->unsetRelation($this->attribute);
         }
 
-        if (is_callable($this->filledCallback)) {
-            call_user_func($this->filledCallback, $request, $model);
+        if (\is_callable($this->filledCallback)) {
+            \call_user_func($this->filledCallback, $request, $model);
         }
     }
 
@@ -378,7 +378,7 @@ class BelongsTo extends Field implements FilterableField, RelatableField
     protected function makeFilter(NovaRequest $request)
     {
         if (
-            is_null($request->resource) || (
+            \is_null($request->resource) || (
                 $request->viaRelationship()
                 && ($request->relationshipType ?? null) === 'hasMany'
                 && $this->resourceClass::uriKey() === $request->viaResource
@@ -439,7 +439,7 @@ class BelongsTo extends Field implements FilterableField, RelatableField
     public function jsonSerialize(): array
     {
         return with(app(NovaRequest::class), function ($request) {
-            $viewable = ! is_null($this->viewable) ? $this->viewable : $this->resourceClass::authorizedToViewAny($request);
+            $viewable = ! \is_null($this->viewable) ? $this->viewable : $this->resourceClass::authorizedToViewAny($request);
 
             return array_merge([
                 'belongsToId' => $this->belongsToId,

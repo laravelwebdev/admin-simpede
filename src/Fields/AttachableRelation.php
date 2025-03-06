@@ -32,8 +32,8 @@ trait AttachableRelation
      */
     public function shouldReorderAttachableValues(NovaRequest $request): bool
     {
-        if (is_callable($this->reordersOnAttachableCallback)) {
-            return call_user_func($this->reordersOnAttachableCallback, $request);
+        if (\is_callable($this->reordersOnAttachableCallback)) {
+            return \call_user_func($this->reordersOnAttachableCallback, $request);
         }
 
         return $this->reordersOnAttachableCallback;
@@ -85,8 +85,8 @@ trait AttachableRelation
      */
     protected function applyAttachableCallbacks(Builder $query, NovaRequest $request, string $resourceClass, Model $model)
     {
-        if (is_callable($this->relatableQueryCallback)) {
-            call_user_func($this->relatableQueryCallback, $request, $query);
+        if (\is_callable($this->relatableQueryCallback)) {
+            \call_user_func($this->relatableQueryCallback, $request, $query);
 
             return;
         }

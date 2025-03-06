@@ -35,7 +35,7 @@ trait Searchable
     public function isSearchable(NovaRequest $request): bool
     {
         if (Util::isSafeCallable($this->searchable)) {
-            $this->searchable = call_user_func($this->searchable, $request);
+            $this->searchable = \call_user_func($this->searchable, $request);
         }
 
         return $this->searchable;

@@ -160,7 +160,7 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
     {
         return with($request->input('vaporFile')[$requestAttribute]['key'], function ($key) use ($request) {
             $fileName = $this->storeAsCallback
-                ? call_user_func($this->storeAsCallback, $request)
+                ? \call_user_func($this->storeAsCallback, $request)
                 : str_replace('tmp/', '', $key);
 
             Storage::disk($this->getStorageDisk())->copy($key, $this->getStorageDir().'/'.$fileName);
@@ -214,13 +214,13 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
      */
     protected function fillAttribute(NovaRequest $request, string $requestAttribute, $model, string $attribute): mixed
     {
-        if (is_null(optional($request->input('vaporFile'))[$requestAttribute])) {
+        if (\is_null(optional($request->input('vaporFile'))[$requestAttribute])) {
             return null;
         }
 
-        $hasExistingFile = ! is_null($this->getStoragePath());
+        $hasExistingFile = ! \is_null($this->getStoragePath());
 
-        $result = call_user_func(
+        $result = \call_user_func(
             $this->storageCallback,
             $request,
             $model,
@@ -238,7 +238,7 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
             return $result;
         }
 
-        if (! is_array($result)) {
+        if (! \is_array($result)) {
             return $model->{$attribute} = $result;
         }
 
@@ -248,7 +248,7 @@ class VaporFile extends Field implements DeletableContract, DownloadableContract
 
         if ($this->isPrunable() && $hasExistingFile) {
             return function () use ($model, $request) {
-                call_user_func(
+                \call_user_func(
                     $this->deleteCallback,
                     $request,
                     $model,

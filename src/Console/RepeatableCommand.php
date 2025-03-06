@@ -53,7 +53,7 @@ class RepeatableCommand extends GeneratorCommand
         $model = $this->option('model');
         $modelNamespace = $this->getModelNamespace();
 
-        if (is_null($model)) {
+        if (\is_null($model)) {
             $model = $modelNamespace.str_replace('/', '\\', $resourceName);
         } elseif (! Str::startsWith($model, [
             $modelNamespace, '\\',

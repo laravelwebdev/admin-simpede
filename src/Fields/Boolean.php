@@ -50,7 +50,7 @@ class Boolean extends Field implements FilterableField
     {
         $value = parent::resolveAttribute($resource, $attribute);
 
-        return ! is_null($value)
+        return ! \is_null($value)
             ? ($value == $this->trueValue ? true : false)
             : null;
     }

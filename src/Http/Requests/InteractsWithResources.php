@@ -53,7 +53,7 @@ trait InteractsWithResources
         return tap(once(function () {
             return Nova::resourceForKey($this->route('resource'));
         }), static function ($resource) {
-            abort_if(is_null($resource), 404);
+            abort_if(\is_null($resource), 404);
         });
     }
 
@@ -103,7 +103,7 @@ trait InteractsWithResources
      */
     public function findModelOrFail($resourceId = null)
     {
-        if (! is_null($resourceId)) {
+        if (! \is_null($resourceId)) {
             return $this->findModelQuery($resourceId)->firstOrFail();
         }
 

@@ -26,7 +26,7 @@ class TabIndexComponent extends IndexComponent
     ) {
         parent::__construct($resourceName, $viaRelationship);
 
-        $this->tabSlug = ! is_null($slug) ? $slug : (string) Str::of($this->viaRelationship ?? $this->resourceName)->snake()->slug();
+        $this->tabSlug = ! \is_null($slug) ? $slug : (string) Str::of($this->viaRelationship ?? $this->resourceName)->snake()->slug();
     }
 
     /**

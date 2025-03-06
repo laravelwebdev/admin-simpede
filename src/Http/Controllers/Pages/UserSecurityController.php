@@ -27,7 +27,7 @@ class UserSecurityController extends Controller
             'options' => config('fortify-options', []),
             'user' => transform(Nova::user($request), static fn ($user) => [
                 'two_factor_enabled' => Features::enabled(Features::twoFactorAuthentication())
-                    && ! is_null($user->two_factor_secret), // @phpstan-ignore property.notFound
+                    && ! \is_null($user->two_factor_secret), // @phpstan-ignore property.notFound
             ]),
         ]));
     }

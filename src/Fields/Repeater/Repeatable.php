@@ -65,7 +65,7 @@ class Repeatable implements JsonSerializable
      */
     public static function label()
     {
-        return Str::plural(Nova::humanize(get_called_class()));
+        return Str::plural(Nova::humanize(\get_called_class()));
     }
 
     /**
@@ -85,7 +85,7 @@ class Repeatable implements JsonSerializable
      */
     public static function key()
     {
-        return Str::singular(Str::kebab(class_basename(get_called_class())));
+        return Str::singular(Str::kebab(class_basename(\get_called_class())));
     }
 
     /**
@@ -103,7 +103,7 @@ class Repeatable implements JsonSerializable
 //                    ->fullWidth()
                     ->resolve($this->data, $field->attribute);
 
-                if (is_null($field->value) && empty($this->data)) {
+                if (\is_null($field->value) && empty($this->data)) {
                     $field->value = $field->resolveDefaultCallback($request);
                 }
             });

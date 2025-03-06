@@ -133,7 +133,7 @@ class BelongsToMany extends Field implements DeletableContract, FilterableField,
     #[\Override]
     public function authorize(Request $request)
     {
-        return call_user_func(
+        return \call_user_func(
             [$this->resourceClass, 'authorizedToViewAny'], $request
         ) && parent::authorize($request);
     }

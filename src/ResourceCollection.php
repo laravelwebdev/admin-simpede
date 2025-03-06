@@ -44,12 +44,25 @@ class ResourceCollection extends Collection
      *
      * @return static<TKey, TValue>
      */
-    public function searchable()
+    public function globallySearchable()
     {
         /** @phpstan-ignore return.type */
         return $this->filter(
             static fn ($resource) => $resource::$globallySearchable
         );
+    }
+
+    /**
+     * Return the searchable resources for the collection.
+     *
+     * @return static<TKey, TValue>
+     *
+     * @deprecated 5.3.0 Use `ResourceCollection::globallySearchable()` instead.
+     */
+    #[\Deprecated('Use `ResourceCollection::globallySearchable()` instead.', since: '5.3.0')]
+    public function searchable()
+    {
+        return $this->globallySearchable();
     }
 
     /**

@@ -65,11 +65,11 @@ class Status extends Text implements Unfillable
      */
     protected function resolveStatusType()
     {
-        if (in_array($this->value, $this->meta['loadingWords'])) {
+        if (\in_array($this->value, $this->meta['loadingWords'])) {
             return 'loading';
         }
 
-        if (in_array($this->value, $this->meta['failedWords'])) {
+        if (\in_array($this->value, $this->meta['failedWords'])) {
             return 'failed';
         }
 

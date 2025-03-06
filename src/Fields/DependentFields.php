@@ -23,7 +23,7 @@ trait DependentFields
      */
     public function dependentComponentKey(): string
     {
-        return sprintf('%s.%s.%s', Str::slug(class_basename(get_called_class())), $this->component, $this->attribute);
+        return \sprintf('%s.%s.%s', Str::slug(class_basename(\get_called_class())), $this->component, $this->attribute);
     }
 
     /**
@@ -61,7 +61,7 @@ trait DependentFields
         if ($value instanceof UndefinedValue) {
             $this->value = null;
         } else {
-            $this->value = ! is_null($value) ? $value : '';
+            $this->value = ! \is_null($value) ? $value : '';
         }
 
         return $this;

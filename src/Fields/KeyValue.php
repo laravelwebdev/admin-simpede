@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Fields;
 
-use Illuminate\Support\Str;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 use Stringable;
@@ -105,7 +104,7 @@ class KeyValue extends Field
     #[\Override]
     public function fillModelWithData(object $model, mixed $value, string $attribute): void
     {
-        $model->forceFill([Str::replace('.', '->', $attribute) => $value]);
+        $model->forceFill([str_replace('.', '->', $attribute) => $value]);
     }
 
     /**
@@ -163,7 +162,7 @@ class KeyValue extends Field
     public function readonlyKeys(NovaRequest $request): bool
     {
         return with($this->readonlyKeysCallback, static function ($callback) use ($request) {
-            return is_callable($callback) ? call_user_func($callback, $request) : ($callback === true);
+            return \is_callable($callback) ? \call_user_func($callback, $request) : ($callback === true);
         });
     }
 

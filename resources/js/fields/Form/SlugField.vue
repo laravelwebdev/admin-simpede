@@ -134,14 +134,6 @@ export default {
       return this.field.shouldListenToFromChanges
     },
 
-    isImmutable() {
-      return Boolean(
-        this.field.readonly === false &&
-          this.field.writable === true &&
-          get(this.field, 'extraAttributes.readonly') === true
-      )
-    },
-
     eventName() {
       return this.getFieldAttributeChangeEventName(this.field.from)
     },

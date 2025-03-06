@@ -38,7 +38,7 @@ class LensViewResource extends Resource
             'perPage' => $paginator->perPage(),
             'softDeletes' => $request->resourceSoftDeletes(),
             'hasId' => $resources->pluck('id')
-                ->reject(static fn ($field) => is_null($field->value))
+                ->reject(static fn ($field) => \is_null($field->value))
                 ->isNotEmpty(),
             'polling' => $lens::$polling,
             'pollingInterval' => $lens::$pollingInterval * 1000,

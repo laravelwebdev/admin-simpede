@@ -75,7 +75,7 @@ abstract class Progress extends Metric
         return $this->result(
             round(
                 (clone $query)->tap(static function ($query) use ($progress) {
-                    call_user_func($progress, $query);
+                    \call_user_func($progress, $query);
                 })->{$function}($column) ?? 0,
                 $this->roundingPrecision,
                 $this->roundingMode

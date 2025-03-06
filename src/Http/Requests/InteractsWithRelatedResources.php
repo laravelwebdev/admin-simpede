@@ -59,7 +59,7 @@ trait InteractsWithRelatedResources
         return once(function () use ($resourceId) {
             $query = Nova::modelInstanceForKey($this->viaResource)->newQueryWithoutScopes();
 
-            if (! is_null($resourceId)) {
+            if (! \is_null($resourceId)) {
                 return $query->whereKey($resourceId)->firstOrFail();
             }
 
@@ -114,7 +114,7 @@ trait InteractsWithRelatedResources
         return once(function () use ($resourceId) {
             $query = Nova::modelInstanceForKey($this->relatedResource)->newQueryWithoutScopes();
 
-            if (! is_null($resourceId)) {
+            if (! \is_null($resourceId)) {
                 return $query->whereKey($resourceId)->firstOrFail();
             }
 
@@ -203,7 +203,7 @@ trait InteractsWithRelatedResources
      */
     public function viaManyToMany(): bool
     {
-        return in_array(
+        return \in_array(
             $this->relationshipType,
             ['belongsToMany', 'morphToMany']
         );

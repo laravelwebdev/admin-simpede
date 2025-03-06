@@ -33,8 +33,8 @@ trait InteractsWithActionEvent
      */
     public static function usingActionEvent(callable $callback): mixed
     {
-        if (! is_null(config('nova.actions.resource'))) {
-            return call_user_func($callback, static::actionEvent()); // @phpstan-ignore argument.type
+        if (! \is_null(config('nova.actions.resource'))) {
+            return \call_user_func($callback, static::actionEvent()); // @phpstan-ignore argument.type
         }
 
         return null;

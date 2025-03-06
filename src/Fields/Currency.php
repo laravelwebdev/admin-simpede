@@ -124,7 +124,7 @@ class Currency extends Number
     {
         $money = $this->toMoneyInstance($value, $currency);
 
-        if (is_null($this->currencySymbol)) {
+        if (\is_null($this->currencySymbol)) {
             return $money->formatTo($locale ?? $this->locale);
         }
 
@@ -209,14 +209,14 @@ class Currency extends Number
      */
     public function resolveCurrencySymbol(): string
     {
-        if (! is_null($this->currencySymbol)) {
+        if (! \is_null($this->currencySymbol)) {
             return $this->currencySymbol;
         }
 
         $currency = $this->currency ?? $this->defaultCurrency;
 
         return tap(Currencies::getSymbol($currency), function (?string $symbol) use ($currency) {
-            if (is_null($symbol)) {
+            if (\is_null($symbol)) {
                 trigger_deprecation('laravel/nova', '5.2.0', 'Unable to retrieve currency symbol for "%s" currency', $currency);
             }
         }) ?? '';
@@ -240,7 +240,7 @@ class Currency extends Number
     #[\Override]
     public function isValidNullValue(mixed $value): bool
     {
-        if (is_null($value)) {
+        if (\is_null($value)) {
             return true;
         }
 

@@ -31,7 +31,7 @@ trait ResolvesActions
             return $actions->withAuthorizedToRun($request, $resource)->values();
         }
 
-        if (! is_null($resources = $request->selectedResources())) {
+        if (! \is_null($resources = $request->selectedResources())) {
             $resources->each(static function ($resource) use ($request, $actions) {
                 $actions->withAuthorizedToRun($request, $resource);
             });
@@ -58,7 +58,7 @@ trait ResolvesActions
             return $actions->withAuthorizedToRun($request, $resource)->values();
         }
 
-        if (! is_null($resources = $request->selectedResources())) {
+        if (! \is_null($resources = $request->selectedResources())) {
             $resources->each(static function ($resource) use ($request, $actions) {
                 $actions->withAuthorizedToRun($request, $resource);
             });
@@ -152,7 +152,7 @@ trait ResolvesActions
         });
 
         if ($field && isset($field->actionsCallback)) {
-            return array_values(call_user_func($field->actionsCallback, $request));
+            return array_values(\call_user_func($field->actionsCallback, $request));
         }
 
         return [];

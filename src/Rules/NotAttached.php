@@ -26,7 +26,7 @@ class NotAttached implements Rule
      */
     public function passes($attribute, $value)
     {
-        return ! in_array(
+        return ! \in_array(
             $this->request->input($this->request->relatedResource),
             $this->model->{$this->request->viaRelationship}()
                 ->withoutGlobalScopes()->get()->modelKeys()

@@ -144,7 +144,7 @@ class NovaNotification extends LaravelNotification implements Arrayable
         if ($this->actionUrl instanceof URL && $this->actionUrl->remote === true) {
             $this->openInNewTab = true;
         } else {
-            throw new HelperNotSupported(sprintf('The %s helper method is only applicable on remote URL.', __METHOD__));
+            throw new HelperNotSupported(\sprintf('The %s helper method is only applicable on remote URL.', __METHOD__));
         }
 
         return $this;

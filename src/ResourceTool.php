@@ -46,7 +46,7 @@ class ResourceTool extends Panel
      */
     public function name()
     {
-        return $this->name ?: Nova::humanize(get_class($this));
+        return $this->name ?: Nova::humanize($this::class);
     }
 
     /**
@@ -56,7 +56,7 @@ class ResourceTool extends Panel
      */
     public function toolComponent()
     {
-        return $this->toolComponent ?? Str::kebab(class_basename(get_class($this)));
+        return $this->toolComponent ?? Str::kebab(class_basename($this::class));
     }
 
     /**

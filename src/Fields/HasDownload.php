@@ -63,7 +63,7 @@ trait HasDownload
      */
     public function toDownloadResponse(NovaRequest $request, Resource $resource): Response|RedirectResponse|StreamedResponse
     {
-        return call_user_func(
+        return \call_user_func(
             $this->downloadResponseCallback,
             $request,
             $resource->resource,

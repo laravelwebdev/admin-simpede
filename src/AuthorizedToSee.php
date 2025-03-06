@@ -21,8 +21,8 @@ trait AuthorizedToSee
      */
     public function authorizedToSee(Request $request)
     {
-        return is_callable($this->seeCallback)
-            ? call_user_func($this->seeCallback, $request) // @phpstan-ignore argument.type
+        return \is_callable($this->seeCallback)
+            ? \call_user_func($this->seeCallback, $request) // @phpstan-ignore argument.type
             : true;
     }
 

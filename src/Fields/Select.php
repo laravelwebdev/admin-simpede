@@ -61,7 +61,7 @@ class Select extends Field implements FilterableField
     public function displayUsingLabels()
     {
         $this->displayUsing(function ($value) {
-            if (is_null($value) || $this->isValidNullValue($value)) {
+            if (\is_null($value) || $this->isValidNullValue($value)) {
                 return $value;
             }
 
@@ -121,7 +121,7 @@ class Select extends Field implements FilterableField
         /** @var TOption $options */
         $options = value($this->optionsCallback);
 
-        if (is_string($options) && enum_exists($options)) {
+        if (\is_string($options) && enum_exists($options)) {
             /** @var class-string<\BackedEnum> $options */
             return collect($options::cases())
                 ->map(static fn ($option) => [
@@ -130,7 +130,7 @@ class Select extends Field implements FilterableField
                 ])->all();
         }
 
-        if (is_callable($options)) {
+        if (\is_callable($options)) {
             $options = $options();
         }
 
@@ -145,7 +145,7 @@ class Select extends Field implements FilterableField
                 ];
             }
 
-            return is_array($label) ? $label + ['value' => $value] : ['label' => $label, 'value' => $value];
+            return \is_array($label) ? $label + ['value' => $value] : ['label' => $label, 'value' => $value];
         })->values()->all();
     }
 

@@ -24,12 +24,12 @@ trait Filterable
     {
         if (property_exists($this, 'requiresExplicitFilterableCallback')
             && $this->requiresExplicitFilterableCallback === true
-            && is_null($filterableCallback)
+            && \is_null($filterableCallback)
         ) {
             throw new InvalidArgumentException('$filterableCallback needs to be callable/Closure');
         }
 
-        $this->filterableCallback = ! is_null($filterableCallback)
+        $this->filterableCallback = ! \is_null($filterableCallback)
             ? $filterableCallback
             : $this->defaultFilterableCallback();
 
@@ -55,7 +55,7 @@ trait Filterable
      */
     public function applyFilter(NovaRequest $request, $query, mixed $value): void
     {
-        call_user_func($this->filterableCallback, $request, $query, $value, $this->filterableAttribute($request));
+        \call_user_func($this->filterableCallback, $request, $query, $value, $this->filterableAttribute($request));
     }
 
     /**
@@ -73,7 +73,7 @@ trait Filterable
      */
     public function resolveFilter(NovaRequest $request)
     {
-        return is_callable($this->filterableCallback) ? $this->makeFilter($request) : null;
+        return \is_callable($this->filterableCallback) ? $this->makeFilter($request) : null;
     }
 
     /**

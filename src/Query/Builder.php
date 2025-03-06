@@ -342,7 +342,7 @@ class Builder implements QueryBuilder
             collect($this->queryCallbacks)
                 ->filter()
                 ->each(static function ($callback) use ($query) {
-                    call_user_func($callback, $query);
+                    \call_user_func($callback, $query);
                 });
         };
 

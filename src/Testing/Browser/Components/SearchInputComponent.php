@@ -27,7 +27,7 @@ class SearchInputComponent extends Component
 
         $input = $resolver->find("[dusk='{$this->attribute}-search-input-dropdown']");
 
-        if (is_null($input) || ! $input->isDisplayed()) {
+        if (\is_null($input) || ! $input->isDisplayed()) {
             $browser->click('');
         }
     }
@@ -57,7 +57,7 @@ class SearchInputComponent extends Component
 
         $element = $browser->element($selector);
 
-        if (! is_null($element) && $element->isDisplayed()) {
+        if (! \is_null($element) && $element->isDisplayed()) {
             $browser->click($selector)->pause(1500);
         }
     }
@@ -133,7 +133,7 @@ class SearchInputComponent extends Component
         $selector = $this->selector();
 
         $browser->elsewhereWhenAvailable("{$selector}-dropdown", function (Browser $browser) use ($selector, $fieldCallback) {
-            call_user_func($fieldCallback, $browser, $selector);
+            \call_user_func($fieldCallback, $browser, $selector);
 
             $this->cancelSelectingSearchResult($browser);
         });

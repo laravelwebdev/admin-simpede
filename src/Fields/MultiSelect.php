@@ -130,14 +130,14 @@ class MultiSelect extends Field implements FilterableField
         /** @var TOption $options */
         $options = value($this->optionsCallback);
 
-        if (is_callable($options)) {
+        if (\is_callable($options)) {
             $options = $options();
         }
 
         return collect($options ?? [])->map(static function ($label, $value) {
             $value = Util::safeInt($value);
 
-            return is_array($label) ? $label + ['value' => $value] : ['label' => $label, 'value' => $value];
+            return \is_array($label) ? $label + ['value' => $value] : ['label' => $label, 'value' => $value];
         })->values()->all();
     }
 

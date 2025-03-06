@@ -2,11 +2,14 @@
 
 namespace Laravel\Nova\Fields;
 
+use Laravel\Nova\Http\Requests\NovaRequest;
+
 /**
  * @method static static make(mixed $name, string|null $attribute = null, callable|null $resolveCallback = null)
  */
 class Heading extends Field implements Unfillable
 {
+    use AsHTML;
     use SupportsDependentFields;
 
     /**
@@ -30,16 +33,23 @@ class Heading extends Field implements Unfillable
 
         $this->withMeta(['value' => $name]);
         $this->hideFromIndex();
-        $this->withMeta(['asHtml' => false]);
     }
 
     /**
-     * Display the field as raw HTML using Vue.
+     * Prepare the element for JSON serialization.
      *
-     * @return $this
+     * @return array<string, mixed>
      */
-    public function asHtml()
+    #[\Override]
+    public function jsonSerialize(): array
     {
-        return $this->withMeta(['asHtml' => true]);
+        $request = app(NovaRequest::class);
+
+        $displayedAs = $this->serializeDisplayedValueAsHtml($request);
+
+        return array_merge(parent::jsonSerialize(), [
+            'asHtml' => $this->asHtml,
+            'displayedAs' => $displayedAs,
+        ]);
     }
 }

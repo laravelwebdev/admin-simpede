@@ -48,7 +48,7 @@ class JSON implements Preset
                     ->withoutMissingValues()
                     ->map(
                         static fn (Field $field) => $field->fillInto($request, $data, $field->attribute, "{$requestAttribute}.{$itemIndex}.fields.{$field->attribute}")
-                    )->filter(static fn ($callback) => is_callable($callback));
+                    )->filter(static fn ($callback) => \is_callable($callback));
 
                 if ($uniqueField) {
                     $this->upsertData($existingItems, $data, $uniqueField);
@@ -127,7 +127,7 @@ class JSON implements Preset
     protected function cleanObsoleteFields(Fluent $data, FieldCollection $fields): void
     {
         foreach ($data->getAttributes() as $attribute => $value) {
-            if (is_null($fields->findFieldByAttribute($attribute))) {
+            if (\is_null($fields->findFieldByAttribute($attribute))) {
                 $data->offsetUnset($attribute);
             }
         }

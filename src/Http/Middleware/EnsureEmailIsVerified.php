@@ -18,7 +18,7 @@ class EnsureEmailIsVerified extends Middleware
     #[\Override]
     public function handle($request, Closure $next, $redirectToRoute = null)
     {
-        if (is_null($redirectToRoute) && Route::has('nova.pages.verification.notice')) {
+        if (\is_null($redirectToRoute) && Route::has('nova.pages.verification.notice')) {
             $redirectToRoute = 'nova.pages.verification.notice';
         }
 

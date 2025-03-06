@@ -87,9 +87,9 @@ trait MutableFields
      */
     public function isWritable(NovaRequest $request): bool
     {
-        if (! is_bool($this->isWritable)) {
+        if (! \is_bool($this->isWritable)) {
             $this->isWritable = with($this->writableCallback, function ($callback) use ($request) {
-                if ($callback === true || (is_callable($callback) && call_user_func($callback, $request))) {
+                if ($callback === true || (\is_callable($callback) && \call_user_func($callback, $request))) {
                     $this->withMeta(['extraAttributes' => ['readonly' => true]]);
 
                     return true;
@@ -160,8 +160,8 @@ trait MutableFields
      */
     public function resolveDefaultCallback(NovaRequest $request): mixed
     {
-        if (is_null($this->value) && Util::isSafeCallable($this->defaultCallback)) {
-            return call_user_func($this->defaultCallback, $request);
+        if (\is_null($this->value) && Util::isSafeCallable($this->defaultCallback)) {
+            return \call_user_func($this->defaultCallback, $request);
         }
 
         return $this->defaultCallback;
@@ -193,10 +193,10 @@ trait MutableFields
      */
     public function isReadonly(NovaRequest $request): bool
     {
-        if (! is_bool($this->isReadonly)) {
+        if (! \is_bool($this->isReadonly)) {
             $this->isReadonly = with($this->readonlyCallback, function ($callback) use ($request) {
-                if ($callback === true || (is_callable($callback) && call_user_func($callback, $request))) {
-                    if (is_null($this->isWritable)) {
+                if ($callback === true || (\is_callable($callback) && \call_user_func($callback, $request))) {
+                    if (\is_null($this->isWritable)) {
                         $this->immutable();
                     }
 

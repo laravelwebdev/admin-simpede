@@ -54,7 +54,7 @@ class RepeatableCollection extends Collection
      */
     public function newRepeatableByModel($model)
     {
-        $repeatable = $this->findByModelClass(get_class($model));
+        $repeatable = $this->findByModelClass($model::class);
 
         return new $repeatable($model);
     }

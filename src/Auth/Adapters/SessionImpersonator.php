@@ -36,11 +36,11 @@ class SessionImpersonator implements ImpersonatesUsers
 
             $authGuard = match (true) {
                 property_exists($guard, 'name') => $guard->name,
-                method_exists($guard, 'getName') => Str::between($guard->getName(), 'login_', '_'.sha1(get_class($guard))),
+                method_exists($guard, 'getName') => Str::between($guard->getName(), 'login_', '_'.sha1($guard::class)),
                 default => null,
             };
 
-            if (is_null($authGuard)) {
+            if (\is_null($authGuard)) {
                 return false;
             }
 

@@ -8,7 +8,9 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Http\Middleware\CheckResponseForModifications;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -17,6 +19,8 @@ use Laravel\Nova\Contracts\ImpersonatesUsers;
 use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Events\ServingNova;
 use Laravel\Nova\Http\Middleware\Authenticate;
+use Laravel\Nova\Http\Middleware\BootTools;
+use Laravel\Nova\Http\Middleware\DispatchServingNovaEvent;
 use Laravel\Nova\Http\Middleware\RedirectIfAuthenticated;
 use Laravel\Nova\Http\Middleware\ServeNova;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -49,8 +53,16 @@ class NovaCoreServiceProvider extends ServiceProvider
 
         Route::aliasMiddleware('nova.guest', RedirectIfAuthenticated::class);
         Route::aliasMiddleware('nova.auth', Authenticate::class);
+        Route::middlewareGroup('nova:serving', [
+            DispatchServingNovaEvent::class,
+            BootTools::class,
+        ]);
         Route::middlewareGroup('nova', config('nova.middleware', []));
         Route::middlewareGroup('nova:api', config('nova.api_middleware', []));
+        Route::middlewareGroup('nova:asset', config('nova.asset_middleware', [
+            'nova:api',
+            CheckResponseForModifications::class,
+        ]));
 
         $this->app->make(HttpKernel::class)
             ->pushMiddleware(ServeNova::class);
@@ -71,8 +83,8 @@ class NovaCoreServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (! defined('NOVA_PATH')) {
-            define('NOVA_PATH', realpath(__DIR__.'/../'));
+        if (! \defined('NOVA_PATH')) {
+            \define('NOVA_PATH', realpath(__DIR__.'/../'));
         }
 
         $this->app->singleton(ImpersonatesUsers::class, SessionImpersonator::class);
@@ -88,7 +100,9 @@ class NovaCoreServiceProvider extends ServiceProvider
     protected function registerAboutCommand(): void
     {
         AboutCommand::add('Nova', static function () {
-            $formatEnabledStatus = static fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
+            $formatEnabledStatus = static function ($value) {
+                return $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
+            };
 
             return [
                 'Version' => fn () => Nova::version(),
@@ -167,23 +181,28 @@ class NovaCoreServiceProvider extends ServiceProvider
      */
     protected function registerRoutes(): void
     {
-        Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+        Route::group(['prefix' => 'nova-api'], function (Router $router) {
+            $router->group($this->routeConfiguration(group: 'asset'), function () {
+                $this->loadRoutesFrom(__DIR__.'/../routes/asset.php');
+            });
+
+            $router->group($this->routeConfiguration(group: 'api'), function () {
+                $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+            });
         });
     }
 
     /**
      * Get the Nova route group configuration array.
      *
-     * @return array{domain: string|null, as: string, prefix: string, middleware: string}
+     * @return array{domain: string|null, as: string, middleware: string, excluded_middleware: array<int, class-string>}
      */
-    protected function routeConfiguration(): array
+    protected function routeConfiguration(string $group): array
     {
         return [
             'domain' => config('nova.domain', null),
-            'as' => 'nova.api.',
-            'prefix' => 'nova-api',
-            'middleware' => 'nova:api',
+            'as' => "nova.{$group}.",
+            'middleware' => "nova:{$group}",
             'excluded_middleware' => [SubstituteBindings::class],
         ];
     }

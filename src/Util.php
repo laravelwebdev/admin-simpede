@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Stringable;
@@ -23,12 +22,12 @@ class Util
         $domain = config('nova.domain');
         $path = trim(Nova::path(), '/') ?: '/';
 
-        if (! is_null($domain) && $domain !== config('app.url') && $path === '/') {
+        if (! \is_null($domain) && $domain !== config('app.url') && $path === '/') {
             if (! Str::startsWith($domain, ['http://', 'https://', '://'])) {
                 $domain = $request->getScheme().'://'.$domain;
             }
 
-            if (! in_array($port = $request->getPort(), [443, 80]) && ! str_ends_with($domain, ":{$port}")) {
+            if (! \in_array($port = $request->getPort(), [443, 80]) && ! str_ends_with($domain, ":{$port}")) {
                 $domain = $domain.':'.$port;
             }
 
@@ -39,10 +38,12 @@ class Util
                 : rtrim($request->getHttpHost(), '/') === $uri['host'];
         }
 
-        return $request->is($path) ||
-            $request->is(trim($path.'/*', '/')) ||
-            $request->is('nova-api/*') ||
-            $request->is('nova-vendor/*');
+        return $request->is(...[
+            $path,
+            trim("{$path}/*", '/'),
+            'nova-api/*',
+            'nova-vendor/*',
+        ]);
     }
 
     /**
@@ -54,7 +55,7 @@ class Util
     {
         $jsonMaxInt = 9007199254740991;
 
-        if (is_int($value) && $value >= $jsonMaxInt) {
+        if (\is_int($value) && $value >= $jsonMaxInt) {
             return (string) $value;
         } elseif (filter_var($value, FILTER_VALIDATE_INT) && $value < $jsonMaxInt) {
             return (int) $value;
@@ -72,15 +73,15 @@ class Util
             return true;
         }
 
-        if (! is_callable($value)) {
+        if (! \is_callable($value)) {
             return false;
         }
 
-        if (is_array($value)) {
-            return count($value) === 2 && array_is_list($value) && method_exists(...$value);
+        if (\is_array($value)) {
+            return \count($value) === 2 && array_is_list($value) && method_exists(...$value);
         }
 
-        return ! is_string($value);
+        return ! \is_string($value);
     }
 
     /**
@@ -88,9 +89,11 @@ class Util
      */
     public static function isFortifyRoutesRegisteredForFrontend(): bool
     {
-        return Collection::make([
-            \App\Providers\FortifyServiceProvider::class, // @phpstan-ignore class.notFound
-            \App\Providers\JetstreamServiceProvider::class, // @phpstan-ignore class.notFound
+        $appNamespace = app()->getNamespace();
+
+        return collect([
+            "{$appNamespace}Providers\FortifyServiceProvider",
+            "{$appNamespace}Providers\JetstreamServiceProvider",
         ])->map(static fn ($provider) => app()->getProvider($provider))
         ->filter()
         ->isNotEmpty();
@@ -105,9 +108,9 @@ class Util
     {
         if ($value instanceof BackedEnum) {
             return $value->value;
-        } elseif (is_object($value) && $value instanceof Stringable) {
+        } elseif (\is_object($value) && $value instanceof Stringable) {
             return (string) $value;
-        } elseif (is_object($value) || is_array($value)) {
+        } elseif (\is_object($value) || \is_array($value)) {
             return rescue(static fn () => json_encode($value), $value);
         }
 
@@ -163,8 +166,8 @@ class Util
      */
     public static function sessionAuthGuardForModel($model): ?string
     {
-        if (is_object($model)) {
-            $model = get_class($model);
+        if (\is_object($model)) {
+            $model = $model::class;
         }
 
         $provider = collect(config('auth.providers'))
@@ -186,7 +189,7 @@ class Util
      */
     public static function resolveResourceOrModelForAuthorization(Resource $resource): Model|Resource
     {
-        if (property_exists($resource, 'policy') && ! is_null($resource::$policy)) {
+        if (property_exists($resource, 'policy') && ! \is_null($resource::$policy)) {
             return $resource;
         }
 
@@ -230,11 +233,9 @@ class Util
             'ProhibitedUnless',
             'Prohibits',
             'Same',
-        ])->mapWithKeys(static function ($rule) use ($attribute) {
-            $rule = Str::snake($rule);
-
-            return ["{$rule}:" => "{$rule}:{$attribute}."];
-        })->all();
+        ])->transform(static fn ($rule) => Str::snake($rule))
+        ->mapWithKeys(static fn ($rule) => ["{$rule}:" => "{$rule}:{$attribute}."])
+        ->all();
     }
 
     /**
@@ -264,7 +265,7 @@ class Util
         throw_unless(
             isset(class_uses_recursive($pivot)[AsPivot::class]),
             RuntimeException::class,
-            sprintf('%s model need to uses %s trait', $pivot::class, AsPivot::class),
+            \sprintf('%s model need to uses %s trait', $pivot::class, AsPivot::class),
         );
 
         return $pivot;

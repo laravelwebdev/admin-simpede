@@ -290,7 +290,7 @@ class MenuItem implements JsonSerializable
      */
     public function method(string $method, ?array $data = null, ?array $headers = null)
     {
-        if (! in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])) {
+        if (! \in_array($method, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])) {
             throw new InvalidArgumentException('Only supports GET, POST, PUT, PATCH or DELETE method');
         }
 

@@ -61,14 +61,14 @@ trait HandlesValidation
      */
     public function rules($rules)
     {
-        $parameters = func_get_args();
+        $parameters = \func_get_args();
 
         $this->rules = (
             $rules instanceof Rule ||
             $rules instanceof InvokableRule ||
             $rules instanceof ValidationRule ||
-            is_string($rules) ||
-            count($parameters) > 1
+            \is_string($rules) ||
+            \count($parameters) > 1
         ) ? $parameters : $rules;
 
         return $this;
@@ -84,7 +84,7 @@ trait HandlesValidation
     public function getRules(NovaRequest $request): array
     {
         return [
-            $this->attribute => is_callable($this->rules) ? call_user_func($this->rules, $request) : $this->rules,
+            $this->attribute => \is_callable($this->rules) ? \call_user_func($this->rules, $request) : $this->rules,
         ];
     }
 
@@ -98,7 +98,7 @@ trait HandlesValidation
     public function getCreationRules(NovaRequest $request): array
     {
         $rules = [
-            $this->attribute => is_callable($this->creationRules) ? call_user_func(
+            $this->attribute => \is_callable($this->creationRules) ? \call_user_func(
                 $this->creationRules,
                 $request
             ) : $this->creationRules,
@@ -119,14 +119,14 @@ trait HandlesValidation
      */
     public function creationRules($rules)
     {
-        $parameters = func_get_args();
+        $parameters = \func_get_args();
 
         $this->creationRules = (
             $rules instanceof Rule ||
             $rules instanceof InvokableRule ||
             $rules instanceof ValidationRule ||
-            is_string($rules) ||
-            count($parameters) > 1
+            \is_string($rules) ||
+            \count($parameters) > 1
         ) ? $parameters : $rules;
 
         return $this;
@@ -142,7 +142,7 @@ trait HandlesValidation
     public function getUpdateRules(NovaRequest $request): array
     {
         $rules = [
-            $this->attribute => is_callable($this->updateRules) ? call_user_func(
+            $this->attribute => \is_callable($this->updateRules) ? \call_user_func(
                 $this->updateRules,
                 $request
             ) : $this->updateRules,
@@ -163,14 +163,14 @@ trait HandlesValidation
      */
     public function updateRules($rules)
     {
-        $parameters = func_get_args();
+        $parameters = \func_get_args();
 
         $this->updateRules = (
             $rules instanceof Rule ||
             $rules instanceof InvokableRule ||
             $rules instanceof ValidationRule ||
-            is_string($rules) ||
-            count($parameters) > 1
+            \is_string($rules) ||
+            \count($parameters) > 1
         ) ? $parameters : $rules;
 
         return $this;

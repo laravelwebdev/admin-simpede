@@ -195,7 +195,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
         }
 
         if ($value) {
-            if (! is_string($this->resourceClass)) {
+            if (! \is_string($this->resourceClass)) {
                 $this->morphToType = $value->getMorphClass();
                 $this->value = (string) $value->getKey();
 
@@ -311,14 +311,14 @@ class MorphTo extends Field implements FilterableField, RelatableField
 
         $model->setAttribute(
             $morphType,
-            ! is_null($instance) ? $this->getMorphAliasForClass($instance::class) : null
+            ! \is_null($instance) ? $this->getMorphAliasForClass($instance::class) : null
         );
 
         $foreignKey = $this->getRelationForeignKeyName($relationship);
 
         parent::fillInto($request, $model, $foreignKey);
 
-        if (is_null($model->getAttribute($morphType))) {
+        if (\is_null($model->getAttribute($morphType))) {
             $model->setAttribute($foreignKey, null);
         }
 
@@ -386,7 +386,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
     protected function formatDisplayValue(Resource $resource, string $relatedResource): string
     {
         if ($display = $this->displayFor($relatedResource)) {
-            return call_user_func($display, $resource);
+            return \call_user_func($display, $resource);
         }
 
         return (string) $resource->title();
@@ -404,7 +404,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
             ->map(static fn ($display, $key) => [ // @phpstan-ignore argument.unresolvableType
                 'type' => is_numeric($key) ? $display : $key,
                 'singularLabel' => is_numeric($key) ? $display::singularLabel() : $key::singularLabel(),
-                'display' => (is_string($display) && is_numeric($key)) ? $display::singularLabel() : $display,
+                'display' => (\is_string($display) && is_numeric($key)) ? $display::singularLabel() : $display,
                 'value' => is_numeric($key) ? $display::uriKey() : $key::uriKey(),
             ])->values()->all();
 
@@ -419,7 +419,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
      */
     public function display($display)
     {
-        if (is_array($display)) {
+        if (\is_array($display)) {
             $this->display = collect($display)->mapWithKeys(
                 fn ($display, $type) => [$type => $this->ensureDisplayerIsCallable($display)]
             )->all();
@@ -447,7 +447,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
      */
     public function displayFor(string $type): ?callable
     {
-        if (is_array($this->display) && $type) {
+        if (\is_array($this->display) && $type) {
             return $this->display[$type] ?? null;
         }
 
@@ -501,8 +501,8 @@ class MorphTo extends Field implements FilterableField, RelatableField
     protected function resolveDefaultResource(NovaRequest $request)
     {
         if ($request->isCreateOrAttachRequest() || $request->isResourceIndexRequest() || $request->isActionRequest()) {
-            if (is_null($this->value) && Util::isSafeCallable($this->defaultResourceCallable)) {
-                $class = call_user_func($this->defaultResourceCallable, $request);
+            if (\is_null($this->value) && Util::isSafeCallable($this->defaultResourceCallable)) {
+                $class = \call_user_func($this->defaultResourceCallable, $request);
             } else {
                 $class = $this->defaultResourceCallable;
             }
@@ -576,9 +576,9 @@ class MorphTo extends Field implements FilterableField, RelatableField
         $resourceClass = $this->resourceClass;
 
         return with(app(NovaRequest::class), function ($request) use ($resourceClass) {
-            $viewable = ! is_null($this->viewable)
+            $viewable = ! \is_null($this->viewable)
                     ? $this->viewable
-                    : (! is_null($resourceClass) ? $resourceClass::authorizedToViewAny($request) : true);
+                    : (! \is_null($resourceClass) ? $resourceClass::authorizedToViewAny($request) : true);
 
             return array_merge([
                 'debounce' => $this->debounce,

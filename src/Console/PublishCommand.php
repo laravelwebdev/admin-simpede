@@ -65,7 +65,7 @@ class PublishCommand extends Command
      */
     protected function migrationNameExists(Filesystem $files, string $name): bool
     {
-        return count($files->glob(
+        return \count($files->glob(
             join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_'.$name.'.php')
         )) !== 0;
     }

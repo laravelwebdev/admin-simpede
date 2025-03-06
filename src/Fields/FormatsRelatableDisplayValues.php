@@ -26,8 +26,8 @@ trait FormatsRelatableDisplayValues
             $resource = Nova::newResourceFromModel($resource);
         }
 
-        if (is_callable($this->display)) {
-            return call_user_func($this->display, $resource);
+        if (\is_callable($this->display)) {
+            return \call_user_func($this->display, $resource);
         }
 
         return $resource->title();

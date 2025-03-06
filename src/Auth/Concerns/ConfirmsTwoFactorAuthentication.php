@@ -16,7 +16,7 @@ trait ConfirmsTwoFactorAuthentication
     {
         $user = Nova::user($request);
 
-        if (! Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm') || is_null($user)) {
+        if (! Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm') || \is_null($user)) {
             return;
         }
 
@@ -48,8 +48,8 @@ trait ConfirmsTwoFactorAuthentication
      */
     protected function twoFactorAuthenticationDisabled(NovaRequest $request, $user): bool
     {
-        return is_null($user->two_factor_secret) &&
-            is_null($user->two_factor_confirmed_at);
+        return \is_null($user->two_factor_secret) &&
+            \is_null($user->two_factor_confirmed_at);
     }
 
     /**
@@ -59,10 +59,10 @@ trait ConfirmsTwoFactorAuthentication
      */
     protected function hasJustBegunConfirmingTwoFactorAuthentication(NovaRequest $request, $user): bool
     {
-        return ! is_null($user->two_factor_secret) &&
-            is_null($user->two_factor_confirmed_at) &&
+        return ! \is_null($user->two_factor_secret) &&
+            \is_null($user->two_factor_confirmed_at) &&
             $request->session()->has('two_factor_empty_at') &&
-            is_null($request->session()->get('two_factor_confirming_at'));
+            \is_null($request->session()->get('two_factor_confirming_at'));
     }
 
     /**
@@ -72,8 +72,8 @@ trait ConfirmsTwoFactorAuthentication
      */
     protected function neverFinishedConfirmingTwoFactorAuthentication(NovaRequest $request, $user, int $currentTime): bool
     {
-        return ! array_key_exists('code', $request->session()->getOldInput()) &&
-            is_null($user->two_factor_confirmed_at) &&
+        return ! \array_key_exists('code', $request->session()->getOldInput()) &&
+            \is_null($user->two_factor_confirmed_at) &&
             $request->session()->get('two_factor_confirming_at', 0) != $currentTime;
     }
 }

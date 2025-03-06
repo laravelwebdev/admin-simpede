@@ -76,7 +76,7 @@ class Sparkline extends Field implements Unfillable
                 )->trend ?? []
             );
         } elseif (Util::isSafeCallable($this->data)) {
-            return call_user_func($this->data, $request);
+            return \call_user_func($this->data, $request);
         }
 
         return $this->data;

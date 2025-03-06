@@ -2,7 +2,6 @@
 
 namespace Laravel\Nova\Fields;
 
-use Illuminate\Support\Str;
 use Laravel\Nova\Fields\Attachments\DeleteAttachments;
 use Laravel\Nova\Fields\Attachments\DetachAnyAttachment;
 use Laravel\Nova\Fields\Attachments\DiscardPendingAttachments;
@@ -133,11 +132,11 @@ trait HasAttachments
 
         $maybeCallback = parent::fillAttribute($request, $requestAttribute, $model, $attribute);
 
-        $attribute = Str::contains($requestAttribute, '.') && $this->attribute !== $requestAttribute
+        $attribute = str_contains($requestAttribute, '.') && $this->attribute !== $requestAttribute
             ? "{$requestAttribute}DraftId"
-            : Str::replace('.', '->', "{$this->attribute}DraftId");
+            : str_replace('.', '->', "{$this->attribute}DraftId");
 
-        if (is_callable($maybeCallback)) {
+        if (\is_callable($maybeCallback)) {
             $callbacks[] = $maybeCallback;
         }
 
@@ -151,7 +150,7 @@ trait HasAttachments
             };
         }
 
-        if (count($callbacks)) {
+        if (\count($callbacks)) {
             return static function () use ($callbacks) {
                 collect($callbacks)->each->__invoke();
             };

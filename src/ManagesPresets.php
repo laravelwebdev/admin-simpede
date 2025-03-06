@@ -20,7 +20,7 @@ trait ManagesPresets
      */
     public function preset($preset, $presetClass = null)
     {
-        if (! is_null($presetClass)) {
+        if (! \is_null($presetClass)) {
             $this->presets[$preset] = $presetClass;
         }
 

@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Support;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Laravel\Nova\Makeable;
 
 class Fluent extends \Illuminate\Support\Fluent
@@ -19,7 +18,7 @@ class Fluent extends \Illuminate\Support\Fluent
     public function fill($attributes)
     {
         foreach ($attributes as $key => $value) {
-            $attribute = Str::replace('->', '.', $key);
+            $attribute = str_replace('->', '.', $key);
 
             if (! Arr::has($this->attributes, $attribute)) {
                 Arr::set($this->attributes, $attribute, $value);
@@ -38,7 +37,7 @@ class Fluent extends \Illuminate\Support\Fluent
     public function forceFill($attributes)
     {
         foreach ($attributes as $key => $value) {
-            $attribute = Str::replace('->', '.', $key);
+            $attribute = str_replace('->', '.', $key);
 
             Arr::set($this->attributes, $attribute, $value);
         }
@@ -55,7 +54,7 @@ class Fluent extends \Illuminate\Support\Fluent
      */
     public function value($key, $default = null)
     {
-        if (array_key_exists($key, $this->attributes)) {
+        if (\array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
         }
 

@@ -31,8 +31,8 @@ trait HasSuggestions
      */
     public function resolveSuggestions(NovaRequest $request): ?iterable
     {
-        if (is_callable($this->suggestions)) {
-            return call_user_func($this->suggestions, $request) ?? null;
+        if (\is_callable($this->suggestions)) {
+            return \call_user_func($this->suggestions, $request) ?? null;
         }
 
         return $this->suggestions;

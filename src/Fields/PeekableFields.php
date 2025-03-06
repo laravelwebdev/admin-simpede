@@ -31,8 +31,8 @@ trait PeekableFields
      */
     public function isShownWhenPeeking(NovaRequest $request): bool
     {
-        if (is_callable($this->showWhenPeeking)) {
-            $this->showWhenPeeking = call_user_func($this->showWhenPeeking, $request);
+        if (\is_callable($this->showWhenPeeking)) {
+            $this->showWhenPeeking = \call_user_func($this->showWhenPeeking, $request);
         }
 
         return $this->showWhenPeeking;

@@ -93,7 +93,7 @@ class HasMany extends Field implements ListableField, RelatableField
     #[\Override]
     public function authorize(Request $request)
     {
-        return call_user_func(
+        return \call_user_func(
             [$this->resourceClass, 'authorizedToViewAny'], $request
         ) && parent::authorize($request);
     }

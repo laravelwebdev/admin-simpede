@@ -11,7 +11,7 @@ class DetachAnyAttachment
      */
     public function __invoke(NovaRequest $request): void
     {
-        call_user_func(new DetachAttachment, $request);
-        call_user_func(new DetachPendingAttachment, $request);
+        \call_user_func(new DetachAttachment, $request);
+        \call_user_func(new DetachPendingAttachment, $request);
     }
 }

@@ -66,7 +66,7 @@ class BooleanGroup extends Field implements FilterableField
     public function options(callable|iterable $options)
     {
         if (Util::isSafeCallable($options)) {
-            $options = call_user_func($options);
+            $options = \call_user_func($options);
         }
 
         $this->options = with(collect($options), static function ($options) {
@@ -152,7 +152,7 @@ class BooleanGroup extends Field implements FilterableField
     {
         return static function (NovaRequest $request, $query, $value, $attribute) {
             $value = collect($value)
-                ->reject(static fn ($value) => is_null($value))
+                ->reject(static fn ($value) => \is_null($value))
                 ->all();
 
             $query->when(! empty($value), static function ($query) use ($value, $attribute) {

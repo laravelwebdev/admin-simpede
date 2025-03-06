@@ -66,18 +66,18 @@ class Dependent
     {
         /** @var TDependentResolver|null $resolver */
         $resolver = (
-            ($request->isCreateOrAttachRequest() && ! in_array('create', $this->context))
-            || ($request->isUpdateOrUpdateAttachedRequest() && ! in_array('update', $this->context))
+            ($request->isCreateOrAttachRequest() && ! \in_array('create', $this->context))
+            || ($request->isUpdateOrUpdateAttachedRequest() && ! \in_array('update', $this->context))
         ) ? null : $this->resolver;
 
         $this->formData = FormData::onlyFrom($request, array_merge($this->attributes, [$field->attribute]));
 
-        if (is_string($resolver) && class_exists($resolver)) {
+        if (\is_string($resolver) && class_exists($resolver)) {
             $resolver = new $resolver;
         }
 
-        if (is_callable($resolver)) {
-            call_user_func($resolver, $field, $request, $this->formData);
+        if (\is_callable($resolver)) {
+            \call_user_func($resolver, $field, $request, $this->formData);
         }
 
         return $this;

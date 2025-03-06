@@ -35,7 +35,7 @@ class RestoreResources
                 /** @phpstan-ignore method.notFound */
                 $model->restore();
 
-                if (! is_null($this->resourceClass)) {
+                if (! \is_null($this->resourceClass)) {
                     $this->resourceClass::afterRestore($this->request, $model);
                 }
 

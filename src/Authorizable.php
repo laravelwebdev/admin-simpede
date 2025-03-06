@@ -21,7 +21,7 @@ trait Authorizable
      */
     public static function authorizable()
     {
-        return ! is_null(static::authorizationGate());
+        return ! \is_null(static::authorizationGate());
     }
 
     /**
@@ -51,7 +51,7 @@ trait Authorizable
 
         $gate = static::authorizationGate();
 
-        if (is_callable([$gate, 'viewAny'])) {
+        if (\is_callable([$gate, 'viewAny'])) {
             $this->authorizeTo($request, 'viewAny');
         }
     }
@@ -71,7 +71,7 @@ trait Authorizable
 
         $resource = Util::resolveResourceOrModelForAuthorization(new static(static::newModel()));
 
-        return is_callable([$gate, 'viewAny'])
+        return \is_callable([$gate, 'viewAny'])
             ? Gate::forUser(Nova::user($request))->check('viewAny', $resource::class)
             : true;
     }
@@ -163,7 +163,7 @@ trait Authorizable
 
         $gate = static::authorizationGate();
 
-        if (is_callable([$gate, 'replicate'])) {
+        if (\is_callable([$gate, 'replicate'])) {
             $this->authorizeTo($request, 'replicate');
 
             return;
@@ -188,7 +188,7 @@ trait Authorizable
 
         $resource = Util::resolveResourceOrModelForAuthorization($this);
 
-        return is_callable([$gate, 'replicate'])
+        return \is_callable([$gate, 'replicate'])
             ? Gate::forUser(Nova::user($request))->check('replicate', $resource)
             : $this->authorizedToCreate($request) && $this->authorizedToUpdate($request);
     }
@@ -252,8 +252,8 @@ trait Authorizable
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'add'.class_basename($model);
 
-        return is_callable([$gate, $method])
-            ? Gate::forUser(Nova::user($request))->check($method, $resource)
+        return \is_callable([$gate, $method])
+            ? Gate::forUser(Nova::user($request))->check($method, [$resource, $model])
             : true;
     }
 
@@ -274,7 +274,7 @@ trait Authorizable
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'attachAny'.Str::singular(class_basename($model));
 
-        return is_callable([$gate, $method])
+        return \is_callable([$gate, $method])
             ? Gate::forUser(Nova::user($request))->check($method, [$resource])
             : true;
     }
@@ -296,7 +296,7 @@ trait Authorizable
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'attach'.Str::singular(class_basename($model));
 
-        return is_callable([$gate, $method])
+        return \is_callable([$gate, $method])
             ? Gate::forUser(Nova::user($request))->check($method, [$resource, $model])
             : true;
     }
@@ -319,7 +319,7 @@ trait Authorizable
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'detach'.Str::singular(class_basename($model));
 
-        return is_callable([$gate, $method])
+        return \is_callable([$gate, $method])
             ? Gate::forUser(Nova::user($request))->check($method, [$resource, $model])
             : true;
     }
@@ -344,7 +344,7 @@ trait Authorizable
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'runAction';
 
-        return is_callable([$gate, $method])
+        return \is_callable([$gate, $method])
             ? Gate::forUser(Nova::user($request))->check($method, [$resource, $action])
             : $this->authorizedToUpdate($request);
     }
@@ -365,7 +365,7 @@ trait Authorizable
         $resource = Util::resolveResourceOrModelForAuthorization($this);
         $method = 'runDestructiveAction';
 
-        return is_callable([$gate, $method])
+        return \is_callable([$gate, $method])
             ? Gate::forUser(Nova::user($request))->check($method, [$resource, $action])
             : $this->authorizedToDelete($request);
     }

@@ -37,6 +37,6 @@ class DeleteResourceRequest extends DeletionRequest
      */
     public function isForSingleResource(): bool
     {
-        return $this->resources !== 'all' && count($this->resources) == 1;
+        return $this->resources !== 'all' && \count($this->resources) == 1;
     }
 }

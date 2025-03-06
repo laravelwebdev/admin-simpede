@@ -48,13 +48,13 @@ class FilterDecoder
         })
             ->filter()
             ->reject(static function ($filter) {
-                if (is_array($filter['value'])) {
-                    return count($filter['value']) < 1;
-                } elseif (is_string($filter['value'])) {
+                if (\is_array($filter['value'])) {
+                    return \count($filter['value']) < 1;
+                } elseif (\is_string($filter['value'])) {
                     return trim($filter['value']) === '';
                 }
 
-                return is_null($filter['value']);
+                return \is_null($filter['value']);
             })->map(static fn ($filter) => new ApplyFilter($filter['filter'], $filter['value']))
             ->values();
     }
@@ -72,6 +72,6 @@ class FilterDecoder
 
         $filters = json_decode(base64_decode($this->filterString), true);
 
-        return is_array($filters) ? $filters : [];
+        return \is_array($filters) ? $filters : [];
     }
 }

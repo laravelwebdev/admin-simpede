@@ -49,8 +49,8 @@ trait PreviewableFields
      */
     public function isShownOnPreview(NovaRequest $request, $resource): bool
     {
-        if (is_callable($this->showOnPreview)) {
-            $this->showOnPreview = call_user_func($this->showOnPreview, $request, $resource);
+        if (\is_callable($this->showOnPreview)) {
+            $this->showOnPreview = \call_user_func($this->showOnPreview, $request, $resource);
         }
 
         return $this->showOnPreview;

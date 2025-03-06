@@ -177,7 +177,6 @@ class FieldCollection extends Collection
      */
     public function filterForDetail(NovaRequest $request, $resource)
     {
-        /** @phpstan-ignore return.type */
         return $this->filter->isShownOnDetail($request, $resource)->values();
     }
 
@@ -189,7 +188,6 @@ class FieldCollection extends Collection
      */
     public function filterForPreview(NovaRequest $request, $resource)
     {
-        /** @phpstan-ignore return.type */
         return $this->filter->isShownOnPreview($request, $resource)->values();
     }
 
@@ -200,7 +198,6 @@ class FieldCollection extends Collection
      */
     public function filterForPeeking(NovaRequest $request)
     {
-        /** @phpstan-ignore return.type */
         return $this->filter->isShownWhenPeeking($request)->values();
     }
 
@@ -212,7 +209,6 @@ class FieldCollection extends Collection
      */
     public function filterForIndex(NovaRequest $request, $resource)
     {
-        /** @phpstan-ignore return.type */
         return $this->filter->isShownOnIndex($request, $resource)->values();
     }
 
@@ -309,7 +305,7 @@ class FieldCollection extends Collection
                  *
                  * @phpstan-ignore varTag.nativeType
                  */
-                return $field->isComputed() || is_null($field->filterableCallback);
+                return $field->isComputed() || \is_null($field->filterableCallback);
             });
     }
 

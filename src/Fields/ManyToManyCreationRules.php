@@ -73,7 +73,7 @@ trait ManyToManyCreationRules
     {
         return transform(
             $this->creationRulesCallback,
-            static fn ($callback) => Arr::wrap(call_user_func($callback, $request)),
+            static fn ($callback) => Arr::wrap(\call_user_func($callback, $request)),
             []
         );
     }

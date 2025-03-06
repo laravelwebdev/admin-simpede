@@ -201,11 +201,11 @@ trait ResolvesFields
             ->when($request->viaManyToMany(), function ($fields) use ($request) {
                 $relatedField = $request->findParentResource()->relatableField($request, $request->viaRelationship);
 
-                if (! is_null($relatedField)) {
+                if (! \is_null($relatedField)) {
                     $fields->prepend($relatedField);
                 }
 
-                return call_user_func($this->relatedFieldResolverCallback($request), $fields);
+                return \call_user_func($this->relatedFieldResolverCallback($request), $fields);
             })
             ->flattenStackedFields()
             ->withOnlyFilterableFields()
@@ -244,7 +244,7 @@ trait ResolvesFields
         return function ($fields) use ($request) {
             return with(
                 $this->actionEventsField(),
-                static fn ($actionField) => in_array(Actionable::class, class_uses_recursive(static::newModel())) && $actionField->authorizedToSee($request)
+                static fn ($actionField) => \in_array(Actionable::class, class_uses_recursive(static::newModel())) && $actionField->authorizedToSee($request)
             ) && $fields->whereInstanceOf(MorphMany::class)
                 ->filter(static fn ($field) => $field->resourceClass === Nova::actionResource())
                 ->isEmpty();
@@ -396,8 +396,8 @@ trait ResolvesFields
     {
         $fields = $this->availableFields($request)->authorized($request);
 
-        if (! is_null($filter)) {
-            $fields = call_user_func($filter, $fields);
+        if (! \is_null($filter)) {
+            $fields = \call_user_func($filter, $fields);
         }
 
         $fields->resolve($this->resource);
@@ -425,7 +425,7 @@ trait ResolvesFields
         $field = $this->availableFields($request)
             ->findFieldByAttribute($attribute);
 
-        if (! (! is_null($field) && $field->authorize($request) && isset($field->resourceClass))) {
+        if (! (! \is_null($field) && $field->authorize($request) && isset($field->resourceClass))) {
             return new FieldCollection;
         }
 
@@ -672,7 +672,7 @@ trait ResolvesFields
             $field->pivotAccessor = $pivotAccessor = $pivotRelation->getPivotAccessor();
 
             return FieldCollection::make(array_values(
-                $this->filter(call_user_func($field->fieldsCallback, $request, $this->resource))
+                $this->filter(\call_user_func($field->fieldsCallback, $request, $this->resource))
             ))->each(static function ($field) use ($pivotAccessor, $pivotRelation) {
                 $field->pivot = true;
                 $field->pivotAccessor = $pivotAccessor;
@@ -706,7 +706,7 @@ trait ResolvesFields
             $field->pivotAccessor = $pivotAccessor = $pivotRelation->getPivotAccessor();
 
             return FieldCollection::make(array_values(
-                $this->filter(call_user_func($field->fieldsCallback, $request, $this->resource))
+                $this->filter(\call_user_func($field->fieldsCallback, $request, $this->resource))
             ))->each(function ($field) use ($pivotAccessor, $pivotRelation) {
                 $field->pivot = true;
                 $field->pivotAccessor = $pivotAccessor;
@@ -813,7 +813,7 @@ trait ResolvesFields
             ->when($panels->where('name', $label)->isEmpty(), static function ($panels) use ($label, $fields) {
                 if ($fields->isNotEmpty()) {
                     $panels->prepend(Panel::makeDefault($label, $fields));
-                } elseif ($panels->isNotEmpty() && in_array($panels->first()->component, ['tabs-panel'])) {
+                } elseif ($panels->isNotEmpty() && \in_array($panels->first()->component, ['tabs-panel'])) {
                     $panels->prepend(Panel::makeDefault($label, [])->withToolbar());
                 }
 
@@ -844,7 +844,7 @@ trait ResolvesFields
             $fields = $fields->values()->all();
             $pivotFields = $this->pivotFieldsFor($request, $request->viaResource)->all();
 
-            if (! is_null($index = $this->indexToInsertPivotFields($request, $fields))) {
+            if (! \is_null($index = $this->indexToInsertPivotFields($request, $fields))) {
                 array_splice($fields, $index + 1, 0, $pivotFields);
             } else {
                 $fields = array_merge($fields, $pivotFields);
@@ -865,7 +865,7 @@ trait ResolvesFields
             $fields = $fields->values()->all();
             $pivotFields = $this->relatedPivotFieldsFor($request, $request->viaResource)->all();
 
-            if (! is_null($index = $this->indexToInsertPivotFields($request, $fields))) {
+            if (! \is_null($index = $this->indexToInsertPivotFields($request, $fields))) {
                 array_splice($fields, $index + 1, 0, $pivotFields);
             } else {
                 $fields = array_merge($fields, $pivotFields);

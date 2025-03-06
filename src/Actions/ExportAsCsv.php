@@ -81,7 +81,7 @@ class ExportAsCsv extends Action
     public function fields(NovaRequest $request)
     {
         if ($this->withFieldsCallback instanceof Closure) {
-            $this->actionFields = $this->actionFields->merge(call_user_func($this->withFieldsCallback, $request));
+            $this->actionFields = $this->actionFields->merge(\call_user_func($this->withFieldsCallback, $request));
         }
 
         return $this->actionFields->all();
@@ -98,7 +98,7 @@ class ExportAsCsv extends Action
 
         $query->when(
             $this->withQueryCallback instanceof Closure,
-            fn ($query) => call_user_func($this->withQueryCallback, $query, $fields)
+            fn ($query) => \call_user_func($this->withQueryCallback, $query, $fields)
         );
 
         $eloquentGenerator = static function () use ($query) {
@@ -107,15 +107,15 @@ class ExportAsCsv extends Action
             }
         };
 
-        $filename = $fields->get('filename') ?? sprintf('%s-%d.csv', $this->uriKey(), now()->format('YmdHis'));
+        $filename = $fields->get('filename') ?? \sprintf('%s-%d.csv', $this->uriKey(), now()->format('YmdHis'));
 
         $extension = 'csv';
 
-        if (Str::contains($filename, '.')) {
+        if (str_contains($filename, '.')) {
             [$filename, $extension] = explode('.', $filename);
         }
 
-        $exportFilename = sprintf(
+        $exportFilename = \sprintf(
             '%s.%s',
             $filename,
             $fields->get('writerType') ?? $extension
@@ -186,7 +186,7 @@ class ExportAsCsv extends Action
     public function withTypeSelector(Closure|string|null $default = null)
     {
         $this->actionFields->push(
-            Select::make(Nova::__('Type'), 'writerType')->options(fn () => [
+            Select::make(Nova::__('Type'), 'writerType')->options(static fn () => [
                 'csv' => Nova::__('CSV (.csv)'),
                 'xlsx' => Nova::__('Excel (.xlsx)'),
             ])->default($default)->rules(['required', Rule::in(['csv', 'xlsx'])])

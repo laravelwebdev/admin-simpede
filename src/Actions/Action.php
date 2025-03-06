@@ -354,7 +354,7 @@ class Action implements JsonSerializable
      */
     public static function visit(Stringable|URL|string $name, Closure|URL|string|array $path = [], array $options = []): static|ActionResponse
     {
-        if (\func_num_args() <= 2 && is_array($path)) {
+        if (\func_num_args() <= 2 && \is_array($path)) {
             return ActionResponse::visit($name, $path);
         }
 
@@ -558,7 +558,7 @@ class Action implements JsonSerializable
         }
 
         if ($this->thenCallback) {
-            return call_user_func($this->thenCallback, collect($response->results)->flatten());
+            return \call_user_func($this->thenCallback, collect($response->results)->flatten());
         }
 
         return $this->handleResult($fields, $response->results);
@@ -589,7 +589,7 @@ class Action implements JsonSerializable
      */
     public function handleResult(ActionFields $fields, array $results)
     {
-        return count($results) ? end($results) : null;
+        return \count($results) ? end($results) : null;
     }
 
     /**
@@ -1033,7 +1033,7 @@ class Action implements JsonSerializable
         $properties = (new ReflectionClass($this))->getProperties();
 
         return array_values(array_filter(array_map(static function ($property) {
-            return ($property->isStatic() || in_array($name = $property->getName(),
+            return ($property->isStatic() || \in_array($name = $property->getName(),
                 ['runCallback', 'seeCallback', 'thenCallback'])) ? null : $name;
         }, $properties)));
     }

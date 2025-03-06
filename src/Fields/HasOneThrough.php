@@ -127,7 +127,7 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     #[\Override]
     public function authorize(Request $request)
     {
-        return call_user_func(
+        return \call_user_func(
             [$this->resourceClass, 'authorizedToViewAny'], $request
         ) && parent::authorize($request);
     }
@@ -226,7 +226,7 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
     public function alreadyFilled(NovaRequest $request): bool
     {
         /** @phpstan-ignore nullCoalesce.expr */
-        return call_user_func($this->filledCallback, $request) ?? false;
+        return \call_user_func($this->filledCallback, $request) ?? false;
     }
 
     /**

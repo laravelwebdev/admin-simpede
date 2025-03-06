@@ -22,7 +22,7 @@ class NovaChannel
 
             Notification::create([
                 'id' => Str::orderedUuid(),
-                'type' => get_class($notification),
+                'type' => $notification::class,
                 'notifiable_id' => $notifiable->getKey(),
                 'notifiable_type' => $notifiable->getMorphClass(),
                 'data' => $payload instanceof Arrayable ? $payload->toArray() : $payload,

@@ -131,7 +131,7 @@ class MetricTableRow implements JsonSerializable, Serializable
             'iconClass' => $this->iconClass,
             'title' => $this->title,
             'subtitle' => $this->subtitle,
-            'actions' => call_user_func($this->actionCallback),
+            'actions' => \call_user_func($this->actionCallback),
         ];
     }
 

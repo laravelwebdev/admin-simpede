@@ -100,13 +100,13 @@ class Slug extends Field implements Previewable
             default => null,
         };
 
-        if (! is_null($from) && $request->isUpdateOrUpdateAttachedRequest()) {
+        if (! \is_null($from) && $request->isUpdateOrUpdateAttachedRequest()) {
             $this->immutable();
             $this->showCustomizeButton = true;
         }
 
         return array_merge([
-            'shouldListenToFromChanges' => ! is_null($from) && ! $request->isUpdateOrUpdateAttachedRequest(),
+            'shouldListenToFromChanges' => ! \is_null($from) && ! $request->isUpdateOrUpdateAttachedRequest(),
             'from' => $from,
             'separator' => $this->separator,
             'showCustomizeButton' => $this->showCustomizeButton,

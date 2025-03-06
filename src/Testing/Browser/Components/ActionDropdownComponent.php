@@ -43,7 +43,7 @@ class ActionDropdownComponent extends Component
     {
         $browser->click("button[data-action-id='{$uriKey}']")
             ->elsewhereWhenAvailable(new Modals\ConfirmActionModalComponent, static function (Browser $browser) use ($fieldCallback) {
-                call_user_func($fieldCallback, $browser);
+                \call_user_func($fieldCallback, $browser);
             });
     }
 

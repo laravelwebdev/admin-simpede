@@ -112,7 +112,7 @@ abstract class Partition extends Metric
         /** @phpstan-ignore property.notFound */
         $key = $result->aggregate_group_by_label;
 
-        if (! is_int($key) && ! is_bool($key)) {
+        if (! \is_int($key) && ! \is_bool($key)) {
             $key = (string) $key;
         }
 

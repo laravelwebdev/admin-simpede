@@ -63,7 +63,7 @@ class DateTime extends Field implements FilterableField
     public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback ?? static function ($value, $request) {
-            if (! is_null($value)) {
+            if (! \is_null($value)) {
                 if ($value instanceof DateTimeInterface) {
                     return $value instanceof CarbonInterface
                         ? $value->toIso8601String()
@@ -82,7 +82,7 @@ class DateTime extends Field implements FilterableField
      */
     public function min(CarbonInterface|string $min)
     {
-        if (is_string($min)) {
+        if (\is_string($min)) {
             $min = Carbon::parse($min);
         }
 
@@ -98,7 +98,7 @@ class DateTime extends Field implements FilterableField
      */
     public function max(CarbonInterface|string $max)
     {
-        if (is_string($max)) {
+        if (\is_string($max)) {
             $max = Carbon::parse($max);
         }
 
@@ -156,7 +156,7 @@ class DateTime extends Field implements FilterableField
         }
 
         $this->originalValue = $this->value;
-        $this->displayedAs = call_user_func($this->displayCallback, $value, $resource, $attribute);
+        $this->displayedAs = \call_user_func($this->displayCallback, $value, $resource, $attribute);
     }
 
     /**
@@ -179,9 +179,9 @@ class DateTime extends Field implements FilterableField
         return static function (NovaRequest $request, $query, $value, $attribute) {
             [$min, $max] = $value;
 
-            if (! is_null($min) && ! is_null($max)) {
+            if (! \is_null($min) && ! \is_null($max)) {
                 return $query->whereBetween($attribute, [$min, $max]);
-            } elseif (! is_null($min)) {
+            } elseif (! \is_null($min)) {
                 return $query->where($attribute, '>=', $min);
             }
 

@@ -46,7 +46,7 @@ class Stack extends Field
      */
     public function __construct($name, mixed $attribute = null, iterable $lines = [])
     {
-        if (is_array($attribute)) {
+        if (\is_array($attribute)) {
             $lines = $attribute;
             $attribute = null;
         }
@@ -102,7 +102,7 @@ class Stack extends Field
     protected function ensureLinesAreResolveable(): void
     {
         $this->lines = $this->lines->map(static function ($line) {
-            if (is_callable($line)) {
+            if (\is_callable($line)) {
                 return Line::make('Anonymous', $line);
             }
 

@@ -40,7 +40,7 @@ class ResourceIndexRequest extends NovaRequest
 
         return (int) transform(
             $this->viaRelationship() ? $resourceClass::perPageViaRelationshipOptions() : $resourceClass::perPageOptions(),
-            fn ($perPageOptions) => in_array($this->perPage, $perPageOptions) ? $this->perPage : $perPageOptions[0],
+            fn ($perPageOptions) => \in_array($this->perPage, $perPageOptions) ? $this->perPage : $perPageOptions[0],
         );
     }
 }

@@ -71,7 +71,7 @@ class NovaRequest extends FormRequest
     public function isCreateOrAttachRequest(): bool
     {
         return $this instanceof ResourceCreateOrAttachRequest
-            || ($this->editing === 'true' && in_array($this->editMode, ['create', 'attach']));
+            || ($this->editing === 'true' && \in_array($this->editMode, ['create', 'attach']));
     }
 
     /**
@@ -80,7 +80,7 @@ class NovaRequest extends FormRequest
     public function isUpdateOrUpdateAttachedRequest(): bool
     {
         return $this instanceof ResourceUpdateOrUpdateAttachedRequest
-            || ($this->editing === 'true' && in_array($this->editMode, ['update', 'update-attached']));
+            || ($this->editing === 'true' && \in_array($this->editMode, ['update', 'update-attached']));
     }
 
     /**
@@ -156,7 +156,7 @@ class NovaRequest extends FormRequest
      */
     public function trashed(): TrashedStatus
     {
-        if (is_null($trashed = $this->trashed)) {
+        if (\is_null($trashed = $this->trashed)) {
             return TrashedStatus::DEFAULT;
         }
 

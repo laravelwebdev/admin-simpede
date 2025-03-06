@@ -73,7 +73,7 @@ trait CallsQueuedActions
      */
     protected function setJobInstanceIfNecessary($instance)
     {
-        if (in_array(InteractsWithQueue::class, class_uses_recursive(get_class($instance)))) {
+        if (\in_array(InteractsWithQueue::class, class_uses_recursive($instance::class))) {
             $instance->setJob($this->job);
         }
 
@@ -85,6 +85,6 @@ trait CallsQueuedActions
      */
     public function displayName(): string
     {
-        return get_class($this->action);
+        return $this->action::class;
     }
 }

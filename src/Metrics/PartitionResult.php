@@ -81,7 +81,7 @@ class PartitionResult implements JsonSerializable
                     'label' => $resolvedLabel,
                     'value' => $value,
                     'percentage' => $total > 0 ? round(($value / $total) * 100, $this->roundingPrecision, $this->roundingMode) : 0,
-                ], fn ($value) => ! is_null($value));
+                ], fn ($value) => ! \is_null($value));
             })->values()->all(),
         ];
     }

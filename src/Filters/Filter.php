@@ -73,7 +73,7 @@ abstract class Filter implements FilterContract, JsonSerializable
      */
     public function key()
     {
-        return get_class($this);
+        return $this::class;
     }
 
     /**
@@ -100,12 +100,12 @@ abstract class Filter implements FilterContract, JsonSerializable
             return array_merge([
                 'class' => $this->key(),
                 'name' => $name,
-                'uniqueKey' => sprintf('%s-%s', Str::slug($name), $component),
+                'uniqueKey' => \sprintf('%s-%s', Str::slug($name), $component),
                 'component' => $component,
                 'options' => collect($this->options($request))->map(static function ($value, $label) {
-                    if (is_array($value)) {
+                    if (\is_array($value)) {
                         return array_merge(['label' => $label], $value);
-                    } elseif (is_string($label)) {
+                    } elseif (\is_string($label)) {
                         return ['label' => $label, 'value' => $value];
                     }
 

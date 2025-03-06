@@ -17,7 +17,7 @@ class ResourceForceDeleteController extends Controller
     {
         ForceDeleteResources::dispatchSync($request, $request->resource());
 
-        if ($request->isForSingleResource() && ! is_null($redirect = $request->resource()::redirectAfterDelete($request))) {
+        if ($request->isForSingleResource() && ! \is_null($redirect = $request->resource()::redirectAfterDelete($request))) {
             return response()->json([
                 'redirect' => $redirect,
             ]);

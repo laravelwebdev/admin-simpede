@@ -24,11 +24,11 @@ class UserResource extends JsonResource
         if (app()->bound(NovaRequest::class)) {
             $resourceClass = Nova::resourceForModel($this->resource);
 
-            if (! is_null($resourceClass)) {
+            if (! \is_null($resourceClass)) {
                 $resource = $resourceClass::make($this->resource);
                 $avatar = $resource->resolveAvatarField(app(NovaRequest::class));
 
-                if (! is_null($avatar)) {
+                if (! \is_null($avatar)) {
                     $avatar = $avatar->resolveThumbnailUrl();
                 }
             }

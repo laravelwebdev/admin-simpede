@@ -32,7 +32,7 @@ trait SupportsAutoCompletion
     public function autocomplete(array|string|bool $value)
     {
         $this->withMeta(['autocomplete' => match (true) {
-            is_array($value) => implode(' ', $value),
+            \is_array($value) => implode(' ', $value),
             $value === true => $this->defaultEnabledAutoCompleteValue(),
             $value === false => $this->defaultDisabledAutoCompleteValue(),
             default => $value,

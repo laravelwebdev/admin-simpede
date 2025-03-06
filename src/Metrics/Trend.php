@@ -409,7 +409,7 @@ abstract class Trend extends RangedMetric
                     $unit,
                     $request->twelveHourTime === 'true'
                 ) => round($result->aggregate ?? 0, $this->roundingPrecision, $this->roundingMode),
-            ])->reject(static fn ($value, $key) => ! in_array($key, $possibleDateKeys))
+            ])->reject(static fn ($value, $key) => ! \in_array($key, $possibleDateKeys))
             ->all()
         );
 
@@ -430,7 +430,7 @@ abstract class Trend extends RangedMetric
         $range = $request->range ?? 1;
         $ranges = collect($this->ranges())->keys()->values()->all();
 
-        if (count($ranges) > 0 && ! in_array($range, $ranges)) {
+        if (\count($ranges) > 0 && ! \in_array($range, $ranges)) {
             $range = min($range, max($ranges));
         }
 
@@ -571,7 +571,7 @@ abstract class Trend extends RangedMetric
             }
         } while ($nextDate->lte($endingDate));
 
-        if (count($possibleDateResults) < $possibleDateRange) {
+        if (\count($possibleDateResults) < $possibleDateRange) {
             $possibleDateResults[
                 $this->formatPossibleAggregateResultDate(
                     $nextDate, $unit, $twelveHourTime

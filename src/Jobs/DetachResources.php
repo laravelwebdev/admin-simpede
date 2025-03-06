@@ -47,7 +47,7 @@ class DetachResources
             foreach ($models as $model) {
                 $pivot = $model->{$accessor};
 
-                if (empty($inPivots) || in_array($pivot->getAttribute($accessorKeyName), $inPivots)) {
+                if (empty($inPivots) || \in_array($pivot->getAttribute($accessorKeyName), $inPivots)) {
                     $this->deletePivot(
                         $this->request, $pivot, $model, $parent
                     );

@@ -30,7 +30,7 @@ class Email extends Text implements FilterableField
      */
     public function __construct($name = null, mixed $attribute = 'email', ?callable $resolveCallback = null)
     {
-        if (is_null($name)) {
+        if (\is_null($name)) {
             $attribute ??= 'email';
         }
 

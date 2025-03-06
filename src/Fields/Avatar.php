@@ -17,7 +17,7 @@ class Avatar extends Image implements Cover
      */
     public function __construct($name = null, mixed $attribute = null, ?string $disk = null, ?callable $storageCallback = null)
     {
-        if (is_null($name)) {
+        if (\is_null($name)) {
             $attribute ??= 'avatar';
             $name = Nova::__('Avatar');
         }

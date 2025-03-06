@@ -153,7 +153,7 @@ class PendingFortifyConfiguration
         $this->cachedConfig = config('fortify', []);
         $this->cachedOptionsConfig = config('fortify-options', []);
 
-        if (! is_null($features)) {
+        if (! \is_null($features)) {
             $this->features = collect(Arr::wrap(value($features)))->merge(array_filter([
                 Nova::routes()->withPasswordReset ? Features::resetPasswords() : null,
             ]))->unique()->all();
@@ -169,7 +169,7 @@ class PendingFortifyConfiguration
      */
     public function enabled(string $feature): bool
     {
-        return in_array($feature, $this->features ?? config('fortify.features', []));
+        return \in_array($feature, $this->features ?? config('fortify.features', []));
     }
 
     /**
@@ -327,7 +327,7 @@ class PendingFortifyConfiguration
      */
     public function register(?bool $routes = null): void
     {
-        if (is_null($routes)) {
+        if (\is_null($routes)) {
             $routes = Util::isFortifyRoutesRegisteredForFrontend();
         }
 

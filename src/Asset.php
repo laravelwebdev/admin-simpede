@@ -48,7 +48,7 @@ abstract class Asset implements Responsable
             return;
         }
 
-        if (is_null($remote)) {
+        if (\is_null($remote)) {
             $remote = Str::startsWith($path, ['http://', 'https://', '://']);
         }
 
@@ -97,7 +97,7 @@ abstract class Asset implements Responsable
      */
     public function toResponse($request)
     {
-        abort_if($this->isRemote() || is_null($this->path), 404);
+        abort_if($this->isRemote() || \is_null($this->path), 404);
 
         return response(
             file_get_contents($this->path), 200, $this->toResponseHeaders(),

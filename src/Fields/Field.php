@@ -5,7 +5,6 @@ namespace Laravel\Nova\Fields;
 use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
 use Laravel\Nova\Contracts\Resolvable;
@@ -28,7 +27,6 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
     use DependentFields;
     use HandlesValidation;
     use HasHelpText;
-    use Macroable;
     use MutableFields;
     use PeekableFields;
     use PreviewableFields;
@@ -250,9 +248,9 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
 
         if (! $this->displayCallback) {
             $this->resolve($resource, $attribute);
-        } elseif (is_callable($this->displayCallback)) {
+        } elseif (\is_callable($this->displayCallback)) {
             if ($this->isComputed()) {
-                $this->value = call_user_func($this->computedCallback, $resource);
+                $this->value = \call_user_func($this->computedCallback, $resource);
             }
 
             tap($this->value ?? $this->resolveAttribute($resource, $attribute), function ($value) use (
@@ -273,7 +271,7 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
     protected function resolveUsingDisplayCallback(mixed $value, $resource, string $attribute): void
     {
         $this->usesCustomizedDisplay = true;
-        $this->displayedAs = call_user_func($this->displayCallback, $value, $resource, $attribute);
+        $this->displayedAs = \call_user_func($this->displayCallback, $value, $resource, $attribute);
     }
 
     /**
@@ -288,16 +286,16 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
         $attribute ??= $this->attribute;
 
         if ($this->isComputed()) {
-            $this->value = call_user_func($this->computedCallback, $resource);
+            $this->value = \call_user_func($this->computedCallback, $resource);
 
             return;
         }
 
         if (! $this->resolveCallback) {
             $this->value = $this->resolveAttribute($resource, $attribute);
-        } elseif (is_callable($this->resolveCallback)) {
+        } elseif (\is_callable($this->resolveCallback)) {
             tap($this->resolveAttribute($resource, $attribute), function ($value) use ($resource, $attribute) {
-                $this->value = call_user_func($this->resolveCallback, $value, $resource, $attribute);
+                $this->value = \call_user_func($this->resolveCallback, $value, $resource, $attribute);
             });
         }
     }
@@ -307,12 +305,12 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
      */
     public function resolveForAction(NovaRequest $request): void
     {
-        if (! is_null($this->value)) {
+        if (! \is_null($this->value)) {
             return;
         }
 
         if (Util::isSafeCallable($this->defaultCallback)) {
-            $this->defaultCallback = call_user_func($this->defaultCallback, $request);
+            $this->defaultCallback = \call_user_func($this->defaultCallback, $request);
         }
 
         $this->value = $this->defaultCallback;
@@ -396,7 +394,7 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
     protected function fillAttribute(NovaRequest $request, string $requestAttribute, object $model, string $attribute)
     {
         if (isset($this->fillCallback)) {
-            return call_user_func($this->fillCallback, $request, $model, $attribute, $requestAttribute);
+            return \call_user_func($this->fillCallback, $request, $model, $attribute, $requestAttribute);
         }
 
         return $this->fillAttributeFromRequest($request, $requestAttribute, $model, $attribute);
@@ -481,7 +479,7 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
      */
     protected function valueIsConsideredNull(mixed $value): bool
     {
-        return is_callable($this->nullValues) ? call_user_func($this->nullValues, $value) : in_array(
+        return \is_callable($this->nullValues) ? \call_user_func($this->nullValues, $value) : \in_array(
             $value,
             (array) $this->nullValues
         );
@@ -559,8 +557,8 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
      */
     public function component()
     {
-        if (isset(static::$customComponents[get_class($this)])) {
-            return static::$customComponents[get_class($this)];
+        if (isset(static::$customComponents[$this::class])) {
+            return static::$customComponents[$this::class];
         }
 
         return $this->component;
@@ -571,7 +569,7 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
      */
     public static function useComponent(string $component): void
     {
-        static::$customComponents[get_called_class()] = $component;
+        static::$customComponents[\get_called_class()] = $component;
     }
 
     /**
@@ -605,21 +603,21 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
     public function isRequired(NovaRequest $request): bool
     {
         return with($this->requiredCallback, function ($callback) use ($request) {
-            if ($callback === true || (is_callable($callback) && call_user_func($callback, $request))) {
+            if ($callback === true || (\is_callable($callback) && \call_user_func($callback, $request))) {
                 return true;
             }
 
-            if (! empty($this->attribute) && is_null($callback)) {
+            if (! empty($this->attribute) && \is_null($callback)) {
                 if ($request->isResourceIndexRequest() || $request->isLensRequest() || $request->isActionRequest()) {
-                    return in_array('required', $this->getCreationRules($request)[$this->attribute]);
+                    return \in_array('required', $this->getCreationRules($request)[$this->attribute]);
                 }
 
                 if ($request->isCreateOrAttachRequest()) {
-                    return in_array('required', $this->getCreationRules($request)[$this->attribute]);
+                    return \in_array('required', $this->getCreationRules($request)[$this->attribute]);
                 }
 
                 if ($request->isUpdateOrUpdateAttachedRequest()) {
-                    return in_array('required', $this->getUpdateRules($request)[$this->attribute]);
+                    return \in_array('required', $this->getUpdateRules($request)[$this->attribute]);
                 }
             }
 
@@ -719,7 +717,7 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
                 'sortableUriKey' => $this->sortableUriKey(),
                 'stacked' => $this->stacked,
                 'textAlign' => $this->textAlign,
-                'uniqueKey' => sprintf(
+                'uniqueKey' => \sprintf(
                     '%s-%s-%s',
                     $this->attribute,
                     Str::slug($this->panel?->name ?? 'default'),

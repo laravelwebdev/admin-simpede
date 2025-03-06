@@ -40,7 +40,6 @@ class MorphedResourceAttachController extends ResourceAttachController
             $relatedKey = $request->findRelatedModelOrFail()->{$relatedKeyName};
         }
 
-        /** @phpstan-ignore method.notFound */
         $pivot = $relationship->newPivot($relationship->getDefaultPivotAttributes(), false);
 
         Util::expectPivotModel($pivot)->forceFill([

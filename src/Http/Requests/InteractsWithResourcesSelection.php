@@ -33,7 +33,7 @@ trait InteractsWithResourcesSelection
 
         $resourceIds = array_filter(! empty($this->resources) ? Arr::wrap($this->resources) : [$this->resourceId]);
 
-        if (count($resourceIds) < 1) {
+        if (\count($resourceIds) < 1) {
             return collect();
         }
 
@@ -53,7 +53,7 @@ trait InteractsWithResourcesSelection
 
         $resourceIds = array_filter(! empty($this->resources) ? Arr::wrap($this->resources) : [$this->resourceId]);
 
-        if (count($resourceIds) < 1) {
+        if (\count($resourceIds) < 1) {
             return collect();
         }
 

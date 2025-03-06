@@ -20,7 +20,7 @@ class AttachableController extends Controller
         $resourceClass = $request->resource();
 
         $isPolymorphic = static function ($query) {
-            return is_null($query) || in_array($query, [true, 1, '1']);
+            return \is_null($query) || \in_array($query, [true, 1, '1']);
         };
 
         $parentResource = $request->findResourceOrFail();

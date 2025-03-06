@@ -291,7 +291,7 @@ class Repeater extends Field
 
         return collect($rules)->map(static function ($fieldRules) use ($replacements) {
             return collect(Arr::wrap($fieldRules))->map(static function ($rule) use ($replacements) {
-                return is_string($rule)
+                return \is_string($rule)
                     ? str_replace(array_keys($replacements), array_values($replacements), $rule)
                     : $rule;
             })->all();

@@ -44,7 +44,7 @@ class ConfiguresPrompts
 
         $field = 'answer';
 
-        if (is_array($rules) && ! array_is_list($rules)) {
+        if (\is_array($rules) && ! array_is_list($rules)) {
             [$field, $rules] = [key($rules), current($rules)];
         }
 

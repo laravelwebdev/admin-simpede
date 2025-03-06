@@ -112,7 +112,7 @@ class PolicyMakeCommand extends \Illuminate\Foundation\Console\PolicyMakeCommand
 
         $rootNamespace = $this->rootNamespace();
 
-        if (Str::startsWith($resource, $rootNamespace)) {
+        if (str_starts_with($resource, $rootNamespace)) {
             return $resource;
         }
 
@@ -194,7 +194,7 @@ class PolicyMakeCommand extends \Illuminate\Foundation\Console\PolicyMakeCommand
 
         if ($resourceClass) {
             if (! str_starts_with($this->rootNamespace(), $resourceClass) && class_exists($resourceClass)) {
-                $resourceClass = sprintf('\%s', $resourceClass);
+                $resourceClass = \sprintf('\%s', $resourceClass);
             }
 
             $input->setOption('resource', $resourceClass);

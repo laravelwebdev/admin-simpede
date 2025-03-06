@@ -45,7 +45,7 @@ class HasMany implements Preset
                     ->withoutMissingValues()
                     ->map(
                         static fn (Field $field) => $field->fillInto($request, $data, $field->attribute, "{$requestAttribute}.{$blockKey}.fields.{$field->attribute}")
-                    )->filter(static fn ($callback) => is_callable($callback))
+                    )->filter(static fn ($callback) => \is_callable($callback))
                     ->toBase();
 
                 return [$data, $callbacks, $item];
@@ -89,7 +89,7 @@ class HasMany implements Preset
         )->all();
 
         $deletableIds = $relation->pluck($uniqueField)
-            ->reject(static fn ($id) => in_array($id, $availableItems));
+            ->reject(static fn ($id) => \in_array($id, $availableItems));
 
         if ($deletableIds->isNotEmpty()) {
             $model->{$attribute}()->whereIn($uniqueField, $deletableIds)->delete();

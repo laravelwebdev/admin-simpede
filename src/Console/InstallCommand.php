@@ -5,6 +5,7 @@ namespace Laravel\Nova\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Configuration\ApplicationBuilder;
+use Illuminate\Support\Composer;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Nova\Util;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -56,6 +57,8 @@ class InstallCommand extends Command
     {
         $appNamespace = $this->laravel->getNamespace();
 
+        $requiresNovaDevtool = confirm('Install Nova Devtool?', default: true);
+
         $this->components->task('Publishing Nova Assets / Resources', task: function () {
             $this->callSilent('nova:publish', ['--fortify' => true]);
         });
@@ -86,6 +89,14 @@ class InstallCommand extends Command
             $this->configuresAppNamespace($files, $appNamespace);
         });
 
+        if ($requiresNovaDevtool === true) {
+            $composer = new Composer($files, $this->laravel->basePath());
+
+            $this->components->task('Install `laravel/nova-devtool` dependency', task: function () use ($composer) {
+                $composer->requirePackages(['laravel/nova-devtool'], dev: true);
+            });
+        }
+
         $this->components->info('Nova scaffolding installed successfully.');
     }
 
@@ -101,7 +112,6 @@ class InstallCommand extends Command
         $eol = Util::eol($appConfig);
 
         if (class_exists(ApplicationBuilder::class) && $files->exists(base_path('bootstrap/providers.php'))) {
-            /** @phpstan-ignore staticMethod.notFound */
             ServiceProvider::addProviderToBootstrapFile("{$appNamespace}Providers\NovaServiceProvider");
 
             if ($this->isDefaultAuthenticationRouting === true) {
@@ -142,11 +152,11 @@ class InstallCommand extends Command
     {
         $namespacedUserModel = Util::userModel();
 
-        if (is_null($namespacedUserModel) && ! file_exists(app_path('Models/User.php'))) {
+        if (\is_null($namespacedUserModel) && ! file_exists(app_path('Models/User.php'))) {
             $namespacedUserModel = 'App\User';
         }
 
-        if (! is_null($namespacedUserModel) && $namespacedUserModel !== 'App\Models\User') {
+        if (! \is_null($namespacedUserModel) && $namespacedUserModel !== 'App\Models\User') {
             $baseUserModel = class_basename($namespacedUserModel);
 
             $searches = ['$model = \App\Models\User::class', 'class-string<\App\Models\User>'];

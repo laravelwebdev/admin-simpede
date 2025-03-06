@@ -3,7 +3,6 @@
 namespace Laravel\Nova\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Support\Str;
 
 class Filename implements Rule
 {
@@ -19,7 +18,7 @@ class Filename implements Rule
     public function passes($attribute, $value)
     {
         return preg_match('/^[^\\/?*:;{}\\\\]+\\.[^\\/?*:;{}\\\\]{3}$/', $value) !== false
-            && ! Str::contains($value, DIRECTORY_SEPARATOR);
+            && ! str_contains($value, DIRECTORY_SEPARATOR);
     }
 
     /**

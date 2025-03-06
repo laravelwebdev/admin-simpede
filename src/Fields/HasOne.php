@@ -127,8 +127,8 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
             }
 
             return false;
-        })->showOnCreating(static fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
-        ->showOnUpdating(static fn ($request) => ! in_array($request->relationshipType, ['hasOne', 'morphOne']))
+        })->showOnCreating(static fn ($request) => ! \in_array($request->relationshipType, ['hasOne', 'morphOne']))
+        ->showOnUpdating(static fn ($request) => ! \in_array($request->relationshipType, ['hasOne', 'morphOne']))
         ->nullable();
     }
 
@@ -171,7 +171,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     #[\Override]
     public function authorize(Request $request)
     {
-        return call_user_func(
+        return \call_user_func(
             [$this->resourceClass, 'authorizedToViewAny'], $request
         ) && parent::authorize($request);
     }
@@ -250,9 +250,9 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     public function jsonSerialize(): array
     {
         return with(app(NovaRequest::class), function ($request) {
-            if (! is_null($this->requiredCallback)) {
+            if (! \is_null($this->requiredCallback)) {
                 $this->nullable = ! with($this->requiredCallback, static function ($callback) use ($request) {
-                    return $callback === true || (is_callable($callback) && call_user_func($callback, $request));
+                    return $callback === true || (\is_callable($callback) && \call_user_func($callback, $request));
                 });
             }
 
@@ -283,7 +283,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     #[\Override]
     public function isRequired(NovaRequest $request): bool
     {
-        if (is_null($this->isRequired)) {
+        if (\is_null($this->isRequired)) {
             $this->isRequired = parent::isRequired($request);
         }
 
@@ -311,7 +311,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     public function alreadyFilled(NovaRequest $request): bool
     {
         /** @phpstan-ignore nullCoalesce.expr */
-        return call_user_func($this->filledCallback, $request) ?? false;
+        return \call_user_func($this->filledCallback, $request) ?? false;
     }
 
     /**
@@ -383,7 +383,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
         $model->setRelation($this->hasOneRelationship, $relation);
 
         return static function () use ($callbacks) {
-            $callbacks->filter(static fn ($callback) => is_callable($callback))
+            $callbacks->filter(static fn ($callback) => \is_callable($callback))
                 ->each->__invoke();
         };
     }
@@ -422,7 +422,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
             ? $model->loadMissing($this->hasOneRelationship)->getRelation($this->hasOneRelationship) ?? $resourceClass::newModel()
             : null;
 
-        if (is_null($relation)) {
+        if (\is_null($relation)) {
             return [];
         }
 
@@ -456,7 +456,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
                         return $rule;
                     }
 
-                    return is_string($rule)
+                    return \is_string($rule)
                             ? str_replace(array_keys($replacements), array_values($replacements), $rule)
                             : $rule;
                 })->all()];
@@ -492,7 +492,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
                         return $rule;
                     }
 
-                    return is_string($rule)
+                    return \is_string($rule)
                             ? str_replace(array_keys($replacements), array_values($replacements), $rule)
                             : $rule;
                 })->all()];
@@ -532,7 +532,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     #[\Override]
     public function isShownOnCreation(NovaRequest $request): bool
     {
-        return call_user_func($this->rejectRecursiveRelatedResourceFields($request), $this) === false
+        return \call_user_func($this->rejectRecursiveRelatedResourceFields($request), $this) === false
             && parent::isShownOnCreation($request);
     }
 
@@ -544,7 +544,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
     #[\Override]
     public function isShownOnUpdate(NovaRequest $request, $resource): bool
     {
-        return call_user_func($this->rejectRecursiveRelatedResourceFields($request), $this) === false
+        return \call_user_func($this->rejectRecursiveRelatedResourceFields($request), $this) === false
             && parent::isShownOnUpdate($request, $resource);
     }
 

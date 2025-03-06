@@ -37,13 +37,13 @@ class DeleteResources
 
                 $uses = class_uses_recursive($model);
 
-                if (in_array(Actionable::class, $uses) && ! in_array(SoftDeletes::class, $uses)) {
+                if (\in_array(Actionable::class, $uses) && ! \in_array(SoftDeletes::class, $uses)) {
                     $model->actions()->delete();
                 }
 
                 $model->delete();
 
-                if (! is_null($this->resourceClass)) {
+                if (! \is_null($this->resourceClass)) {
                     $this->resourceClass::afterDelete($this->request, $model);
                 }
 

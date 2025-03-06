@@ -19,7 +19,7 @@ class ActionController extends Controller
     public function index(NovaRequest $request): JsonResponse
     {
         $resourceId = with($request->input('resources'), static function ($resourceIds) {
-            return is_array($resourceIds) && count($resourceIds) === 1 ? $resourceIds[0] : null;
+            return \is_array($resourceIds) && \count($resourceIds) === 1 ? $resourceIds[0] : null;
         });
 
         $resource = $request->newResourceWith(

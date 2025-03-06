@@ -53,11 +53,11 @@ class TabsGroup extends Panel
      */
     public function __construct($name = null, callable|iterable $fields = [], ?string $attribute = null)
     {
-        if (is_null($attribute)) {
+        if (\is_null($attribute)) {
             $attribute = Str::random(16);
         }
 
-        if (is_null($name)) {
+        if (\is_null($name)) {
             $this->showTitle = false;
             $name = $attribute;
         }
@@ -104,7 +104,7 @@ class TabsGroup extends Panel
     protected function convertFieldsToTabs(callable|iterable $fields): Collection
     {
         $fieldsCollection = collect(
-            is_callable($fields) ? call_user_func($fields) : $fields
+            \is_callable($fields) ? \call_user_func($fields) : $fields
         );
 
         return $fieldsCollection->map(function ($fields, $key) {
@@ -121,7 +121,7 @@ class TabsGroup extends Panel
                 )->withPosition($this->tabsCount);
             }
 
-            if (! is_array($fields)) {
+            if (! \is_array($fields)) {
                 return Tab::make(
                     $fields->name, [$fields],
                 )->withPosition($this->tabsCount);

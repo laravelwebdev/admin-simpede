@@ -14,6 +14,6 @@ class MissingActionHandlerException extends Exception
      */
     public static function make($action, string $method)
     {
-        return new static('Action handler ['.get_class($action).'@'.$method.'] not defined.');
+        return new static('Action handler ['.$action::class.'@'.$method.'] not defined.');
     }
 }

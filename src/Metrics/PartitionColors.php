@@ -39,7 +39,7 @@ class PartitionColors
     {
         return blank($this->colors) ? null :
             tap($this->colors[
-                $this->pointer % count($this->colors)
+                $this->pointer % \count($this->colors)
             ] ?? null, function () {
                 $this->pointer++;
             });

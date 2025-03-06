@@ -28,7 +28,7 @@ class PrimaryKey extends Column
         $model = $query->getModel();
 
         $canSearchPrimaryKey = ctype_digit($search) &&
-                               in_array($model->getKeyType(), ['int', 'integer']) &&
+                               \in_array($model->getKeyType(), ['int', 'integer']) &&
                                ($connectionType != 'pgsql' || $search <= $this->maxPrimaryKeySize);
 
         if (! $canSearchPrimaryKey) {

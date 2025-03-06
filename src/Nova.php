@@ -237,7 +237,7 @@ class Nova
             return $callback(app()->make(NovaRequest::class));
         }
 
-        if (is_callable($default)) {
+        if (\is_callable($default)) {
             return $default(app('request'));
         }
 
@@ -253,8 +253,8 @@ class Nova
     {
         $guard = Util::userGuard();
 
-        if (is_null($request)) {
-            return call_user_func(app('auth')->userResolver(), $guard);
+        if (\is_null($request)) {
+            return \call_user_func(app('auth')->userResolver(), $guard);
         }
 
         return $request->user($guard);
@@ -294,7 +294,7 @@ class Nova
     public static function bootResources(): void
     {
         static::resourceCollection()
-            ->filter(static fn ($resourceClass) => property_exists($resourceClass, 'policy') && ! is_null($resourceClass::$policy))
+            ->filter(static fn ($resourceClass) => property_exists($resourceClass, 'policy') && ! \is_null($resourceClass::$policy))
             ->each(static function ($resourceClass) {
                 Gate::policy($resourceClass, $resourceClass::$policy);
             });
@@ -431,7 +431,7 @@ class Nova
                 $resources[] = $resourceClass;
             }
 
-            if (property_exists($resourceClass, 'policy') && ! is_null($resourceClass::$policy)) {
+            if (property_exists($resourceClass, 'policy') && ! \is_null($resourceClass::$policy)) {
                 $gate->policy($resourceClass, $resourceClass::$policy);
             }
         }
@@ -465,7 +465,7 @@ class Nova
      */
     public static function newResourceFromModel($model): Resource
     {
-        if (is_null($resource = static::resourceForModel($model))) {
+        if (\is_null($resource = static::resourceForModel($model))) {
             throw new ResourceMissingException($model);
         }
 
@@ -480,8 +480,8 @@ class Nova
      */
     public static function resourceForModel($class): ?string
     {
-        if (is_object($class)) {
-            $class = get_class($class);
+        if (\is_object($class)) {
+            $class = $class::class;
         }
 
         if (isset(static::$resourcesByModel[$class])) {
@@ -542,13 +542,13 @@ class Nova
             static::createUserUsing();
         }
 
-        return call_user_func(
+        return \call_user_func(
             static::$createUserCallback,
             ...array_map(static function ($question) {
                 return with(value($question), static function ($question) {
                     return $question instanceof Prompt ? $question->prompt() : $question;
                 });
-            }, call_user_func(static::$createUserCommandCallback, $command))
+            }, \call_user_func(static::$createUserCommandCallback, $command))
         );
     }
 
@@ -626,7 +626,7 @@ class Nova
     public static function resolveUserTimezone(Request $request): ?string
     {
         if (static::$userTimezoneCallback) {
-            return call_user_func(static::$userTimezoneCallback, $request);
+            return \call_user_func(static::$userTimezoneCallback, $request);
         }
 
         return null;
@@ -672,7 +672,7 @@ class Nova
      */
     public static function availableTools(Request $request): array
     {
-        if (is_null(static::user($request))) {
+        if (\is_null(static::user($request))) {
             return [];
         }
 
@@ -718,7 +718,7 @@ class Nova
     public static function availableDashboardCardsForDashboard(string $dashboard, NovaRequest $request): Collection
     {
         return with(static::dashboardForKey($dashboard, $request), static function ($dashboard) use ($request) {
-            if (is_null($dashboard)) {
+            if (\is_null($dashboard)) {
                 return collect();
             }
 
@@ -733,7 +733,7 @@ class Nova
      */
     public static function translations(array|string $translations): static
     {
-        if (is_string($translations)) {
+        if (\is_string($translations)) {
             if (! is_readable($translations)) {
                 return new static;
             }
@@ -764,8 +764,8 @@ class Nova
     public static function jsonVariables(Request $request): array
     {
         return collect(static::$jsonVariables)->map(static function ($variable) use ($request) {
-            return is_object($variable) && is_callable($variable)
-                ? $variable($request)
+            return Util::isSafeCallable($variable)
+                ? \call_user_func($variable, $request)
                 : $variable;
         })->all();
     }
@@ -786,13 +786,11 @@ class Nova
     public static function humanize(object|string $value): string
     {
         if (! $value instanceof BackedEnum) {
-            return Str::headline(
-                match (true) {
-                    is_object($value) => class_basename($value::class),
-                    class_exists($value, false) => class_basename($value),
-                    default => $value
-                }
-            );
+            return Str::headline(match (true) {
+                \is_object($value) => class_basename($value::class),
+                class_exists($value, false) => class_basename($value),
+                default => $value
+            });
         }
 
         if (method_exists($value, 'name')) {
@@ -851,10 +849,10 @@ class Nova
                 'base' => static::path(),
                 'userId' => $userId,
                 'mainMenu' => static function ($request) use ($userId) {
-                    return ! is_null($userId) ? Menu::wrap(self::resolveMainMenu($request)) : [];
+                    return ! \is_null($userId) ? Menu::wrap(self::resolveMainMenu($request)) : [];
                 },
                 'userMenu' => static function ($request) use ($userId) {
-                    return ! is_null($userId) ? Menu::wrap(self::resolveUserMenu($request)) : Menu::make();
+                    return ! \is_null($userId) ? Menu::wrap(self::resolveUserMenu($request)) : Menu::make();
                 },
                 'notificationPollingInterval' => static::$notificationPollingInterval * 1000,
                 'resources' => static fn ($request) => static::resourceInformation($request),
@@ -932,7 +930,7 @@ class Nova
     public static function globallySearchableResources(Request $request): array
     {
         return static::authorizedResources($request)
-            ->searchable()
+            ->globallySearchable()
             ->sortBy(static::sortResourcesWith())
             ->all();
     }
@@ -944,8 +942,8 @@ class Nova
     {
         $defaultMenu = static::defaultMainMenu($request);
 
-        if (! is_null(static::$mainMenuCallback)) {
-            return call_user_func(static::$mainMenuCallback, $request, $defaultMenu);
+        if (! \is_null(static::$mainMenuCallback)) {
+            return \call_user_func(static::$mainMenuCallback, $request, $defaultMenu);
         }
 
         return $defaultMenu;
@@ -968,8 +966,8 @@ class Nova
     {
         $defaultMenu = static::defaultUserMenu($request);
 
-        if (! is_null(static::$userMenuCallback)) {
-            return call_user_func(static::$userMenuCallback, $request, $defaultMenu);
+        if (! \is_null(static::$userMenuCallback)) {
+            return \call_user_func(static::$userMenuCallback, $request, $defaultMenu);
         }
 
         return $defaultMenu;
@@ -1022,7 +1020,7 @@ class Nova
      */
     public static function __callStatic(string $method, array $parameters)
     {
-        if (! property_exists(get_called_class(), $method)) {
+        if (! property_exists(\get_called_class(), $method)) {
             throw new BadMethodCallException("Method {$method} does not exist.");
         }
 
@@ -1094,8 +1092,8 @@ class Nova
      */
     public static function breadcrumbsEnabled(): bool
     {
-        return is_callable(static::$withBreadcrumbs)
-            ? call_user_func(static::$withBreadcrumbs, app(NovaRequest::class))
+        return \is_callable(static::$withBreadcrumbs)
+            ? \call_user_func(static::$withBreadcrumbs, app(NovaRequest::class))
             : static::$withBreadcrumbs;
     }
 
@@ -1128,8 +1126,8 @@ class Nova
      */
     public static function resolveFooter(Request $request): string
     {
-        if (! is_null(static::$footerCallback)) {
-            return (string) call_user_func(static::$footerCallback, $request);
+        if (! \is_null(static::$footerCallback)) {
+            return (string) \call_user_func(static::$footerCallback, $request);
         }
 
         return static::defaultFooter($request);
@@ -1185,7 +1183,7 @@ class Nova
     public static function brandColors(): array
     {
         return collect(config('nova.brand.colors'))
-            ->reject(static fn ($value) => is_null($value))
+            ->reject(static fn ($value) => \is_null($value))
             ->all();
     }
 
@@ -1224,7 +1222,7 @@ class Nova
         $locale = null;
 
         if (static::$userLocaleCallback) {
-            $locale = call_user_func(static::$userLocaleCallback, $request);
+            $locale = \call_user_func(static::$userLocaleCallback, $request);
         }
 
         return str_replace('_', '-', $locale ?? app()->getLocale());

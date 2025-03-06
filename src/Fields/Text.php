@@ -74,8 +74,11 @@ class Text extends Field implements FilterableField
             ]);
         }
 
+        $displayedAs = $this->serializeDisplayedValueAsHtml($request);
+
         return array_merge(parent::jsonSerialize(), [
             'asHtml' => $this->asHtml,
+            'displayedAs' => $displayedAs,
             'copyable' => $this->copyable,
         ]);
     }

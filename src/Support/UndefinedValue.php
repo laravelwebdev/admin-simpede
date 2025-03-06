@@ -12,7 +12,7 @@ class UndefinedValue implements \JsonSerializable
      */
     public static function equalsTo(mixed $value): bool
     {
-        return $value instanceof UndefinedValue || is_null($value);
+        return $value instanceof UndefinedValue || \is_null($value);
     }
 
     /**

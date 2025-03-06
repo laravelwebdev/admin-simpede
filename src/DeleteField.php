@@ -26,13 +26,13 @@ class DeleteField
         }
 
         /** @phpstan-ignore property.notFound */
-        $result = call_user_func_array($field->deleteCallback, $arguments);
+        $result = \call_user_func_array($field->deleteCallback, $arguments);
 
         if ($result === true) {
             return $model;
         }
 
-        if (! is_array($result)) {
+        if (! \is_array($result)) {
             $model->{$field->attribute} = $result;
         } else {
             foreach ($result as $key => $value) {

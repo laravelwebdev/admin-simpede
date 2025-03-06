@@ -23,7 +23,7 @@ class Observable
      */
     public function __construct(Model|string $eloquent, array|object|string $classes)
     {
-        $model = is_string($eloquent) ? new $eloquent : $eloquent;
+        $model = \is_string($eloquent) ? new $eloquent : $eloquent;
 
         $dispatcher = $model->getEventDispatcher();
 
@@ -43,7 +43,7 @@ class Observable
     {
         $observerName = $this->resolveObserverClassName($observer);
 
-        $name = get_class($model);
+        $name = $model::class;
 
         foreach ($model->getObservableEvents() as $event) {
             if (method_exists($observer, $event)) {
@@ -60,7 +60,7 @@ class Observable
     protected function createCallbackForListenerOnServingNova(mixed $listener, string $method): Closure
     {
         return static function () use ($method, $listener) {
-            $payload = func_get_args();
+            $payload = \func_get_args();
 
             return Nova::whenServing(static fn () => app()->make($listener)->$method(...$payload));
         };
@@ -76,8 +76,8 @@ class Observable
      */
     protected function resolveObserverClassName(object|string $class): string
     {
-        if (is_object($class)) {
-            return get_class($class);
+        if (\is_object($class)) {
+            return $class::class;
         }
 
         if (class_exists($class)) {

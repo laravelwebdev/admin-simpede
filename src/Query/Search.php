@@ -33,7 +33,7 @@ class Search
             collect($searchColumns)
                 ->each(function ($column) use ($query, $connectionType) {
                     /** @phpstan-ignore booleanAnd.alwaysFalse */
-                    if ($column instanceof Column || (! is_string($column) && is_callable($column))) {
+                    if ($column instanceof Column || (! \is_string($column) && \is_callable($column))) {
                         $column($query, $this->searchKeyword, $connectionType);
                     } else {
                         Column::from($column)->__invoke($query, $this->searchKeyword, $connectionType);

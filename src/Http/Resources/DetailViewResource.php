@@ -41,7 +41,7 @@ class DetailViewResource extends Resource
 
                         return ($request->relationshipType === 'hasOne' && $field instanceof BelongsTo && $relatedResource) ||
                             ($request->relationshipType === 'morphOne' && $field instanceof MorphTo && $relatedResource) ||
-                            (in_array($request->relationshipType, ['hasOne', 'morphOne']) && ($field instanceof MorphOne || $field instanceof HasOne));
+                            (\in_array($request->relationshipType, ['hasOne', 'morphOne']) && ($field instanceof MorphOne || $field instanceof HasOne));
                     });
                 })
                 ->values()->all();

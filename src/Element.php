@@ -3,6 +3,7 @@
 namespace Laravel\Nova;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 
 /**
@@ -11,6 +12,7 @@ use JsonSerializable;
 abstract class Element implements JsonSerializable
 {
     use AuthorizedToSee;
+    use Macroable;
     use Makeable;
     use Metable;
     use ProxiesCanSeeToGate;

@@ -28,7 +28,7 @@ trait RoundingPrecision
     {
         $this->roundingPrecision = $precision;
 
-        if (in_array($mode, [PHP_ROUND_HALF_UP, PHP_ROUND_HALF_DOWN, PHP_ROUND_HALF_EVEN, PHP_ROUND_HALF_ODD])) {
+        if (\in_array($mode, [PHP_ROUND_HALF_UP, PHP_ROUND_HALF_DOWN, PHP_ROUND_HALF_EVEN, PHP_ROUND_HALF_ODD])) {
             $this->roundingMode = $mode;
         }
 

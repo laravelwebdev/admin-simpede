@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
-use Illuminate\Http\Middleware\CheckResponseForModifications;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Laravel\Nova\Http\Controllers\ActionController;
@@ -56,16 +55,10 @@ use Laravel\Nova\Http\Controllers\ResourceSearchController;
 use Laravel\Nova\Http\Controllers\ResourceShowController;
 use Laravel\Nova\Http\Controllers\ResourceStoreController;
 use Laravel\Nova\Http\Controllers\ResourceUpdateController;
-use Laravel\Nova\Http\Controllers\ScriptController;
 use Laravel\Nova\Http\Controllers\SearchController;
 use Laravel\Nova\Http\Controllers\SoftDeleteStatusController;
-use Laravel\Nova\Http\Controllers\StyleController;
 use Laravel\Nova\Http\Controllers\UpdateFieldController;
 use Laravel\Nova\Http\Controllers\UpdatePivotFieldController;
-
-// Scripts & Styles...
-Route::get('/scripts/{script}', ScriptController::class)->middleware(CheckResponseForModifications::class);
-Route::get('/styles/{style}', StyleController::class)->middleware(CheckResponseForModifications::class);
 
 // Global Search...
 Route::get('/search', SearchController::class);

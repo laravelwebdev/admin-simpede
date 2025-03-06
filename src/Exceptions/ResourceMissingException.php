@@ -15,7 +15,7 @@ class ResourceMissingException extends Exception
     public function __construct($model)
     {
         parent::__construct(
-            __('Unable to find Resource for model [:model].', ['model' => get_class($model)])
+            __('Unable to find Resource for model [:model].', ['model' => $model::class])
         );
     }
 

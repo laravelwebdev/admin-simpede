@@ -61,7 +61,7 @@ class ResourceUpdateController extends Controller
             });
 
             tap(Nova::user($request), static function ($user) use ($model) {
-                if (get_class($model) === Util::userModel() && $model->is($user)) {
+                if ($model::class === Util::userModel() && $model->is($user)) {
                     $user->refresh();
                 }
             });

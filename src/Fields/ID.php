@@ -36,7 +36,7 @@ class ID extends Field
      */
     public function __construct($name = null, ?string $attribute = null, ?callable $resolveCallback = null)
     {
-        if (is_null($name)) {
+        if (\is_null($name)) {
             $attribute ??= 'id';
             $name = Nova::__('ID');
         }
@@ -68,7 +68,7 @@ class ID extends Field
                     ->whereInstanceOf(self::class)
                     ->first(),
             static fn ($field) => tap($field)->resolve($model),
-            static fn () => ! is_null($model) && $model->exists ? static::forModel($model) : null,
+            static fn () => ! \is_null($model) && $model->exists ? static::forModel($model) : null,
         );
 
         if ($field instanceof static) {
@@ -88,7 +88,7 @@ class ID extends Field
         return tap(static::make('ID', $model->getKeyName()), static function ($field) use ($model) {
             $value = $model->getKey();
 
-            if (is_int($value) && $value >= 9007199254740991) {
+            if (\is_int($value) && $value >= 9007199254740991) {
                 $field->asBigInt();
             }
 
@@ -111,7 +111,7 @@ class ID extends Field
                 ? optional($resource->{$pivotAccessor})->getKey()
                 : null;
 
-            if (is_int($pivotValue) || is_string($pivotValue)) {
+            if (\is_int($pivotValue) || \is_string($pivotValue)) {
                 $this->pivotValue = $pivotValue;
             }
         }

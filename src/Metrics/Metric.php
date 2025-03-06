@@ -49,7 +49,7 @@ abstract class Metric extends Card
         $resolver = $this->getResolver($request);
 
         if ($cacheFor = $this->cacheFor()) {
-            $cacheFor = is_numeric($cacheFor) ? new DateInterval(sprintf('PT%dS', $cacheFor * 60)) : $cacheFor;
+            $cacheFor = is_numeric($cacheFor) ? new DateInterval(\sprintf('PT%dS', $cacheFor * 60)) : $cacheFor;
 
             return Cache::remember(
                 $this->getCacheKey($request),
@@ -82,7 +82,7 @@ abstract class Metric extends Card
      */
     public function getCacheKey(NovaRequest $request)
     {
-        return sprintf(
+        return \sprintf(
             'nova.metric.%s.%s.%s.%s.%s.%s',
             $this->uriKey(),
             $request->input('range', 'no-range'),
@@ -158,7 +158,7 @@ abstract class Metric extends Card
     public function refreshWhenFiltersChange(bool $value = true)
     {
         if ($this->onlyOnDetail === true && $value === true) {
-            throw new HelperNotSupported(sprintf('The %s helper method is not compatible with onlyOnDetail helper.', __METHOD__));
+            throw new HelperNotSupported(\sprintf('The %s helper method is not compatible with onlyOnDetail helper.', __METHOD__));
         }
 
         $this->refreshWhenFiltersChange = $value;
@@ -176,7 +176,7 @@ abstract class Metric extends Card
     public function onlyOnDetail()
     {
         if ($this->refreshWhenFiltersChange === true) {
-            throw new HelperNotSupported(sprintf('The %s helper method is not compatible with refreshWhenFiltersChange helper.', __METHOD__));
+            throw new HelperNotSupported(\sprintf('The %s helper method is not compatible with refreshWhenFiltersChange helper.', __METHOD__));
         }
 
         $this->onlyOnDetail = true;
@@ -193,7 +193,7 @@ abstract class Metric extends Card
     public function jsonSerialize(): array
     {
         return array_merge(parent::jsonSerialize(), [
-            'class' => get_class($this),
+            'class' => $this::class,
             'name' => $this->name(),
             'uriKey' => $this->uriKey(),
             'helpWidth' => $this->getHelpWidth(),

@@ -77,7 +77,7 @@ class CallQueuedAction
         });
 
         if ($method = $this->failedMethodName()) {
-            call_user_func([$this->action, $method], $this->fields, $this->models, $e);
+            \call_user_func([$this->action, $method], $this->fields, $this->models, $e);
         }
     }
 

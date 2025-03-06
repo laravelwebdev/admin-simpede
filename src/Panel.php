@@ -127,7 +127,6 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
                 ]);
         }
 
-        /** @phpstan-ignore return.type */
         return tap($first->panel, static function ($panel) use ($name, $fields) {
             $panel->name = $name;
             $panel->withMeta(['fields' => $fields]);
@@ -146,7 +145,7 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
      */
     protected function prepareFields(callable|iterable $fields): iterable
     {
-        $fields = is_callable($fields) ? call_user_func($fields) : $fields;
+        $fields = \is_callable($fields) ? \call_user_func($fields) : $fields;
 
         return collect($this->filter($fields instanceof Collection ? $fields->all() : $fields))
             ->reject(static fn ($field) => $field instanceof MissingValue)
@@ -230,7 +229,7 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
                  * @var \Laravel\Nova\Fields\Field $field
                  * @var int $key
                  */
-                call_user_func($callback, $field, $key);
+                \call_user_func($callback, $field, $key);
 
                 return $field;
             })->all();

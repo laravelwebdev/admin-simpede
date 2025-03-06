@@ -13,7 +13,7 @@ class ActionMethod
      */
     public static function determine(Action $action, $model): string
     {
-        if (! is_null($action->handleCallback)) {
+        if (! \is_null($action->handleCallback)) {
             return 'handleUsingCallback';
         }
 

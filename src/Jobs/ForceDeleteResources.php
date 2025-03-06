@@ -35,14 +35,14 @@ class ForceDeleteResources
             $models->each(function ($model) {
                 $this->forceDeleteFields($this->request, $model);
 
-                if (in_array(Actionable::class, class_uses_recursive($model))) {
+                if (\in_array(Actionable::class, class_uses_recursive($model))) {
                     /** @phpstan-ignore method.notFound */
                     $model->actions()->delete();
                 }
 
                 $model->forceDelete();
 
-                if (! is_null($this->resourceClass)) {
+                if (! \is_null($this->resourceClass)) {
                     $this->resourceClass::afterForceDelete($this->request, $model);
                 }
 

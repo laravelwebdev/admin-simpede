@@ -45,7 +45,7 @@ class DashboardViewResource extends Resource
     public function authorizedDashboardForRequest(DashboardRequest $request): Dashboard
     {
         return tap(Nova::dashboardForKey($this->name, $request), static function ($dashboard) {
-            abort_if(is_null($dashboard), 404);
+            abort_if(\is_null($dashboard), 404);
         });
     }
 }

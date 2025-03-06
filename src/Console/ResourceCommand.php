@@ -88,7 +88,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
 
         $modelNamespace = $this->getModelNamespace();
 
-        if (is_null($model)) {
+        if (\is_null($model)) {
             $model = $modelNamespace.str_replace('/', '\\', $resourceName);
         } elseif (! Str::startsWith($model, [
             $modelNamespace, '\\',
@@ -96,7 +96,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
             $model = $modelNamespace.$model;
         }
 
-        if (in_array(strtolower($resourceName), $this->protectedNames)) {
+        if (\in_array(strtolower($resourceName), $this->protectedNames)) {
             $this->components->warn("You *must* override the uriKey method for your {$resourceName} resource.");
         }
 
@@ -114,7 +114,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
 
         if (! class_exists($baseResourceClass)) {
             $baseResourceClass = 'Laravel\Nova\Resource';
-        } elseif (! Str::contains($resourceName, '/') && class_exists($baseResourceClass)) {
+        } elseif (! str_contains($resourceName, '/') && class_exists($baseResourceClass)) {
             return $result;
         }
 

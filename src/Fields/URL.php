@@ -53,7 +53,7 @@ class URL extends Text
         return with(app(NovaRequest::class), function ($request) {
             $data = parent::jsonSerialize();
 
-            if (is_null($data['displayedAs'])) {
+            if (\is_null($data['displayedAs'])) {
                 $data['displayedAs'] = match (true) {
                     $request->isResourceIndexRequest() => $this->name,
                     default => $data['value'],
