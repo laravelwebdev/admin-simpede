@@ -119,7 +119,8 @@ class NovaCoreServiceProvider extends ServiceProvider
                 'Notification Polling' => AboutCommand::format(Nova::$notificationPollingInterval, console: static fn ($value) => "{$value}s"),
 
                 'Authentication' => AboutCommand::format(Nova::routes()->withAuthentication, console: $formatEnabledStatus),
-                'Authentication Guard' => AboutCommand::format(config('nova.guard'), console: static fn ($value) => $value ?? 'null'),
+                'Authentication Guard' => AboutCommand::format(Util::userGuard(), console: static fn ($value) => $value ?? 'null'),
+                'Authentication User' => static fn () => Util::userModel(),
 
                 'Password Reset' => AboutCommand::format(Nova::routes()->withPasswordReset, console: $formatEnabledStatus),
                 'Password Reset Broker' => AboutCommand::format(config('nova.passwords'), console: static fn ($value) => $value ?? 'null'),

@@ -43,12 +43,15 @@
     <div
       class="grid grid-cols-full divide-y divide-gray-100 dark:divide-gray-700"
     >
-      <div v-for="(field, fieldIndex) in item.fields" :key="field.uniqueKey">
+      <div
+        v-for="(nestedField, nestedFieldIndex) in item.fields"
+        :key="nestedField.uniqueKey"
+      >
         <component
-          :ref="fieldRefs[`fields.${field.attribute}`]"
-          :is="'form-' + field.component"
-          :field="field"
-          :index="fieldIndex"
+          :ref="fieldRefs[`fields.${nestedField.attribute}`]"
+          :is="`form-${nestedField.component}`"
+          :field="nestedField"
+          :index="nestedFieldIndex"
           :errors="errors"
           :show-help-text="true"
           @file-deleted="$emit('file-deleted')"

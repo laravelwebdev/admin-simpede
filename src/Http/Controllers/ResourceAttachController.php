@@ -50,6 +50,10 @@ class ResourceAttachController extends Controller
                     )
                 );
 
+                tap(new $resourceClass($model), static function ($resource) use ($request) {
+                    abort_unless($resource->authorizedToAttach($request, $request->findRelatedModelOrFail()), 401);
+                });
+
                 DB::transaction(function () use ($request, $model, $pivot) {
                     Nova::usingActionEvent(function ($actionEvent) use ($request, $model, $pivot) {
                         $this->actionEvent = $actionEvent->forAttachedResource($request, $model, $pivot);
@@ -83,10 +87,6 @@ class ResourceAttachController extends Controller
             Validator::make($request->all(), $rules, [], $this->customRulesKeys($request, $attribute))->validate();
 
             $resourceClass::validateForAttachment($request);
-        });
-
-        tap(new $resourceClass($model), static function ($resource) use ($request) {
-            abort_unless($resource->authorizedToAttach($request, $request->findRelatedModelOrFail()), 401);
         });
     }
 

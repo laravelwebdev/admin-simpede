@@ -15,8 +15,8 @@ use Laravel\Nova\Util;
 use Stringable;
 
 /**
- * @phpstan-type TFieldValidationRules \Stringable|string|\Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\Rule|\Illuminate\Contracts\Validation\InvokableRule|callable
- * @phpstan-type TValidationRules array<int, TFieldValidationRules>|\Stringable|string|(callable(string, mixed, \Closure):(void))
+ * @phpstan-type TFieldValidationRules \Stringable|string|\Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\Rule|\Illuminate\Contracts\Validation\InvokableRule|(callable(string, mixed, \Closure):(void))
+ * @phpstan-type TValidationRules array<int, TFieldValidationRules>|TFieldValidationRules
  *
  * @method static static make(mixed $name, string|callable|object|null $attribute = null, callable|null $resolveCallback = null)
  */
