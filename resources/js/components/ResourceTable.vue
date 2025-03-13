@@ -10,6 +10,7 @@
         :fields="fields"
         :should-show-column-borders="shouldShowColumnBorders"
         :should-show-checkboxes="shouldShowCheckboxes"
+        :should-show-select-all-checkboxes="shouldShowSelectAllCheckboxes"
         :sortable="sortable"
         @order="requestOrderByChange"
         @reset-order-by="resetOrderBy"
@@ -30,6 +31,7 @@
           :restore-resource="restoreResource"
           :selected-resources="selectedResources"
           :should-show-checkboxes="shouldShowCheckboxes"
+          :should-show-select-all-checkboxes="shouldShowSelectAllCheckboxes"
           :should-show-column-borders="shouldShowColumnBorders"
           :table-style="tableStyle"
           :testId="`${resourceName}-items-${index}`"
@@ -59,6 +61,7 @@ export default {
     singularName: { type: String, required: true },
     selectedResources: { default: [] },
     selectedResourceIds: {},
+    shouldShowSelectAllCheckboxes: { type: Boolean, default: false },
     shouldShowCheckboxes: { type: Boolean, default: false },
     actionsAreAvailable: { type: Boolean, default: false },
     viaResource: { default: null },

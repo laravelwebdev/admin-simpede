@@ -685,16 +685,6 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     }
 
     /**
-     * Return a fresh resource instance.
-     *
-     * @return static
-     */
-    protected static function newResource()
-    {
-        return new static(static::newModel());
-    }
-
-    /**
      * Determine whether to show borders for each column on the X-axis.
      *
      * @return bool
@@ -724,6 +714,16 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     public static function clickAction()
     {
         return static::$clickAction;
+    }
+
+    /**
+     * Return a fresh resource instance.
+     *
+     * @return static
+     */
+    protected static function newResource()
+    {
+        return new static(static::newModel());
     }
 
     /**

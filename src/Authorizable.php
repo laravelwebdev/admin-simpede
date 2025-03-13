@@ -32,7 +32,7 @@ trait Authorizable
     public static function authorizationGate()
     {
         return Gate::getPolicyFor(
-            Util::resolveResourceOrModelForAuthorization(new static(static::newModel()))
+            Util::resolveResourceOrModelForAuthorization(self::newResource())
         );
     }
 
@@ -69,7 +69,7 @@ trait Authorizable
 
         $gate = static::authorizationGate();
 
-        $resource = Util::resolveResourceOrModelForAuthorization(new static(static::newModel()));
+        $resource = Util::resolveResourceOrModelForAuthorization(self::newResource());
 
         return \is_callable([$gate, 'viewAny'])
             ? Gate::forUser(Nova::user($request))->check('viewAny', $resource::class)
@@ -118,7 +118,7 @@ trait Authorizable
     public static function authorizedToCreate(Request $request)
     {
         if (static::authorizable()) {
-            $resource = Util::resolveResourceOrModelForAuthorization(new static(static::newModel()));
+            $resource = Util::resolveResourceOrModelForAuthorization(self::newResource());
 
             return Gate::forUser(Nova::user($request))->check('create', $resource::class);
         }

@@ -14,6 +14,7 @@
           @blur="handleChangesOnBlurEvent"
           @keyup.enter="handleChangeOnPressingEnterEvent"
           @keydown.enter="handleChangeOnPressingEnterEvent"
+          @keydown="handleChangeOnKeyPressEvent"
           :id="field.uniqueKey"
           :disabled="isImmutable"
           :readonly="isImmutable"
@@ -91,6 +92,30 @@ export default {
       this.listenToValueChanges(event?.target?.value ?? event)
     },
 
+    handleChangeOnKeyPressEvent(event) {
+      if (this.isImmutable === true) {
+        return
+      }
+
+      this.allowCustomisingValue()
+    },
+
+    allowCustomisingValue() {
+      this.isCustomisingValue = true
+      this.removeChangeListener()
+      this.isListeningToChanges = false
+      this.field.writable = true
+      this.field.extraAttributes.readonly = false
+      this.field.showCustomizeButton = false
+    },
+
+    disableCustomisingValue() {
+      this.isCustomisingValue = false
+      this.registerChangeListener()
+      this.field.writable = false
+      this.field.extraAttributes.readonly = true
+    },
+
     listenToValueChanges(value) {
       if (this.isImmutable === true) {
         return
@@ -112,20 +137,12 @@ export default {
 
     toggleCustomizeClick() {
       if (this.field.extraAttributes.readonly === true) {
-        this.isCustomisingValue = true
-        this.removeChangeListener()
-        this.isListeningToChanges = false
-        this.field.writable = true
-        this.field.extraAttributes.readonly = false
-        this.field.showCustomizeButton = false
+        this.allowCustomisingValue()
         this.$refs.theInput.focus()
         return
       }
 
-      this.isCustomisingValue = false
-      this.registerChangeListener()
-      this.field.writable = false
-      this.field.extraAttributes.readonly = true
+      this.disableCustomisingValue()
     },
   },
 

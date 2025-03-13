@@ -22,8 +22,7 @@ mix
   .ts('resources/ui/ui.js', 'public/ui.js')
   .vue({ version: 3 })
   // .sourceMaps()
-  // .extract(Object.keys(packages.dependencies))
-  .extract()
+  .extract(Object.keys(packages.dependencies))
   .setPublicPath('public')
   .postCss('resources/css/app.css', 'public', [
     postcssImport(),

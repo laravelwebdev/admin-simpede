@@ -10,7 +10,7 @@
   >
     <!-- Resource Selection Checkbox -->
     <td
-      v-if="initializingWithShowCheckboxes"
+      v-if="showShowCheckboxesRow"
       @click.stop
       class="w-[1%] white-space-nowrap pl-5 pr-5 dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-900"
       :class="{
@@ -227,6 +227,7 @@ export default {
     'restoreResource',
     'selectedResources',
     'shouldShowCheckboxes',
+    'shouldShowSelectAllCheckboxes',
     'shouldShowColumnBorders',
     'tableStyle',
     'testId',
@@ -242,12 +243,9 @@ export default {
     deleteModalOpen: false,
     restoreModalOpen: false,
     previewModalOpen: false,
-
-    initializingWithShowCheckboxes: false,
   }),
 
   beforeMount() {
-    this.initializingWithShowCheckboxes = this.shouldShowCheckboxes
     this.isSelected = this.selectedResources.indexOf(this.resource) > -1
   },
 
@@ -413,6 +411,10 @@ export default {
       } else {
         return this.resource.authorizedToView
       }
+    },
+
+    showShowCheckboxesRow() {
+      return this.shouldShowSelectAllCheckboxes || this.shouldShowCheckboxes
     },
 
     shouldShowActionDropdown() {

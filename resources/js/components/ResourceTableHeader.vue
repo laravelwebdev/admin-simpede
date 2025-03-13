@@ -3,7 +3,7 @@
     <tr>
       <!-- Select Checkbox -->
       <th
-        v-if="initializingWithShowCheckboxes"
+        v-if="showShowCheckboxesRow"
         class="w-[1%] white-space-nowrap uppercase bg-gray-50 dark:bg-gray-800 text-xxs text-gray-500 tracking-wide pl-5 pr-2 py-2"
         :class="{
           'border-r border-gray-200 dark:border-gray-600':
@@ -58,18 +58,11 @@ export default {
     resourceName: String,
     shouldShowColumnBorders: Boolean,
     shouldShowCheckboxes: Boolean,
+    shouldShowSelectAllCheckboxes: Boolean,
     fields: {
       type: [Object, Array],
     },
     sortable: Boolean,
-  },
-
-  data: () => ({
-    initializingWithShowCheckboxes: false,
-  }),
-
-  beforeMount() {
-    this.initializingWithShowCheckboxes = this.shouldShowCheckboxes
   },
 
   methods: {
@@ -85,6 +78,12 @@ export default {
      */
     resetOrderBy(field) {
       this.$emit('reset-order-by', field)
+    },
+  },
+
+  computed: {
+    showShowCheckboxesRow() {
+      return this.shouldShowSelectAllCheckboxes || this.shouldShowCheckboxes
     },
   },
 }

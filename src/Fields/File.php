@@ -48,7 +48,7 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
     /**
      * The callback that should be executed to store the file.
      *
-     * @var callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent, string, string, ?string, ?string):mixed
+     * @var callable(\Illuminate\Http\Request, \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent, string, string, ?string, ?string):mixed
      */
     public $storageCallback;
 
@@ -78,7 +78,7 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
      *
      * @param  \Stringable|string  $name
      * @param  string|callable|null  $attribute
-     * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent, string, string, ?string, ?string):(mixed))|null  $storageCallback
+     * @param  (callable(\Illuminate\Http\Request, \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent, string, string, ?string, ?string):(mixed))|null  $storageCallback
      * @return void
      */
     public function __construct($name, mixed $attribute = null, ?string $disk = null, ?callable $storageCallback = null)
@@ -125,7 +125,7 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
 
         return $file->storeAs(
             $this->getStorageDir(),
-            \call_user_func($this->storeAsCallback, $request, $model, $attribute, $request, $this->getStorageDir(), $this->getStorageDisk()),
+            \call_user_func($this->storeAsCallback, $request, $model, $attribute, $requestAttribute, $this->getStorageDir(), $this->getStorageDisk()),
             $this->getStorageDisk()
         );
     }
@@ -179,7 +179,7 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
     /**
      * Specify the callback that should be used to store the file.
      *
-     * @param  callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent, string, string, ?string, ?string):mixed  $storageCallback
+     * @param  callable(\Illuminate\Http\Request, \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent, string, string, ?string, ?string):mixed  $storageCallback
      * @return $this
      */
     public function store(callable $storageCallback)
@@ -192,7 +192,7 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
     /**
      * Specify the callback that should be used to determine the file's storage name.
      *
-     * @param  callable(\Illuminate\Http\Request):string  $storeAsCallback
+     * @param  callable(\Illuminate\Http\Request, \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent, string, string, ?string, ?string):string  $storeAsCallback
      * @return $this
      */
     public function storeAs(callable $storeAsCallback)
