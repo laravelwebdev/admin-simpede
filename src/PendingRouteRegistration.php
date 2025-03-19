@@ -238,7 +238,12 @@ class PendingRouteRegistration
     {
         $limiter = config('fortify.limiters.login');
 
-        if ($this->withAuthentication === true) {
+        if ($this->withAuthentication === false && ! empty($this->loginPath)) {
+            Nova::router(middleware: $this->authenticationMiddlewares)
+                ->group(function (Router $router) {
+                    $router->redirect('/login', $this->loginPath)->name('nova.pages.login');
+                });
+        } else {
             if (
                 $this->withDefaultAuthentication === true
                 && ! Route::has('login')
@@ -259,14 +264,17 @@ class PendingRouteRegistration
                 ->group(static function (Router $router) {
                     $router->post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('nova.logout');
                 });
-        } elseif (! empty($this->loginPath)) {
-            Nova::router(middleware: $this->authenticationMiddlewares)
-                ->group(function (Router $router) {
-                    $router->redirect('/login', $this->loginPath)->name('nova.pages.login');
-                });
         }
 
-        if ($this->withPasswordReset === true || Nova::fortify()->enabled(Features::resetPasswords())) {
+        if ($this->withPasswordReset === false && ! empty($this->forgotPasswordPath)) {
+            Nova::router(middleware: $this->passwordResetMiddlewares)
+                ->group(function (Router $router) {
+                    $router->redirect('/password/reset', $this->forgotPasswordPath)->name('nova.pages.password.email');
+                });
+        } elseif (
+            $this->withPasswordReset === true
+            || (Nova::fortify()->enabled(Features::resetPasswords()) && $this->withDefaultAuthentication === true)
+        ) {
             Nova::router(middleware: $this->passwordResetMiddlewares)
                 ->group(static function (Router $router) {
                     $router->get('/password/reset', [PasswordResetLinkController::class, 'create'])->name('nova.pages.password.email');

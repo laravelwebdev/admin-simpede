@@ -22,9 +22,10 @@ class ImpersonateController extends Controller
         }
 
         /** @var class-string<\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model> $userModel */
-        $userModel = with(Nova::modelInstanceForKey($request->input('resource')), static function ($model) {
-            return ! \is_null($model) ? $model::class : Util::userModel();
-        });
+        $userModel = with(
+            Nova::modelInstanceForKey($request->input('resource')),
+            static fn ($model) => ! \is_null($model) ? $model::class : Util::userModel()
+        );
 
         $authGuard = Util::sessionAuthGuardForModel($userModel);
 

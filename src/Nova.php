@@ -598,7 +598,7 @@ class Nova
     protected static function defaultCreateUserCallback(): Closure
     {
         return function ($name, $email, $password) {
-            $model = Util::userModel();
+            $model = Util::userModelOrFallback();
 
             return tap((new $model)->forceFill([
                 'name' => $name,

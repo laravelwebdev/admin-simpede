@@ -52,7 +52,7 @@ class ActionEvent extends Model
      */
     public function user()
     {
-        return $this->belongsTo(Util::userModel(), 'user_id');
+        return $this->belongsTo(Util::userModelOrFallback(), 'user_id');
     }
 
     /**
@@ -62,7 +62,9 @@ class ActionEvent extends Model
      */
     public function target()
     {
-        $queryWithTrashed = static fn ($query) => $query->withTrashed();
+        $queryWithTrashed = static function ($query) {
+            return $query->withTrashed();
+        };
 
         return $this->morphTo('target', 'target_type', 'target_id')
                     ->constrain(

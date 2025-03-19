@@ -346,11 +346,7 @@ class PendingFortifyConfiguration
         /** @var \Laravel\Nova\PendingRouteRegistration $routes */
         $routes = Nova::routes();
 
-        if ($this->withFrontendRoutes === true && $routes->withAuthentication === false && $routes->withPasswordReset === false) {
-            return;
-        }
-
-        Nova::serving(function (ServingNova $event) {
+        Nova::serving(function (ServingNova $event) use ($routes) {
             $this->sync();
 
             /** @var \Illuminate\Contracts\Foundation\Application $app */
@@ -359,13 +355,28 @@ class PendingFortifyConfiguration
             $app->scoped(StatefulGuard::class, static fn () => Auth::guard(Util::userGuard()));
             $app->scoped(RedirectAsIntended::class, RedirectAsIntendedForNova::class);
 
-            $app->scoped(LoginViewResponseContract::class, LoginViewResponse::class);
-            $app->scoped(LoginResponseContract::class, LoginResponse::class);
-            $app->scoped(LogoutResponseContract::class, LogoutResponse::class);
+            if ($routes->withAuthentication === true) {
+                $app->scoped(LoginViewResponseContract::class, LoginViewResponse::class);
+                $app->scoped(LoginResponseContract::class, LoginResponse::class);
+                $app->scoped(LogoutResponseContract::class, LogoutResponse::class);
+                $app->scoped(TwoFactorChallengeViewResponseContract::class, TwoFactorChallengeViewResponse::class);
+                $app->scoped(TwoFactorLoginResponseContract::class, TwoFactorLoginResponse::class);
+                $app->scoped(FortifyRedirectIfTwoFactorAuthenticatable::class, RedirectIfTwoFactorAuthenticatable::class);
+            }
 
-            $app->scoped(ResetPasswordViewResponseContract::class, ResetPasswordViewResponse::class);
-            $app->scoped(RequestPasswordResetLinkViewResponseContract::class, RequestPasswordResetLinkViewResponse::class);
-            $app->scoped(ResetsUserPasswordsContract::class, ResetUserPassword::class);
+            if ($routes->withPasswordReset === true) {
+                $app->scoped(ResetPasswordViewResponseContract::class, ResetPasswordViewResponse::class);
+                $app->scoped(RequestPasswordResetLinkViewResponseContract::class, RequestPasswordResetLinkViewResponse::class);
+                $app->scoped(ResetsUserPasswordsContract::class, ResetUserPassword::class);
+
+                ResetPassword::toMailUsing(static function ($notifiable, $token) {
+                    return (new MailMessage)
+                        ->subject(Nova::__('Reset Password Notification'))
+                        ->line(Nova::__('You are receiving this email because we received a password reset request for your account.'))
+                        ->action(Nova::__('Reset Password'), route('nova.pages.password.reset', ['token' => $token]))
+                        ->line(Nova::__('If you did not request a password reset, no further action is required.'));
+                });
+            }
 
             $app->scoped(VerifyEmailViewResponseContract::class, VerifyEmailViewResponse::class);
 
@@ -375,19 +386,6 @@ class PendingFortifyConfiguration
             $app->scoped(ConfirmPasswordViewResponseContract::class, ConfirmPasswordViewResponse::class);
             $app->scoped(PasswordConfirmedResponseContract::class, PasswordConfirmedResponse::class);
             $app->scoped(FailedPasswordConfirmationResponseContract::class, FailedPasswordConfirmationResponse::class);
-
-            $app->scoped(TwoFactorChallengeViewResponseContract::class, TwoFactorChallengeViewResponse::class);
-            $app->scoped(TwoFactorLoginResponseContract::class, TwoFactorLoginResponse::class);
-
-            $app->scoped(FortifyRedirectIfTwoFactorAuthenticatable::class, RedirectIfTwoFactorAuthenticatable::class);
-
-            ResetPassword::toMailUsing(static function ($notifiable, $token) {
-                return (new MailMessage)
-                    ->subject(Nova::__('Reset Password Notification'))
-                    ->line(Nova::__('You are receiving this email because we received a password reset request for your account.'))
-                    ->action(Nova::__('Reset Password'), route('nova.pages.password.reset', ['token' => $token]))
-                    ->line(Nova::__('If you did not request a password reset, no further action is required.'));
-            });
         });
     }
 }

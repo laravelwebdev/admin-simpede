@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -145,6 +146,16 @@ class Util
     public static function userModel(): ?string
     {
         return static::userModelFromGuard(static::userGuard());
+    }
+
+    /**
+     * Get the user model for Laravel Nova, use default User model available from Framework as fallback.
+     *
+     * @return class-string<\Illuminate\Foundation\Auth\User|\Illuminate\Database\Eloquent\Model>
+     */
+    public static function userModelOrFallback(): string
+    {
+        return static::userModel() ?? User::class;
     }
 
     /**
