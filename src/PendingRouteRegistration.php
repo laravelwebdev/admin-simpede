@@ -103,13 +103,17 @@ class PendingRouteRegistration
     /**
      * Register Nova without authentication routes.
      *
+     * @param  array<int, class-string|string>  $middleware
      * @return $this
      */
     public function withoutAuthenticationRoutes(
         string|false $login = '/login',
         string|false $logout = '/logout',
+        array $middleware = ['nova']
     ) {
+        $this->authenticationMiddlewares = $middleware;
         $this->withAuthentication = false;
+        $this->withDefaultAuthentication = false;
 
         $this->loginPath = $login;
         $this->logoutPath = $logout;
@@ -123,7 +127,7 @@ class PendingRouteRegistration
      * @param  array<int, class-string|string>  $middleware
      * @return $this
      */
-    public function withPasswordResetRoutes($middleware = ['nova'])
+    public function withPasswordResetRoutes(array $middleware = ['nova'])
     {
         $this->withPasswordReset = true;
 
@@ -140,7 +144,9 @@ class PendingRouteRegistration
     public function withoutPasswordResetRoutes(
         string|false $forgotPassword = '/forgot-password',
         string|false $resetPassword = '/reset-password',
+        array $middleware = ['nova']
     ) {
+        $this->passwordResetMiddlewares = $middleware;
         $this->withPasswordReset = false;
 
         $this->forgotPasswordPath = $forgotPassword;
@@ -201,6 +207,7 @@ class PendingRouteRegistration
         $apiMiddlewares = config('nova.api_middleware', []);
 
         $this->bootstrapAuthenticationRoutes($app);
+        $this->bootstrapPasswordResetRoutes($app);
         $this->bootstrapEmailVerificationRoutes($app);
         $this->bootstrapUserSecurityRoutes($app, $apiMiddlewares);
         $this->bootstrapConfirmPasswordRoutes($app, $apiMiddlewares);
@@ -236,54 +243,65 @@ class PendingRouteRegistration
      */
     protected function bootstrapAuthenticationRoutes(Application $app): void
     {
-        $limiter = config('fortify.limiters.login');
-
-        if ($this->withAuthentication === false && ! empty($this->loginPath)) {
-            Nova::router(middleware: $this->authenticationMiddlewares)
-                ->group(function (Router $router) {
-                    $router->redirect('/login', $this->loginPath)->name('nova.pages.login');
-                });
-        } else {
-            if (
-                $this->withDefaultAuthentication === true
-                && ! Route::has('login')
-                && Nova::url('/login') !== '/login'
-            ) {
-                Route::redirect('/login', Nova::url('/login'))->name('login');
+        if ($this->withAuthentication === false) {
+            if (! empty($this->loginPath)) {
+                Nova::router(middleware: $this->authenticationMiddlewares)
+                    ->group(function (Router $router) {
+                        $router->redirect('/login', $this->loginPath)->name('nova.pages.login');
+                    });
             }
 
-            Nova::router(middleware: $this->authenticationMiddlewares)
-                ->group(static function (Router $router) use ($limiter) {
-                    $router->get('/login', [AuthenticatedSessionController::class, 'create'])->name('nova.pages.login');
-                    $router->post('/login', [AuthenticatedSessionController::class, 'store'])
-                        ->middleware(array_filter([$limiter ? 'throttle:'.$limiter : null]))
-                        ->name('nova.login');
-                });
-
-            Nova::router()
-                ->group(static function (Router $router) {
-                    $router->post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('nova.logout');
-                });
+            return;
         }
 
-        if ($this->withPasswordReset === false && ! empty($this->forgotPasswordPath)) {
-            Nova::router(middleware: $this->passwordResetMiddlewares)
-                ->group(function (Router $router) {
-                    $router->redirect('/password/reset', $this->forgotPasswordPath)->name('nova.pages.password.email');
-                });
-        } elseif (
-            $this->withPasswordReset === true
-            || (Nova::fortify()->enabled(Features::resetPasswords()) && $this->withDefaultAuthentication === true)
+        $limiter = config('fortify.limiters.login');
+
+        if (
+            $this->withDefaultAuthentication === true
+            && ! Route::has('login')
+            && Nova::url('/login') !== '/login'
         ) {
-            Nova::router(middleware: $this->passwordResetMiddlewares)
-                ->group(static function (Router $router) {
-                    $router->get('/password/reset', [PasswordResetLinkController::class, 'create'])->name('nova.pages.password.email');
-                    $router->post('/password/email', [PasswordResetLinkController::class, 'store'])->name('nova.password.email');
-
-                    $router->get('/password/reset/{token}', [NewPasswordController::class, 'create'])->name('nova.pages.password.reset');
-                    $router->post('/password/reset', [NewPasswordController::class, 'store'])->name('nova.password.reset');
-                });
+            Route::redirect('/login', Nova::url('/login'))->name('login');
         }
+
+        Nova::router(middleware: $this->authenticationMiddlewares)
+            ->group(static function (Router $router) use ($limiter) {
+                $router->get('/login', [AuthenticatedSessionController::class, 'create'])->name('nova.pages.login');
+                $router->post('/login', [AuthenticatedSessionController::class, 'store'])
+                    ->middleware(array_filter([$limiter ? 'throttle:'.$limiter : null]))
+                    ->name('nova.login');
+            });
+
+        Nova::router()
+            ->group(static function (Router $router) {
+                $router->post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('nova.logout');
+            });
+    }
+
+    /**
+     * Bootstrap the registered Nova password reset routes.
+     */
+    protected function bootstrapPasswordResetRoutes(Application $app): void
+    {
+        if ($this->withPasswordReset === false) {
+            if (! empty($this->forgotPasswordPath)) {
+                Nova::router(middleware: $this->passwordResetMiddlewares)
+                    ->group(function (Router $router) {
+                        $router->redirect('/password/reset', $this->forgotPasswordPath)->name('nova.pages.password.email');
+                    });
+            }
+
+            return;
+        }
+
+        Nova::router(middleware: $this->passwordResetMiddlewares)
+            ->group(static function (Router $router) {
+                $router->get('/password/reset', [PasswordResetLinkController::class, 'create'])->name('nova.pages.password.email');
+                $router->post('/password/email', [PasswordResetLinkController::class, 'store'])->name('nova.password.email');
+
+                $router->get('/password/reset/{token}', [NewPasswordController::class, 'create'])->name('nova.pages.password.reset');
+                $router->post('/password/reset', [NewPasswordController::class, 'store'])->name('nova.password.reset');
+            });
     }
 
     /**

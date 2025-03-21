@@ -140,6 +140,9 @@ class PendingFortifyConfiguration
     {
         $this->username = Fortify::username();
         $this->email = Fortify::email();
+
+        $this->cachedConfig = config('fortify', []);
+        $this->cachedOptionsConfig = config('fortify-options', []);
     }
 
     /**
@@ -150,13 +153,8 @@ class PendingFortifyConfiguration
      */
     public function features(Closure|array|null $features = null)
     {
-        $this->cachedConfig = config('fortify', []);
-        $this->cachedOptionsConfig = config('fortify-options', []);
-
         if (! \is_null($features)) {
-            $this->features = collect(Arr::wrap(value($features)))->merge(array_filter([
-                Nova::routes()->withPasswordReset ? Features::resetPasswords() : null,
-            ]))->unique()->all();
+            $this->features = Arr::wrap(value($features));
 
             $this->options = config('fortify-options');
         }
@@ -328,10 +326,12 @@ class PendingFortifyConfiguration
     public function register(?bool $routes = null): void
     {
         if (\is_null($routes)) {
-            $routes = Util::isFortifyRoutesRegisteredForFrontend();
+            $routes = Fortify::$registersRoutes === true
+                ? Util::isFortifyRoutesRegisteredForFrontend()
+                : false;
         }
 
-        if ($routes === false) {
+        if ($routes === false && Fortify::$registersRoutes === true) {
             Fortify::ignoreRoutes();
         }
 
@@ -345,6 +345,11 @@ class PendingFortifyConfiguration
     {
         /** @var \Laravel\Nova\PendingRouteRegistration $routes */
         $routes = Nova::routes();
+
+        $this->features = collect($this->features ?? [])->merge(array_filter([
+            $routes->withPasswordReset ? Features::resetPasswords() : null,
+            $routes->withEmailVerification ? Features::emailVerification() : null,
+        ]))->unique()->all();
 
         Nova::serving(function (ServingNova $event) use ($routes) {
             $this->sync();

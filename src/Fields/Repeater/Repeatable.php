@@ -100,12 +100,25 @@ class Repeatable implements JsonSerializable
             ->each(function (Field $field) use ($request) {
                 $field
                     ->compact()
-//                    ->fullWidth()
                     ->resolve($this->data, $field->attribute);
 
                 if (\is_null($field->value) && empty($this->data)) {
                     $field->value = $field->resolveDefaultCallback($request);
                 }
+            });
+    }
+
+    /**
+     * Resolve the values of the fields in the Repeatable.
+     *
+     * @return \Laravel\Nova\Fields\FieldCollection
+     */
+    public function resolveFieldsForDisplay(NovaRequest $request)
+    {
+        return FieldCollection::make($this->fields($request))
+            ->withoutMissingValues()
+            ->each(function (Field $field) {
+                $field->compact()->resolveForDisplay($this->data, $field->attribute);
             });
     }
 
@@ -151,14 +164,18 @@ class Repeatable implements JsonSerializable
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
-        $request = app(NovaRequest::class);
+        $fields = with(app(NovaRequest::class), function ($request) {
+            return $request->isFormRequest()
+                ? $this->resolveFields($request)
+                : $this->resolveFieldsForDisplay($request);
+        });
 
         return [
             'icon' => static::$icon,
             'label' => static::label(),
             'singularLabel' => static::singularLabel(),
             'type' => static::key(),
-            'fields' => $this->resolveFields($request),
+            'fields' => $fields,
             'confirmBeforeRemoval' => $this->confirmRemoval,
         ];
     }

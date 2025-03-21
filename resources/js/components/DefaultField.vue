@@ -1,9 +1,15 @@
 <template>
   <div v-if="field.visible" :class="fieldWrapperClasses">
     <div v-if="field.withLabel" :class="labelClasses">
-      <slot>
+      <slot
+        name="default"
+        :for="fieldLabelFor"
+        :label="fieldLabel"
+        :required="field.required"
+        :hasHelpText="shouldShowHelpText"
+      >
         <FormLabel
-          :label-for="labelFor || field.uniqueKey"
+          :label-for="fieldLabelFor"
           class="space-x-1"
           :class="{ 'mb-2': shouldShowHelpText }"
         >
@@ -49,6 +55,11 @@ export default {
   },
 
   computed: {
+    /**
+     * HTML classes for field wrapper.
+     *
+     * @returns {string[]}
+     */
     fieldWrapperClasses() {
       // prettier-ignore
       return [
@@ -61,6 +72,11 @@ export default {
       ]
     },
 
+    /**
+     * HTML classes for label.
+     *
+     * @returns {string[]}
+     */
     labelClasses() {
       // prettier-ignore
       return [
@@ -74,6 +90,11 @@ export default {
       ]
     },
 
+    /**
+     * HTML classes for control wrapper.
+     *
+     * @returns {string[]}
+     */
     controlWrapperClasses() {
       // prettier-ignore
       return [
@@ -90,6 +111,8 @@ export default {
 
     /**
      * Return the label that should be used for the field.
+     *
+     * @returns {string}
      */
     fieldLabel() {
       // If the field name is purposefully an empty string, then let's show it as such
@@ -101,7 +124,18 @@ export default {
     },
 
     /**
+     * Return the label target for the field.
+     *
+     * @returns {string}
+     */
+    fieldLabelFor() {
+      return this.labelFor || this.field.uniqueKey
+    },
+
+    /**
      * Determine help text should be shown.
+     *
+     * @returns {boolean}
      */
     shouldShowHelpText() {
       return this.showHelpText && this.field.helpText?.length > 0
