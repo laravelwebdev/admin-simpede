@@ -15,9 +15,9 @@ trait ResolvesFilters
     public function availableFilters(NovaRequest $request): Collection
     {
         return $this->resolveFilters($request)
-                    ->concat($this->resolveFiltersFromFields($request))
-                    ->filter->authorizedToSee($request)
-                    ->values();
+            ->concat($this->resolveFiltersFromFields($request))
+            ->filter->authorizedToSee($request)
+            ->values();
     }
 
     /**

@@ -67,12 +67,12 @@ class ActionEvent extends Model
         };
 
         return $this->morphTo('target', 'target_type', 'target_id')
-                    ->constrain(
-                        collect(Nova::$resources)
-                            ->filter(static fn ($resource) => $resource::softDeletes())
-                            ->mapWithKeys(static fn ($resource) => [$resource::$model => $queryWithTrashed])
-                            ->all()
-                    )->when(true, static fn ($query) => $query->hasMacro('withTrashed') ? $queryWithTrashed($query) : $query);
+            ->constrain(
+                collect(Nova::$resources)
+                    ->filter(static fn ($resource) => $resource::softDeletes())
+                    ->mapWithKeys(static fn ($resource) => [$resource::$model => $queryWithTrashed])
+                    ->all()
+            )->when(true, static fn ($query) => $query->hasMacro('withTrashed') ? $queryWithTrashed($query) : $query);
     }
 
     /**
@@ -346,9 +346,9 @@ class ActionEvent extends Model
                 ->whereNotIn('id', static function ($query) use ($model, $limit) {
                     $query->select('id')->fromSub(
                         static::select('id')->orderBy('id', 'desc')
-                                ->where('actionable_id', $model['actionable_id'])
-                                ->where('actionable_type', $model['actionable_type'])
-                                ->limit($limit)->toBase(),
+                            ->where('actionable_id', $model['actionable_id'])
+                            ->where('actionable_type', $model['actionable_type'])
+                            ->limit($limit)->toBase(),
                         'action_events_temp'
                     );
                 })->delete();
@@ -361,7 +361,7 @@ class ActionEvent extends Model
     public static function markBatchAsRunning(string $batchId): int
     {
         return static::where('batch_id', $batchId)
-                    ->whereNotIn('status', ['finished', 'failed'])->update([
+            ->whereNotIn('status', ['finished', 'failed'])->update([
                         'status' => 'running',
                     ]);
     }
@@ -372,7 +372,7 @@ class ActionEvent extends Model
     public static function markBatchAsFinished(string $batchId): int
     {
         return static::where('batch_id', $batchId)
-                    ->whereNotIn('status', ['finished', 'failed'])->update([
+            ->whereNotIn('status', ['finished', 'failed'])->update([
                         'status' => 'finished',
                     ]);
     }
@@ -395,7 +395,7 @@ class ActionEvent extends Model
     public static function markBatchAsFailed(string $batchId, Throwable|string|null $e = null): int
     {
         return static::where('batch_id', $batchId)
-                    ->whereNotIn('status', ['finished', 'failed'])->update([
+            ->whereNotIn('status', ['finished', 'failed'])->update([
                         'status' => 'failed',
                         'exception' => $e ? (string) $e : '',
                     ]);
@@ -419,9 +419,9 @@ class ActionEvent extends Model
     public static function updateStatus(string $batchId, $model, string $status, Throwable|string|null $e = null): int
     {
         return static::where('batch_id', $batchId)
-                        ->where('model_type', $model->getMorphClass())
-                        ->where('model_id', $model->getKey())
-                        ->update(['status' => $status, 'exception' => (string) $e]);
+            ->where('model_type', $model->getMorphClass())
+            ->where('model_id', $model->getKey())
+            ->update(['status' => $status, 'exception' => (string) $e]);
     }
 
     /**
