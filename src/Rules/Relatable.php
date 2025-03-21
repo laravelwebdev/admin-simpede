@@ -67,7 +67,7 @@ class Relatable implements Rule
     protected function relationshipIsFull(Model $model, string $attribute, mixed $value): bool
     {
         $inverseRelation = $this->request->newResource()
-                    ->resolveInverseFieldsForAttribute($this->request, $attribute)->first(static function ($field) {
+            ->resolveInverseFieldsForAttribute($this->request, $attribute)->first(static function ($field) {
                         return ($field instanceof MorphOne || $field instanceof HasOne) && ! $field->ofManyRelationship();
                     });
 

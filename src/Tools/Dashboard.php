@@ -22,7 +22,7 @@ class Dashboard extends Tool
             return MenuSection::make(
                 Nova::__('Dashboards'), $dashboards->map(fn ($dashboard) => $dashboard->menu($request))
             )->collapsable()
-            ->icon('squares-2-x-2');
+                ->icon('squares-2-x-2');
         }
 
         if ($dashboards->count() == 1) {
