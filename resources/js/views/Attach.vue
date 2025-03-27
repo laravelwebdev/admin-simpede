@@ -466,6 +466,8 @@ export default {
 
         this.disableNavigateBackUsingHistory()
 
+        Nova.success(this.__('The resource was attached!'))
+
         this.submittedViaAttachAndAttachAnother = false
 
         await this.fetchPolicies()

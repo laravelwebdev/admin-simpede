@@ -4,7 +4,6 @@ let tailwindcss = require('tailwindcss')
 let path = require('path')
 let postcssImport = require('postcss-import')
 let postcssRtlcss = require('postcss-rtlcss')
-let packages = require('./package.json')
 
 /*
  |--------------------------------------------------------------------------
@@ -22,7 +21,7 @@ mix
   .ts('resources/ui/ui.js', 'public/ui.js')
   .vue({ version: 3 })
   // .sourceMaps()
-  .extract(Object.keys(packages.dependencies))
+  .extract()
   .setPublicPath('public')
   .postCss('resources/css/app.css', 'public', [
     postcssImport(),
