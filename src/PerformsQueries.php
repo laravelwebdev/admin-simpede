@@ -57,13 +57,13 @@ trait PerformsQueries
 
         /** @phpstan-ignore nullCoalesce.expr */
         $searchColumns = collect(static::searchableColumns() ?? [])
-                            ->transform(static function ($column) use ($modelKeyName) {
-                                if ($column === $modelKeyName) {
-                                    return new PrimaryKey($column, static::maxPrimaryKeySize());
-                                }
+            ->transform(static function ($column) use ($modelKeyName) {
+                if ($column === $modelKeyName) {
+                    return new PrimaryKey($column, static::maxPrimaryKeySize());
+                }
 
-                                return $column;
-                            })->all();
+                return $column;
+            })->all();
 
         return static::initializeSearch($query, $search, $searchColumns);
     }
