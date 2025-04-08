@@ -15,7 +15,7 @@ use Laravel\Nova\Rules\Relatable;
 use Laravel\Nova\Util;
 
 /**
- * @method static static make(mixed $name, string|null $attribute = null)
+ * @method static static make(\Stringable|string $name, string|null $attribute = null)
  */
 class MorphTo extends Field implements FilterableField, RelatableField
 {

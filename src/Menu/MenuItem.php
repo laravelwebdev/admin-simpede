@@ -22,7 +22,7 @@ use Laravel\Nova\WithComponent;
 use Stringable;
 
 /**
- * @method static static make(string $name, string|null $path = null)
+ * @method static static make(\Stringable|string $name, string|null $path = null)
  */
 class MenuItem implements JsonSerializable
 {

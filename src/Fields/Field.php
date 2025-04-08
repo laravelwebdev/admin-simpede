@@ -18,7 +18,7 @@ use Stringable;
  * @phpstan-type TFieldValidationRules \Stringable|string|\Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\Rule|\Illuminate\Contracts\Validation\InvokableRule|(callable(string, mixed, \Closure):(void))
  * @phpstan-type TValidationRules array<int, TFieldValidationRules>|TFieldValidationRules
  *
- * @method static static make(mixed $name, string|callable|object|null $attribute = null, callable|null $resolveCallback = null)
+ * @method static static make(\Stringable|string $name, string|callable|object|null $attribute = null, callable|null $resolveCallback = null)
  */
 #[\AllowDynamicProperties]
 abstract class Field extends FieldElement implements JsonSerializable, Resolvable

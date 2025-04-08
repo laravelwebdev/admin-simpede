@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 /**
- * @method static static make(string $name, string|array|null $attribute = null, array $lines = [])
+ * @method static static make(\Stringable|string $name, string|array|null $attribute = null, array $lines = [])
  */
 class Stack extends Field
 {

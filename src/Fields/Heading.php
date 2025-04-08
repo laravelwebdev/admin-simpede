@@ -5,7 +5,7 @@ namespace Laravel\Nova\Fields;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 /**
- * @method static static make(mixed $name, string|null $attribute = null, callable|null $resolveCallback = null)
+ * @method static static make(\Stringable|string $name, string|null $attribute = null, callable|null $resolveCallback = null)
  */
 class Heading extends Field implements Unfillable
 {

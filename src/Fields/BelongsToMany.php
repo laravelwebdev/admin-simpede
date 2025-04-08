@@ -14,7 +14,7 @@ use Laravel\Nova\Rules\RelatableAttachment;
 use Stringable;
 
 /**
- * @method static static make(mixed $name, string|null $attribute = null, string|null $resource = null)
+ * @method static static make(\Stringable|string $name, string|null $attribute = null, string|null $resource = null)
  */
 class BelongsToMany extends Field implements DeletableContract, FilterableField, ListableField, PivotableField
 {

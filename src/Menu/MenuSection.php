@@ -17,7 +17,7 @@ use Laravel\Nova\WithIcon;
 use Stringable;
 
 /**
- * @method static static make(string $name, array|iterable $items = [], string $icon = 'collection')
+ * @method static static make(\Stringable|string $name, array|iterable $items = [], string $icon = 'collection')
  */
 class MenuSection implements JsonSerializable
 {

@@ -5,6 +5,9 @@ namespace Laravel\Nova\Fields;
 use Laravel\Nova\Contracts\Cover;
 use Laravel\Nova\Nova;
 
+/**
+ * @method static static make(\Stringable|string|null $name = null, string|callable|null $attribute = null, string|null $disk = null, callable|null $storageCallback = null)
+ */
 class Avatar extends Image implements Cover
 {
     /**

@@ -68,12 +68,12 @@
 
               <div v-if="setupKey" class="mt-4 max-w-xl text-sm">
                 <p class="font-semibold">
-                  Setup Key: <span v-html="setupKey"></span>
+                  {{ __('Setup Key') }}: <span v-html="setupKey"></span>
                 </p>
               </div>
 
               <div v-if="confirming" class="mt-4">
-                <label class="block mb-2" for="code">Code</label>
+                <label class="block mb-2" for="code">{{ __('Code') }}</label>
                 <input
                   id="code"
                   v-model="confirmationForm.code"

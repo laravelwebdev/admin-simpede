@@ -10,7 +10,7 @@ use Laravel\Nova\Resource;
 use Laravel\Nova\Util;
 
 /**
- * @method static static make(mixed $name, string|null $attribute = null, string|null $resource = null)
+ * @method static static make(\Stringable|string $name, string|null $attribute = null, string|null $resource = null)
  */
 class Tag extends Field implements PivotableField
 {

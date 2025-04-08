@@ -86,42 +86,42 @@ class PendingFortifyConfiguration
      *
      * @var (callable(\Illuminate\Http\Request):(array<int, string|class-string>))|null
      */
-    protected $authenticateThroughCallback = null;
+    protected static $authenticateThroughCallback = null;
 
     /**
      * The original callback that is responsible for building the authentication pipeline array, if applicable.
      *
      * @var (callable(\Illuminate\Http\Request):(array<int, string|class-string>))|null
      */
-    protected $originalAuthenticateThroughCallback = null;
+    protected static $originalAuthenticateThroughCallback = null;
 
     /**
      * The callback that is responsible for validating authentication credentials, if applicable.
      *
      * @var (callable(\Illuminate\Http\Request):(mixed|null))|null
      */
-    protected $authenticateUsingCallback = null;
+    protected static $authenticateUsingCallback = null;
 
     /**
      * The original callback that is responsible for validating authentication credentials, if applicable.
      *
      * @var (callable(\Illuminate\Http\Request):(mixed|null))|null
      */
-    protected $originalAuthenticateUsingCallback = null;
+    protected static $originalAuthenticateUsingCallback = null;
 
     /**
      * The callback that is responsible for confirming user passwords.
      *
      * @var (callable(mixed, ?string):(bool))|null
      */
-    protected $confirmPasswordsUsingCallback = null;
+    protected static $confirmPasswordsUsingCallback = null;
 
     /**
      * The original callback that is responsible for confirming user passwords.
      *
      * @var (callable(mixed, ?string):(bool))|null
      */
-    protected $originalConfirmPasswordsUsingCallback = null;
+    protected static $originalConfirmPasswordsUsingCallback = null;
 
     /**
      * Determined whether Fortify configurations and static props has been cached.
@@ -219,7 +219,7 @@ class PendingFortifyConfiguration
      */
     public function authenticateThrough(callable $callback)
     {
-        $this->authenticateThroughCallback = $callback;
+        static::$authenticateThroughCallback = $callback;
 
         return $this;
     }
@@ -232,7 +232,7 @@ class PendingFortifyConfiguration
      */
     public function authenticateUsing(callable $callback)
     {
-        $this->authenticateUsingCallback = $callback;
+        static::$authenticateUsingCallback = $callback;
 
         return $this;
     }
@@ -245,7 +245,7 @@ class PendingFortifyConfiguration
      */
     public function confirmPasswordsUsing(callable $callback)
     {
-        $this->confirmPasswordsUsingCallback = $callback;
+        static::$confirmPasswordsUsingCallback = $callback;
 
         return $this;
     }
@@ -282,21 +282,17 @@ class PendingFortifyConfiguration
                 'fortify.email' => $this->email,
             ]);
         } else {
-            $this->authenticateThroughCallback ??= $this->originalAuthenticateThroughCallback = Fortify::$authenticateThroughCallback;
-            $this->authenticateUsingCallback ??= $this->originalAuthenticateUsingCallback = Fortify::$authenticateUsingCallback;
-            $this->confirmPasswordsUsingCallback ??= $this->originalConfirmPasswordsUsingCallback = Fortify::$confirmPasswordsUsingCallback;
-
             config([
                 'fortify.features' => $this->features ?? Arr::get($this->cachedConfig, 'features', []),
                 'fortify-options' => $this->options ?? $this->cachedOptionsConfig,
                 'fortify.username' => $this->username,
                 'fortify.email' => $this->email,
             ]);
-
-            Fortify::$authenticateThroughCallback = $this->authenticateThroughCallback;
-            Fortify::$authenticateUsingCallback = $this->authenticateUsingCallback;
-            Fortify::$confirmPasswordsUsingCallback = $this->confirmPasswordsUsingCallback;
         }
+
+        Fortify::$authenticateThroughCallback = static::$authenticateThroughCallback ?? static::$originalAuthenticateThroughCallback;
+        Fortify::$authenticateUsingCallback = static::$authenticateUsingCallback ?? static::$originalAuthenticateUsingCallback;
+        Fortify::$confirmPasswordsUsingCallback = static::$confirmPasswordsUsingCallback ?? static::$originalConfirmPasswordsUsingCallback;
 
         $this->cached = true;
     }
@@ -311,10 +307,18 @@ class PendingFortifyConfiguration
                 'fortify' => $this->cachedConfig,
                 'fortify-options' => $this->cachedOptionsConfig,
             ]);
+        }
 
-            Fortify::$authenticateThroughCallback = $this->originalAuthenticateThroughCallback;
-            Fortify::$authenticateUsingCallback = $this->originalAuthenticateUsingCallback;
-            Fortify::$confirmPasswordsUsingCallback = $this->originalConfirmPasswordsUsingCallback;
+        if (is_callable(static::$originalAuthenticateThroughCallback)) {
+            Fortify::$authenticateThroughCallback = static::$originalAuthenticateThroughCallback;
+        }
+
+        if (is_callable(static::$originalAuthenticateUsingCallback)) {
+            Fortify::$authenticateUsingCallback = static::$originalAuthenticateUsingCallback;
+        }
+
+        if (is_callable(static::$originalConfirmPasswordsUsingCallback)) {
+            Fortify::$confirmPasswordsUsingCallback = static::$originalConfirmPasswordsUsingCallback;
         }
 
         $this->cached = false;
@@ -350,6 +354,10 @@ class PendingFortifyConfiguration
             $routes->withPasswordReset ? Features::resetPasswords() : null,
             $routes->withEmailVerification ? Features::emailVerification() : null,
         ]))->unique()->all();
+
+        static::$originalAuthenticateThroughCallback ??= Fortify::$authenticateThroughCallback;
+        static::$originalAuthenticateUsingCallback ??= Fortify::$authenticateUsingCallback;
+        static::$originalConfirmPasswordsUsingCallback ??= Fortify::$confirmPasswordsUsingCallback;
 
         Nova::serving(function (ServingNova $event) use ($routes) {
             $this->sync();

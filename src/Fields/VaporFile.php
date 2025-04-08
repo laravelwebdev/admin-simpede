@@ -12,7 +12,7 @@ use Laravel\Nova\Contracts\Storable as StorableContract;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 /**
- * @method static static make(mixed $name, string|null $attribute = null, callable|null $storageCallback = null)
+ * @method static static make(\Stringable|string $name, string|null $attribute = null, callable|null $storageCallback = null)
  */
 class VaporFile extends Field implements DeletableContract, DownloadableContract, StorableContract
 {

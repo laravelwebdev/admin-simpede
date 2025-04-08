@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Stringable;
 
 /**
- * @method static static make(string|self $name, string|null $path, bool|null $remote = null)
+ * @method static static make(self|\Stringable|string $name, string|null $path, bool|null $remote = null)
  */
 abstract class Asset implements Responsable
 {

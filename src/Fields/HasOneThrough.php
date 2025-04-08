@@ -12,7 +12,7 @@ use Laravel\Nova\Resource;
 use Stringable;
 
 /**
- * @method static static make(mixed $name, string|null $attribute = null, string|null $resource = null)
+ * @method static static make(\Stringable|string $name, string|null $attribute = null, string|null $resource = null)
  */
 class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
 {
