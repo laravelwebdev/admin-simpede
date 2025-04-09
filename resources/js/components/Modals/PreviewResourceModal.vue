@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :show="show"
+    :show="show && canBePreviewed"
     @close-via-escape="$emit('close')"
     role="alertdialog"
     size="2xl"
@@ -90,6 +90,7 @@ export default {
     loading: true,
     title: null,
     resource: null,
+    canBePreviewed: false,
   }),
 
   async created() {
@@ -113,20 +114,14 @@ export default {
           this.title = title
           this.resource = resource
           this.loading = false
+          this.canBePreviewed = true
         })
         .catch(error => {
-          if (error.response.status >= 500) {
-            Nova.$emit('error', error.response.data.message)
-            return
-          }
-
-          if (error.response.status === 404) {
-            Nova.visit('/404')
-            return
-          }
-
-          if (error.response.status === 403) {
-            Nova.visit('/403')
+          if (
+            error.response.status >= 500 ||
+            [403, 404].includes(error.response.status)
+          ) {
+            Nova.debug(error.response.data.message)
             return
           }
 

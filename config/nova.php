@@ -1,8 +1,19 @@
 <?php
 
-use Laravel\Nova\Actions\ActionResource;
-
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Nova License Key
+    |--------------------------------------------------------------------------
+    |
+    | The following configuration option contains your Nova license key. On
+    | non-local domains, Nova will verify that the Nova installation has
+    | a valid license associated with the application's active domain.
+    |
+    */
+
+    'license_key' => env('NOVA_LICENSE_KEY'),
 
     /*
     |--------------------------------------------------------------------------
@@ -172,7 +183,7 @@ return [
     */
 
     'actions' => [
-        'resource' => ActionResource::class,
+        'resource' => \Laravel\Nova\Actions\ActionResource::class,
     ],
 
     /*

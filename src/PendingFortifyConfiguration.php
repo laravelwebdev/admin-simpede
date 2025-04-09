@@ -309,15 +309,15 @@ class PendingFortifyConfiguration
             ]);
         }
 
-        if (is_callable(static::$originalAuthenticateThroughCallback)) {
+        if (\is_callable(static::$originalAuthenticateThroughCallback)) {
             Fortify::$authenticateThroughCallback = static::$originalAuthenticateThroughCallback;
         }
 
-        if (is_callable(static::$originalAuthenticateUsingCallback)) {
+        if (\is_callable(static::$originalAuthenticateUsingCallback)) {
             Fortify::$authenticateUsingCallback = static::$originalAuthenticateUsingCallback;
         }
 
-        if (is_callable(static::$originalConfirmPasswordsUsingCallback)) {
+        if (\is_callable(static::$originalConfirmPasswordsUsingCallback)) {
             Fortify::$confirmPasswordsUsingCallback = static::$originalConfirmPasswordsUsingCallback;
         }
 

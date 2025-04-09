@@ -3,13 +3,11 @@
 </template>
 
 <script>
-export default {
-  props: ['resourceName', 'field'],
+import { FieldValue } from 'laravel-nova'
 
-  computed: {
-    fieldValue() {
-      return this.field.displayedAs || this.field.value
-    },
-  }
+export default {
+  mixins: [FieldValue],
+
+  props: ['resourceName', 'field'],
 }
 </script>

@@ -65,16 +65,16 @@ class Password extends Field
     }
 
     /**
-     * Hydrate the given attribute on the model based on the incoming request.
+     * Fill the model's attribute with data.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent  $model
      */
     #[\Override]
-    protected function fillAttributeFromRequest(NovaRequest $request, string $requestAttribute, object $model, string $attribute): void
+    public function fillModelWithData(object $model, mixed $value, string $attribute): void
     {
-        if (! empty($request[$requestAttribute])) {
-            $model->{$attribute} = Hash::make($request[$requestAttribute]);
-        }
+        $attributes = [str_replace('.', '->', $attribute) => Hash::make($value)];
+
+        $model->forceFill($attributes);
     }
 
     /**

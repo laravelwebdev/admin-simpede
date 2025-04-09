@@ -4,21 +4,8 @@
     :errors="errors"
     :show-help-text="showHelpText"
     :full-width-content="fullWidthContent"
+    @focus-form-input="toggle"
   >
-    <template #default="defaultSlotProps">
-      <FormLabel
-        class="space-x-1"
-        :class="{ 'mb-2': defaultSlotProps.hasHelpText }"
-        @click.prevent.stop="toggle"
-      >
-        <span>
-          {{ defaultSlotProps.label }}
-        </span>
-        <span v-if="defaultSlotProps.required" class="text-red-500 text-sm">
-          {{ __('*') }}
-        </span>
-      </FormLabel>
-    </template>
     <template #field>
       <Checkbox
         :disabled="currentlyIsReadonly"

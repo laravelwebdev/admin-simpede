@@ -12,6 +12,7 @@
           :label-for="fieldLabelFor"
           class="space-x-1"
           :class="{ 'mb-2': shouldShowHelpText }"
+          @click.prevent.stop="$emit('focus-form-input')"
         >
           <span>
             {{ fieldLabel }}
@@ -44,6 +45,8 @@ import { HandlesValidationErrors, mapProps } from '@/mixins'
 
 export default {
   mixins: [HandlesValidationErrors],
+
+  emits: ['focus-form-input'],
 
   props: {
     field: { type: Object, required: true },

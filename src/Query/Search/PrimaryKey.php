@@ -27,14 +27,19 @@ class PrimaryKey extends Column
     {
         $model = $query->getModel();
 
-        $canSearchPrimaryKey = ctype_digit($search) &&
-                               \in_array($model->getKeyType(), ['int', 'integer']) &&
-                               ($connectionType != 'pgsql' || $search <= $this->maxPrimaryKeySize);
+        $validIntegerKeyword = ctype_digit($search);
+        $validIntegerOnModelKey = \in_array($model->getKeyType(), ['int', 'integer']);
 
-        if (! $canSearchPrimaryKey) {
-            return parent::__invoke($query, $search, $connectionType, $whereOperator);
+        if ($whereOperator === 'orWhere' && $validIntegerKeyword === false && $validIntegerOnModelKey === true) {
+            return $query;
+        } elseif (
+            $validIntegerKeyword === true &&
+            $validIntegerOnModelKey === true &&
+            ($connectionType != 'pgsql' || $search <= $this->maxPrimaryKeySize)
+        ) {
+            return $query->{$whereOperator}($model->getQualifiedKeyName(), $search);
         }
 
-        return $query->{$whereOperator}($model->getQualifiedKeyName(), $search);
+        return parent::__invoke($query, $search, $connectionType, $whereOperator);
     }
 }

@@ -134,7 +134,6 @@ export default {
       Nova.$emit('clear-filter-values')
 
       setTimeout(() => {
-        this.$emit('trashed-changed', '')
         this.$emit('clear-selected-filters')
       }, 500)
     },

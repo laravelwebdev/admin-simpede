@@ -424,7 +424,7 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
      */
     public function fillModelWithData(object $model, mixed $value, string $attribute): void
     {
-        $attributes = [Str::replace('.', '->', $attribute) => $value];
+        $attributes = [str_replace('.', '->', $attribute) => $value];
 
         $model->forceFill($attributes);
     }

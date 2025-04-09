@@ -30,15 +30,18 @@ class Search
         return $this->queryBuilder->where(function ($query) use ($searchColumns) {
             $connectionType = $query->getModel()->getConnection()->getDriverName();
 
-            collect($searchColumns)
-                ->each(function ($column) use ($query, $connectionType) {
-                    /** @phpstan-ignore booleanAnd.alwaysFalse */
-                    if ($column instanceof Column || (! \is_string($column) && \is_callable($column))) {
-                        $column($query, $this->searchKeyword, $connectionType);
-                    } else {
-                        Column::from($column)->__invoke($query, $this->searchKeyword, $connectionType);
-                    }
-                });
+            $columns = collect($searchColumns);
+
+            $whereOperator = $columns->count() > 1 ? 'orWhere' : 'where';
+
+            $columns->each(function ($column) use ($query, $connectionType, $whereOperator) {
+                /** @phpstan-ignore booleanAnd.alwaysFalse */
+                if ($column instanceof Column || (! \is_string($column) && \is_callable($column))) {
+                    $column($query, $this->searchKeyword, $connectionType, $whereOperator);
+                } else {
+                    Column::from($column)->__invoke($query, $this->searchKeyword, $connectionType, $whereOperator);
+                }
+            });
         });
     }
 }
