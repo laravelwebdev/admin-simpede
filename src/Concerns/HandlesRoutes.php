@@ -46,8 +46,8 @@ trait HandlesRoutes
     public static function router(?array $middleware = null, ?string $prefix = null): RouteRegistrar
     {
         return Route::domain(config('nova.domain', null))
-                    ->prefix(static::url($prefix))
-                    ->middleware($middleware ?? config('nova.middleware', []));
+            ->prefix(static::url($prefix))
+            ->middleware($middleware ?? config('nova.middleware', []));
     }
 
     /**
