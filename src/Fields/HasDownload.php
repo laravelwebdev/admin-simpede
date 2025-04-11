@@ -6,11 +6,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Resource;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * @phpstan-type TResourceModel \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent|\stdClass
- * @phpstan-type TDownloadResponse \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+ * @phpstan-type TDownloadResponse \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse|\Symfony\Component\HttpFoundation\StreamedResponse
  * @phpstan-type TDownloadResponseCallback (callable(\Laravel\Nova\Http\Requests\NovaRequest, TResourceModel, ?string, ?string):(TDownloadResponse))
  */
 trait HasDownload
@@ -61,7 +62,7 @@ trait HasDownload
     /**
      * Create an HTTP response to download the underlying field.
      */
-    public function toDownloadResponse(NovaRequest $request, Resource $resource): Response|RedirectResponse|StreamedResponse
+    public function toDownloadResponse(NovaRequest $request, Resource $resource): Response|RedirectResponse|BinaryFileResponse|StreamedResponse
     {
         return \call_user_func(
             $this->downloadResponseCallback,

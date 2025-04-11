@@ -72,9 +72,11 @@ class Password extends Field
     #[\Override]
     public function fillModelWithData(object $model, mixed $value, string $attribute): void
     {
-        $attributes = [str_replace('.', '->', $attribute) => Hash::make($value)];
+        if (! empty($value)) {
+            $attributes = [str_replace('.', '->', $attribute) => Hash::make($value)];
 
-        $model->forceFill($attributes);
+            $model->forceFill($attributes);
+        }
     }
 
     /**

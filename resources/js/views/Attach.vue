@@ -433,11 +433,13 @@ export default {
      * Attach the selected resource.
      */
     async attachResource() {
+      this.isWorking = true
       this.submittedViaAttachResource = true
 
       try {
         await this.attachRequest()
 
+        this.isWorking = false
         this.submittedViaAttachResource = false
 
         await this.fetchPolicies(),
@@ -447,6 +449,7 @@ export default {
       } catch (error) {
         window.scrollTo(0, 0)
 
+        this.isWorking = false
         this.submittedViaAttachResource = false
 
         this.handleOnCreateResponseError(error)
@@ -457,6 +460,7 @@ export default {
      * Attach a new resource and reset the form
      */
     async attachAndAttachAnother() {
+      this.isWorking = true
       this.submittedViaAttachAndAttachAnother = true
 
       try {
@@ -466,15 +470,16 @@ export default {
 
         this.disableNavigateBackUsingHistory()
 
-        Nova.success(this.__('The resource was attached!'))
-
+        this.isWorking = false
         this.submittedViaAttachAndAttachAnother = false
 
-        await this.fetchPolicies()
+        await this.fetchPolicies(),
+          Nova.success(this.__('The resource was attached!'))
 
         // Reset the form by refetching the fields
         this.initializeComponent()
       } catch (error) {
+        this.isWorking = false
         this.submittedViaAttachAndAttachAnother = false
 
         this.handleOnCreateResponseError(error)
