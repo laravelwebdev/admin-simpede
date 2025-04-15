@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Fields;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Fields\Filters\BooleanGroupFilter;
@@ -10,6 +11,11 @@ use Laravel\Nova\Nova;
 use Laravel\Nova\Util;
 use Stringable;
 
+/**
+ * @phpstan-type TOptionLabel \Stringable|string
+ * @phpstan-type TOptionValue string
+ * @phpstan-type TOption iterable<TOptionValue|int, TOptionLabel>
+ */
 class BooleanGroup extends Field implements FilterableField
 {
     use FieldFilterable;
@@ -37,11 +43,13 @@ class BooleanGroup extends Field implements FilterableField
     public $noValueText = 'No Data';
 
     /**
-     * The options for the field.
+     * The field's options callback.
      *
-     * @var array|null
+     * @var iterable<string|int, string>|callable|null
+     *
+     * @phpstan-var TOption|(callable(): (TOption))|null
      */
-    public $options = null;
+    public $optionsCallback;
 
     /**
      * Determine false values should be hidden.
@@ -65,11 +73,26 @@ class BooleanGroup extends Field implements FilterableField
      */
     public function options(callable|iterable $options)
     {
-        if (Util::isSafeCallable($options)) {
-            $options = \call_user_func($options);
-        }
+        $this->optionsCallback = $options;
 
-        $this->options = with(collect($options), static function ($options) {
+        return $this;
+    }
+
+    /**
+     * Serialize options for the field.
+     *
+     * @return array<int, array<string, mixed>>
+     *
+     * @phpstan-return array<int, array{label: string, value: string}>
+     */
+    protected function serializeOptions(): array
+    {
+        /** @var TOption $options */
+        $options = ! Util::isSafeCallable($this->optionsCallback) && ! $this->optionsCallback instanceof Closure
+            ? value($this->optionsCallback)
+            : \call_user_func($this->optionsCallback);
+
+        return with(collect($options), static function ($options) {
             $isList = array_is_list($options->all());
 
             return $options->map(static function ($label, $name) use ($isList) {
@@ -78,8 +101,6 @@ class BooleanGroup extends Field implements FilterableField
                     : ['label' => $label, 'name' => $label];
             })->values()->all();
         });
-
-        return $this;
     }
 
     /**
@@ -188,7 +209,7 @@ class BooleanGroup extends Field implements FilterableField
         return array_merge(parent::jsonSerialize(), [
             'hideTrueValues' => $this->hideTrueValues,
             'hideFalseValues' => $this->hideFalseValues,
-            'options' => $this->options,
+            'options' => $this->serializeOptions(),
             'noValueText' => Nova::__($this->noValueText),
         ]);
     }

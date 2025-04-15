@@ -32,22 +32,25 @@ export default {
   created() {
     this.field.value = this.field.value || {}
 
-    this.value = this.field.options
-      .filter(o => {
-        if (this.field.hideFalseValues === true && o.checked === false) {
-          return false
-        } else if (this.field.hideTrueValues === true && o.checked === true) {
-          return false
-        }
+    const hideTrueValues = this.field.hideTrueValues
+    const hideFalseValues = this.field.hideFalseValues
 
-        return true
-      })
+    this.value = this.field.options
       .map(o => {
         return {
           name: o.name,
           label: o.label,
           checked: this.field.value[o.name] || false,
         }
+      })
+      .filter(o => {
+        if (hideFalseValues === true && o.checked === false) {
+          return false
+        } else if (hideTrueValues === true && o.checked === true) {
+          return false
+        }
+
+        return true
       })
   },
 }

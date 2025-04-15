@@ -228,7 +228,7 @@ export default class Nova {
         const page =
           this.pages[name] != null
             ? this.pages[name]
-            : require('@/pages/Error404').default
+            : require('@/pages/Loading').default
 
         page.layout = page.layout || Layout
 
