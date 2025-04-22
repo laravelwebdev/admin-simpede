@@ -2,6 +2,9 @@
 
 namespace Laravel\Nova\Tabs;
 
+use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
+use Illuminate\Http\Resources\MissingValue;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use Laravel\Nova\Makeable;
@@ -12,6 +15,7 @@ use Stringable;
  */
 class Tab implements JsonSerializable
 {
+    use ConditionallyLoadsAttributes;
     use Makeable;
 
     /**
@@ -25,6 +29,13 @@ class Tab implements JsonSerializable
     public string $attribute;
 
     /**
+     * List of fields available for the tab.
+     *
+     * @var array<int, \Laravel\Nova\Fields\Field>
+     */
+    public array $fields = [];
+
+    /**
      * The position of the tab.
      */
     public int $position = 0;
@@ -33,15 +44,22 @@ class Tab implements JsonSerializable
      * Construct a new tab instance.
      *
      * @param  \Stringable|string  $name
-     * @param  array<int, \Laravel\Nova\Fields\Field>  $fields
+     * @param  (callable():(iterable))|iterable  $fields
      */
     public function __construct(
         $name,
-        public array $fields,
+        callable|iterable $fields,
         ?string $attribute = null,
     ) {
         $this->name = $name;
         $this->attribute = $attribute ?? Str::slug($name);
+
+        $fields = \is_callable($fields) ? \call_user_func($fields) : $fields;
+
+        $this->fields = collect($this->filter($fields instanceof Collection ? $fields->all() : $fields))
+                ->reject(static fn ($field) => $field instanceof MissingValue)
+                ->values()
+                ->all();
     }
 
     /**

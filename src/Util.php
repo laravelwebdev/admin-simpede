@@ -48,7 +48,7 @@ class Util
     }
 
     /**
-     * Convert large integer higher than Number.MAX_SAFE_INTEGER to string.
+     * Convert a large integer higher than Number.MAX_SAFE_INTEGER to string.
      *
      * https://stackoverflow.com/questions/47188449/json-max-int-number/47188576
      */
@@ -149,7 +149,7 @@ class Util
     }
 
     /**
-     * Get the user model for Laravel Nova, use default User model available from Framework as fallback.
+     * Get the user model for Laravel Nova, use the default User model available from Framework as a fallback.
      *
      * @return class-string<\Illuminate\Foundation\Auth\User|\Illuminate\Database\Eloquent\Model>
      */
@@ -171,7 +171,7 @@ class Util
     }
 
     /**
-     * Get the session auth guard for the model.
+     * Get the session authentication guard for the model.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model  $model
      */
@@ -264,7 +264,7 @@ class Util
     }
 
     /**
-     * Expect given model to implements `Pivot` class or uses `AsPivot` trait.
+     * Expect the given model to implement `Pivot` class or use `AsPivot` trait.
      *
      * @param  (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot  $pivot
      * @return (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot

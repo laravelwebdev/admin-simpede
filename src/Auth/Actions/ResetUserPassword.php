@@ -18,8 +18,10 @@ class ResetUserPassword implements ResetsUserPasswords
      * @param  \Illuminate\Contracts\Auth\CanResetPassword&\Illuminate\Database\Eloquent\Model  $user
      * @param  array<string, string>  $input
      */
-    public function reset(CanResetPassword $user, array $input): void
-    {
+    public function reset(
+        CanResetPassword $user,
+        #[\SensitiveParameter] array $input
+    ): void {
         Validator::make($input, [
             'password' => $this->passwordWithConfirmedRules(),
         ])->validate();

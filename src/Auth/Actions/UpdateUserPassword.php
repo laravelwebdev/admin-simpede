@@ -19,8 +19,10 @@ class UpdateUserPassword implements UpdatesUserPasswords
      * @param  \Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model  $user
      * @param  array<string, string>  $input
      */
-    public function update(Authenticatable $user, array $input): void
-    {
+    public function update(
+        Authenticatable $user,
+        #[\SensitiveParameter] array $input
+    ): void {
         $userGuard = Util::userGuard();
 
         Validator::make($input, [

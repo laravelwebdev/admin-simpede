@@ -799,7 +799,7 @@ class Nova
             return $value->label();
         }
 
-        return Str::headline($value->name);
+        return Str::title(str_replace('_', ' ', $value->name));
     }
 
     /**
