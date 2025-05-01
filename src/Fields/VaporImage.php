@@ -21,7 +21,6 @@ class VaporImage extends VaporFile
      * @param  \Stringable|string  $name
      * @param  string|callable|null  $attribute
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, object, string, string, ?string, ?string):(mixed))|null  $storageCallback
-     * @return void
      */
     public function __construct($name, mixed $attribute = null, ?callable $storageCallback = null)
     {

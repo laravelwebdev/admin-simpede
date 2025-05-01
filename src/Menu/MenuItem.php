@@ -204,9 +204,12 @@ class MenuItem implements JsonSerializable
         ]);
     }
 
+    /**
+     * Get the encoded filter.
+     */
     public function encodedFilters(): string
     {
-        return (new FilterEncoder($this->filters->all()))->encode();
+        return new FilterEncoder($this->filters->all());
     }
 
     /**

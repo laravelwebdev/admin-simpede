@@ -4,6 +4,8 @@ namespace Laravel\Nova;
 
 use Closure;
 
+use function Orchestra\Sidekick\is_safe_callable;
+
 trait WithBadge
 {
     /**
@@ -30,7 +32,7 @@ trait WithBadge
     {
         $this->badgeType = $type;
 
-        if (Util::isSafeCallable($badgeCallback) || $badgeCallback instanceof Badge) {
+        if (is_safe_callable($badgeCallback) || $badgeCallback instanceof Badge) {
             $this->badgeCallback = $badgeCallback;
         }
 

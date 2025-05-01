@@ -38,12 +38,7 @@ class RepeatableCommand extends GeneratorCommand
      */
     protected $type = 'Repeatable';
 
-    /**
-     * Build the class with the given name.
-     *
-     * @param  string  $name
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function buildClass($name)
     {
@@ -86,12 +81,7 @@ class RepeatableCommand extends GeneratorCommand
         return $this->resolveStubPath('/stubs/nova/repeatable.stub');
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
@@ -134,11 +124,7 @@ class RepeatableCommand extends GeneratorCommand
         }
     }
 
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getOptions()
     {

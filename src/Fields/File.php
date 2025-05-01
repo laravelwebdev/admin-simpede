@@ -79,7 +79,6 @@ class File extends Field implements DeletableContract, DownloadableContract, Sto
      * @param  \Stringable|string  $name
      * @param  string|callable|null  $attribute
      * @param  (callable(\Illuminate\Http\Request, \Illuminate\Database\Eloquent\Model|\Laravel\Nova\Support\Fluent, string, string, ?string, ?string):(mixed))|null  $storageCallback
-     * @return void
      */
     public function __construct($name, mixed $attribute = null, ?string $disk = null, ?callable $storageCallback = null)
     {

@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\Eloquent\model_exists;
+use function Orchestra\Sidekick\Http\safe_int;
 
 /**
  * @method static static make(\Stringable|string|null $name = null, string|null $attribute = null, callable|null $resolveCallback = null)
@@ -32,7 +34,6 @@ class ID extends Field
      *
      * @param  \Stringable|string|null  $name
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
-     * @return void
      */
     public function __construct($name = null, ?string $attribute = null, ?callable $resolveCallback = null)
     {
@@ -68,7 +69,7 @@ class ID extends Field
                     ->whereInstanceOf(self::class)
                     ->first(),
             static fn ($field) => tap($field)->resolve($model),
-            static fn () => ! \is_null($model) && $model->exists ? static::forModel($model) : null,
+            static fn () => model_exists($model) ? static::forModel($model) : null,
         );
 
         if ($field instanceof static) {
@@ -116,7 +117,7 @@ class ID extends Field
             }
         }
 
-        return Util::safeInt(
+        return safe_int(
             parent::resolveAttribute($resource, $attribute)
         );
     }

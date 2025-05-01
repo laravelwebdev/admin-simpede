@@ -16,8 +16,9 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
 use Laravel\Nova\ResourceTool;
 use Laravel\Nova\ResourceToolElement;
-use Laravel\Nova\Util;
 use Stringable;
+
+use function Orchestra\Sidekick\Eloquent\normalize_value;
 
 /**
  * @template TKey of int
@@ -338,7 +339,7 @@ class FieldCollection extends Collection
                     yield "{$key}_type" => $field->morphToType;
                 }
 
-                yield $key => Util::hydrate($field->resolveDependentValue($request));
+                yield $key => normalize_value($field->resolveDependentValue($request));
             }
         });
 

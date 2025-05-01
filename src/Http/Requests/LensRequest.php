@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Contracts\RelatableField;
 
+use function Orchestra\Sidekick\Eloquent\table_name;
+
 /**
  * @property-read string|null $orderBy
  * @property-read string|null $orderByDirection
@@ -68,7 +70,7 @@ class LensRequest extends NovaRequest
 
         if ($fieldExists) {
             return $query->orderBy(
-                ($this->tableOrderPrefix ? $query->getModel()->getTable().'.' : '').$this->orderBy,
+                ($this->tableOrderPrefix ? table_name($query->getModel()).'.' : '').$this->orderBy,
                 $this->orderByDirection === 'asc' ? 'asc' : 'desc'
             );
         }
@@ -145,9 +147,7 @@ class LensRequest extends NovaRequest
         return (int) \in_array($this->perPage, $perPageOptions) ? $this->perPage : $perPageOptions[0];
     }
 
-    /**
-     * Determine if this request is an action request.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function isActionRequest(): bool
     {

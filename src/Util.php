@@ -3,7 +3,6 @@
 namespace Laravel\Nova;
 
 use BackedEnum;
-use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -11,7 +10,6 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use RuntimeException;
-use Stringable;
 
 class Util
 {
@@ -51,38 +49,22 @@ class Util
      * Convert a large integer higher than Number.MAX_SAFE_INTEGER to string.
      *
      * https://stackoverflow.com/questions/47188449/json-max-int-number/47188576
+     *
+     * @deprecated
      */
     public static function safeInt(mixed $value): mixed
     {
-        $jsonMaxInt = 9007199254740991;
-
-        if (\is_int($value) && $value >= $jsonMaxInt) {
-            return (string) $value;
-        } elseif (filter_var($value, FILTER_VALIDATE_INT) && $value < $jsonMaxInt) {
-            return (int) $value;
-        }
-
-        return $value;
+        return \Orchestra\Sidekick\Http\safe_int($value);
     }
 
     /**
      * Determine if the value is a callable and not a string matching an available function name.
+     *
+     * @deprecated
      */
     public static function isSafeCallable(mixed $value): bool
     {
-        if ($value instanceof Closure) {
-            return true;
-        }
-
-        if (! \is_callable($value)) {
-            return false;
-        }
-
-        if (\is_array($value)) {
-            return \count($value) === 2 && array_is_list($value) && method_exists(...$value);
-        }
-
-        return ! \is_string($value);
+        return \Orchestra\Sidekick\is_safe_callable($value);
     }
 
     /**
@@ -104,18 +86,12 @@ class Util
      * Hydrate the value to scalar (array, string, int etc...).
      *
      * @return scalar
+     *
+     * @deprecated
      */
     public static function hydrate(mixed $value)
     {
-        if ($value instanceof BackedEnum) {
-            return $value->value;
-        } elseif (\is_object($value) && $value instanceof Stringable) {
-            return (string) $value;
-        } elseif (\is_object($value) || \is_array($value)) {
-            return rescue(static fn () => json_encode($value), $value);
-        }
-
-        return $value;
+        return \Orchestra\Sidekick\Eloquent\normalize_value($value);
     }
 
     /**
@@ -274,7 +250,7 @@ class Util
     public static function expectPivotModel(Model|Pivot $pivot): Model|Pivot
     {
         throw_unless(
-            isset(class_uses_recursive($pivot)[AsPivot::class]),
+            \Orchestra\Sidekick\Eloquent\is_pivot_model($pivot),
             RuntimeException::class,
             \sprintf('%s model need to uses %s trait', $pivot::class, AsPivot::class),
         );

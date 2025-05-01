@@ -12,7 +12,9 @@ use Laravel\Nova\Http\Requests\ResourceIndexRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
 use Laravel\Nova\Rules\Relatable;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\Http\safe_int;
+use function Orchestra\Sidekick\is_safe_callable;
 
 /**
  * @method static static make(\Stringable|string $name, string|null $attribute = null)
@@ -116,7 +118,6 @@ class MorphTo extends Field implements FilterableField, RelatableField
      * Create a new field.
      *
      * @param  \Stringable|string  $name
-     * @return void
      */
     public function __construct($name, ?string $attribute = null)
     {
@@ -207,7 +208,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
             } else {
                 $this->morphToResource = new $this->resourceClass($value);
 
-                $this->morphToId = Util::safeInt($this->morphToId);
+                $this->morphToId = safe_int($this->morphToId);
 
                 $resource = Nova::newResourceFromModel($value);
 
@@ -374,7 +375,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
             'avatar' => $resource->resolveAvatarUrl($request),
             'display' => $this->formatDisplayValue($resource, $relatedResource),
             'subtitle' => $resource->subtitle(),
-            'value' => Util::safeInt($resource->getKey()),
+            'value' => safe_int($resource->getKey()),
         ]);
     }
 
@@ -437,7 +438,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
      */
     protected function ensureDisplayerIsCallable($display): callable
     {
-        return Util::isSafeCallable($display)
+        return is_safe_callable($display)
             ? $display
             : fn ($resource) => $resource->{$display};
     }
@@ -501,7 +502,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
     protected function resolveDefaultResource(NovaRequest $request)
     {
         if ($request->isCreateOrAttachRequest() || $request->isResourceIndexRequest() || $request->isActionRequest()) {
-            if (\is_null($this->value) && Util::isSafeCallable($this->defaultResourceCallable)) {
+            if (\is_null($this->value) && is_safe_callable($this->defaultResourceCallable)) {
                 $class = \call_user_func($this->defaultResourceCallable, $request);
             } else {
                 $class = $this->defaultResourceCallable;

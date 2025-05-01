@@ -22,7 +22,6 @@ class FormData extends FluentDecorator
      * Create a new fluent instance.
      *
      * @param  iterable<TKey, TValue>  $attributes
-     * @return void
      */
     public function __construct($attributes, protected NovaRequest $request)
     {

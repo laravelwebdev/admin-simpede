@@ -26,7 +26,6 @@ class Email extends Text implements FilterableField
      * @param  \Stringable|string|null  $name
      * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
-     * @return void
      */
     public function __construct($name = null, mixed $attribute = 'email', ?callable $resolveCallback = null)
     {

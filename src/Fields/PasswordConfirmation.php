@@ -19,7 +19,6 @@ class PasswordConfirmation extends Password
      * @param  \Stringable|string  $name
      * @param  string|callable|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
-     * @return void
      */
     public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {

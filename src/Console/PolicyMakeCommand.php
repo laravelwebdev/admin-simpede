@@ -26,12 +26,7 @@ class PolicyMakeCommand extends \Illuminate\Foundation\Console\PolicyMakeCommand
      */
     protected $name = 'nova:policy';
 
-    /**
-     * Build the class with the given name.
-     *
-     * @param  string  $name
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function buildClass($name)
     {
@@ -119,47 +114,28 @@ class PolicyMakeCommand extends \Illuminate\Foundation\Console\PolicyMakeCommand
         return $rootNamespace.'Nova\\'.$resource;
     }
 
-    /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getStub()
     {
         return $this->resolveStubPath('/stubs/policy.stub');
     }
 
-    /**
-     * Get the model for the guard's user provider.
-     *
-     * @return string|null
-     *
-     * @throws \LogicException
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function userProviderModel()
     {
         return Util::userModel();
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Nova\Policies';
     }
 
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getOptions()
     {
@@ -169,11 +145,7 @@ class PolicyMakeCommand extends \Illuminate\Foundation\Console\PolicyMakeCommand
         ];
     }
 
-    /**
-     * Interact further with the user if they were prompted for missing arguments.
-     *
-     * @return void
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
     {

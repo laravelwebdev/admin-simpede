@@ -5,17 +5,39 @@ namespace Laravel\Nova\Query\Search;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Database\Query\Expression;
+use Laravel\Nova\Makeable;
 
+/**
+ * @method static static make(\Illuminate\Contracts\Database\Query\Expression|string $column)
+ * @method static static exact(\Illuminate\Contracts\Database\Query\Expression|string $column)
+ */
 class Column
 {
+    use Makeable;
+
+    /**
+     * Query where operator type.
+     */
+    protected SearchType $searchType = SearchType::LIKE;
+
     /**
      * Construct a new search.
-     *
-     * @return void
      */
     public function __construct(public ExpressionContract|string $column)
     {
         //
+    }
+
+    /**
+     * Create a new instance with exact search.
+     *
+     * @return static
+     *
+     * @phpstan-ignore missingType.parameter
+     */
+    public static function exact(...$arguments)
+    {
+        return static::make(...$arguments)->whereUsing(SearchType::EXACT);
     }
 
     /**
@@ -38,14 +60,26 @@ class Column
         }
 
         if (strpos($column, '->') !== false) {
-            return new SearchableJson($column);
+            return SearchableJson::make($column);
         } elseif (strpos($column, '.') !== false) {
             [$relation, $columnName] = explode('.', $column, 2);
 
-            return new SearchableRelation($relation, $columnName);
+            return SearchableRelation::make($relation, $columnName);
         }
 
         return new static($column);
+    }
+
+    /**
+     * Determine if query should use `=` operator.
+     *
+     * @return $this
+     */
+    public function whereUsing(SearchType $searchType)
+    {
+        $this->searchType = $searchType;
+
+        return $this;
     }
 
     /**
@@ -55,9 +89,22 @@ class Column
     {
         return $query->{$whereOperator}(
             $this->columnName($query),
-            $connectionType == 'pgsql' ? 'ilike' : 'like',
+            $this->resolveWhereOperatorFrom($connectionType),
             "%{$search}%"
         );
+    }
+
+    /**
+     * Resolve where operator default.
+     */
+    protected function resolveWhereOperatorFrom(string $connectionType): string
+    {
+        $likeOperator = $connectionType === 'pgsql' ? 'ilike' : 'like';
+
+        return match ($this->searchType) {
+            SearchType::EXACT => '=',
+            default => $likeOperator,
+        };
     }
 
     /**

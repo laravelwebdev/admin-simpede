@@ -42,7 +42,6 @@ class Stack extends Field
      * @param  \Stringable|string  $name
      * @param  string|array<int, class-string<\Laravel\Nova\Fields\Field>|callable>|null  $attribute
      * @param  iterable<int, class-string<\Laravel\Nova\Fields\Field>|callable>  $lines
-     * @return void
      */
     public function __construct($name, mixed $attribute = null, iterable $lines = [])
     {

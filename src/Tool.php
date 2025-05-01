@@ -12,8 +12,6 @@ abstract class Tool
 
     /**
      * Create a new Tool.
-     *
-     * @return void
      */
     public function __construct()
     {

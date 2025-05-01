@@ -7,11 +7,7 @@ use Laravel\Nova\Nova;
 
 class RelatableAttachment extends Relatable
 {
-    /**
-     * Authorize that the user is allowed to relate this resource.
-     *
-     * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function authorize(string $resourceClass, Model $model): bool
     {
@@ -28,9 +24,7 @@ class RelatableAttachment extends Relatable
         );
     }
 
-    /**
-     * Determine if the relationship is "full".
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function relationshipIsFull(Model $model, string $attribute, mixed $value): bool
     {

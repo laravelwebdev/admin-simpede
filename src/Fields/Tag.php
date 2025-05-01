@@ -7,7 +7,8 @@ use Laravel\Nova\Contracts\PivotableField;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\Http\safe_int;
 
 /**
  * @method static static make(\Stringable|string $name, string|null $attribute = null, string|null $resource = null)
@@ -86,7 +87,6 @@ class Tag extends Field implements PivotableField
      *
      * @param  \Stringable|string  $name
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
-     * @return void
      */
     public function __construct($name, ?string $attribute = null, ?string $resource = null)
     {
@@ -215,7 +215,7 @@ class Tag extends Field implements PivotableField
             'avatar' => $resource->resolveAvatarUrl($request),
             'display' => (string) $resource->title(),
             'subtitle' => $resource->subtitle(),
-            'value' => Util::safeInt($resource->getKey()),
+            'value' => safe_int($resource->getKey()),
         ]);
     }
 

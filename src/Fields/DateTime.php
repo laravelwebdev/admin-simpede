@@ -58,7 +58,6 @@ class DateTime extends Field implements FilterableField
      * @param  \Stringable|string  $name
      * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
-     * @return void
      */
     public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {

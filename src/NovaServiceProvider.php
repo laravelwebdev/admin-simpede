@@ -57,7 +57,7 @@ class NovaServiceProvider extends ServiceProvider
      */
     protected function registerResources(): void
     {
-        $this->loadJsonTranslationsFrom(lang_path('vendor/nova'));
+        // ...
     }
 
     /**

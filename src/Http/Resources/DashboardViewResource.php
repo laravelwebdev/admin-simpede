@@ -11,8 +11,6 @@ class DashboardViewResource extends Resource
 {
     /**
      * Construct a new Dashboard Resource.
-     *
-     * @return void
      */
     public function __construct(protected string $name)
     {

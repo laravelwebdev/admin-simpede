@@ -14,6 +14,8 @@ use Laravel\Nova\Metrics\HasHelpText;
 use Laravel\Nova\Util;
 use Stringable;
 
+use function Orchestra\Sidekick\is_safe_callable;
+
 /**
  * @phpstan-type TFieldValidationRules \Stringable|string|\Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\Rule|\Illuminate\Contracts\Validation\InvokableRule|(callable(string, mixed, \Closure):(void))
  * @phpstan-type TValidationRules array<int, TFieldValidationRules>|TFieldValidationRules
@@ -206,7 +208,6 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
      * @param  \Stringable|string  $name
      * @param  string|callable|object|null  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveCallback
-     * @return void
      */
     public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {
@@ -215,7 +216,7 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
 
         $this->default(null);
 
-        if ($attribute instanceof Closure || Util::isSafeCallable($attribute)) {
+        if ($attribute instanceof Closure || is_safe_callable($attribute)) {
             $this->computedCallback = $attribute;
             $this->attribute = 'ComputedField';
         } else {
@@ -309,7 +310,7 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
             return;
         }
 
-        if (Util::isSafeCallable($this->defaultCallback)) {
+        if (is_safe_callable($this->defaultCallback)) {
             $this->defaultCallback = \call_user_func($this->defaultCallback, $request);
         }
 
@@ -453,9 +454,9 @@ abstract class Field extends FieldElement implements JsonSerializable, Resolvabl
      * Determine if the given value is considered a valid null value
      * if the field supports them.
      *
-     * @deprecated Use "isValidNullValue()"
+     * @deprecated 4.14.0 Use "isValidNullValue()"
      */
-    #[\Deprecated('Use `isValidNullValue()` method instead', '4.14.0')]
+    #[\Deprecated('Use `isValidNullValue()` method instead', since: '4.14.0')]
     protected function isNullValue(mixed $value): bool
     {
         return $this->isValidNullValue($value);

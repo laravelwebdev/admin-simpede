@@ -10,7 +10,6 @@ class ResourceMissingException extends Exception
      * Construct a new exception.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return void
      */
     public function __construct($model)
     {

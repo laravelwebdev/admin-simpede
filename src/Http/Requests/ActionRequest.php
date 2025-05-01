@@ -276,9 +276,7 @@ class ActionRequest extends NovaRequest
         return null;
     }
 
-    /**
-     * Determine if this request is an action request.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function isActionRequest(): bool
     {

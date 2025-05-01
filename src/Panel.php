@@ -2,9 +2,6 @@
 
 namespace Laravel\Nova;
 
-use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
-use Illuminate\Http\Resources\MergeValue;
-use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -14,6 +11,7 @@ use Laravel\Nova\Contracts\RelatableField;
 use Laravel\Nova\Exceptions\NovaException;
 use Laravel\Nova\Fields\Collapsable;
 use Laravel\Nova\Fields\FieldCollection;
+use Laravel\Nova\Fields\FieldMergeValue;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Metrics\HasHelpText;
 use Stringable;
@@ -27,10 +25,9 @@ use Stringable;
  * @method static static make(\Stringable|string $name, callable|iterable $fields = [], ?string $attribute = null)
  */
 #[\AllowDynamicProperties]
-class Panel extends MergeValue implements JsonSerializable, Stringable
+class Panel extends FieldMergeValue implements JsonSerializable, Stringable
 {
     use Collapsable;
-    use ConditionallyLoadsAttributes;
     use HasHelpText;
     use Macroable;
     use Makeable;
@@ -133,23 +130,11 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
         });
     }
 
-    /**
-     * Prepare the given fields.
-     *
-     * @param  (callable():(iterable))|iterable  $fields
-     * @return array<int, TFields>
-     *
-     * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
-     *
-     * @phpstan-return TPanelFields
-     */
+    /** {@inheritDoc} */
+    #[\Override]
     protected function prepareFields(callable|iterable $fields): iterable
     {
-        $fields = \is_callable($fields) ? \call_user_func($fields) : $fields;
-
-        return collect($this->filter($fields instanceof Collection ? $fields->all() : $fields))
-            ->reject(static fn ($field) => $field instanceof MissingValue)
-            ->values()
+        return Collection::make(parent::prepareFields($fields))
             ->each(function ($field) {
                 $field->panel = $this;
             })->all();
@@ -213,28 +198,6 @@ class Panel extends MergeValue implements JsonSerializable, Stringable
             })->first();
 
         return $field->name;
-    }
-
-    /**
-     * Transform each field in the panel using a callback.
-     *
-     * @param  callable(\Laravel\Nova\Fields\Field, int):mixed  $callback
-     * @return $this
-     */
-    public function each(callable $callback)
-    {
-        $this->data = Collection::make($this->data)
-            ->transform(static function ($field, $key) use ($callback) {
-                /**
-                 * @var \Laravel\Nova\Fields\Field $field
-                 * @var int $key
-                 */
-                \call_user_func($callback, $field, $key);
-
-                return $field;
-            })->all();
-
-        return $this;
     }
 
     /**

@@ -34,8 +34,6 @@ abstract class Element implements JsonSerializable
 
     /**
      * Create a new element.
-     *
-     * @return void
      */
     public function __construct(?string $component = null)
     {

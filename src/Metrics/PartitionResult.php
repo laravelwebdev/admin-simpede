@@ -27,7 +27,6 @@ class PartitionResult implements JsonSerializable
      * Create a new partition result instance.
      *
      * @param  array<string, int|float>  $value
-     * @return void
      */
     public function __construct(public array $value)
     {

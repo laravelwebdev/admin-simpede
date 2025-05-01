@@ -5,7 +5,7 @@ namespace Laravel\Nova;
 trait Makeable
 {
     /**
-     * Create a new element.
+     * Create a new instance.
      *
      * @return static
      */

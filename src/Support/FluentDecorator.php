@@ -32,7 +32,6 @@ abstract class FluentDecorator implements Arrayable, ArrayAccess, Jsonable, Json
      * Create a new fluent instance.
      *
      * @param  iterable<TKey, TValue>  $attributes
-     * @return void
      */
     public function __construct($attributes = [])
     {

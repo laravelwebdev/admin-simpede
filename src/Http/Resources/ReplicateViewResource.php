@@ -9,8 +9,6 @@ class ReplicateViewResource extends CreateViewResource
 {
     /**
      * Construct a new Create View Resource.
-     *
-     * @return void
      */
     public function __construct(protected string|int|null $fromResourceId = null)
     {

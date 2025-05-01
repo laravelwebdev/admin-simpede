@@ -4,9 +4,7 @@ namespace Laravel\Nova\Http\Requests;
 
 class CreateResourceRequest extends NovaRequest
 {
-    /**
-     * Determine if this request is a create or attach request.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function isCreateOrAttachRequest(): bool
     {

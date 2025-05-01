@@ -10,9 +10,7 @@ class LensActionRequest extends ActionRequest
 {
     use InteractsWithLenses;
 
-    /**
-     * Transform the request into a query.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function toQuery(): Builder
     {
@@ -23,18 +21,14 @@ class LensActionRequest extends ActionRequest
         });
     }
 
-    /**
-     * Transform the request into a query without scope.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function toQueryWithoutScopes(): Builder
     {
         return $this->toQuery();
     }
 
-    /**
-     * Get the all actions for the request.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function resolveActions(): Collection
     {

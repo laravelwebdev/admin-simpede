@@ -9,8 +9,6 @@ class Search
 {
     /**
      * Create a new search builder instance.
-     *
-     * @return void
      */
     public function __construct(
         public EloquentBuilder $queryBuilder,

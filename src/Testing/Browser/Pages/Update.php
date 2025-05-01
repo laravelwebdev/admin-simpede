@@ -22,7 +22,6 @@ class Update extends Page
      *
      * @param  \Illuminate\Database\Eloquent\Model|string|int  $resourceId
      * @param  array<string, mixed>  $queryParams
-     * @return void
      */
     public function __construct(
         public string $resourceName,

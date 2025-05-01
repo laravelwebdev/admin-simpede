@@ -140,9 +140,9 @@ abstract class Metric extends Card
      *
      * @return $this
      *
-     * @deprecated Use "refreshWhenActionsRun()"
+     * @deprecated 4.0.0 Use "refreshWhenActionsRun()"
      */
-    #[\Deprecated('Use `refreshWhenActionsRun()` method instead', '4.0.0')]
+    #[\Deprecated('Use `refreshWhenActionsRun()` method instead', since: '4.0.0')]
     public function refreshWhenActionRuns(bool $value = true)
     {
         return $this->refreshWhenActionsRun($value);

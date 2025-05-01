@@ -6,8 +6,6 @@ class LensComponent extends IndexComponent
 {
     /**
      * Create a new component instance.
-     *
-     * @return void
      */
     public function __construct(
         public string $resourceName,

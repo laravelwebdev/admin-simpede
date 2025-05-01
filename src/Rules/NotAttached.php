@@ -10,8 +10,6 @@ class NotAttached implements Rule
 {
     /**
      * Create a new rule instance.
-     *
-     * @return void
      */
     public function __construct(public NovaRequest $request, public Model $model)
     {

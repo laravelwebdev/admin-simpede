@@ -13,6 +13,8 @@ use Laravel\Nova\Resource;
 use Laravel\Nova\Util;
 use Stringable;
 
+use function Orchestra\Sidekick\Eloquent\model_exists;
+
 /**
  * @method static static make(mixed $name, string|null $attribute = null, string|null $resource = null)
  */
@@ -102,7 +104,6 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
      *
      * @param  \Stringable|string  $name
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
-     * @return void
      */
     public function __construct($name, ?string $attribute = null, ?string $resource = null)
     {
@@ -123,7 +124,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
                             ->with($this->attribute)
                             ->find($request->viaResourceId);
 
-                return optional($parent->{$this->attribute})->exists === true;
+                return model_exists($parent->{$this->attribute});
             }
 
             return false;
@@ -337,7 +338,7 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
         $resourceClass = $this->resourceClass;
         $relation = $model->loadMissing($this->hasOneRelationship)->getRelation($this->hasOneRelationship) ?? $resourceClass::newModel();
 
-        $editMode = $relation->exists === false ? 'create' : 'update';
+        $editMode = model_exists($relation) ? 'update' : 'create';
 
         $filled = collect($request->{$attribute} ?? [])->filter()->isNotEmpty();
 
@@ -428,9 +429,9 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
 
         $resource = $resourceClass::make($relation);
 
-        return $relation->exists === false
-            ? $this->getResourceCreationRules($request, $resource)
-            : $this->getResourceUpdateRules($request, $resource);
+        return model_exists($relation)
+            ? $this->getResourceUpdateRules($request, $resource)
+            : $this->getResourceCreationRules($request, $resource);
     }
 
     /**

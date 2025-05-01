@@ -8,12 +8,7 @@ use Laravel\Nova\Nova;
 
 class RedirectIfTwoFactorAuthenticatable extends Action
 {
-    /**
-     * Attempt to validate the incoming credentials.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function validateCredentials($request)
     {

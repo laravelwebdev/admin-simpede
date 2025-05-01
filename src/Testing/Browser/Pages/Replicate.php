@@ -18,7 +18,6 @@ class Replicate extends Create
      *
      * @param  \Illuminate\Database\Eloquent\Model|string|int  $fromResourceId
      * @param  array<string, mixed>  $queryParams
-     * @return void
      */
     public function __construct(
         string $resourceName,

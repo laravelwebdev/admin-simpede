@@ -332,9 +332,9 @@ class Action implements JsonSerializable
      * @param  (\Closure():(string))|(\Closure(\Illuminate\Database\Eloquent\Model):(string))|string|array<string, mixed>  $path
      * @param  array<string, mixed>  $options
      *
-     * @deprecated Use "Action::visit()"
+     * @deprecated 4.0.0 Use "Action::visit()" instead
      */
-    #[\Deprecated('Use `visit()` method instead', '4.0.0')]
+    #[\Deprecated('Use `visit()` method instead', since: '4.0.0')]
     public static function push(Stringable|URL|string $name, Closure|URL|string|array $path, array $options = []): static|ActionResponse
     {
         return self::visit($name, $path, $options);
@@ -426,9 +426,9 @@ class Action implements JsonSerializable
     /**
      * Return a download response from the action.
      *
-     * @deprecated Use "Action::downloadURL()"
+     * @deprecated 4.31.2 Use "Action::downloadURL()" instead
      */
-    #[\Deprecated('Use `downloadURL()` method instead', '4.31.2')]
+    #[\Deprecated('Use `downloadURL()` method instead', since: '4.31.2')]
     public static function download(string $url, Stringable|string $name): ActionResponse
     {
         return ActionResponse::download($name, $url);
@@ -767,9 +767,9 @@ class Action implements JsonSerializable
      *
      * @return $this
      *
-     * @deprecated Use "Action::showInline()"
+     * @deprecated 4.0.0 Use "Action::showInline()" instead
      */
-    #[\Deprecated('Use `showInline()` method instead', '4.0.0')]
+    #[\Deprecated('Use `showInline()` method instead', since: '4.0.0')]
     public function showOnTableRow()
     {
         return $this->showInline();

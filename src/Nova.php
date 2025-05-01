@@ -34,6 +34,7 @@ use Stringable;
 use Symfony\Component\Finder\Finder;
 
 use function Illuminate\Filesystem\join_paths;
+use function Orchestra\Sidekick\is_safe_callable;
 
 /**
  * @method static bool runsMigrations()
@@ -764,7 +765,7 @@ class Nova
     public static function jsonVariables(Request $request): array
     {
         return collect(static::$jsonVariables)->map(static function ($variable) use ($request) {
-            return Util::isSafeCallable($variable)
+            return is_safe_callable($variable)
                 ? \call_user_func($variable, $request)
                 : $variable;
         })->all();

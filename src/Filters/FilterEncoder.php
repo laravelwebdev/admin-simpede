@@ -2,7 +2,9 @@
 
 namespace Laravel\Nova\Filters;
 
-class FilterEncoder
+use Stringable;
+
+class FilterEncoder implements Stringable
 {
     /**
      * Create a new filter encoder instance.
@@ -10,6 +12,14 @@ class FilterEncoder
     public function __construct(public array $filters = [])
     {
         //
+    }
+
+    /**
+     * Prepare for string serialization.
+     */
+    public function __toString(): string
+    {
+        return $this->encode();
     }
 
     /**

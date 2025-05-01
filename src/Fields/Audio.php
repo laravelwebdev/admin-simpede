@@ -27,7 +27,6 @@ class Audio extends File
      * @param  \Stringable|string  $name
      * @param  string|callable|null  $attribute
      * @param  (callable(\Illuminate\Http\Request, object, string, string, ?string, ?string):mixed)|null  $storageCallback
-     * @return void
      */
     public function __construct($name, mixed $attribute = null, ?string $disk = 'public', ?callable $storageCallback = null)
     {

@@ -4,7 +4,8 @@ namespace Laravel\Nova\Fields;
 
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\is_safe_callable;
 
 trait FormatsRelatableDisplayValues
 {
@@ -41,7 +42,7 @@ trait FormatsRelatableDisplayValues
      */
     public function display(callable|string $display)
     {
-        $this->display = Util::isSafeCallable($display)
+        $this->display = is_safe_callable($display)
             ? $display
             : fn ($resource) => $resource->{$display};
 

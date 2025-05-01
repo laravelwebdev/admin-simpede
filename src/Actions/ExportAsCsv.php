@@ -63,8 +63,6 @@ class ExportAsCsv extends Action
 
     /**
      * Construct a new action instance.
-     *
-     * @return void
      */
     public function __construct(Stringable|string|null $name = null)
     {
@@ -72,11 +70,7 @@ class ExportAsCsv extends Action
         $this->actionFields = Collection::make();
     }
 
-    /**
-     * Get the fields available on the action.
-     *
-     * @return array
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function fields(NovaRequest $request)
     {
@@ -210,11 +204,7 @@ class ExportAsCsv extends Action
         return $this;
     }
 
-    /**
-     * Get the displayable name of the action.
-     *
-     * @return \Stringable|string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function name()
     {
@@ -222,7 +212,7 @@ class ExportAsCsv extends Action
     }
 
     /**
-     * Mark the action as a standalone action.
+     * {@inheritDoc}
      *
      * @return never
      *

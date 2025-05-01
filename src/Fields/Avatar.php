@@ -16,7 +16,6 @@ class Avatar extends Image implements Cover
      * @param  \Stringable|string|null  $name
      * @param  string|callable|null  $attribute
      * @param  (callable(\Illuminate\Http\Request, object, string, string, ?string, ?string):(mixed))|null  $storageCallback
-     * @return void
      */
     public function __construct($name = null, mixed $attribute = null, ?string $disk = null, ?callable $storageCallback = null)
     {

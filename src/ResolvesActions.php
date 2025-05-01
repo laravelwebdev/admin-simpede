@@ -7,6 +7,8 @@ use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\MorphToMany;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
+use function Orchestra\Sidekick\Eloquent\model_exists;
+
 trait ResolvesActions
 {
     /**
@@ -27,7 +29,7 @@ trait ResolvesActions
         $actions = $this->resolveActions($request)
                     ->filter->authorizedToSee($request);
 
-        if (optional($resource)->exists === true) {
+        if (model_exists($resource)) {
             return $actions->withAuthorizedToRun($request, $resource)->values();
         }
 
@@ -54,7 +56,7 @@ trait ResolvesActions
         $actions = $this->resolveActions($request)
                     ->authorizedToSeeOnIndex($request);
 
-        if (optional($resource)->exists === true) {
+        if (model_exists($resource)) {
             return $actions->withAuthorizedToRun($request, $resource)->values();
         }
 

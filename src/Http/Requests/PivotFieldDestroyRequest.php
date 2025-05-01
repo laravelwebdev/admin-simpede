@@ -49,11 +49,7 @@ class PivotFieldDestroyRequest extends NovaRequest
         );
     }
 
-    /**
-     * Find the related resource for the operation.
-     *
-     * @return \Laravel\Nova\Resource<\Illuminate\Database\Eloquent\Model>
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function findRelatedResource(string|int|null $resourceId = null): Resource
     {
@@ -62,11 +58,7 @@ class PivotFieldDestroyRequest extends NovaRequest
         );
     }
 
-    /**
-     * Find the related model for the operation.
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function findRelatedModel(string|int|null $resourceId = null): Model
     {

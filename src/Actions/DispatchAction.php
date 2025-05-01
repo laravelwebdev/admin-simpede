@@ -29,8 +29,6 @@ class DispatchAction
 
     /**
      * Create a new action dispatcher instance.
-     *
-     * @return void
      */
     public function __construct(
         protected ActionRequest $request,

@@ -6,9 +6,7 @@ use Laravel\Dusk\Browser;
 
 class ComboBoxInputComponent extends SearchInputComponent
 {
-    /**
-     * Search for the given value for a searchable field attribute.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function searchInput(Browser $browser, string $search, int $pause = 500): void
     {

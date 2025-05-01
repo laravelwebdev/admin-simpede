@@ -163,9 +163,7 @@ class NovaRequest extends FormRequest
         return TrashedStatus::tryFrom((string) $trashed) ?? TrashedStatus::DEFAULT;
     }
 
-    /**
-     * Create an Illuminate request from a Symfony instance.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public static function createFromBase(SymfonyRequest $request): static
     {

@@ -15,7 +15,10 @@ abstract class DateFilter extends Filter
      * Set the first day of the week.
      *
      * @return $this
+     *
+     * @deprecated 5.6.0 Feature no longer supported.
      */
+    #[\Deprecated('Feature no longer available', since: '5.6.0')]
     public function firstDayOfWeek(int $day)
     {
         return $this->withMeta([__FUNCTION__ => $day]);

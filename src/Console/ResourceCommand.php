@@ -74,12 +74,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
         return parent::handle();
     }
 
-    /**
-     * Build the class with the given name.
-     *
-     * @param  string  $name
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function buildClass($name)
     {
@@ -137,12 +132,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
         return $this->resolveStubPath('/stubs/nova/resource.stub');
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
@@ -194,11 +184,7 @@ class ResourceCommand extends GeneratorCommand implements PromptsForMissingInput
         }
     }
 
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getOptions()
     {

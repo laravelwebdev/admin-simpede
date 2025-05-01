@@ -12,6 +12,8 @@ use Laravel\Nova\Resource;
 use Laravel\Nova\URL;
 use Stringable;
 
+use function Orchestra\Sidekick\Eloquent\model_exists;
+
 class Breadcrumb implements JsonSerializable
 {
     use AuthorizedToSee;
@@ -35,7 +37,7 @@ class Breadcrumb implements JsonSerializable
      */
     public static function resource(Resource|string $resourceClass): static
     {
-        if ($resourceClass instanceof Resource && $resourceClass->model()->exists === true) {
+        if ($resourceClass instanceof Resource && model_exists($resourceClass->model())) {
             return static::make(
                 Nova::__(':resource Details: :title', [
                     'resource' => $resourceClass::singularLabel(),

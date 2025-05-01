@@ -19,6 +19,8 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Menu\MenuItem;
 use Laravel\Scout\Searchable;
 
+use function Orchestra\Sidekick\Eloquent\model_exists;
+
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
@@ -221,7 +223,6 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
      * Create a new resource instance.
      *
      * @param  TModel|null  $resource
-     * @return void
      */
     public function __construct($resource = null)
     {
@@ -256,7 +257,7 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     {
         $model = $this->model();
 
-        if ($model->exists !== true) {
+        if (! model_exists($model)) {
             throw new InvalidArgumentException('Unable to replicate from non-existing resource');
         }
 

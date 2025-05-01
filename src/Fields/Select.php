@@ -8,8 +8,9 @@ use Laravel\Nova\Exceptions\NovaException;
 use Laravel\Nova\Fields\Filters\SelectFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
-use Laravel\Nova\Util;
 use Stringable;
+
+use function Orchestra\Sidekick\Http\safe_int;
 
 /**
  * @phpstan-type TOptionLabel \Stringable|string|array{label: string, group?: string}
@@ -136,7 +137,7 @@ class Select extends Field implements FilterableField
 
         return collect($options ?? [])->map(static function ($label, $value) use ($searchable) {
             $label = $label instanceof Stringable ? (string) $label : $label;
-            $value = Util::safeInt($value);
+            $value = safe_int($value);
 
             if ($searchable && isset($label['group'])) {
                 return [

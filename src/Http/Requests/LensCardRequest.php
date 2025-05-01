@@ -8,9 +8,7 @@ class LensCardRequest extends CardRequest
 {
     use InteractsWithLenses;
 
-    /**
-     * Get all of the possible metrics for the request.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function availableCards(): Collection
     {

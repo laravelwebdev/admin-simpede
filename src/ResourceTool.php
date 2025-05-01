@@ -29,8 +29,6 @@ class ResourceTool extends Panel
 
     /**
      * Create a new resource tool instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -72,12 +70,7 @@ class ResourceTool extends Panel
         return $this;
     }
 
-    /**
-     * Set additional meta information for the resource tool.
-     *
-     * @param  array<string, mixed>  $meta
-     * @return $this
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function withMeta(array $meta)
     {

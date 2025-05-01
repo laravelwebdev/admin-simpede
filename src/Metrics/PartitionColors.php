@@ -15,7 +15,6 @@ class PartitionColors
      * Create a new instance.
      *
      * @param  array<string|int, string>  $colors
-     * @return void
      */
     public function __construct(public array $colors = [])
     {

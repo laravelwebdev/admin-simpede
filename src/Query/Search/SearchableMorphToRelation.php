@@ -5,13 +5,16 @@ namespace Laravel\Nova\Query\Search;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Database\Query\Expression;
 
+/**
+ * @method static static make(string $relation, \Illuminate\Contracts\Database\Query\Expression|string $column, array $types)
+ * @method static static exact(string $relation, \Illuminate\Contracts\Database\Query\Expression|string $column, array $types)
+ */
 class SearchableMorphToRelation extends SearchableRelation
 {
     /**
      * Construct a new search.
      *
      * @param  array<int, class-string<\Illuminate\Database\Eloquent\Model|\Laravel\Nova\Resource>|string>  $types
-     * @return void
      */
     public function __construct(
         string $relation,
@@ -21,9 +24,7 @@ class SearchableMorphToRelation extends SearchableRelation
         parent::__construct($relation, $column);
     }
 
-    /**
-     * Apply the search.
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function __invoke(Builder $query, string $search, string $connectionType, string $whereOperator = 'orWhere'): Builder
     {

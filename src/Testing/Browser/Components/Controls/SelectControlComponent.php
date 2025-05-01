@@ -15,9 +15,7 @@ class SelectControlComponent extends Component
         //
     }
 
-    /**
-     * Get the root selector associated with this component.
-     */
+    /** {@inheritDoc} */
     public function selector(): string
     {
         return "select[dusk='{$this->attribute}']";

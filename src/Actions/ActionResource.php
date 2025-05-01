@@ -36,32 +36,16 @@ class ActionResource extends Resource
      */
     public static $policy = ActionResourcePolicy::class;
 
-    /**
-     * The single value that should be used to represent the resource when being displayed.
-     *
-     * @var string
-     */
+    /** {@inheritDoc} */
     public static $title = 'name';
 
-    /**
-     * Indicates if the resource should be globally searchable.
-     *
-     * @var bool
-     */
+    /** {@inheritDoc} */
     public static $globallySearchable = false;
 
-    /**
-     * Indicates whether the resource should automatically poll for new resources.
-     *
-     * @var bool
-     */
+    /** {@inheritDoc} */
     public static $polling = true;
 
-    /**
-     * Get the fields displayed by the resource.
-     *
-     * @return array
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function fields(NovaRequest $request)
     {
@@ -93,66 +77,42 @@ class ActionResource extends Resource
         ];
     }
 
-    /**
-     * Build an "index" query for the given resource.
-     *
-     * @return \Illuminate\Contracts\Database\Eloquent\Builder
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public static function indexQuery(NovaRequest $request, Builder $query)
     {
         return $query->with('user');
     }
 
-    /**
-     * Determine if this resource is available for navigation.
-     *
-     * @return bool
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public static function availableForNavigation(Request $request)
     {
         return false;
     }
 
-    /**
-     * Determine if this resource is searchable.
-     *
-     * @return bool
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public static function searchable()
     {
         return false;
     }
 
-    /**
-     * Get the displayable label of the resource.
-     *
-     * @return \Stringable|string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public static function label()
     {
         return Nova::__('Action Events');
     }
 
-    /**
-     * Get the displayable singular label of the resource.
-     *
-     * @return \Stringable|string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public static function singularLabel()
     {
         return Nova::__('Action Event');
     }
 
-    /**
-     * Get the URI key for the resource.
-     *
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public static function uriKey()
     {

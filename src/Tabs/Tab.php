@@ -2,20 +2,20 @@
 
 namespace Laravel\Nova\Tabs;
 
-use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
-use Illuminate\Http\Resources\MissingValue;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
+use Laravel\Nova\Fields\FieldMergeValue;
 use Laravel\Nova\Makeable;
 use Stringable;
 
 /**
- * @method static static make(\Stringable|string $name, array $fields, ?string $attribute = null)
+ * @phpstan-import-type TFields from \Laravel\Nova\Resource
+ * @phpstan-import-type TPanelFields from \Laravel\Nova\Fields\FieldMergeValue
+ *
+ * @method static static make(\Stringable|string $name, callable|array $fields, ?string $attribute = null)
  */
-class Tab implements JsonSerializable
+class Tab extends FieldMergeValue implements JsonSerializable
 {
-    use ConditionallyLoadsAttributes;
     use Makeable;
 
     /**
@@ -29,13 +29,6 @@ class Tab implements JsonSerializable
     public string $attribute;
 
     /**
-     * List of fields available for the tab.
-     *
-     * @var array<int, \Laravel\Nova\Fields\Field>
-     */
-    public array $fields = [];
-
-    /**
      * The position of the tab.
      */
     public int $position = 0;
@@ -45,6 +38,8 @@ class Tab implements JsonSerializable
      *
      * @param  \Stringable|string  $name
      * @param  (callable():(iterable))|iterable  $fields
+     *
+     * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
      */
     public function __construct(
         $name,
@@ -54,12 +49,7 @@ class Tab implements JsonSerializable
         $this->name = $name;
         $this->attribute = $attribute ?? Str::slug($name);
 
-        $fields = \is_callable($fields) ? \call_user_func($fields) : $fields;
-
-        $this->fields = collect($this->filter($fields instanceof Collection ? $fields->all() : $fields))
-                ->reject(static fn ($field) => $field instanceof MissingValue)
-                ->values()
-                ->all();
+        parent::__construct($this->prepareFields($fields));
     }
 
     /**
@@ -68,6 +58,8 @@ class Tab implements JsonSerializable
      * @param  \Stringable|string|null  $name
      * @param  (callable():(iterable))|iterable  $fields
      * @return \Laravel\Nova\Tabs\TabsGroup
+     *
+     * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
      */
     public static function group($name = null, callable|iterable $fields = [], ?string $attribute = null)
     {
@@ -79,9 +71,12 @@ class Tab implements JsonSerializable
      *
      * @internal
      *
+     * @param  (callable():(iterable))|iterable  $fields
      * @return static
+     *
+     * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
      */
-    public static function mutate(self $tab, iterable $fields)
+    public static function mutate(self $tab, callable|iterable $fields)
     {
         return tap(new static($tab->name, $fields), static function ($newTab) use ($tab) {
             $newTab->withAttribute($tab->attribute);
@@ -123,7 +118,7 @@ class Tab implements JsonSerializable
     {
         return [
             'name' => $this->name,
-            'fields' => $this->fields,
+            'fields' => $this->data,
             'position' => $this->position,
             'attribute' => $this->attribute,
         ];

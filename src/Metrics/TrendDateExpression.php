@@ -12,8 +12,6 @@ abstract class TrendDateExpression implements Stringable
 {
     /**
      * Create a new raw query expression.
-     *
-     * @return void
      */
     public function __construct(
         public Builder $query,

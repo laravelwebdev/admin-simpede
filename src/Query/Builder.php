@@ -49,7 +49,6 @@ class Builder implements QueryBuilder
      * Construct a new query builder for a resource.
      *
      * @param  class-string<\Laravel\Nova\Resource>  $resourceClass
-     * @return void
      */
     public function __construct(
         protected readonly string $resourceClass

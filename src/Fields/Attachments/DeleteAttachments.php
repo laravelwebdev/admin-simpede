@@ -24,7 +24,6 @@ class DeleteAttachments
      * Create a new class instance.
      *
      * @param  \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Storable  $field
-     * @return void
      */
     public function __construct($field)
     {

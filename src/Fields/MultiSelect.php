@@ -6,7 +6,8 @@ use Illuminate\Support\Arr;
 use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Fields\Filters\MultiSelectFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\Http\safe_int;
 
 /**
  * @phpstan-type TOptionLabel \Stringable|string|array{label: string, group?: string}
@@ -135,7 +136,7 @@ class MultiSelect extends Field implements FilterableField
         }
 
         return collect($options ?? [])->map(static function ($label, $value) {
-            $value = Util::safeInt($value);
+            $value = safe_int($value);
 
             return \is_array($label) ? $label + ['value' => $value] : ['label' => $label, 'value' => $value];
         })->values()->all();

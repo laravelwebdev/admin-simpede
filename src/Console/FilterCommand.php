@@ -48,23 +48,14 @@ class FilterCommand extends GeneratorCommand
         return $this->resolveStubPath('/stubs/nova/filter.stub');
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Nova\Filters';
     }
 
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getOptions()
     {

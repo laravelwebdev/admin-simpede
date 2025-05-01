@@ -48,12 +48,7 @@ class BaseResourceCommand extends GeneratorCommand
         return $this->resolveStubPath('/stubs/nova/base-resource.stub');
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {

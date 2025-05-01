@@ -11,6 +11,8 @@ use Laravel\Nova\Panel;
 use Laravel\Nova\Resource;
 use Stringable;
 
+use function Orchestra\Sidekick\Eloquent\model_exists;
+
 /**
  * @method static static make(\Stringable|string $name, string|null $attribute = null, string|null $resource = null)
  */
@@ -77,7 +79,6 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
      *
      * @param  \Stringable|string  $name
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
-     * @return void
      */
     public function __construct($name, ?string $attribute = null, ?string $resource = null)
     {
@@ -96,7 +97,7 @@ class HasOneThrough extends Field implements BehavesAsPanel, RelatableField
             if ($parentResource && filled($request->viaResourceId)) {
                 $parent = $parentResource::newModel()->find($request->viaResourceId);
 
-                return optional($parent->{$this->attribute})->exists === true;
+                return model_exists($parent->{$this->attribute});
             }
 
             return false;

@@ -11,13 +11,9 @@ use Laravel\Nova\Util;
 class MorphedResourceAttachController extends ResourceAttachController
 {
     /**
-     * Initialize a fresh pivot model for the relationship.
+     * {@inheritDoc}
      *
      * @param  \Illuminate\Database\Eloquent\Relations\MorphToMany  $relationship
-     * @return (\Illuminate\Database\Eloquent\Model&\Illuminate\Database\Eloquent\Relations\Concerns\AsPivot)|\Illuminate\Database\Eloquent\Relations\Pivot
-     *
-     * @throws \RuntimeException
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     #[\Override]
     protected function initializePivot(NovaRequest $request, $relationship): Model|Pivot

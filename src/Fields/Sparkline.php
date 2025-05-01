@@ -4,7 +4,8 @@ namespace Laravel\Nova\Fields;
 
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Metrics\Trend;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\is_safe_callable;
 
 class Sparkline extends Field implements Unfillable
 {
@@ -75,7 +76,7 @@ class Sparkline extends Field implements Unfillable
                     ])
                 )->trend ?? []
             );
-        } elseif (Util::isSafeCallable($this->data)) {
+        } elseif (is_safe_callable($this->data)) {
             return \call_user_func($this->data, $request);
         }
 

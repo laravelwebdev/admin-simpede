@@ -10,8 +10,6 @@ class ApplyFilter
 {
     /**
      * Create a new invokable filter applier.
-     *
-     * @return void
      */
     public function __construct(
         public Filter $filter,

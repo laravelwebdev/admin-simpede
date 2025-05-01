@@ -16,8 +16,6 @@ class IndexComponent extends Component
 
     /**
      * Create a new component instance.
-     *
-     * @return void
      */
     public function __construct(
         public string $resourceName,

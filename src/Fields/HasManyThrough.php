@@ -32,7 +32,6 @@ class HasManyThrough extends HasMany implements ListableField, RelatableField
      *
      * @param  \Stringable|string  $name
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
-     * @return void
      */
     public function __construct($name, ?string $attribute = null, ?string $resource = null)
     {

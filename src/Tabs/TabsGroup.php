@@ -11,8 +11,7 @@ use Laravel\Nova\Panel;
 
 /**
  * @phpstan-import-type TFields from \Laravel\Nova\Resource
- *
- * @phpstan-type TPanelFields iterable<int, TFields>
+ * @phpstan-import-type TPanelFields from \Laravel\Nova\Fields\FieldMergeValue
  *
  * @method static static make(\Stringable|string|null $name = null, callable|iterable $fields = [], ?string $attribute = null)
  */
@@ -144,7 +143,7 @@ class TabsGroup extends Panel
     {
         $this->tabs[] = $tab;
 
-        foreach ($tab->fields as $field) {
+        foreach ($tab->data as $field) {
             /** @var \Laravel\Nova\Panel|\Laravel\Nova\Fields\Field $field */
             if ($field instanceof Panel) {
                 /** @phpstan-ignore property.notFound */

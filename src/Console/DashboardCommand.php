@@ -32,12 +32,7 @@ class DashboardCommand extends GeneratorCommand
      */
     protected $type = 'Dashboard';
 
-    /**
-     * Build the class with the given name.
-     *
-     * @param  string  $name
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function buildClass($name)
     {
@@ -62,12 +57,7 @@ class DashboardCommand extends GeneratorCommand
         return $this->resolveStubPath('/stubs/nova/dashboard.stub');
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {

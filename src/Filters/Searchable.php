@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Laravel\Nova\Filters;
 
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\is_safe_callable;
 
 trait Searchable
 {
@@ -34,7 +35,7 @@ trait Searchable
      */
     public function isSearchable(NovaRequest $request): bool
     {
-        if (Util::isSafeCallable($this->searchable)) {
+        if (is_safe_callable($this->searchable)) {
             $this->searchable = \call_user_func($this->searchable, $request);
         }
 

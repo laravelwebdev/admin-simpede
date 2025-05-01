@@ -4,7 +4,8 @@ namespace Laravel\Nova\Fields;
 
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Metable;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\is_safe_callable;
 
 trait MutableFields
 {
@@ -129,7 +130,7 @@ trait MutableFields
     public function isComputed(): bool
     {
         /** @phpstan-ignore booleanNot.alwaysFalse, booleanAnd.alwaysFalse */
-        return Util::isSafeCallable($this->computedCallback);
+        return is_safe_callable($this->computedCallback);
     }
 
     /**
@@ -160,7 +161,7 @@ trait MutableFields
      */
     public function resolveDefaultCallback(NovaRequest $request): mixed
     {
-        if (\is_null($this->value) && Util::isSafeCallable($this->defaultCallback)) {
+        if (\is_null($this->value) && is_safe_callable($this->defaultCallback)) {
             return \call_user_func($this->defaultCallback, $request);
         }
 

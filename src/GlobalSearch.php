@@ -6,13 +6,14 @@ use Generator;
 use Laravel\Nova\Contracts\QueryBuilder;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
+use function Orchestra\Sidekick\Http\safe_int;
+
 class GlobalSearch
 {
     /**
      * Create a new global search instance.
      *
      * @param  array<int, class-string<\Laravel\Nova\Resource>>  $resources
-     * @return void
      */
     public function __construct(
         public NovaRequest $request,
@@ -70,7 +71,7 @@ class GlobalSearch
             'resourceTitle' => $resourceClass::label(),
             'title' => (string) $resource->title(),
             'subTitle' => transform($resource->subtitle(), fn ($subtitle) => (string) $subtitle),
-            'resourceId' => Util::safeInt($model->getKey()),
+            'resourceId' => safe_int($model->getKey()),
             'url' => url(Nova::url('/resources/'.$resourceClass::uriKey().'/'.$model->getKey())),
             'avatar' => $resource->resolveAvatarUrl($this->request),
             'rounded' => $resource->resolveIfAvatarShouldBeRounded($this->request),

@@ -149,6 +149,8 @@ class NovaApplicationServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->loadJsonTranslationsFrom(lang_path('vendor/nova'));
+
         $this->fortify();
 
         $this->booted(function () {

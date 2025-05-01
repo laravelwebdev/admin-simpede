@@ -24,7 +24,6 @@ class UiAvatar extends Avatar implements Unfillable
      * Create a new field.
      *
      * @param  \Stringable|string|null  $name
-     * @return void
      */
     public function __construct($name = null, string $attribute = 'name')
     {

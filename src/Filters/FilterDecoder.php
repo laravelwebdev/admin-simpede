@@ -31,10 +31,10 @@ class FilterDecoder
     public function filters(): Collection
     {
         if (empty($filters = $this->decodeFromBase64String())) {
-            return collect();
+            return new Collection;
         }
 
-        return collect($filters)->map(function ($filter) {
+        return Collection::make($filters)->map(function ($filter) {
             $class = key($filter);
             $value = $filter[$class];
 

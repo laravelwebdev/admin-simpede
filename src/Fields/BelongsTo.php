@@ -13,8 +13,9 @@ use Laravel\Nova\Http\Requests\ResourceIndexRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
 use Laravel\Nova\Rules\Relatable;
-use Laravel\Nova\Util;
 use Stringable;
+
+use function Orchestra\Sidekick\Http\safe_int;
 
 /**
  * @method static static make(\Stringable|string $name, string|null $attribute = null, string|null $resource = null)
@@ -106,7 +107,6 @@ class BelongsTo extends Field implements FilterableField, RelatableField
      *
      * @param  \Stringable|string  $name
      * @param  class-string<\Laravel\Nova\Resource>|null  $resource
-     * @return void
      */
     public function __construct($name, ?string $attribute = null, ?string $resource = null)
     {
@@ -179,7 +179,7 @@ class BelongsTo extends Field implements FilterableField, RelatableField
         if ($value) {
             $this->belongsToResource = new $this->resourceClass($value);
 
-            $this->belongsToId = Util::safeInt($value->getKey());
+            $this->belongsToId = safe_int($value->getKey());
 
             $this->value = $this->formatDisplayValue($this->belongsToResource);
 
@@ -297,7 +297,7 @@ class BelongsTo extends Field implements FilterableField, RelatableField
             'avatar' => $resource->resolveAvatarUrl($request),
             'display' => $this->formatDisplayValue($resource),
             'subtitle' => $resource->subtitle(),
-            'value' => Util::safeInt($resource->getKey()),
+            'value' => safe_int($resource->getKey()),
         ]);
     }
 
@@ -331,7 +331,7 @@ class BelongsTo extends Field implements FilterableField, RelatableField
      */
     public function setValue(mixed $value): void
     {
-        $this->belongsToId = Util::safeInt($value);
+        $this->belongsToId = safe_int($value);
         $this->value = $value;
     }
 

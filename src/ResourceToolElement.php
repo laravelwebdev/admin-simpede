@@ -8,8 +8,6 @@ class ResourceToolElement extends FieldElement
 {
     /**
      * Create a new resource tool.
-     *
-     * @return void
      */
     public function __construct(?string $component = null)
     {

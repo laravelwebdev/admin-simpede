@@ -13,6 +13,8 @@ use Laravel\Nova\Nova;
 use Laravel\Nova\Util;
 use Throwable;
 
+use function Orchestra\Sidekick\Eloquent\normalize_value;
+
 /**
  * @property \Illuminate\Database\Eloquent\Model $target
  * @property \Illuminate\Foundation\Auth\User $user
@@ -438,7 +440,7 @@ class ActionEvent extends Model
     protected static function hydrateChangesPayload(array $attributes): array
     {
         return collect($attributes)
-            ->transform(static fn ($value) => Util::hydrate($value))
+            ->transform(static fn ($value) => normalize_value($value))
             ->all();
     }
 }

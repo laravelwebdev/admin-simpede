@@ -7,7 +7,8 @@ use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Http\Requests\ResourceSearchRequest;
 use Laravel\Nova\Resource;
-use Laravel\Nova\Util;
+
+use function Orchestra\Sidekick\Http\safe_int;
 
 class ResourceSearchController extends Controller
 {
@@ -64,7 +65,7 @@ class ResourceSearchController extends Controller
             'avatar' => $resource->resolveAvatarUrl($request),
             'display' => (string) $resource->title(),
             'subtitle' => $resource->subtitle(),
-            'value' => Util::safeInt($resource->getKey()),
+            'value' => safe_int($resource->getKey()),
         ]);
     }
 }

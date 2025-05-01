@@ -23,9 +23,9 @@ class Transaction
 
             $actionBatchId = (string) Str::orderedUuid();
 
-            return tap($callback($actionBatchId), static function ($response) use ($finished, $actionBatchId) {
+            return tap(\call_user_func($callback, $actionBatchId), static function ($response) use ($finished, $actionBatchId) {
                 if ($finished) {
-                    $finished($actionBatchId);
+                    \call_user_func($finished, $actionBatchId);
                 }
 
                 DB::commit();

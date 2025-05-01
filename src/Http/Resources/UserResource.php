@@ -12,12 +12,7 @@ use Laravel\Nova\Nova;
  */
 class UserResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
+    /** {@inheritDoc} */
     #[\Override]
     public function toArray($request)
     {

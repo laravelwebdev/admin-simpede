@@ -66,7 +66,6 @@ class ProgressResult implements JsonSerializable
      *
      * @param  int|float  $value
      * @param  int|float  $target
-     * @return void
      */
     public function __construct($value, $target)
     {

@@ -18,8 +18,6 @@ class CallQueuedAction
 
     /**
      * Create a new job instance.
-     *
-     * @return void
      */
     public function __construct(
         Action $action,

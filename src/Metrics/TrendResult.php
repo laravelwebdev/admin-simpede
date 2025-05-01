@@ -58,7 +58,6 @@ class TrendResult implements JsonSerializable
      * Create a new trend result instance.
      *
      * @param  int|float|numeric-string|null  $value
-     * @return void
      */
     public function __construct($value = null)
     {

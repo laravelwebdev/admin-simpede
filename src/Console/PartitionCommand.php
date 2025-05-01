@@ -32,12 +32,7 @@ class PartitionCommand extends GeneratorCommand
      */
     protected $type = 'Metric';
 
-    /**
-     * Build the class with the given name.
-     *
-     * @param  string  $name
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function buildClass($name)
     {
@@ -58,12 +53,7 @@ class PartitionCommand extends GeneratorCommand
         return $this->resolveStubPath('/stubs/nova/partition.stub');
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
+    /** {@inheritDoc} */
     #[\Override]
     protected function getDefaultNamespace($rootNamespace)
     {

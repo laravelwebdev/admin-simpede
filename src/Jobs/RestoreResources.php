@@ -15,7 +15,6 @@ class RestoreResources
      * Create a new job instance.
      *
      * @param  class-string<\Laravel\Nova\Resource>|null  $resourceClass
-     * @return void
      */
     public function __construct(
         public RestoreResourceRequest|RestoreLensResourceRequest $request,

@@ -23,7 +23,6 @@ class StoppedImpersonating
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $impersonator
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $impersonated
-     * @return void
      */
     public function __construct($impersonator, $impersonated)
     {

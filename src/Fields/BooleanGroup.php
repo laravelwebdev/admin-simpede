@@ -8,8 +8,9 @@ use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Fields\Filters\BooleanGroupFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
-use Laravel\Nova\Util;
 use Stringable;
+
+use function Orchestra\Sidekick\is_safe_callable;
 
 /**
  * @phpstan-type TOptionLabel \Stringable|string
@@ -88,7 +89,7 @@ class BooleanGroup extends Field implements FilterableField
     protected function serializeOptions(): array
     {
         /** @var TOption $options */
-        $options = ! Util::isSafeCallable($this->optionsCallback) && ! $this->optionsCallback instanceof Closure
+        $options = ! is_safe_callable($this->optionsCallback) && ! $this->optionsCallback instanceof Closure
             ? value($this->optionsCallback)
             : \call_user_func($this->optionsCallback);
 

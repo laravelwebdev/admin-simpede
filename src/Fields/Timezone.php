@@ -15,7 +15,6 @@ class Timezone extends Select
      *
      * @param  \Stringable|string  $name
      * @param  string|callable|null  $attribute
-     * @return void
      */
     public function __construct($name, mixed $attribute = null, ?callable $resolveCallback = null)
     {

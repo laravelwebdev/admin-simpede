@@ -83,7 +83,6 @@ abstract class Lens implements ArrayAccess, JsonSerializable, UrlRoutable
      * Create a new lens instance.
      *
      * @param  \Illuminate\Database\Eloquent\Model|null  $resource
-     * @return void
      */
     public function __construct($resource = null)
     {

@@ -203,19 +203,14 @@ class SearchInputComponent extends Component
         });
     }
 
-    /**
-     * Assert that the current page contains this component.
-     *
-     * @return void
-     */
+    /** {@inheritDoc} */
+    #[\Override]
     public function assert(Browser $browser)
     {
         $browser->waitFor($this->selector());
     }
 
-    /**
-     * Get the root selector associated with this component.
-     */
+    /** {@inheritDoc} */
     public function selector(): string
     {
         return "@{$this->attribute}-search-input";
