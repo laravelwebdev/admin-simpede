@@ -5,6 +5,7 @@ namespace Laravel\Nova\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Nova;
+use Laravel\Nova\Util;
 
 class RedirectIfAuthenticated
 {
@@ -18,7 +19,11 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (Auth::guard($guard)->check()) {
+        if (! \is_null($guard)) {
+            trigger_deprecation('laravel/nova', '5.6.1', 'Guard parameter no longer supported via [%s] middleware', __CLASS__);
+        }
+
+        if (Auth::guard(Util::userGuard())->check()) {
             return redirect(Nova::path());
         }
 

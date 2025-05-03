@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 /**
  * @phpstan-import-type TFields from \Laravel\Nova\Resource
@@ -15,6 +16,33 @@ use Illuminate\Support\Collection;
 abstract class FieldMergeValue extends MergeValue
 {
     use ConditionallyLoadsAttributes;
+
+    /**
+     * Determine if the given offset exists.
+     *
+     * @param  string  $offset
+     */
+    public function __isset($offset): bool
+    {
+        return match ($offset) {
+            'fields' => true,
+            default => false,
+        };
+    }
+
+    /**
+     * Get the value for a given offset.
+     *
+     * @param  string  $offset
+     * @return mixed
+     */
+    public function __get($offset): mixed
+    {
+        return match ($offset) {
+            'fields' => $this->data,
+            default => throw new InvalidArgumentException(sprintf('Unable to retrieve $%s value', $offset)),
+        };
+    }
 
     /**
      * Prepare the given fields.
