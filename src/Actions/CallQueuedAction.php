@@ -56,7 +56,7 @@ class CallQueuedAction
             }
 
             return $action->withActionBatchId($this->actionBatchId)
-                        ->{$this->method}($this->fields, $this->models);
+                ->{$this->method}($this->fields, $this->models);
         });
     }
 

@@ -33,7 +33,7 @@ class NotExactlyAttached implements Rule
         $pivot = $relation->newPivot();
         $pivotAccessor = $relation->getPivotAccessor();
         $query = $relation->withoutGlobalScopes()
-                        ->where($relation->getQualifiedRelatedPivotKeyName(), '=', $this->request->input($this->request->relatedResource));
+            ->where($relation->getQualifiedRelatedPivotKeyName(), '=', $this->request->input($this->request->relatedResource));
 
         $resource = Nova::newResourceFromModel($this->model);
 
