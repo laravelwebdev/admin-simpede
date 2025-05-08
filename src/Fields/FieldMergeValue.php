@@ -34,13 +34,12 @@ abstract class FieldMergeValue extends MergeValue
      * Get the value for a given offset.
      *
      * @param  string  $offset
-     * @return mixed
      */
     public function __get($offset): mixed
     {
         return match ($offset) {
             'fields' => $this->data,
-            default => throw new InvalidArgumentException(sprintf('Unable to retrieve $%s value', $offset)),
+            default => throw new InvalidArgumentException(\sprintf('Unable to retrieve $%s value', $offset)),
         };
     }
 

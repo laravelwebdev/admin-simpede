@@ -13,7 +13,7 @@ use Laravel\Nova\Nova;
 use Laravel\Nova\Util;
 use Throwable;
 
-use function Orchestra\Sidekick\Eloquent\normalize_value;
+use function Orchestra\Sidekick\Eloquent\model_state;
 
 /**
  * @property \Illuminate\Database\Eloquent\Model $target
@@ -86,6 +86,8 @@ class ActionEvent extends Model
      */
     public static function forResourceCreate($user, $model)
     {
+        [$original, $changes] = model_state($model);
+
         return new static([
             'batch_id' => (string) Str::orderedUuid(),
             'user_id' => $user->getAuthIdentifier(),
@@ -97,8 +99,8 @@ class ActionEvent extends Model
             'model_type' => $model->getMorphClass(),
             'model_id' => $model->getKey(),
             'fields' => '',
-            'original' => null,
-            'changes' => array_diff_key($model->attributesToArray(), array_flip($model->getHidden())),
+            'original' => $original,
+            'changes' => $changes,
             'status' => 'finished',
             'exception' => '',
         ]);
@@ -113,6 +115,8 @@ class ActionEvent extends Model
      */
     public static function forResourceUpdate($user, $model)
     {
+        [$original, $changes] = model_state($model);
+
         return new static([
             'batch_id' => (string) Str::orderedUuid(),
             'user_id' => $user->getAuthIdentifier(),
@@ -124,12 +128,8 @@ class ActionEvent extends Model
             'model_type' => $model->getMorphClass(),
             'model_id' => $model->getKey(),
             'fields' => '',
-            'changes' => static::hydrateChangesPayload(
-                $changes = array_diff_key($model->getDirty(), array_flip($model->getHidden()))
-            ),
-            'original' => static::hydrateChangesPayload(
-                array_intersect_key($model->newInstance()->setRawAttributes($model->getRawOriginal())->attributesToArray(), $changes)
-            ),
+            'changes' => $changes,
+            'original' => $original,
             'status' => 'finished',
             'exception' => '',
         ]);
@@ -144,6 +144,8 @@ class ActionEvent extends Model
      */
     public static function forAttachedResource(NovaRequest $request, $parent, $pivot)
     {
+        [$original, $changes] = model_state($pivot);
+
         return new static([
             'batch_id' => (string) Str::orderedUuid(),
             'user_id' => Nova::user($request)->getAuthIdentifier(),
@@ -155,8 +157,8 @@ class ActionEvent extends Model
             'model_type' => $pivot->getMorphClass(),
             'model_id' => $pivot->getKey(),
             'fields' => '',
-            'original' => null,
-            'changes' => array_diff_key($pivot->attributesToArray(), $pivot->getHidden()),
+            'original' => $original,
+            'changes' => $changes,
             'status' => 'finished',
             'exception' => '',
         ]);
@@ -171,6 +173,8 @@ class ActionEvent extends Model
      */
     public static function forAttachedResourceUpdate(NovaRequest $request, $parent, $pivot)
     {
+        [$original, $changes] = model_state($pivot);
+
         return new static([
             'batch_id' => (string) Str::orderedUuid(),
             'user_id' => Nova::user($request)->getAuthIdentifier(),
@@ -182,12 +186,8 @@ class ActionEvent extends Model
             'model_type' => $pivot->getMorphClass(),
             'model_id' => $pivot->getKey(),
             'fields' => '',
-            'changes' => static::hydrateChangesPayload(
-                $changes = array_diff_key($pivot->getDirty(), array_flip($pivot->getHidden()))
-            ),
-            'original' => static::hydrateChangesPayload(
-                array_intersect_key($pivot->newInstance()->setRawAttributes($pivot->getRawOriginal())->attributesToArray(), $changes)
-            ),
+            'changes' => $changes,
+            'original' => $original,
             'status' => 'finished',
             'exception' => '',
         ]);
@@ -432,15 +432,5 @@ class ActionEvent extends Model
     public function getTable(): string
     {
         return 'action_events';
-    }
-
-    /**
-     * Hydrate the changes payuload.
-     */
-    protected static function hydrateChangesPayload(array $attributes): array
-    {
-        return collect($attributes)
-            ->transform(static fn ($value) => normalize_value($value))
-            ->all();
     }
 }

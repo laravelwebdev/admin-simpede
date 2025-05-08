@@ -13,6 +13,8 @@ use Laravel\Nova\Panel;
  * @phpstan-import-type TFields from \Laravel\Nova\Resource
  * @phpstan-import-type TPanelFields from \Laravel\Nova\Fields\FieldMergeValue
  *
+ * @phpstan-type TGroupFields iterable<int, TFields|\Laravel\Nova\Tabs\Tab>
+ *
  * @method static static make(\Stringable|string|null $name = null, callable|iterable $fields = [], ?string $attribute = null)
  */
 class TabsGroup extends Panel
@@ -31,6 +33,8 @@ class TabsGroup extends Panel
 
     /**
      * List of tabs.
+     *
+     * @var array<int, \Laravel\Nova\Tabs\Tab>
      */
     public array $tabs = [];
 
@@ -49,6 +53,8 @@ class TabsGroup extends Panel
      *
      * @param  \Stringable|string|null  $name
      * @param  (callable():(iterable))|iterable  $fields
+     *
+     * @phpstan-param (callable():(TGroupFields))|TGroupFields  $fields
      */
     public function __construct($name = null, callable|iterable $fields = [], ?string $attribute = null)
     {

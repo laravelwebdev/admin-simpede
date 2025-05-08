@@ -27,7 +27,7 @@ class UpdateUserPassword implements UpdatesUserPasswords
 
         Validator::make($input, [
             'current_password' => ['required', 'string', "current_password:{$userGuard}"],
-            'password' => $this->passwordRules(),
+            'password' => $this->passwordWithConfirmedRules(),
         ], [
             'current_password.current_password' => __('The provided password does not match your current password.'),
         ])->validate();

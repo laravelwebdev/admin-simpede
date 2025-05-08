@@ -57,12 +57,18 @@ trait ResolvesActions
                     ->authorizedToSeeOnIndex($request);
 
         if (model_exists($resource)) {
-            return $actions->withAuthorizedToRun($request, $resource)->values();
+            return $actions->withAuthorizedToRun($request, $resource)
+                ->each(static function ($action) use ($resource) {
+                    $action->resource = $resource;
+                })->values();
         }
 
         if (! \is_null($resources = $request->selectedResources())) {
             $resources->each(static function ($resource) use ($request, $actions) {
-                $actions->withAuthorizedToRun($request, $resource);
+                $actions->withAuthorizedToRun($request, $resource)
+                    ->each(static function ($action) use ($resource) {
+                        $action->resource = $resource;
+                    });
             });
 
             return $actions->values();
@@ -81,6 +87,9 @@ trait ResolvesActions
         return $this->resolveActions($request)
                     ->authorizedToSeeOnDetail($request)
                     ->withAuthorizedToRun($request, $this->resource)
+                    ->each(function ($action) {
+                        $action->resource = $this->resource;
+                    })
                     ->values();
     }
 
@@ -94,6 +103,9 @@ trait ResolvesActions
         return $this->resolveActions($request)
                     ->authorizedToSeeOnTableRow($request)
                     ->withAuthorizedToRun($request, $this->resource)
+                    ->each(function ($action) {
+                        $action->resource = $this->resource;
+                    })
                     ->values();
     }
 

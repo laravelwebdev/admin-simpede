@@ -4,7 +4,7 @@
     :errors="errors"
     :show-help-text="showHelpText"
     :full-width-content="fullWidthContent"
-    @focus-form-input="toggle"
+    @focus-form-input="toggleFromLabel"
   >
     <template #field>
       <Checkbox
@@ -52,6 +52,12 @@ export default {
      */
     fill(formData) {
       this.fillIfVisible(formData, this.fieldAttribute, this.trueValue)
+    },
+
+    toggleFromLabel() {
+      if (!this.currentlyIsReadonly) {
+        this.toggle()
+      }
     },
 
     toggle() {

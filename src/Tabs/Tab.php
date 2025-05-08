@@ -11,6 +11,7 @@ use Stringable;
 /**
  * @phpstan-import-type TFields from \Laravel\Nova\Resource
  * @phpstan-import-type TPanelFields from \Laravel\Nova\Fields\FieldMergeValue
+ * @phpstan-import-type TGroupFields from \Laravel\Nova\Tabs\TabsGroup
  *
  * @method static static make(\Stringable|string $name, callable|array $fields, ?string $attribute = null)
  */
@@ -59,7 +60,7 @@ class Tab extends FieldMergeValue implements JsonSerializable
      * @param  (callable():(iterable))|iterable  $fields
      * @return \Laravel\Nova\Tabs\TabsGroup
      *
-     * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
+     * @phpstan-param (callable():(TGroupFields))|TGroupFields $fields
      */
     public static function group($name = null, callable|iterable $fields = [], ?string $attribute = null)
     {

@@ -28,6 +28,7 @@ use ReflectionClass;
 use Stringable;
 
 /**
+ * @phpstan-type TModel \Illuminate\Database\Eloquent\Model
  * @phpstan-type TAuthoriseCallback \Closure(\Laravel\Nova\Http\Requests\NovaRequest):bool
  *
  * @phpstan-property TAuthoriseCallback|null $seeCallback
@@ -220,6 +221,13 @@ class Action implements JsonSerializable
      * @var (\Closure(\Laravel\Nova\Fields\ActionFields, \Illuminate\Support\Collection):(mixed))|null
      */
     public $handleCallback = null;
+
+    /**
+     * The underlying model resource instance.
+     *
+     * @var TModel|null
+     */
+    public $resource;
 
     /**
      * Create a new action using the given callback.
