@@ -6,9 +6,15 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Laravel\Nova\Contracts\FilterableField;
 use Laravel\Nova\Filters\Filter as BaseFilter;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Makeable;
 
+/**
+ * @method static static make(\Laravel\Nova\Contracts\FilterableField&\Laravel\Nova\Fields\Field $field)
+ */
 abstract class Filter extends BaseFilter
 {
+    use Makeable;
+
     /**
      * Construct a new filter.
      *

@@ -40,6 +40,9 @@ class ActionResource extends Resource
     public static $title = 'name';
 
     /** {@inheritDoc} */
+    public static $with = ['target', 'user'];
+
+    /** {@inheritDoc} */
     public static $globallySearchable = false;
 
     /** {@inheritDoc} */
