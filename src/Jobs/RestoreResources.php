@@ -31,6 +31,10 @@ class RestoreResources
         $this->request->chunks(150, function ($models) {
             /** @var \Illuminate\Database\Eloquent\Collection<array-key, \Illuminate\Database\Eloquent\Model> $models */
             $models->each(function ($model) {
+                if (! \is_null($this->resourceClass)) {
+                    $this->resourceClass::beforeRestore($this->request, $model);
+                }
+
                 /** @phpstan-ignore method.notFound */
                 $model->restore();
 

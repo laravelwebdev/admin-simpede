@@ -29,7 +29,7 @@ class CreationPivotFieldResource extends Resource
      */
     public function newResourceWith(ResourceCreateOrAttachRequest $request): NovaResource
     {
-        return tap($request->newResourceWith($request->findModel() ?? $request->model()), static function ($resource) use ($request) {
+        return tap($request->newResourceWith($request->findModel()), static function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
         });
     }

@@ -40,6 +40,10 @@ class ForceDeleteResources
                     $model->actions()->delete();
                 }
 
+                if (! \is_null($this->resourceClass)) {
+                    $this->resourceClass::beforeForceDelete($this->request, $model);
+                }
+
                 $model->forceDelete();
 
                 if (! \is_null($this->resourceClass)) {

@@ -6,6 +6,8 @@ use Illuminate\Routing\Controller;
 use Laravel\Nova\Contracts\PivotableField;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
+use function Orchestra\Sidekick\Eloquent\model_exists;
+
 class AttachableController extends Controller
 {
     /**
@@ -82,7 +84,7 @@ class AttachableController extends Controller
             if (
                 $request->first === 'true'
                 || $field->allowDuplicateRelations /** @phpstan-ignore property.notFound */
-                || \is_null($relatedModel = $request->findModel())
+                || ! model_exists($relatedModel = $request->findModel())
             ) {
                 return;
             }

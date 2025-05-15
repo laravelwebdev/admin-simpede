@@ -2,6 +2,7 @@
 
 namespace Laravel\Nova\Fields;
 
+use Closure;
 use InvalidArgumentException;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -55,7 +56,11 @@ trait Filterable
      */
     public function applyFilter(NovaRequest $request, $query, mixed $value): void
     {
-        \call_user_func($this->filterableCallback, $request, $query, $value, $this->filterableAttribute($request));
+        $callback = $this->filterableCallback instanceof Closure
+            ? Closure::bind($this->filterableCallback, $this)
+            : $this->filterableCallback;
+
+        \call_user_func($callback, $request, $query, $value, $this->filterableAttribute($request));
     }
 
     /**
@@ -79,12 +84,12 @@ trait Filterable
     /**
      * Define the default filterable callback.
      *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed):\Illuminate\Contracts\Database\Eloquent\Builder
+     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):\Illuminate\Contracts\Database\Eloquent\Builder
      */
     protected function defaultFilterableCallback()
     {
-        return function (NovaRequest $request, $query, $value) {
-            return $query->where($this->filterableAttribute($request), '=', $value);
+        return function (NovaRequest $request, $query, $value, $attribute) {
+            return $query->where($attribute, '=', $value);
         };
     }
 

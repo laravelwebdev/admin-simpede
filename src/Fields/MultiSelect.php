@@ -101,7 +101,7 @@ class MultiSelect extends Field implements FilterableField
      */
     protected function defaultFilterableCallback()
     {
-        return static function (NovaRequest $request, $query, $value, $attribute) {
+        return function (NovaRequest $request, $query, $value, $attribute) {
             return $query->whereJsonContains($attribute, $value);
         };
     }

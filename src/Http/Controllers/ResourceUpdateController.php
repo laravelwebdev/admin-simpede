@@ -49,6 +49,8 @@ class ResourceUpdateController extends Controller
                     });
                 });
 
+                $resource::beforeUpdate($request, $model);
+
                 if ($model->save() === false) {
                     throw new ResourceSaveCancelledException;
                 }

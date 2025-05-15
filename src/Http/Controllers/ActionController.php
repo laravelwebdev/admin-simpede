@@ -23,7 +23,7 @@ class ActionController extends Controller
         });
 
         $resource = $request->newResourceWith(
-            $request->findModel($resourceId) ?? $request->model()
+            $request->findModel($resourceId)
         );
 
         return response()->json(with([

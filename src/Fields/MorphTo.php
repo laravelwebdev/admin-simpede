@@ -546,7 +546,7 @@ class MorphTo extends Field implements FilterableField, RelatableField
                             ->mapWithKeys(static fn ($type) => [$type => $type::newModel()->getMorphClass()])
                             ->all();
 
-        return static function (NovaRequest $request, $query, $value, $attribute) use ($morphToTypes) {
+        return function (NovaRequest $request, $query, $value, $attribute) use ($morphToTypes) {
             $query->whereHasMorph(
                 $attribute,
                 ! empty($value) && isset($morphToTypes[$value]) ? $morphToTypes[$value] : $morphToTypes

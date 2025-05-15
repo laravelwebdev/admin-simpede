@@ -100,7 +100,7 @@ class Number extends Text
      */
     protected function defaultFilterableCallback()
     {
-        return static function (NovaRequest $request, $query, $value, $attribute) {
+        return function (NovaRequest $request, $query, $value, $attribute) {
             [$min, $max] = $value;
 
             if (! \is_null($min) && ! \is_null($max)) {

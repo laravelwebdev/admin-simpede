@@ -67,6 +67,11 @@ class PendingRouteRegistration
     public bool $withEmailVerification = false;
 
     /**
+     * Indicate if Nova should enable email enumeration.
+     */
+    public bool $withPasswordResetPreventsEmailEnumeration = false;
+
+    /**
      * The authentications middlewares.
      *
      * @var array<int, class-string|string>
@@ -127,9 +132,10 @@ class PendingRouteRegistration
      * @param  array<int, class-string|string>  $middleware
      * @return $this
      */
-    public function withPasswordResetRoutes(array $middleware = ['nova'])
+    public function withPasswordResetRoutes(array $middleware = ['nova'], bool $preventsEmailEnumeration = false)
     {
         $this->withPasswordReset = true;
+        $this->withPasswordResetPreventsEmailEnumeration = $preventsEmailEnumeration;
 
         $this->passwordResetMiddlewares = $middleware;
 
@@ -254,7 +260,10 @@ class PendingRouteRegistration
             return;
         }
 
-        $limiter = config('fortify.limiters.login');
+        $limiter = transform(
+            config('fortify.limiters.login'),
+            fn ($name) => Util::isThrottleRequestLimiter($name) ? $name : null,
+        );
 
         if (
             $this->withDefaultAuthentication === true
@@ -313,7 +322,11 @@ class PendingRouteRegistration
             return;
         }
 
-        $verificationLimiter = config('fortify.limiters.verification', '6,1');
+        $verificationLimiter = transform(
+            config('fortify.limiters.verification', '6,1'),
+            fn ($name) => Util::isThrottleRequestLimiter($name) ? $name : null,
+        );
+
         $middlewares = [...$this->authenticationMiddlewares, 'nova.auth'];
         $middlewaresWithLimiter = [...$middlewares, "throttle:{$verificationLimiter}"];
         $hasVerifyRoute = Route::has('verification.verify');
@@ -387,7 +400,11 @@ class PendingRouteRegistration
         }
 
         $guard = Util::userGuard();
-        $twoFactorLimiter = config('fortify.limiters.two-factor');
+
+        $twoFactorLimiter = transform(
+            config('fortify.limiters.two-factor'),
+            fn ($name) => Util::isThrottleRequestLimiter($name) ? $name : null,
+        );
 
         $middlewaresWithLimiter = array_filter([
             ...$this->authenticationMiddlewares,

@@ -84,6 +84,10 @@ class ResourceStoreController extends Controller
             abort_unless($relatedResource->authorizedToAdd($request, $model), 401);
         })->model()->{$request->viaRelationship}();
 
+        $resourceClass = $request->resource();
+
+        $resourceClass::beforeCreate($request, $model);
+
         if ($relation instanceof HasManyThrough) {
             return $model->save();
         }

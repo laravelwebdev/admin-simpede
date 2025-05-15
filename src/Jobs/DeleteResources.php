@@ -41,6 +41,10 @@ class DeleteResources
                     $model->actions()->delete();
                 }
 
+                if (! \is_null($this->resourceClass)) {
+                    $this->resourceClass::beforeDelete($this->request, $model);
+                }
+
                 $model->delete();
 
                 if (! \is_null($this->resourceClass)) {

@@ -17,18 +17,6 @@ trait FieldFilterable
     }
 
     /**
-     * Define the default filterable callback.
-     *
-     * @return callable(\Laravel\Nova\Http\Requests\NovaRequest, \Illuminate\Contracts\Database\Eloquent\Builder, mixed, string):\Illuminate\Contracts\Database\Eloquent\Builder
-     */
-    protected function defaultFilterableCallback()
-    {
-        return static function (NovaRequest $request, $query, $value, $attribute) {
-            return $query->where($attribute, '=', $value);
-        };
-    }
-
-    /**
      * Define filterable attribute.
      *
      * @return string

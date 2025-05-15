@@ -405,7 +405,7 @@ class BelongsTo extends Field implements FilterableField, RelatableField
      */
     protected function defaultFilterableCallback()
     {
-        return static function (NovaRequest $request, $query, $value, $attribute) {
+        return function (NovaRequest $request, $query, $value, $attribute) {
             $query->where($attribute, '=', $value);
         };
     }

@@ -5,13 +5,13 @@ namespace Laravel\Nova;
 use Closure;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Auth\StatefulGuard;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable as FortifyRedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Contracts\ConfirmPasswordViewResponse as ConfirmPasswordViewResponseContract;
 use Laravel\Fortify\Contracts\FailedPasswordConfirmationResponse as FailedPasswordConfirmationResponseContract;
+use Laravel\Fortify\Contracts\FailedPasswordResetLinkRequestResponse as FailedPasswordResetLinkRequestResponseContract;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\LoginViewResponse as LoginViewResponseContract;
 use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
@@ -20,6 +20,7 @@ use Laravel\Fortify\Contracts\PasswordUpdateResponse as PasswordUpdateResponseCo
 use Laravel\Fortify\Contracts\RequestPasswordResetLinkViewResponse as RequestPasswordResetLinkViewResponseContract;
 use Laravel\Fortify\Contracts\ResetPasswordViewResponse as ResetPasswordViewResponseContract;
 use Laravel\Fortify\Contracts\ResetsUserPasswords as ResetsUserPasswordsContract;
+use Laravel\Fortify\Contracts\SuccessfulPasswordResetLinkRequestResponse as SuccessfulPasswordResetLinkRequestResponseContract;
 use Laravel\Fortify\Contracts\TwoFactorChallengeViewResponse as TwoFactorChallengeViewResponseContract;
 use Laravel\Fortify\Contracts\TwoFactorLoginResponse as TwoFactorLoginResponseContract;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords as UpdatesUserPasswordsContract;
@@ -29,6 +30,7 @@ use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Http\Responses\RedirectAsIntended;
 use Laravel\Nova\Auth\Actions\ConfirmPasswordViewResponse;
 use Laravel\Nova\Auth\Actions\FailedPasswordConfirmationResponse;
+use Laravel\Nova\Auth\Actions\FailedPasswordResetLinkRequestResponse;
 use Laravel\Nova\Auth\Actions\LoginResponse;
 use Laravel\Nova\Auth\Actions\LoginViewResponse;
 use Laravel\Nova\Auth\Actions\LogoutResponse;
@@ -39,6 +41,7 @@ use Laravel\Nova\Auth\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Nova\Auth\Actions\RequestPasswordResetLinkViewResponse;
 use Laravel\Nova\Auth\Actions\ResetPasswordViewResponse;
 use Laravel\Nova\Auth\Actions\ResetUserPassword;
+use Laravel\Nova\Auth\Actions\SuccessfulPasswordResetLinkRequestResponse;
 use Laravel\Nova\Auth\Actions\TwoFactorChallengeViewResponse;
 use Laravel\Nova\Auth\Actions\TwoFactorLoginResponse;
 use Laravel\Nova\Auth\Actions\UpdateUserPassword;
@@ -378,6 +381,11 @@ class PendingFortifyConfiguration
             }
 
             if ($routes->withPasswordReset === true) {
+                if ($routes->withPasswordResetPreventsEmailEnumeration === true) {
+                    $app->scoped(SuccessfulPasswordResetLinkRequestResponseContract::class, SuccessfulPasswordResetLinkRequestResponse::class);
+                    $app->scoped(FailedPasswordResetLinkRequestResponseContract::class, FailedPasswordResetLinkRequestResponse::class);
+                }
+
                 $app->scoped(ResetPasswordViewResponseContract::class, ResetPasswordViewResponse::class);
                 $app->scoped(RequestPasswordResetLinkViewResponseContract::class, RequestPasswordResetLinkViewResponse::class);
                 $app->scoped(ResetsUserPasswordsContract::class, ResetUserPassword::class);

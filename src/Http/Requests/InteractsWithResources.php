@@ -116,7 +116,7 @@ trait InteractsWithResources
      * Find the model instance for the request.
      *
      * @param  string|int|null  $resourceId
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function findModel($resourceId = null)
     {

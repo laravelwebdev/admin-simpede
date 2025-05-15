@@ -172,7 +172,7 @@ class BooleanGroup extends Field implements FilterableField
      */
     protected function defaultFilterableCallback()
     {
-        return static function (NovaRequest $request, $query, $value, $attribute) {
+        return function (NovaRequest $request, $query, $value, $attribute) {
             $value = collect($value)
                 ->reject(static fn ($value) => \is_null($value))
                 ->all();

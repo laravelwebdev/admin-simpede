@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -43,6 +44,16 @@ class Util
             'nova-api/*',
             'nova-vendor/*',
         ]);
+    }
+
+    /**
+     * Determine if given limiter can be used to throttle the request.
+     */
+    public static function isThrottleRequestLimiter(mixed $limiter): bool
+    {
+        $name = \Orchestra\Sidekick\enum_value($limiter);
+
+        return str_contains($name, ',') || ! \is_null(RateLimiter::limiter($name));
     }
 
     /**
