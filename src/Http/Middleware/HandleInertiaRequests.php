@@ -4,7 +4,6 @@ namespace Laravel\Nova\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Inertia\Inertia;
 use Inertia\Middleware;

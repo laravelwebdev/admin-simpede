@@ -4,7 +4,6 @@ namespace Laravel\Nova\Auth\Actions;
 
 use Illuminate\Http\JsonResponse;
 use Laravel\Fortify\Contracts\LogoutResponse as Responsable;
-use Laravel\Nova\Nova;
 
 class LogoutResponse implements Responsable
 {

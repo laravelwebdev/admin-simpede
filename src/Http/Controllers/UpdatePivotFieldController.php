@@ -31,7 +31,7 @@ class UpdatePivotFieldController extends Controller
                 return $request->query('field') === $field->attribute &&
                         $request->query('component') === $field->dependentComponentKey();
             })->applyDependsOn($request)
-            ->first()
+                ->first()
         );
     }
 }

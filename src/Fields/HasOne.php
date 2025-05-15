@@ -121,16 +121,16 @@ class HasOne extends Field implements BehavesAsPanel, RelatableField
 
             if ($this->ofManyRelationship === false && $request->viaRelationship === $this->attribute && $request->viaResourceId) {
                 $parent = $parentResource::newModel()
-                            ->with($this->attribute)
-                            ->find($request->viaResourceId);
+                    ->with($this->attribute)
+                    ->find($request->viaResourceId);
 
                 return model_exists($parent->{$this->attribute});
             }
 
             return false;
         })->showOnCreating(static fn ($request) => ! \in_array($request->relationshipType, ['hasOne', 'morphOne']))
-        ->showOnUpdating(static fn ($request) => ! \in_array($request->relationshipType, ['hasOne', 'morphOne']))
-        ->nullable();
+            ->showOnUpdating(static fn ($request) => ! \in_array($request->relationshipType, ['hasOne', 'morphOne']))
+            ->nullable();
     }
 
     /**
