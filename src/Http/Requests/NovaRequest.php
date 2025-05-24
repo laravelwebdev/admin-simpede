@@ -57,6 +57,15 @@ class NovaRequest extends FormRequest
         return $request;
     }
 
+    /** {@inheritDoc} */
+    #[\Override]
+    public function user($guard = null)
+    {
+        $guard ??= config('nova.guard');
+
+        return parent::user($guard);
+    }
+
     /**
      * Determine if this request is an inline create or attach request.
      */

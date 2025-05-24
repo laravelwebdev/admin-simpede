@@ -12,9 +12,12 @@ class NotificationReadController extends Controller
     /**
      * Mark the given notification as read.
      */
-    public function __invoke(NotificationRequest $request): JsonResponse
+    public function __invoke(NotificationRequest $request, string|int $notification): JsonResponse
     {
-        $notification = Notification::findOrFail($request->notification);
+        $notification = Notification::query()
+            ->whereNotifiableId($request->user()->getKey())
+            ->findOrFail($notification);
+
         $notification->update(['read_at' => now()]);
 
         return response()->json();

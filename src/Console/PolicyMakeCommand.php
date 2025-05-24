@@ -123,6 +123,17 @@ class PolicyMakeCommand extends \Illuminate\Foundation\Console\PolicyMakeCommand
 
     /** {@inheritDoc} */
     #[\Override]
+    protected function resolveStubPath($stub)
+    {
+        if (file_exists($customPath = $this->laravel->basePath('/stubs/nova/policy.stub'))) {
+            return $customPath;
+        }
+
+        return parent::resolveStubPath($stub);
+    }
+
+    /** {@inheritDoc} */
+    #[\Override]
     protected function userProviderModel()
     {
         return Util::userModel();
