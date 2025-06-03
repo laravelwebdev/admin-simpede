@@ -121,13 +121,13 @@ class ActionRequest extends NovaRequest
     public function toQueryWithoutScopes(): Builder
     {
         return tap($this->newQueryWithoutScopes(), function ($query) {
-            $resource = $this->resource();
-            $query->with($resource::$with);
+            $resourceClass = $this->resource();
+            $query->with($resourceClass::$with);
 
             if (! $this->allResourcesSelected() && $this->selectedResourceIds()->count() === 1) {
-                $resource::detailQuery($this, $query);
+                $resourceClass::detailQuery($this, $query);
             } else {
-                $resource::indexQuery($this, $query);
+                $resourceClass::indexQuery($this, $query);
             }
         });
     }

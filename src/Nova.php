@@ -133,7 +133,7 @@ class Nova
     /**
      * The callback used to sort Nova resources in the sidebar.
      *
-     * @var (callable(string):(mixed))|null
+     * @var (callable(class-string<\Laravel\Nova\Resource>):(mixed))|null
      */
     public static $sortCallback = null;
 
@@ -335,12 +335,12 @@ class Nova
     /**
      * Get the sorting strategy to use for Nova resources.
      *
-     * @return callable(string):mixed
+     * @return callable(class-string<\Laravel\Nova\Resource>):mixed
      */
     public static function sortResourcesWith(): callable
     {
-        return static::$sortCallback ?? static function ($resource) {
-            return $resource::label();
+        return static::$sortCallback ?? static function ($resourceClass) {
+            return $resourceClass::label();
         };
     }
 
@@ -466,11 +466,11 @@ class Nova
      */
     public static function newResourceFromModel($model): Resource
     {
-        if (\is_null($resource = static::resourceForModel($model))) {
+        if (\is_null($resourceClass = static::resourceForModel($model))) {
             throw new ResourceMissingException($model);
         }
 
-        return new $resource($model);
+        return new $resourceClass($model);
     }
 
     /**
@@ -503,8 +503,8 @@ class Nova
      */
     public static function resourceInstanceForKey(?string $key): ?Resource
     {
-        if ($resource = static::resourceForKey($key)) {
-            return new $resource($resource::newModel());
+        if ($resourceClass = static::resourceForKey($key)) {
+            return $resourceClass::newResource();
         }
 
         return null;
@@ -518,7 +518,7 @@ class Nova
     public static function resourceForKey(?string $key): ?string
     {
         return static::resourceCollection()->first(
-            static fn ($value) => $value::uriKey() === $key
+            static fn ($resourceClass) => $resourceClass::uriKey() === $key
         );
     }
 
@@ -991,24 +991,24 @@ class Nova
      */
     public static function resourceInformation(Request $request): array
     {
-        return static::resourceCollection()->map(static function ($resource) use ($request) {
-            /** @var class-string<\Laravel\Nova\Resource> $resource */
+        return static::resourceCollection()->map(static function ($resourceClass) use ($request) {
+            /** @var class-string<\Laravel\Nova\Resource> $resourceClass */
             return array_merge([
-                'uriKey' => $resource::uriKey(),
-                'label' => $resource::label(),
-                'singularLabel' => $resource::singularLabel(),
-                'createButtonLabel' => $resource::createButtonLabel(),
-                'updateButtonLabel' => $resource::updateButtonLabel(),
-                'authorizedToCreate' => $resource::authorizedToCreate($request),
-                'searchable' => $resource::searchable(),
-                'tableStyle' => $resource::tableStyle(),
-                'showColumnBorders' => $resource::showColumnBorders(),
-                'debounce' => $resource::$debounce * 1000,
-                'clickAction' => $resource::clickAction(),
+                'uriKey' => $resourceClass::uriKey(),
+                'label' => $resourceClass::label(),
+                'singularLabel' => $resourceClass::singularLabel(),
+                'createButtonLabel' => $resourceClass::createButtonLabel(),
+                'updateButtonLabel' => $resourceClass::updateButtonLabel(),
+                'authorizedToCreate' => $resourceClass::authorizedToCreate($request),
+                'searchable' => $resourceClass::searchable(),
+                'tableStyle' => $resourceClass::tableStyle(),
+                'showColumnBorders' => $resourceClass::showColumnBorders(),
+                'debounce' => $resourceClass::$debounce * 1000,
+                'clickAction' => $resourceClass::clickAction(),
 
                 /** @deprecated */
-                'perPageOptions' => $resource::perPageOptions(),
-            ], $resource::additionalInformation($request));
+                'perPageOptions' => $resourceClass::perPageOptions(),
+            ], $resourceClass::additionalInformation($request));
         })->values()->all();
     }
 
@@ -1031,7 +1031,7 @@ class Nova
     /**
      * Register the callback used to sort Nova resources in the sidebar.
      *
-     * @param  callable(string):mixed  $callback
+     * @param  callable(class-string<\Laravel\Nova\Resource>):mixed  $callback
      */
     public static function sortResourcesBy(callable $callback): static
     {

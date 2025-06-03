@@ -36,8 +36,8 @@ class UpdateViewResource extends Resource
     {
         return $request->newResourceWith(
             tap($request->findModelQuery(), static function ($query) use ($request) {
-                $resource = $request->resource();
-                $resource::editQuery($request, $query);
+                $resourceClass = $request->resource();
+                $resourceClass::editQuery($request, $query);
             })->firstOrFail()
         );
     }

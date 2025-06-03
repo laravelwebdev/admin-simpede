@@ -30,18 +30,18 @@ class AttachedResourceUpdateController extends Controller
      */
     public function __invoke(NovaRequest $request): mixed
     {
-        $resource = $request->resource();
+        $resourceClass = $request->resource();
 
         $model = $request->findModelOrFail();
 
-        tap(new $resource($model), static function ($resource) use ($request) {
+        tap(new $resourceClass($model), static function ($resource) use ($request) {
             abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
         });
 
-        $this->validate($request, $model, $resource);
+        $this->validate($request, $model, $resourceClass);
 
         try {
-            return DB::connection($model->getConnectionName())->transaction(function () use ($request, $resource, $model) {
+            return DB::connection($model->getConnectionName())->transaction(function () use ($request, $resourceClass, $model) {
                 $model->setRelation(
                     $model->{$request->viaRelationship}()->getPivotAccessor(),
                     $pivot = $this->findPivot($request, $model)
@@ -51,7 +51,7 @@ class AttachedResourceUpdateController extends Controller
                     return response('', 409);
                 }
 
-                [$pivot, $callbacks] = $resource::fillPivotForUpdate($request, $model, $pivot);
+                [$pivot, $callbacks] = $resourceClass::fillPivotForUpdate($request, $model, $pivot);
 
                 DB::transaction(function () use ($request, $model, $pivot) {
                     Nova::usingActionEvent(function (ActionEvent $actionEvent) use ($request, $model, $pivot) {

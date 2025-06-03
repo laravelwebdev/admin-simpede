@@ -22,7 +22,7 @@ class ResourceCollection extends Collection
     {
         /** @phpstan-ignore return.type */
         return $this->filter(
-            static fn ($resource) => $resource::authorizedToViewAny($request)
+            static fn ($resourceClass) => $resourceClass::authorizedToViewAny($request)
         );
     }
 
@@ -35,7 +35,7 @@ class ResourceCollection extends Collection
     {
         /** @phpstan-ignore return.type */
         return $this->filter(
-            static fn ($resource) => $resource::availableForNavigation($request)
+            static fn ($resourceClass) => $resourceClass::availableForNavigation($request)
         );
     }
 
@@ -48,7 +48,7 @@ class ResourceCollection extends Collection
     {
         /** @phpstan-ignore return.type */
         return $this->filter(
-            static fn ($resource) => $resource::$globallySearchable
+            static fn ($resourceClass) => $resourceClass::$globallySearchable
         );
     }
 
@@ -74,7 +74,7 @@ class ResourceCollection extends Collection
     {
         /** @phpstan-ignore return.type */
         return $this->groupBy(
-            static fn ($resource, $key) => (string) $resource::group()
+            static fn ($resourceClass, $key) => (string) $resourceClass::group()
         )->toBase()->sortKeys();
     }
 

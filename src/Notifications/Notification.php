@@ -4,8 +4,10 @@ namespace Laravel\Nova\Notifications;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Notification extends Model
 {
@@ -65,5 +67,32 @@ class Notification extends Model
     public function scopeUnread(Builder $query): Builder
     {
         return $query->whereNull('read_at');
+    }
+
+    /**
+     * Scope a query to only include current authenticated user.
+     */
+    public function scopeCurrentUser(Builder $query): Builder
+    {
+        return $this->scopeCurrentUserFromRequest($query, app(NovaRequest::class));
+    }
+
+    /**
+     * Scope a query to only include current authenticated user from request.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function scopeCurrentUserFromRequest(Builder $query, NovaRequest $request): Builder
+    {
+        $user = $request->user();
+
+        if (\is_null($user)) {
+            throw (new ModelNotFoundException)->setModel(static::class);
+        }
+
+        return $query->where(function ($query) use ($user) {
+            return $query->where('notifiable_type', $user->getMorphClass())
+                ->where('notifiable_id', $user->getKey());
+        });
     }
 }

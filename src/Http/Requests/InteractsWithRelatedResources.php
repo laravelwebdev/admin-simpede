@@ -163,9 +163,9 @@ trait InteractsWithRelatedResources
      */
     public function newRelatedResource(): Resource
     {
-        $resource = $this->relatedResource();
+        $resourceClass = $this->relatedResource();
 
-        return new $resource($resource::newModel());
+        return $resourceClass::newResource();
     }
 
     /**
@@ -185,9 +185,9 @@ trait InteractsWithRelatedResources
      */
     public function newViaResource(): Resource
     {
-        $resource = $this->viaResource();
+        $resourceClass = $this->viaResource();
 
-        return new $resource($resource::newModel());
+        return $resourceClass::newResource();
     }
 
     /**

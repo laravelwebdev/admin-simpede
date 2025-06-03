@@ -75,6 +75,10 @@ class ResourceStoreController extends Controller
      */
     protected function storeResource(CreateResourceRequest $request, $model): bool
     {
+        $resourceClass = $request->resource();
+
+        $resourceClass::beforeCreate($request, $model);
+
         if (! $request->viaRelationship()) {
             return $model->save();
         }
@@ -83,10 +87,6 @@ class ResourceStoreController extends Controller
             abort_unless($relatedResource->hasRelatableField($request, $request->viaRelationship), 404);
             abort_unless($relatedResource->authorizedToAdd($request, $model), 401);
         })->model()->{$request->viaRelationship}();
-
-        $resourceClass = $request->resource();
-
-        $resourceClass::beforeCreate($request, $model);
 
         if ($relation instanceof HasManyThrough) {
             return $model->save();

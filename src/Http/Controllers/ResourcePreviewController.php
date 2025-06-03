@@ -14,8 +14,8 @@ class ResourcePreviewController extends Controller
     public function __invoke(ResourcePreviewRequest $request): JsonResponse
     {
         $resource = $request->newResourceWith(tap($request->findModelQuery(), static function ($query) use ($request) {
-            $resource = $request->resource();
-            $resource::detailQuery($request, $query);
+            $resourceClass = $request->resource();
+            $resourceClass::detailQuery($request, $query);
         })->firstOrFail());
 
         $resource->authorizeToView($request);

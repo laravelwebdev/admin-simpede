@@ -17,18 +17,18 @@ class ResourceSearchController extends Controller
      */
     public function __invoke(ResourceSearchRequest $request): JsonResponse
     {
-        $resource = $request->resource();
+        $resourceClass = $request->resource();
 
         $withTrashed = $this->shouldIncludeTrashed(
-            $request, $resource
+            $request, $resourceClass
         );
 
         return response()->json([
             'resources' => $request->searchIndex()
-                ->mapInto($resource)
-                ->map(fn ($resource) => $this->transformResult($request, $resource))
+                ->mapInto($resourceClass)
+                ->map(fn ($resourceClass) => $this->transformResult($request, $resourceClass))
                 ->values(),
-            'softDeletes' => $resource::softDeletes(),
+            'softDeletes' => $resourceClass::softDeletes(),
             'withTrashed' => $withTrashed,
         ]);
     }

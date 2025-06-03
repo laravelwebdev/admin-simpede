@@ -13,8 +13,8 @@ class SoftDeleteStatusController extends Controller
      */
     public function __invoke(NovaRequest $request): JsonResponse
     {
-        $resource = $request->resource();
+        $resourceClass = $request->resource();
 
-        return response()->json(['softDeletes' => $resource::softDeletes()]);
+        return response()->json(['softDeletes' => $resourceClass::softDeletes()]);
     }
 }

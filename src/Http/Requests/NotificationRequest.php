@@ -17,7 +17,8 @@ class NotificationRequest extends NovaRequest
     public function notifications(): AnonymousResourceCollection
     {
         return NotificationResource::collection(
-            Notification::whereNotifiableId($this->user()->getKey())
+            Notification::query()
+                ->currentUserFromRequest($this)
                 ->latest()
                 ->take(100)
                 ->get()
@@ -30,7 +31,7 @@ class NotificationRequest extends NovaRequest
     public function markAsRead(): void
     {
         Notification::unread()
-            ->whereNotifiableId($this->user()->getKey())
+            ->currentUserFromRequest($this)
             ->update(['read_at' => now()]);
     }
 
@@ -40,7 +41,7 @@ class NotificationRequest extends NovaRequest
     public function unreadCount(): int
     {
         return Notification::unread()
-            ->whereNotifiableId($this->user()->getKey())
+            ->currentUserFromRequest($this)
             ->count();
     }
 }

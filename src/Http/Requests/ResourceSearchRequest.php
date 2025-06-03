@@ -14,14 +14,14 @@ class ResourceSearchRequest extends NovaRequest
      */
     public function searchIndex(): Collection
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
         $model = $this->model();
 
-        $limit = $resource::usesScout()
-            ? $resource::$scoutSearchResults
-            : $resource::$relatableSearchResults;
+        $limit = $resourceClass::usesScout()
+            ? $resourceClass::$scoutSearchResults
+            : $resourceClass::$relatableSearchResults;
 
-        $query = app()->make(QueryBuilder::class, [$resource]);
+        $query = app()->make(QueryBuilder::class, [$resourceClass]);
 
         $this->first === 'true'
             ? $query->whereKey($model->newQueryWithoutScopes(), $this->current)

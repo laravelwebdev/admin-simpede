@@ -42,8 +42,8 @@ class IndexViewResource extends Resource
      */
     public function authorizedResourceForRequest(ResourceIndexRequest $request): string
     {
-        return tap($request->resource(), static function ($resource) use ($request) {
-            abort_unless($resource::authorizedToViewAny($request), 403);
+        return tap($request->resource(), static function ($resourceClass) use ($request) {
+            abort_unless($resourceClass::authorizedToViewAny($request), 403);
         });
     }
 }

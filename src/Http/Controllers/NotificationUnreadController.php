@@ -15,7 +15,7 @@ class NotificationUnreadController extends Controller
     public function __invoke(NotificationRequest $request, string|int $notification): JsonResponse
     {
         $notification = Notification::query()
-            ->whereNotifiableId($request->user()->getKey())
+            ->currentUserFromRequest($request)
             ->findOrFail($notification);
 
         $notification->update(['read_at' => null]);

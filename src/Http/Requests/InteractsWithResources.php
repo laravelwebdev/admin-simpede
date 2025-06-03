@@ -36,9 +36,9 @@ trait InteractsWithResources
      */
     public function resourceSoftDeletes()
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
 
-        return $resource::softDeletes();
+        return $resourceClass::softDeletes();
     }
 
     /**
@@ -64,9 +64,9 @@ trait InteractsWithResources
      */
     public function newResource()
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
 
-        return new $resource($this->model());
+        return new $resourceClass($this->model());
     }
 
     /**
@@ -148,9 +148,9 @@ trait InteractsWithResources
      */
     public function newResourceWith($model)
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
 
-        return new $resource($model);
+        return new $resourceClass($model);
     }
 
     /**
@@ -180,8 +180,8 @@ trait InteractsWithResources
      */
     public function model()
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
 
-        return $resource::newModel();
+        return $resourceClass::newModel();
     }
 }

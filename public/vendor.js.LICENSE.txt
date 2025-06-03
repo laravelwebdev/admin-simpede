@@ -472,7 +472,7 @@
  */
 
 /*!
-* focus-trap 7.6.4
+* focus-trap 7.6.5
 * @license MIT, https://github.com/focus-trap/focus-trap/blob/master/LICENSE
 */
 
@@ -496,13 +496,13 @@
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
 /**
-* @vue/runtime-dom v3.5.14
+* @vue/runtime-dom v3.5.16
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 
 /**
-* @vue/shared v3.5.14
+* @vue/shared v3.5.16
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/

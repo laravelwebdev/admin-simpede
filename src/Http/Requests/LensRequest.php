@@ -103,12 +103,12 @@ class LensRequest extends NovaRequest
      */
     public function toResources(Collection $models): Collection
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
 
-        return $models->map(function ($model) use ($resource) {
+        return $models->map(function ($model) use ($resourceClass) {
             $lensResource = $this->lens()->setResource($model);
 
-            return transform((new $resource($model))->serializeForIndex(
+            return transform((new $resourceClass($model))->serializeForIndex(
                 $this, $lensResource->resolveFields($this)
             ), function ($payload) use ($model, $lensResource) {
                 $hasId = ! \is_null($payload['id']->value);

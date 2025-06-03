@@ -18,9 +18,7 @@ class DispatchServingNovaEvent
      */
     public function handle($request, $next)
     {
-        $preventsAccessingMissingAttributes = method_exists(Model::class, 'preventsAccessingMissingAttributes')
-            ? Model::preventsAccessingMissingAttributes()
-            : null;
+        $preventsAccessingMissingAttributes = Model::preventsAccessingMissingAttributes();
 
         if ($preventsAccessingMissingAttributes === true) {
             Model::preventAccessingMissingAttributes(false);

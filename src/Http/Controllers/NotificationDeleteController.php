@@ -14,9 +14,9 @@ class NotificationDeleteController extends Controller
      */
     public function __invoke(NotificationRequest $request, string|int $notification): JsonResponse
     {
-        $notification = Notification::whereNotifiableId(
-            $request->user()->getKey()
-        )->findOrFail($notification);
+        $notification = Notification::query()
+            ->currentUserFromRequest($request)
+            ->findOrFail($notification);
 
         $notification->update(['read_at' => now()]);
         $notification->delete();

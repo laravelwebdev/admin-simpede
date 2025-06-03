@@ -13,7 +13,7 @@ class RelatableAuthorizationController extends Controller
     public function __invoke(NovaRequest $request): array
     {
         $parentResource = $request->findParentResourceOrFail();
-        $resource = $request->resource();
+        $resourceClass = $request->resource();
 
         if ($request->viaManyToMany()) {
             return ['authorized' => $parentResource->authorizedToAttachAny(
@@ -23,6 +23,6 @@ class RelatableAuthorizationController extends Controller
 
         return ['authorized' => $parentResource->authorizedToAdd(
             $request, $request->model()
-        ) && $resource::authorizedToCreate($request)];
+        ) && $resourceClass::authorizedToCreate($request)];
     }
 }

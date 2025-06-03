@@ -230,6 +230,39 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     }
 
     /**
+     * Return a fresh resource instance.
+     *
+     * @return static<TModel>
+     */
+    public static function newResource()
+    {
+        return new static(static::newModel());
+    }
+
+    /**
+     * Get a fresh instance of the model represented by the resource.
+     *
+     * @return TModel
+     */
+    public static function newModel()
+    {
+        /** @var TModel $model */
+        $model = static::$model;
+
+        return new $model(static::defaultAttributes());
+    }
+
+    /**
+     * Get the default attributes for the model represented by the resource.
+     *
+     * @return array<string, mixed>
+     */
+    public static function defaultAttributes()
+    {
+        return [];
+    }
+
+    /**
      * Get the fields displayed by the resource.
      *
      * @return array
@@ -411,29 +444,6 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     public static function updateButtonLabel()
     {
         return Nova::__('Update :resource', ['resource' => static::singularLabel()]);
-    }
-
-    /**
-     * Get a fresh instance of the model represented by the resource.
-     *
-     * @return TModel
-     */
-    public static function newModel()
-    {
-        /** @var TModel $model */
-        $model = static::$model;
-
-        return new $model(static::defaultAttributes());
-    }
-
-    /**
-     * Get the default attributes for the model represented by the resource.
-     *
-     * @return array<string, mixed>
-     */
-    public static function defaultAttributes()
-    {
-        return [];
     }
 
     /**
@@ -715,16 +725,6 @@ abstract class Resource implements ArrayAccess, JsonSerializable, UrlRoutable
     public static function clickAction()
     {
         return static::$clickAction;
-    }
-
-    /**
-     * Return a fresh resource instance.
-     *
-     * @return static
-     */
-    protected static function newResource()
-    {
-        return new static(static::newModel());
     }
 
     /**

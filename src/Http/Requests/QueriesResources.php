@@ -14,9 +14,9 @@ trait QueriesResources
      */
     public function toQuery(): Builder
     {
-        $resource = $this->resource();
+        $resourceClass = $this->resource();
 
-        return $resource::buildIndexQuery(
+        return $resourceClass::buildIndexQuery(
             $this, $this->newQuery(), $this->search,
             $this->filters()->all(), $this->orderings(), $this->trashed()
         );

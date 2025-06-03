@@ -14,11 +14,9 @@ class NotificationDeleteAllController extends Controller
      */
     public function __invoke(NotificationRequest $request): JsonResponse
     {
-        dispatch(static function () use ($request) {
-            Notification::whereNotifiableId(
-                $request->user()->getKey()
-            )->delete();
-        })->afterResponse();
+        Notification::query()
+            ->currentUserFromRequest($request)
+            ->delete();
 
         return response()->json();
     }
