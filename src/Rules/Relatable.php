@@ -36,7 +36,7 @@ class Relatable implements Rule
         $model = $this->query->tap(static function ($query) {
             tap($query->getQuery(), static function ($builder) {
                 /** @var \Illuminate\Database\Query\Builder $builder */
-                $builder->orders = [];
+                $builder->reorder();
 
                 $builder->select(
                     ! empty($builder->joins) ? $builder->from.'.*' : '*'

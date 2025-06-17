@@ -129,7 +129,7 @@ trait InteractsWithResources
      * Get the query to find the model instance for the request.
      *
      * @param  mixed|null  $resourceId
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Contracts\Database\Eloquent\Builder
      */
     public function findModelQuery($resourceId = null)
     {
