@@ -33,19 +33,20 @@
     </Heading>
 
     <template v-if="!shouldBeCollapsed">
-      <div class="flex gap-2 mb-6">
+      <div
+        class="flex gap-2"
+        :class="{
+          'mb-6': hasResourceSearch || hasResourceActionControls,
+        }"
+      >
         <IndexSearchInput
-          v-if="resourceInformation && resourceInformation.searchable"
-          :searchable="resourceInformation && resourceInformation.searchable"
+          v-if="hasResourceSearch"
+          :searchable="hasResourceSearch"
           v-model="search"
         />
 
         <div
-          v-if="
-            availableStandaloneActions.length > 0 ||
-            authorizedToCreate ||
-            authorizedToRelate
-          "
+          v-if="hasResourceActionControls"
           class="inline-flex items-center gap-2 ml-auto"
         >
           <!-- Action Dropdown -->
@@ -619,6 +620,20 @@ export default {
           }
         }
       }
+    },
+
+    hasResourceSearch() {
+      return Boolean(
+        this.resourceInformation && this.resourceInformation.searchable
+      )
+    },
+
+    hasResourceActionControls() {
+      return Boolean(
+        this.availableStandaloneActions.length > 0 ||
+          (this.relationshipType === '' && this.authorizedToCreate) ||
+          (this.relationshipType !== '' && this.authorizedToRelate)
+      )
     },
   },
 }

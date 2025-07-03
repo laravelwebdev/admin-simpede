@@ -84,7 +84,7 @@ class ResourceStoreController extends Controller
         }
 
         $relation = tap($request->findParentResourceOrFail(), static function ($relatedResource) use ($request, $model) {
-            abort_unless($relatedResource->hasRelatableField($request, $request->viaRelationship), 404);
+            abort_unless($relatedResource->hasRelatableFieldOrRelationship($request, $request->viaRelationship), 404);
             abort_unless($relatedResource->authorizedToAdd($request, $model), 401);
         })->model()->{$request->viaRelationship}();
 

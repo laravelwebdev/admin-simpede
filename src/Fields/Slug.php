@@ -93,13 +93,15 @@ class Slug extends Field implements Previewable
     {
         $request = app(NovaRequest::class);
 
+        $field = parent::jsonSerialize();
+
         $from = match (true) {
             $this->from instanceof Field => $this->from->attribute,
             ! empty($this->from) => str_replace(' ', '_', Str::lower((string) $this->from)),
             default => null,
         };
 
-        if (! \is_null($from) && $request->isUpdateOrUpdateAttachedRequest()) {
+        if (! \is_null($from) && $field['readonly'] === false && $request->isUpdateOrUpdateAttachedRequest()) {
             $this->immutable();
             $this->showCustomizeButton = true;
         }

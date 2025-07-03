@@ -28,7 +28,7 @@ class DetachResources
     public function handle(): void
     {
         $parent = tap($this->request->findParentResourceOrFail(), function ($resource) {
-            abort_unless($resource->hasRelatableField($this->request, $this->request->viaRelationship), 409);
+            abort_unless($resource->hasRelatableFieldOrRelationship($this->request, $this->request->viaRelationship), 409);
         })->model();
 
         $relation = $parent->{$this->request->viaRelationship}();

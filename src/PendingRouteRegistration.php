@@ -91,7 +91,7 @@ class PendingRouteRegistration
      * @param  array<int, class-string|string>  $middleware
      * @return $this
      */
-    public function withAuthenticationRoutes(array $middleware = ['nova'], bool $default = false)
+    public function withAuthenticationRoutes(array $middleware = ['nova:auth'], bool $default = false)
     {
         $this->withAuthentication = true;
 
@@ -114,7 +114,7 @@ class PendingRouteRegistration
     public function withoutAuthenticationRoutes(
         string|false $login = '/login',
         string|false $logout = '/logout',
-        array $middleware = ['nova']
+        array $middleware = ['nova:auth']
     ) {
         $this->authenticationMiddlewares = $middleware;
         $this->withAuthentication = false;
@@ -132,7 +132,7 @@ class PendingRouteRegistration
      * @param  array<int, class-string|string>  $middleware
      * @return $this
      */
-    public function withPasswordResetRoutes(array $middleware = ['nova'], bool $preventsEmailEnumeration = false)
+    public function withPasswordResetRoutes(array $middleware = ['nova:auth'], bool $preventsEmailEnumeration = false)
     {
         $this->withPasswordReset = true;
         $this->withPasswordResetPreventsEmailEnumeration = $preventsEmailEnumeration;
@@ -150,7 +150,7 @@ class PendingRouteRegistration
     public function withoutPasswordResetRoutes(
         string|false $forgotPassword = '/forgot-password',
         string|false $resetPassword = '/reset-password',
-        array $middleware = ['nova']
+        array $middleware = ['nova:auth']
     ) {
         $this->passwordResetMiddlewares = $middleware;
         $this->withPasswordReset = false;

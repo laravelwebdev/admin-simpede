@@ -3,6 +3,7 @@
 namespace Laravel\Nova;
 
 use Closure;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Actions\Actionable;
 use Laravel\Nova\Contracts\BehavesAsPanel;
@@ -22,6 +23,8 @@ use Laravel\Nova\Fields\MorphToMany;
 use Laravel\Nova\Fields\Unfillable;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Tabs\TabsGroup;
+use ReflectionMethod;
+use ReflectionNamedType;
 
 /**
  * @phpstan-import-type TFields from \Laravel\Nova\Resource
@@ -232,6 +235,18 @@ trait ResolvesFields
     public function hasRelatableField(NovaRequest $request, string $attribute): bool
     {
         return $this->relatableField($request, $attribute) !== null;
+    }
+
+    public function hasRelatableFieldOrRelationship(NovaRequest $request, string $attribute): bool
+    {
+        if ($this->hasRelatableField($request, $attribute)) {
+            return true;
+        }
+
+        $model = $this->model() ?? static::newModel();
+        $method = new ReflectionMethod($model, $attribute);
+
+        return $method->getReturnType() instanceof ReflectionNamedType && is_subclass_of($method->getReturnType()->getName(), Relation::class);
     }
 
     /**

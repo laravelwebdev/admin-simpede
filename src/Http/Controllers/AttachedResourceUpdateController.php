@@ -35,7 +35,7 @@ class AttachedResourceUpdateController extends Controller
         $model = $request->findModelOrFail();
 
         tap(new $resourceClass($model), static function ($resource) use ($request) {
-            abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
+            abort_unless($resource->hasRelatableFieldOrRelationship($request, $request->viaRelationship), 404);
         });
 
         $this->validate($request, $model, $resourceClass);

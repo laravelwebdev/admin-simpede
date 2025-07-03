@@ -16,7 +16,7 @@ class AttachableController extends Controller
     public function __invoke(NovaRequest $request): array
     {
         $field = $request->newResource()
-                    ->availableFields($request)
+                    ->availableFieldsOnIndexOrDetail($request)
                     ->filterForManyToManyRelations()
                     ->filter(static function ($field) use ($request) {
                         return $field->resourceName === $request->field && // @phpstan-ignore property.notFound

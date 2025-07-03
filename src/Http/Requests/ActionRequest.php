@@ -138,7 +138,7 @@ class ActionRequest extends NovaRequest
     protected function modelsViaRelationship(): Builder
     {
         $relation = tap($this->findParentResource(), function ($resource) {
-            abort_unless($resource->hasRelatableField($this, $this->viaRelationship), 404);
+            abort_unless($resource->hasRelatableFieldOrRelationship($this, $this->viaRelationship), 404);
         })->model()->{$this->viaRelationship}()->withoutGlobalScopes();
 
         if (isset($this->pivots) && ! empty($this->pivots)) {
@@ -269,7 +269,7 @@ class ActionRequest extends NovaRequest
     {
         if ($this->isPivotAction()) {
             return tap($this->newViaResource(), function ($resource) {
-                abort_unless($resource->hasRelatableField($this, $this->viaRelationship), 404);
+                abort_unless($resource->hasRelatableFieldOrRelationship($this, $this->viaRelationship), 404);
             })->model()->{$this->viaRelationship}();
         }
 

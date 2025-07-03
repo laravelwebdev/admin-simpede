@@ -67,7 +67,7 @@ class UpdatePivotFieldResource extends Resource
     public function authorizedResourceForRequest(ResourceUpdateOrUpdateAttachedRequest $request): NovaResource
     {
         return tap($request->findResourceOrFail(), static function ($resource) use ($request) {
-            abort_unless($resource->hasRelatableField($request, $request->viaRelationship), 404);
+            abort_unless($resource->hasRelatableFieldOrRelationship($request, $request->viaRelationship), 404);
         });
     }
 }

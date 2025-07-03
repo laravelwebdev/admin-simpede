@@ -16,7 +16,7 @@
           @keydown.enter="handleChangeOnPressingEnterEvent"
           @keydown="handleChangeOnKeyPressEvent"
           :id="field.uniqueKey"
-          :disabled="isImmutable"
+          :disabled="isReadonly"
           :readonly="isImmutable"
           class="w-full form-control form-input form-control-bordered"
           :dusk="field.attribute"

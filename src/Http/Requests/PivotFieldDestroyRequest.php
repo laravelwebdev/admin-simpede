@@ -38,7 +38,7 @@ class PivotFieldDestroyRequest extends NovaRequest
     {
         $resource = $this->findResourceOrFail();
 
-        abort_unless($resource->hasRelatableField($this, $this->viaRelationship), 404);
+        abort_unless($resource->hasRelatableFieldOrRelationship($this, $this->viaRelationship), 404);
 
         return Util::expectPivotModel(
             once(function () use ($resource) {
@@ -64,7 +64,7 @@ class PivotFieldDestroyRequest extends NovaRequest
     {
         $resource = $this->findResourceOrFail();
 
-        abort_unless($resource->hasRelatableField($this, $this->viaRelationship), 404);
+        abort_unless($resource->hasRelatableFieldOrRelationship($this, $this->viaRelationship), 404);
 
         return once(function () use ($resource, $resourceId) {
             return $resource->model()

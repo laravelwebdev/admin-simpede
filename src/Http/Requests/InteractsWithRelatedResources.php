@@ -141,7 +141,7 @@ trait InteractsWithRelatedResources
 
         $parent = $parentResource->model();
 
-        return ($parent && $parentResource->hasRelatableField($this, $this->viaRelationship))
+        return ($parent && $parentResource->hasRelatableFieldOrRelationship($this, $this->viaRelationship))
             ? class_basename($parent->{$this->viaRelationship}()->getPivotClass())
             : Resource::DEFAULT_PIVOT_NAME;
     }

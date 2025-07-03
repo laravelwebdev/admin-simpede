@@ -32,7 +32,7 @@ trait QueriesResources
             return $this->model()->newQuery();
         }
 
-        abort_unless($this->newViaResource()->hasRelatableField($this, $this->viaRelationship), 409);
+        abort_unless($this->newViaResource()->hasRelatableFieldOrRelationship($this, $this->viaRelationship), 409);
 
         /** @return \Illuminate\Database\Eloquent\Relations\Relation */
         return forward_static_call([$this->viaResource(), 'newModel'])
@@ -51,7 +51,7 @@ trait QueriesResources
             return $this->model()->newQueryWithoutScopes();
         }
 
-        abort_unless($this->newViaResource()->hasRelatableField($this, $this->viaRelationship), 409);
+        abort_unless($this->newViaResource()->hasRelatableFieldOrRelationship($this, $this->viaRelationship), 409);
 
         /** @return \Illuminate\Database\Eloquent\Relations\Relation */
         return forward_static_call([$this->viaResource(), 'newModel'])

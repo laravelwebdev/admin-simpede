@@ -23,6 +23,7 @@ use Laravel\Nova\Http\Middleware\BootTools;
 use Laravel\Nova\Http\Middleware\DispatchServingNovaEvent;
 use Laravel\Nova\Http\Middleware\RedirectIfAuthenticated;
 use Laravel\Nova\Http\Middleware\ServeNova;
+use Laravel\Nova\Http\MiddlewareCollection;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Listeners\BootNova;
 use Laravel\Nova\Query\Builder;
@@ -57,12 +58,13 @@ class NovaCoreServiceProvider extends ServiceProvider
             DispatchServingNovaEvent::class,
             BootTools::class,
         ]);
-        Route::middlewareGroup('nova', config('nova.middleware', []));
-        Route::middlewareGroup('nova:api', config('nova.api_middleware', []));
-        Route::middlewareGroup('nova:asset', config('nova.asset_middleware', [
+        MiddlewareCollection::make($middlewares = config('nova.middleware', []))->asMiddlewareGroup('nova');
+        MiddlewareCollection::make(config('nova.api_middleware', []))->asMiddlewareGroup('nova:api');
+        MiddlewareCollection::make(config('nova.asset_middleware', [
             'nova:api',
             CheckResponseForModifications::class,
-        ]));
+        ]))->asMiddlewareGroup('nova:asset');
+        MiddlewareCollection::make($middlewares)->appendsRedirectIfAuthenticatedMiddleware()->asMiddlewareGroup('nova:auth');
 
         $this->app->make(HttpKernel::class)
             ->pushMiddleware(ServeNova::class);
