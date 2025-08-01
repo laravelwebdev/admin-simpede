@@ -781,8 +781,8 @@ trait ResolvesFields
 
         $panels = $fieldsWithPanels->groupBy(static fn ($field) => (string) $field->panel)
             ->transform(static fn ($fields, $name) => match (true) {
-                $fields[0]->panel instanceof TabsGroup => TabsGroup::mutate($name, $fields),
-                default => Panel::mutate($name, $fields),
+                $fields[0]->panel instanceof TabsGroup => TabsGroup::mutate($name, $fields), // @phpstan-ignore argument.type
+                default => Panel::mutate($name, $fields),  // @phpstan-ignore argument.type
             })->toBase();
 
         if ($panels->where('component', 'tabs')->isNotEmpty()) {
@@ -801,7 +801,7 @@ trait ResolvesFields
                             $fields[] = $relation->meta['fields'][0];
                         });
 
-                    TabsGroup::hydrate($panel, $fields);
+                    TabsGroup::hydrate($panel, $fields); // @phpstan-ignore argument.type
                 }
 
                 return $panel;
@@ -809,7 +809,7 @@ trait ResolvesFields
         }
 
         return $this->panelsWithDefaultLabel(
-            $panels,
+            $panels, // @phpstan-ignore argument.type
             $defaultFields->values(),
             $label
         );

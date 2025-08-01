@@ -43,9 +43,10 @@ class Select extends Field implements FilterableField
      * Set the options for the select menu.
      *
      * @param  iterable<string|int, array<string, mixed>|string>|callable|class-string<\BackedEnum>  $options
-     * @return $this
      *
      * @phpstan-param TOption|(callable(): (TOption)) $options
+     *
+     * @return $this
      */
     public function options(iterable|callable|string $options)
     {

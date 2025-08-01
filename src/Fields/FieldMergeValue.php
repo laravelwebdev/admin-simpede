@@ -47,9 +47,10 @@ abstract class FieldMergeValue extends MergeValue
      * Prepare the given fields.
      *
      * @param  (callable():(iterable))|iterable  $fields
-     * @return array<int, TFields>
      *
      * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
+     *
+     * @return array<int, TFields>
      *
      * @phpstan-return TPanelFields
      */

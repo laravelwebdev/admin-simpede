@@ -47,9 +47,10 @@ class Menu implements JsonSerializable
      * Push items into the menu.
      *
      * @param  \JsonSerializable|iterable  $items
-     * @return $this
      *
      * @phpstan-param TMenu|iterable $items
+     *
+     * @return $this
      */
     public function push(MenuGroup|MenuItem|MenuList|MenuSection|iterable $items = [])
     {
@@ -60,9 +61,10 @@ class Menu implements JsonSerializable
      * Append items into the menu.
      *
      * @param  \JsonSerializable|iterable  $items
-     * @return $this
      *
      * @phpstan-param TMenu|iterable $items
+     *
+     * @return $this
      */
     public function append(MenuGroup|MenuItem|MenuList|MenuSection|iterable $items = [])
     {
@@ -75,9 +77,10 @@ class Menu implements JsonSerializable
      * Prepend items to the menu.
      *
      * @param  \JsonSerializable|iterable  $items
-     * @return $this
      *
      * @phpstan-param TMenu|iterable $items
+     *
+     * @return $this
      */
     public function prepend(MenuGroup|MenuItem|MenuList|MenuSection|iterable $items = [])
     {

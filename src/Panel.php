@@ -75,9 +75,10 @@ class Panel extends FieldMergeValue implements JsonSerializable, Stringable
      *
      * @param  \Stringable|string  $name
      * @param  (callable():(iterable))|iterable  $fields
-     * @return void
      *
      * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
+     *
+     * @return void
      */
     public function __construct($name, callable|iterable $fields = [], ?string $attribute = null)
     {
@@ -92,9 +93,10 @@ class Panel extends FieldMergeValue implements JsonSerializable, Stringable
      *
      * @param  \Stringable|string  $name
      * @param  (callable():(iterable))|iterable  $fields
-     * @return static
      *
      * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
+     *
+     * @return static
      */
     public static function makeDefault($name, callable|iterable $fields = [], ?string $attribute = null)
     {
@@ -106,9 +108,10 @@ class Panel extends FieldMergeValue implements JsonSerializable, Stringable
      *
      * @param  \Stringable|string  $name
      * @param  \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field>  $fields
-     * @return \Laravel\Nova\Panel
      *
      * @phpstan-param \Laravel\Nova\Fields\FieldCollection<int, TFields>  $fields
+     *
+     * @return \Laravel\Nova\Panel
      */
     public static function mutate($name, FieldCollection $fields)
     {

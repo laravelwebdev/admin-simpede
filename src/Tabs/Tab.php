@@ -58,9 +58,10 @@ class Tab extends FieldMergeValue implements JsonSerializable
      *
      * @param  \Stringable|string|null  $name
      * @param  (callable():(iterable))|iterable  $fields
-     * @return \Laravel\Nova\Tabs\TabsGroup
      *
      * @phpstan-param (callable():(TGroupFields))|TGroupFields $fields
+     *
+     * @return \Laravel\Nova\Tabs\TabsGroup
      */
     public static function group($name = null, callable|iterable $fields = [], ?string $attribute = null)
     {
@@ -73,9 +74,10 @@ class Tab extends FieldMergeValue implements JsonSerializable
      * @internal
      *
      * @param  (callable():(iterable))|iterable  $fields
-     * @return static
      *
      * @phpstan-param (callable():(TPanelFields))|TPanelFields $fields
+     *
+     * @return static
      */
     public static function mutate(self $tab, callable|iterable $fields)
     {

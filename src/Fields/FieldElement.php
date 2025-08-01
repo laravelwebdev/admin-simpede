@@ -118,9 +118,10 @@ abstract class FieldElement extends Element
      * Specify that the element should be visible on the index view.
      *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, mixed):(bool))|bool  $callback
-     * @return $this
      *
      * @phpstan-param (callable(\Laravel\Nova\Http\Requests\NovaRequest, TMixedResource):(bool))|bool  $callback
+     *
+     * @return $this
      */
     public function showOnIndex(callable|bool $callback = true)
     {
@@ -133,9 +134,10 @@ abstract class FieldElement extends Element
      * Specify that the element should be hidden from the detail view.
      *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest, mixed):(bool))|bool  $callback
-     * @return $this
      *
      * @phpstan-param (callable(\Laravel\Nova\Http\Requests\NovaRequest, TMixedResource):(bool))|bool  $callback
+     *
+     * @return $this
      */
     public function showOnDetail(callable|bool $callback = true)
     {

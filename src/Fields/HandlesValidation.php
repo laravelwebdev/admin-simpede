@@ -55,9 +55,10 @@ trait HandlesValidation
      * @no-named-arguments
      *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(array|\Stringable|string|callable))|array|\Stringable|string  ...$rules
-     * @return $this
      *
      * @phpstan-param (callable(\Laravel\Nova\Http\Requests\NovaRequest):TValidationRules)|TValidationRules ...$rules
+     *
+     * @return $this
      */
     public function rules($rules)
     {
@@ -113,9 +114,10 @@ trait HandlesValidation
      * @no-named-arguments
      *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(array|\Stringable|string|callable))|array|\Stringable|string  ...$rules
-     * @return $this
      *
      * @phpstan-param (callable(\Laravel\Nova\Http\Requests\NovaRequest):TValidationRules)|TValidationRules ...$rules
+     *
+     * @return $this
      */
     public function creationRules($rules)
     {
@@ -157,9 +159,10 @@ trait HandlesValidation
      * @no-named-arguments
      *
      * @param  (callable(\Laravel\Nova\Http\Requests\NovaRequest):(array|\Stringable|string|callable))|array|\Stringable|string  ...$rules
-     * @return $this
      *
      * @phpstan-param (callable(\Laravel\Nova\Http\Requests\NovaRequest):TValidationRules)|TValidationRules ...$rules
+     *
+     * @return $this
      */
     public function updateRules($rules)
     {

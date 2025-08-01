@@ -170,9 +170,10 @@ class TrendResult implements JsonSerializable
      * Set the metric value formatting.
      *
      * @param  array<string, mixed>|string  $format
-     * @return $this
      *
      * @phpstan-param TNumbroFormat|string  $format
+     *
+     * @return $this
      */
     public function format(array|string $format)
     {

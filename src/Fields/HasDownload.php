@@ -48,9 +48,10 @@ trait HasDownload
      * Specify the callback that should be used to create a download HTTP response.
      *
      * @param  callable(\Laravel\Nova\Http\Requests\NovaRequest, object, ?string, ?string):mixed  $downloadResponseCallback
-     * @return $this
      *
      * @phpstan-param TDownloadResponseCallback $downloadResponseCallback
+     *
+     * @return $this
      */
     public function download(callable $downloadResponseCallback)
     {
