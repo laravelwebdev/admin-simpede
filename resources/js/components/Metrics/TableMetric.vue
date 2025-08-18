@@ -9,7 +9,7 @@
       <div
         v-if="value.length > 0"
         class="overflow-hidden overflow-x-auto relative"
-        :class="card.scrollable ? 'h-[320px] overflow-y-auto' : ''"
+        :class="card.scrollable ? 'h-[330px] overflow-y-auto' : ''"
       >
         <table class="w-full table-default table-fixed">
           <tbody
