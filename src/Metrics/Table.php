@@ -21,6 +21,8 @@ class Table extends Metric
      */
     public $emptyText = 'No Results Found...';
 
+    public $scrollable = false;
+
     /**
      * Set the text to be displayed when the table is empty.
      *
@@ -34,6 +36,18 @@ class Table extends Metric
     }
 
     /**
+     * Set the table's scrollable behavior.
+     *
+     * @param  bool  $scrollable
+     * @return $this
+     */
+    public function scrollable(bool $scrollable = true)
+    {
+        $this->scrollable = $scrollable;
+
+        return $this;
+    }
+    /**
      * Prepare the metric for JSON serialization.
      *
      * @return array<string, mixed>
@@ -43,6 +57,7 @@ class Table extends Metric
     {
         return array_merge(parent::jsonSerialize(), [
             'emptyText' => Nova::__($this->emptyText),
+            'scrollable' => Nova::__($this->scrollable),
         ]);
     }
 }

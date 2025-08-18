@@ -9,6 +9,7 @@
       <div
         v-if="value.length > 0"
         class="overflow-hidden overflow-x-auto relative"
+        :class="card.scrollable ? 'h-[320px] overflow-y-auto' : ''"
       >
         <table class="w-full table-default table-fixed">
           <tbody
@@ -18,6 +19,7 @@
           </tbody>
         </table>
       </div>
+
       <div v-else class="flex flex-col items-center justify-between px-6 gap-2">
         <p class="font-normal text-center py-4">
           {{ card.emptyText }}
@@ -95,3 +97,11 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+/* Scrollbar tipis (aktif hanya jika overflow-y-auto ada, yaitu saat scrollable = true) */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background-color: rgba(100,116,139,.5); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background-color: rgba(100,116,139,.8); }
+::-webkit-scrollbar-track { background: transparent; }
+</style>
