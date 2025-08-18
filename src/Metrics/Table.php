@@ -47,6 +47,7 @@ class Table extends Metric
 
         return $this;
     }
+
     /**
      * Prepare the metric for JSON serialization.
      *
