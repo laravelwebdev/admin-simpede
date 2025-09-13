@@ -47,7 +47,7 @@
     "@vueuse/core": "^10.11.1",
     "@vueuse/integrations": "^10.11.1",
     "autosize": "^4.0.4",
-    "axios": "^1.11.0",
+    "axios": "^1.12.1",
     "caniuse-lite": "^1.0.30001739",
     "chartist": "^1.4.0",
     "chartist-plugin-tooltips-updated": "^1.0.0",
