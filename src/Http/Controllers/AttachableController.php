@@ -16,13 +16,13 @@ class AttachableController extends Controller
     public function __invoke(NovaRequest $request): array
     {
         $field = $request->newResource()
-                    ->availableFieldsOnIndexOrDetail($request)
-                    ->filterForManyToManyRelations()
-                    ->filter(static function ($field) use ($request) {
-                        return $field->resourceName === $request->field && // @phpstan-ignore property.notFound
-                            $field->component === $request->component &&
-                            $field->attribute === $request->viaRelationship;
-                    })->first();
+            ->availableFieldsOnIndexOrDetail($request)
+            ->filterForManyToManyRelations()
+            ->filter(static function ($field) use ($request) {
+                return $field->resourceName === $request->field && // @phpstan-ignore property.notFound
+                    $field->component === $request->component &&
+                    $field->attribute === $request->viaRelationship;
+            })->first();
 
         abort_if(\is_null($field), 404);
 
@@ -94,8 +94,8 @@ class AttachableController extends Controller
                 $relation = $relatedModel->{$field->manyToManyRelationship}();
 
                 return $relation->applyDefaultPivotQuery($query)
-                        ->select($relation->getRelatedPivotKeyName())
-                        ->whereColumn($relation->getQualifiedRelatedKeyName(), $relation->getQualifiedRelatedPivotKeyName());
+                    ->select($relation->getRelatedPivotKeyName())
+                    ->whereColumn($relation->getQualifiedRelatedKeyName(), $relation->getQualifiedRelatedPivotKeyName());
             });
         };
     }
