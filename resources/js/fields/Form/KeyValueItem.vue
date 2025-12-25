@@ -21,8 +21,8 @@
           ref="keyField"
           type="text"
           class="font-mono text-xs resize-none block w-full px-3 py-3 dark:text-gray-400 bg-clip-border"
-          :readonly="!isEditable || readOnlyKeys"
-          :tabindex="!isEditable || readOnlyKeys ? -1 : 0"
+          :readonly="!isFormEditable || readOnlyKeys"
+          :tabindex="!isFormEditable || readOnlyKeys ? -1 : 0"
           style="background-clip: border-box"
           :class="[
             !isEditable || readOnlyKeys
@@ -51,8 +51,8 @@
           ref="valueField"
           type="text"
           class="font-mono text-xs block w-full px-3 py-3 dark:text-gray-400 bg-clip-border"
-          :readonly="!isEditable"
-          :tabindex="!isEditable ? -1 : 0"
+          :readonly="!isFormEditable"
+          :tabindex="!isFormEditable ? -1 : 0"
           :class="[
             !isEditable
               ? `${disabledBackgroundColors} focus:outline-none cursor-normal`
@@ -142,6 +142,10 @@ export default {
 
     isEditable() {
       return !this.readOnly
+    },
+
+    isFormEditable() {
+      return this.isEditable && this.editMode === true
     },
 
     defaultBackgroundColors() {

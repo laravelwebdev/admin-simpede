@@ -68,8 +68,8 @@ class Select extends Field implements FilterableField
             }
 
             return collect($this->serializeOptions(false))
-                ->where('value', $value)
-                ->first()['label'] ?? $value;
+                    ->where('value', $value)
+                    ->first()['label'] ?? $value;
         });
 
         return $this;

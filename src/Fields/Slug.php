@@ -108,7 +108,7 @@ class Slug extends Field implements Previewable
 
         return array_merge([
             'shouldListenToFromChanges' => ! \is_null($from) && ! $request->isUpdateOrUpdateAttachedRequest(),
-            'from' => $from,
+            'slugFrom' => $from,
             'separator' => $this->separator,
             'showCustomizeButton' => $this->showCustomizeButton,
         ], parent::jsonSerialize());

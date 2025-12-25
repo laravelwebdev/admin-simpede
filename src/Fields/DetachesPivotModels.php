@@ -26,11 +26,11 @@ trait DetachesPivotModels
                 $pivotFields = $resource->resolvePivotFields($request, $request->resource);
 
                 $pivotFields->whereInstanceOf(Deletable::class)
-                    ->filter->isPrunable()
-                    ->each(static function ($field) use ($request, $pivot) {
-                        /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Deletable $field */
-                        DeleteField::forRequest($request, $field, $pivot)->save();
-                    });
+                        ->filter->isPrunable()
+                        ->each(static function ($field) use ($request, $pivot) {
+                            /** @var \Laravel\Nova\Fields\Field&\Laravel\Nova\Contracts\Deletable $field */
+                            DeleteField::forRequest($request, $field, $pivot)->save();
+                        });
 
                 $pivot->delete();
             }

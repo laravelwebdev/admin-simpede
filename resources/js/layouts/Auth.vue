@@ -9,7 +9,11 @@
 </template>
 
 <script setup>
+import { useInteractsWithErrors } from '@/composables/useInteractsWithErrors'
+
 defineOptions({
   name: 'Auth',
 })
+
+useInteractsWithErrors()
 </script>

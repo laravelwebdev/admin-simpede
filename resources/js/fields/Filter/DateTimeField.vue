@@ -85,20 +85,17 @@ export default {
       let [startValue, endValue] = this.filter.currentValue || [null, null]
 
       this.startValue = filled(startValue)
-        ? DateTime.fromISO(startValue).toFormat("yyyy-MM-dd'T'HH:mm")
+        ? this.fromDateTime(startValue).toFormat("yyyy-MM-dd'T'HH:mm")
         : null
 
       this.endValue = filled(endValue)
-        ? DateTime.fromISO(endValue).toFormat("yyyy-MM-dd'T'HH:mm")
+        ? this.fromDateTime(endValue).toFormat("yyyy-MM-dd'T'HH:mm")
         : null
     },
 
     validateFilter(startValue, endValue) {
-      startValue = filled(startValue)
-        ? this.toDateTimeISO(startValue, 'start')
-        : null
-
-      endValue = filled(endValue) ? this.toDateTimeISO(endValue, 'end') : null
+      startValue = filled(startValue) ? this.toDateTimeISO(startValue) : null
+      endValue = filled(endValue) ? this.toDateTimeISO(endValue) : null
 
       return [startValue, endValue]
     },
@@ -117,21 +114,27 @@ export default {
       this.setCurrentFilterValue()
     },
 
-    fromDateTimeISO(value) {
+    fromDateTime(value) {
       return DateTime.fromISO(value, {
         setZone: true,
-      })
-        .setZone(this.timezone)
-        .toISO()
+      }).setZone(this.timezone)
     },
 
-    toDateTimeISO(value) {
+    toDateTime(value) {
       let isoDate = DateTime.fromISO(value, {
         zone: this.timezone,
         setZone: true,
       })
 
-      return isoDate.setZone(Nova.config('timezone')).toISO()
+      return isoDate.setZone(Nova.config('timezone'))
+    },
+
+    fromDateTimeISO(value) {
+      return this.fromDateTime(value).toISO()
+    },
+
+    toDateTimeISO(value) {
+      return this.toDateTime(value).toISO()
     },
   },
 

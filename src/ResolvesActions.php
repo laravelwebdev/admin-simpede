@@ -27,7 +27,7 @@ trait ResolvesActions
         }
 
         $actions = $this->resolveActions($request)
-            ->filter->authorizedToSee($request);
+                    ->filter->authorizedToSee($request);
 
         if (model_exists($resource)) {
             return $actions->withAuthorizedToRun($request, $resource)->values();
@@ -54,7 +54,7 @@ trait ResolvesActions
         $resource = $this->resource;
 
         $actions = $this->resolveActions($request)
-            ->authorizedToSeeOnIndex($request);
+                    ->authorizedToSeeOnIndex($request);
 
         if (model_exists($resource)) {
             return $actions->withAuthorizedToRun($request, $resource)
@@ -85,12 +85,12 @@ trait ResolvesActions
     public function availableActionsOnDetail(NovaRequest $request): ActionCollection
     {
         return $this->resolveActions($request)
-            ->authorizedToSeeOnDetail($request)
-            ->withAuthorizedToRun($request, $this->resource)
-            ->each(function ($action) {
-                $action->resource = $this->resource;
-            })
-            ->values();
+                    ->authorizedToSeeOnDetail($request)
+                    ->withAuthorizedToRun($request, $this->resource)
+                    ->each(function ($action) {
+                        $action->resource = $this->resource;
+                    })
+                    ->values();
     }
 
     /**
@@ -101,12 +101,12 @@ trait ResolvesActions
     public function availableActionsOnTableRow(NovaRequest $request): ActionCollection
     {
         return $this->resolveActions($request)
-            ->authorizedToSeeOnTableRow($request)
-            ->withAuthorizedToRun($request, $this->resource)
-            ->each(function ($action) {
-                $action->resource = $this->resource;
-            })
-            ->values();
+                    ->authorizedToSeeOnTableRow($request)
+                    ->withAuthorizedToRun($request, $this->resource)
+                    ->each(function ($action) {
+                        $action->resource = $this->resource;
+                    })
+                    ->values();
     }
 
     /**
@@ -129,8 +129,8 @@ trait ResolvesActions
     public function availablePivotActions(NovaRequest $request): ActionCollection
     {
         return $this->resolvePivotActions($request)
-            ->authorizedToSeeOnIndex($request)
-            ->values();
+                    ->authorizedToSeeOnIndex($request)
+                    ->values();
     }
 
     /**

@@ -24,8 +24,11 @@ class StoppedImpersonating
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $impersonator
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $impersonated
      */
-    public function __construct($impersonator, $impersonated)
-    {
+    public function __construct(
+        $impersonator,
+        $impersonated,
+        public ?string $redirectTo
+    ) {
         $this->impersonator = $impersonator;
         $this->impersonated = $impersonated;
     }

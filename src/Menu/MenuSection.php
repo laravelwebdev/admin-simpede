@@ -82,7 +82,7 @@ class MenuSection implements JsonSerializable
             return static::make(
                 $dashboard->label()
             )->path('/dashboards/'.$dashboard->uriKey())
-                ->canSee(static fn ($request) => $dashboard->authorizedToSee($request));
+            ->canSee(static fn ($request) => $dashboard->authorizedToSee($request));
         });
     }
 
@@ -97,7 +97,7 @@ class MenuSection implements JsonSerializable
         return static::make(
             $resourceClass::label()
         )->path('/resources/'.$resourceClass::uriKey())
-            ->canSee(static fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
+        ->canSee(static fn ($request) => $resourceClass::availableForNavigation($request) && $resourceClass::authorizedToViewAny($request));
     }
 
     /**

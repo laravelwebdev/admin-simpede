@@ -89,8 +89,8 @@ class Util
             "{$appNamespace}Providers\FortifyServiceProvider",
             "{$appNamespace}Providers\JetstreamServiceProvider",
         ])->map(static fn ($provider) => app()->getProvider($provider))
-            ->filter()
-            ->isNotEmpty();
+        ->filter()
+        ->isNotEmpty();
     }
 
     /**
@@ -232,8 +232,8 @@ class Util
             'Prohibits',
             'Same',
         ])->transform(static fn ($rule) => Str::snake($rule))
-            ->mapWithKeys(static fn ($rule) => ["{$rule}:" => "{$rule}:{$attribute}."])
-            ->all();
+        ->mapWithKeys(static fn ($rule) => ["{$rule}:" => "{$rule}:{$attribute}."])
+        ->all();
     }
 
     /**

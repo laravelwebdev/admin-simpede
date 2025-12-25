@@ -124,7 +124,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { uid } from 'uid/single'
 import { mapProps } from '@/mixins'
 import { usePanelVisibility } from '@/composables/usePanelVisibility'
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
@@ -159,6 +160,8 @@ const props = defineProps({
     'viaRelationship',
   ]),
 })
+
+const relationFormUniqueId = ref(uid())
 
 const tabs = computed(() => {
   const tabs = props.panel.fields.reduce((tabs, field) => {

@@ -37,7 +37,7 @@ class Notification extends Model
     /**
      * The guarded attributes on the model.
      *
-     * @var array<string>|bool
+     * @var array<string>
      */
     protected $guarded = [];
 

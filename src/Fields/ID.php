@@ -66,8 +66,8 @@ class ID extends Field
         /** @phpstan-ignore argument.templateType */
         $field = transform(
             $resource->availableFieldsOnIndexOrDetail(app(NovaRequest::class))
-                ->whereInstanceOf(self::class)
-                ->first(),
+                    ->whereInstanceOf(self::class)
+                    ->first(),
             static fn ($field) => tap($field)->resolve($model),
             static fn () => model_exists($model) ? static::forModel($model) : null,
         );

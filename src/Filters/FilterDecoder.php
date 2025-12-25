@@ -14,13 +14,15 @@ class FilterDecoder
 
     /**
      * Create a new FilterDecoder instance.
+     *
+     * @param  iterable<string, mixed>  $availableFilters
      */
     public function __construct(
         protected ?string $filterString,
         ?iterable $availableFilters = null
     ) {
         $this->filterString = $filterString;
-        $this->availableFilters = Collection::make($availableFilters ?? []);
+        $this->availableFilters = new Collection($availableFilters ?? []);
     }
 
     /**
@@ -34,7 +36,7 @@ class FilterDecoder
             return new Collection;
         }
 
-        return Collection::make($filters)->map(function ($filter) {
+        return (new Collection($filters))->map(function ($filter) {
             $class = key($filter);
             $value = $filter[$class];
 

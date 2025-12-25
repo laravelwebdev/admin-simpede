@@ -45,7 +45,6 @@ import {
   HandlesValidationErrors,
 } from '@/mixins'
 import debounce from 'lodash/debounce'
-import get from 'lodash/get'
 import isNil from 'lodash/isNil'
 
 export default {
@@ -126,7 +125,7 @@ export default {
         return
       }
 
-      if (isNil(this.field.from)) {
+      if (isNil(this.slugFromAttribute)) {
         this.debouncedHandleChange(value)
       }
     },
@@ -136,7 +135,7 @@ export default {
     },
 
     toggleCustomizeClick() {
-      if (this.field.extraAttributes.readonly === true) {
+      if (this.field.extraAttributes?.readonly === true) {
         this.allowCustomisingValue()
         this.$refs.theInput.focus()
         return
@@ -147,16 +146,20 @@ export default {
   },
 
   computed: {
+    slugFromAttribute() {
+      return this.field.slugFrom
+    },
+
     shouldRegisterInitialListener() {
       return this.field.shouldListenToFromChanges
     },
 
     eventName() {
-      return this.getFieldAttributeChangeEventName(this.field.from)
+      return this.getFieldAttributeChangeEventName(this.slugFromAttribute)
     },
 
     placeholder() {
-      if (isNil(this.field.from)) {
+      if (isNil(this.slugFromAttribute)) {
         return this.field.placeholder ?? this.field.name
       }
 

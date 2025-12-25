@@ -78,13 +78,19 @@ class Stack extends Field
         $request = app(NovaRequest::class);
 
         $this->lines = $this->lines->filter(static function ($field) use ($request, $resource) {
+            if (! $field->authorizedToSee($request)) {
+                return false;
+            }
+
             /** @var \Laravel\Nova\Fields\Field $field */
             if ($request->isResourceIndexRequest()) {
                 return $field->isShownOnIndex($request, $resource);
             }
 
             return $field->isShownOnDetail($request, $resource);
-        })->values()->each->resolveForDisplay($resource, $attribute);
+        })
+            ->values()
+            ->each->resolveForDisplay($resource, $attribute);
     }
 
     /**

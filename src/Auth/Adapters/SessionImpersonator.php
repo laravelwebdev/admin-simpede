@@ -16,6 +16,11 @@ use Laravel\Nova\Util;
 class SessionImpersonator implements ImpersonatesUsers
 {
     /**
+     * Default redirection after stopping impersonation.
+     */
+    public ?string $redirectToAfterStopping = null;
+
+    /**
      * Start impersonating a user.
      *
      * @return bool
@@ -25,12 +30,12 @@ class SessionImpersonator implements ImpersonatesUsers
         return rescue(function () use ($request, $guard, $user) {
             $impersonator = Nova::user($request);
 
-            $request->session()->put(
-                'nova_impersonated_by', $impersonator->getAuthIdentifier()
-            );
-            $request->session()->put(
-                'nova_impersonated_remember', $guard->viaRemember()
-            );
+            /** @var string|null $referer */
+            $referer = $request->hasHeader('referer') ? $request->header('referer') : null;
+
+            $request->session()->put('nova_impersonated_by', $impersonator->getAuthIdentifier());
+            $request->session()->put('nova_impersonated_remember', $guard->viaRemember());
+            $request->session()->put('nova_impersonated_from', $this->redirectToAfterStopping = $referer);
 
             $novaGuard = Util::userGuard();
 
@@ -52,7 +57,9 @@ class SessionImpersonator implements ImpersonatesUsers
 
             $guard->login($user);
 
-            event(new StartedImpersonating($impersonator, $user));
+            event(new StartedImpersonating(
+                $impersonator, $user, $this->redirectUrlAfterStartingImpersonation()
+            ));
 
             return true;
         }, false);
@@ -73,13 +80,19 @@ class SessionImpersonator implements ImpersonatesUsers
             $user = $request->user($userGuard = $request->session()->get('nova_impersonated_guard'));
             $impersonator = $userModel::findOrFail($request->session()->get('nova_impersonated_by', null));
 
+            $this->redirectToAfterStopping = $request->session()->has('nova_impersonated_from')
+                ? $request->session()->get('nova_impersonated_from')
+                : null;
+
             if ($request->session()->has('nova_impersonated_guard')) {
                 Auth::guard($userGuard)->logout();
             }
 
             $guard->login($impersonator, $request->session()->get('nova_impersonated_remember') ?? false);
 
-            event(new StoppedImpersonating($impersonator, $user));
+            event(new StoppedImpersonating(
+                $impersonator, $user, $this->redirectToAfterStopping ?? $this->redirectUrlAfterStoppingImpersonation()
+            ));
 
             $this->flushImpersonationData($request);
 
@@ -108,6 +121,7 @@ class SessionImpersonator implements ImpersonatesUsers
             $request->session()->forget('nova_impersonated_by');
             $request->session()->forget('nova_impersonated_guard');
             $request->session()->forget('nova_impersonated_remember');
+            $request->session()->forget('nova_impersonated_from');
         }
     }
 
@@ -119,7 +133,7 @@ class SessionImpersonator implements ImpersonatesUsers
     public function redirectAfterStartingImpersonation(Request $request)
     {
         return response()->json([
-            'redirect' => config('nova.impersonation.started', '/'),
+            'redirect' => $this->redirectUrlAfterStartingImpersonation() ?? '/',
         ]);
     }
 
@@ -131,7 +145,23 @@ class SessionImpersonator implements ImpersonatesUsers
     public function redirectAfterStoppingImpersonation(Request $request)
     {
         return response()->json([
-            'redirect' => config('nova.impersonation.stopped', Nova::url('/')),
+            'redirect' => $this->redirectUrlAfterStoppingImpersonation() ?? $this->redirectToAfterStopping ?? Nova::url('/'),
         ]);
+    }
+
+    /**
+     * Resolve the redirection URL after starting impersonation.
+     */
+    protected function redirectUrlAfterStartingImpersonation(): ?string
+    {
+        return config('nova.impersonation.started');
+    }
+
+    /**
+     * Resolve the redirection URL after stopping impersonation.
+     */
+    protected function redirectUrlAfterStoppingImpersonation(): ?string
+    {
+        return config('nova.impersonation.stopped');
     }
 }

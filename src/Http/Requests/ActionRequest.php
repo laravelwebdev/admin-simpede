@@ -155,10 +155,11 @@ class ActionRequest extends NovaRequest
      * Map the chunk of models into an appropriate state.
      *
      * @param  \Illuminate\Support\LazyCollection|\Illuminate\Database\Eloquent\Collection  $chunk
+     * @return \Laravel\Nova\Actions\ActionModelCollection<array-key, \Illuminate\Database\Eloquent\Model>
      */
     protected function mapChunk($chunk): ActionModelCollection
     {
-        return ActionModelCollection::make(
+        return new ActionModelCollection(
             $this->isPivotAction()
                 ? $chunk->map->{$this->pivotRelation()->getPivotAccessor()}
                 : $chunk
@@ -193,7 +194,7 @@ class ActionRequest extends NovaRequest
         return once(function () {
             $fields = new Fluent;
 
-            $results = FieldCollection::make($this->action()->fields($this))
+            $results = (new FieldCollection($this->action()->fields($this)))
                 ->authorized($this)
                 ->applyDependsOn($this)
                 ->withoutReadonly($this)

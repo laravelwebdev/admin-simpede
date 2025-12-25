@@ -58,13 +58,13 @@ class NovaCoreServiceProvider extends ServiceProvider
             DispatchServingNovaEvent::class,
             BootTools::class,
         ]);
-        MiddlewareCollection::make($middlewares = config('nova.middleware', []))->asMiddlewareGroup('nova');
-        MiddlewareCollection::make(config('nova.api_middleware', []))->asMiddlewareGroup('nova:api');
-        MiddlewareCollection::make(config('nova.asset_middleware', [
+        (new MiddlewareCollection($middlewares = config('nova.middleware', [])))->asMiddlewareGroup('nova');
+        (new MiddlewareCollection(config('nova.api_middleware', [])))->asMiddlewareGroup('nova:api');
+        (new MiddlewareCollection(config('nova.asset_middleware', [
             'nova:api',
             CheckResponseForModifications::class,
-        ]))->asMiddlewareGroup('nova:asset');
-        MiddlewareCollection::make($middlewares)->appendsRedirectIfAuthenticatedMiddleware()->asMiddlewareGroup('nova:auth');
+        ])))->asMiddlewareGroup('nova:asset');
+        (new MiddlewareCollection($middlewares))->appendsRedirectIfAuthenticatedMiddleware()->asMiddlewareGroup('nova:auth');
 
         $this->app->make(HttpKernel::class)
             ->pushMiddleware(ServeNova::class);

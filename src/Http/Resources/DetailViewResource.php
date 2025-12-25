@@ -49,9 +49,12 @@ class DetailViewResource extends Resource
             return $detail;
         });
 
+        /** @var \Laravel\Nova\Fields\FieldCollection<int, \Laravel\Nova\Fields\Field> $fields */
+        $fields = new FieldCollection($payload['fields']);
+
         return [
             'title' => (string) $resource->title(),
-            'panels' => $resource->availablePanelsForDetail($request, $resource, FieldCollection::make($payload['fields'])),
+            'panels' => $resource->availablePanelsForDetail($request, $resource, $fields),
             'resource' => $payload,
         ];
     }

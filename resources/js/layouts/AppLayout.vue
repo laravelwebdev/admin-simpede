@@ -25,8 +25,8 @@
 </template>
 
 <script setup>
-import { useLocalization } from '@/composables/useLocalization'
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { useInteractsWithErrors } from '@/composables/useInteractsWithErrors'
+import { computed } from 'vue'
 import MainHeader from '@/layouts/MainHeader'
 import Footer from '@/layouts/Footer'
 
@@ -34,36 +34,7 @@ defineOptions({
   name: 'AppLayout',
 })
 
-const { __ } = useLocalization()
-
-const handleError = message => {
-  Nova.error(message)
-}
-
-const handleTokenExpired = () => {
-  Nova.$toasted.show(__('Sorry, your session has expired.'), {
-    action: {
-      onClick: () => Nova.redirectToLogin(),
-      text: __('Reload'),
-    },
-    duration: null,
-    type: 'error',
-  })
-
-  setTimeout(() => {
-    Nova.redirectToLogin()
-  }, 5000)
-}
+useInteractsWithErrors()
 
 const breadcrumbsEnabled = computed(() => Nova.config('breadcrumbsEnabled'))
-
-onMounted(() => {
-  Nova.$on('error', handleError)
-  Nova.$on('token-expired', handleTokenExpired)
-})
-
-onBeforeUnmount(() => {
-  Nova.$off('error', handleError)
-  Nova.$off('token-expired', handleTokenExpired)
-})
 </script>

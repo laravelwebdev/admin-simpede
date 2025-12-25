@@ -56,6 +56,8 @@ class ImpersonateController extends Controller
      */
     public function stopImpersonating(NovaRequest $request, ImpersonatesUsers $impersonator): JsonResponse
     {
+        $redirectTo = $request->session()->has('nova_impersonated_from') ? $request->session()->get('nova_impersonated_from') : null;
+
         $impersonator->stopImpersonating(
             $request,
             Auth::guard(config('nova.guard', config('auth.defaults.guard'))),
